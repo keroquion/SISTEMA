@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Sticker - Petulap SST</title>
+  
+  <link rel="stylesheet" href="css/styles.css?v=3">
+  <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+  
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#F8FAFC">
+  
+  <script>
+    if ("serviceWorker" in navigator) { 
+      window.addEventListener("load", () => { 
+        navigator.serviceWorker.register("sw.js").then(r => console.log("SW ok")).catch(e => console.log("SW fail", e)); 
+      }); 
+    }
+  </script>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Dashboard Styles (solo para fuentes y variables) -->
+  <link rel="stylesheet" href="css/dashboard.css?v=3">
+  
+  <style>
+    body {
+        font-family: 'Inter', sans-serif;
+        background-color: white;
+        margin: 0;
+        padding: 10px;
+        display: block; /* Sobrescribir el display flex del dashboard */
+        text-align: center;
+    }
+    .title {
+        font-size: 14px;
+        font-weight: 700;
+        margin-bottom: 5px;
+    }
+    .footer {
+        font-size: 11px;
+        color: #333;
+        margin-top: 5px;
+    }
+    @media print {
+        .no-print { display: none; }
+        body { margin: 0; padding: 0; }
+    }
+  </style>
+
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="apple-touch-icon" href="icon.jpg">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+</head>
+<body>
+
+  <div class="title" id="lbl-ticket">PETULAP - ST-2026-000</div>
+  <svg id="barcode"></svg>
+  <div class="footer" id="lbl-cliente">Cliente: Cargando...</div>
+
+  <div class="no-print" style="margin-top:20px; font-size:12px; color:#666;">
+    Si la impresion no sale automatica, presiona Ctrl+P
+  </div>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const numero = urlParams.get('numero'); // Ej: ST-2026-001
+    const cliente = urlParams.get('cliente') || 'Sin Nombre';
+    
+    if (numero) {
+      document.getElementById('lbl-ticket').textContent = 'PETULAP - ' + numero;
+      document.getElementById('lbl-cliente').textContent = 'Cli: ' + cliente.substring(0, 20); // truncar a 20 chars
+      
+      JsBarcode("#barcode", numero, {
+        format: "CODE128",
+        lineColor: "#000",
+        width: 1.5,
+        height: 30,
+        displayValue: true,
+        fontSize: 10,
+        margin: 0
+      });
+      
+      // Intentar auto-imprimir
+      setTimeout(() => {
+        window.print();
+        // Opcional: Cerrar la ventana tras imprimir (si fue abierta desde otra)
+        // setTimeout(() => window.close(), 500); 
+      }, 500);
+    } else {
+      document.body.innerHTML = "<p>Error: Faltan parametros (numero de ticket).</p>";
+    }
+  </script>
+
+</body>
+</html>

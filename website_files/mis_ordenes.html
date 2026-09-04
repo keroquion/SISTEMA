@@ -1,0 +1,1159 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Panel Kanban - Petulap SST</title>
+
+<link rel="stylesheet" href="css/tokens.css?v=1">
+    <link rel="stylesheet" href="css/styles.css?v=3">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0f172a">
+
+<script>
+if ("serviceWorker" in navigator) { window.addEventListener("load", () => { navigator.serviceWorker.register("sw.js").then(r => console.log("SW ok")).catch(e => console.log("SW fail", e)); }); }
+</script>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <!-- Dashboard Styles -->
+    <link rel="stylesheet" href="css/dashboard.css?v=3">
+
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="apple-touch-icon" href="icon.jpg">
+
+    <script>
+      (function(){
+        if(localStorage.getItem('petulap-theme') === 'dark') {
+          document.documentElement.setAttribute('data-theme', 'dark');
+        }
+      })();
+    </script>
+</head>
+<body class="dashboard-body">
+
+    <!-- MOBILE HEADER -->
+    <header class="mobile-header">
+        <button class="menu-toggle" id="mobile-menu-toggle">
+            <i class="ph ph-list"></i>
+        </button>
+        <div class="logo-container">
+            <div class="logo-icon">P</div>
+            <span>PETULAP S.A.C.</span>
+        </div>
+        
+                <button class="theme-toggle-btn" aria-label="Cambiar tema" onclick="toggleTheme()" style="background: none; border: none; font-size: 20px; cursor: pointer; color: var(--text-secondary); margin-right: 15px; display: flex; align-items: center;">
+                    <i class="ph ph-moon"></i>
+                </button>
+                <button class="notification-btn">
+            <i class="ph ph-bell"></i>
+        </button>
+    </header>
+
+    <!-- MOBILE SIDEBAR (ACCORDION) -->
+    <div class="mobile-sidebar" id="mobile-sidebar">
+        <div class="accordion-item active">
+            <div class="accordion-header">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <i class="ph ph-headset"></i>
+                    SOPORTE Y TALLER
+                </div>
+                <i class="ph ph-caret-down"></i>
+            </div>
+            <div class="accordion-content">
+                <a href="soporte.html" class="accordion-link">
+                    <i class="ph-fill ph-ticket acc-icon-green"></i>
+                    Tickets
+                </a>
+                <a href="mis_ordenes.html" class="accordion-link">
+                    <i class="ph-fill ph-kanban acc-icon-orange"></i>
+                    Kanban
+                </a>
+                <a href="tecnicos.html" class="accordion-link">
+                    <i class="ph-fill ph-users acc-icon-blue"></i>
+                    Tecnicos
+                </a>
+                <a href="recepcion_movil.html" class="accordion-link">
+                    <i class="ph-fill ph-device-mobile acc-icon-gray"></i>
+                    App Recepcion
+                </a>
+                <a href="garantias.html" class="accordion-link">
+                    <i class="ph-fill ph-shield-check acc-icon-blue"></i>
+                    Garantias
+                </a>
+            </div>
+        </div>
+
+        <div class="accordion-item">
+            <div class="accordion-header">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <i class="ph ph-package"></i>
+                    INVENTARIO Y OPERACIONES
+                </div>
+                <i class="ph ph-caret-down"></i>
+            </div>
+            <div class="accordion-content">
+                <a href="inventario.html" class="accordion-link">
+                    <i class="ph-fill ph-archive-box acc-icon-orange"></i>
+                    Inventario General
+                </a>
+                <a href="inventario_soporte.html" class="accordion-link">
+                    <i class="ph-fill ph-scan acc-icon-green"></i>
+                    Escaneo / Triaje Masivo
+                </a>
+                <a href="importar.html" class="accordion-link">
+                    <i class="ph-fill ph-download-simple acc-icon-blue"></i>
+                    Importar Excel
+                </a>
+                <a href="caja.html" class="accordion-link">
+                    <i class="ph-fill ph-money acc-icon-green"></i>
+                    Caja / Entregas
+                </a>
+            </div>
+        </div>
+
+        <div class="accordion-item danger-border">
+            <div class="accordion-header">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <i class="ph ph-wrench"></i>
+                    GERENCIA Y CLIENTES
+                </div>
+                <i class="ph ph-caret-down"></i>
+            </div>
+            <div class="accordion-content">
+                <a href="lotes.html" class="accordion-link">
+                    <i class="ph-fill ph-stack acc-icon-blue"></i>
+                    Lotes Masivos
+                </a>
+                <a href="clientes.html" class="accordion-link">
+                    <i class="ph-fill ph-user-list acc-icon-green"></i>
+                    Actividades y Clientes
+                </a>
+            </div>
+        </div>
+
+        <div class="accordion-item">
+            <div class="accordion-header">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <i class="ph ph-chart-line-up"></i>
+                    ADMINISTRACION Y OTROS
+                </div>
+                <i class="ph ph-caret-down"></i>
+            </div>
+            <div class="accordion-content">
+                <a href="reportes.html" class="accordion-link">
+                    <i class="ph-fill ph-chart-bar acc-icon-blue"></i>
+                    Lotes y Equipos (Reportes)
+                </a>
+                <a href="turnos.html" class="accordion-link">
+                    <i class="ph-fill ph-clock acc-icon-orange"></i>
+                    Asignacion Turnos
+                </a>
+                <a href="admin_roles.html" class="accordion-link">
+                    <i class="ph-fill ph-crown acc-icon-blue"></i>
+                    Roles y Permisos
+                </a>
+                <a href="manual.html" class="accordion-link">
+                    <i class="ph-fill ph-book-open acc-icon-gray"></i>
+                    Manual de Usuario
+                </a>
+            </div>
+        </div>
+        <div class="accordion-item danger-border">
+            <div class="accordion-header">
+                <div style="display: flex; align-items: center; gap: 10px; color: var(--danger);">
+                    <i class="ph ph-power"></i>
+                    SISTEMA
+                </div>
+                <i class="ph ph-caret-down"></i>
+            </div>
+            <div class="accordion-content">
+                <a href="#" class="accordion-link" onclick="clearCache(event)">
+                    <i class="ph-fill ph-trash acc-icon-orange"></i>
+                    Eliminar Cache
+                </a>
+                <a href="#" class="accordion-link" onclick="logout(event)">
+                    <i class="ph-fill ph-sign-out acc-icon-gray"></i>
+                    Cerrar Sesion
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- MOBILE BOTTOM NAV -->
+    <nav class="mobile-nav">
+        <a href="index.html" class="nav-item">
+            <i class="ph ph-house"></i>
+            <span>Dashboard</span>
+        </a>
+        <a href="consulta.html" class="nav-item">
+            <i class="ph ph-magnifying-glass"></i>
+            <span>Buscar</span>
+        </a>
+        <a href="login.html" class="nav-item">
+            <i class="ph ph-user"></i>
+            <span>Mi Cuenta</span>
+        </a>
+    </nav>
+
+    <!-- DESKTOP SIDEBAR -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <button class="menu-toggle">
+                <i class="ph ph-list"></i>
+            </button>
+            <div class="logo-container">
+                <div class="logo-icon">P</div>
+                <span>PETULAP S.A.C.</span>
+            </div>
+        </div>
+
+        <div style="padding: 0px 15px 5px 15px;">
+            <div style="width: 100%; padding: 4px 8px; background: rgba(255,255,255,0.1); border-radius: 6px; display: flex; align-items: center;">
+                <i class="ph ph-magnifying-glass" style="color: #cbd5e1; font-size: 14px;"></i>
+                <input type="text" placeholder="Buscar..." style="color: white; font-size: 12px; width: 100%; margin-left: 6px; background: transparent; border: none; outline: none; padding: 2px 0;">
+            </div>
+        </div>
+
+        <div class="sidebar-menu">
+            <a href="index.html" class="menu-item">
+                <div class="menu-item-left">
+                    <i class="ph ph-house"></i>
+                    <span>Panel de Control</span>
+                </div>
+            </a>
+
+            <div class="menu-section">
+                <span class="menu-title">Soporte y Taller</span>
+                <a href="soporte.html" class="menu-item">
+                    <div class="menu-item-left">
+                        <i class="ph ph-ticket"></i>
+                        <span>Tickets de Soporte</span>
+                    </div>
+                    <div class="status-dot dot-green"></div>
+                </a>
+                <a href="mis_ordenes.html" class="menu-item">
+                    <div class="menu-item-left">
+                        <i class="ph ph-kanban"></i>
+                        <span>Panel Kanban</span>
+                    </div>
+                    <div class="status-dot dot-yellow"></div>
+                </a>
+                <a href="tecnicos.html" class="menu-item">
+                    <div class="menu-item-left">
+                        <i class="ph ph-users"></i>
+                        <span>Tecnicos</span>
+                    </div>
+                    <div class="status-dot dot-yellow"></div>
+                </a>
+                <a href="recepcion_movil.html" class="menu-item">
+                    <div class="menu-item-left">
+                        <i class="ph ph-device-mobile"></i>
+                        <span>App Recepcion</span>
+                    </div>
+                    <div class="status-dot dot-gray"></div>
+                </a>
+            </div>
+
+            <div class="menu-section">
+                <span class="menu-title">Inventario y Operaciones</span>
+                <a href="inventario.html" class="menu-item">
+                    <div class="menu-item-left">
+                        <i class="ph ph-archive-box"></i>
+                        <span>Inventario General</span>
+                    </div>
+                    <div class="status-dot dot-red"></div>
+                </a>
+                <a href="inventario_soporte.html" class="menu-item">
+                    <div class="menu-item-left">
+                        <i class="ph ph-scan"></i>
+                        <span>Escaneo / Triaje</span>
+                    </div>
+                    <div class="status-dot dot-green"></div>
+                </a>
+                <a href="caja.html" class="menu-item">
+                    <div class="menu-item-left">
+                        <i class="ph ph-money"></i>
+                        <span>Caja / Entregas</span>
+                    </div>
+                    <div class="status-dot dot-blue"></div>
+                </a>
+            </div>
+            
+            <div class="menu-section">
+                <span class="menu-title">Gerencia y Utilidades</span>
+                <a href="reportes.html" class="menu-item">
+                    <div class="menu-item-left">
+                        <i class="ph ph-chart-bar"></i>
+                        <span>Reportes</span>
+                    </div>
+                    <div class="status-dot dot-blue"></div>
+                </a>
+                <a href="lotes.html" class="menu-item">
+                    <div class="menu-item-left">
+                        <i class="ph ph-stack"></i>
+                        <span>Lotes Masivos</span>
+                    </div>
+                    <div class="status-dot dot-blue"></div>
+                </a>
+                <a href="admin_roles.html" class="menu-item">
+                    <div class="menu-item-left">
+                        <i class="ph ph-crown"></i>
+                        <span>Roles y Permisos</span>
+                    </div>
+                    <div class="status-dot dot-yellow"></div>
+                </a>
+            </div>
+            <div class="menu-section">
+                <div class="menu-title" style="color: var(--danger)">SISTEMA</div>
+                <a href="#" class="menu-item" onclick="clearCache(event)">
+                    <div class="menu-item-left">
+                        <i class="ph ph-trash"></i>
+                        <span>Eliminar Cache</span>
+                    </div>
+                </a>
+                <a href="#" class="menu-item" onclick="logout(event)">
+                    <div class="menu-item-left">
+                        <i class="ph ph-sign-out"></i>
+                        <span>Cerrar Sesion</span>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <div class="sidebar-footer">
+            <button class="btn-minimize">
+                <i class="ph ph-arrow-left"></i>
+                <span>Minimizar</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- MAIN WRAPPER -->
+    <main class="main-wrapper">
+        
+        <!-- DESKTOP TOPBAR -->
+        <header class="topbar" style="display: none !important;">
+            <div class="search-bar">
+                <i class="ph ph-magnifying-glass"></i>
+                <input type="text" placeholder="Buscar en el sistema...">
+            </div>
+            
+            <div class="topbar-right">
+                <button class="notification-btn">
+                    <i class="ph ph-bell"></i>
+                    <span class="badge-counter">3</span>
+                </button>
+                <a href="login.html" class="user-profile">
+                    <img src="https://ui-avatars.com/api/?name=User+Profile&background=0D8ABC&color=fff" alt="User Profile">
+                </a>
+            </div>
+        </header>
+
+        <!-- DASHBOARD CONTENT -->
+        <div class="content" style="padding: 5px 15px 15px 15px !important;">
+
+
+
+<style>
+  @media (max-width: 768px) {
+    .content { padding: 15px 5px !important; }
+  }
+</style>
+
+<div class="container" style="max-width: 100%; width: 100%; padding: 0; display: flex !important; flex-direction: column !important; flex: 1 !important; min-height: 0 !important;">
+  
+  <!-- KANBAN BOARD -->
+  <div id="panel-principal" style="display: flex !important; flex-direction: column !important; flex: 1 !important; min-height: 0 !important;">
+    
+    <!-- ACCIONES KANBAN -->
+    <div style="display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:space-between; margin-bottom: 8px; background: white; padding: 6px 12px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.02);">
+      
+      <div class="tabs" style="display: flex; gap: 6px; background: #e2e8f0; padding: 4px; border-radius: 8px; border: 1px solid #cbd5e1;">
+        <button id="tab-clientes" class="tab-btn active" onclick="cambiarTab('clientes')" style="padding: 5px 12px; border-radius: 6px; font-weight: 700; transition: 0.3s; border: none; font-size: 13px;"><i class="ph-fill ph-users"></i> Clientes</button>
+        <button id="tab-internos" class="tab-btn inactive" onclick="cambiarTab('internos')" style="padding: 5px 12px; border-radius: 6px; font-weight: 700; transition: 0.3s; border: none; font-size: 13px;"><i class="ph-fill ph-buildings"></i> Internos</button>
+      </div>
+
+      <div class="kanban-action-btns" style="display:flex; gap:8px; flex-wrap: wrap;">
+        <button class="btn-primary" style="padding:6px 12px; font-weight: 700; border-radius: 6px; background: #0f172a; border: none; box-shadow: 0 2px 5px rgba(15,23,42,0.2); display: flex; align-items: center; justify-content: center; gap: 4px; font-size: 13px;" onclick="window.location.href='historial_entregados.html'"><i class="ph-bold ph-books"></i> Historial</button>
+        <button class="btn-primary" id="btn-asignar-rep" style="display:none; padding:6px 12px; font-weight: 700; border-radius: 6px; background: linear-gradient(135deg, #f59e0b, #d97706); border: none; box-shadow: 0 2px 5px rgba(217,119,6,0.2); display: flex; align-items: center; justify-content: center; gap: 4px; font-size: 13px;" onclick="abrirModalAsignar()"><i class="ph-bold ph-crosshair"></i> Lote/Interno</button>
+        <button class="btn-primary" id="btn-crear-tarea" style="display:none; padding:6px 12px; font-weight: 700; border-radius: 6px; background: linear-gradient(135deg, #8b5cf6, #6d28d9); border: none; box-shadow: 0 2px 5px rgba(109,40,217,0.2); display: flex; align-items: center; justify-content: center; gap: 4px; font-size: 13px;" onclick="if(typeof abrirModalTareaGlobal === 'function') abrirModalTareaGlobal();"><i class="ph-bold ph-plus"></i> Crear Tarea</button>
+      </div>
+    </div>
+    
+    <div id="kanban-board">
+      <div class="k-col pend" id="kcol-pend">
+        <div class="k-header" onclick="toggleExpand('kcol-pend')" style="cursor: pointer;" title="Clic para expandir/contraer"><div style="display:flex; align-items:center; gap:5px;"><i class="ph ph-clipboard"></i> PENDIENTES (<span id="c-pend">0</span>)</div><i class="ph-bold ph-arrows-out expand-icon"></i></div>
+        <div class="k-body" id="col-pend"></div>
+      </div>
+      <div class="k-col diag" id="kcol-diag">
+        <div class="k-header" onclick="toggleExpand('kcol-diag')" style="cursor: pointer;" title="Clic para expandir/contraer"><div style="display:flex; align-items:center; gap:5px;"><i class="ph ph-magnifying-glass"></i> EN REVISION / REP. (<span id="c-diag">0</span>)</div><i class="ph-bold ph-arrows-out expand-icon"></i></div>
+        <div class="k-body" id="col-diag"></div>
+      </div>
+      <div class="k-col rep" id="kcol-rep">
+        <div class="k-header" onclick="toggleExpand('kcol-rep')" style="cursor: pointer;" title="Clic para expandir/contraer"><div style="display:flex; align-items:center; gap:5px;"><i class="ph ph-package"></i> ESPERANDO REPUESTO (<span id="c-rep">0</span>)</div><i class="ph-bold ph-arrows-out expand-icon"></i></div>
+        <div class="k-body" id="col-rep"></div>
+      </div>
+      <div class="k-col listo" id="kcol-listo">
+        <div class="k-header" onclick="toggleExpand('kcol-listo')" style="cursor: pointer;" title="Clic para expandir/contraer"><div style="display:flex; align-items:center; gap:5px;"><i class="ph ph-check-circle"></i> LISTOS / ENTREGADOS (<span id="c-listo">0</span>)</div><i class="ph-bold ph-arrows-out expand-icon"></i></div>
+        <div class="k-body" id="col-listo"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- MODAL ACCIONES TECNICO -->
+<div class="modal-overlay" id="modal" style="display:none;">
+  <div class="card" style="width:90%; max-width:400px">
+    <h2 id="m-titulo"></h2>
+    <p id="m-subtitulo">Este mensaje sera visible para el cliente cuando consulte su ticket en la web.</p>
+    
+    <div class="form-group">
+      <label id="lbl-input" class="form-label"></label>
+      <select id="m-repuesto" class="form-control" style="display:none; margin-bottom:10px"></select>
+      <textarea id="m-texto" class="form-control" rows="4" placeholder="Escribe aqui..."></textarea>
+    </div>
+    
+    <div style="display:flex; gap:10px">
+      <button class="btn btn-outline" onclick="cerrarModal()">Cancelar</button>
+      <button class="btn btn-primary" id="btn-guardar-modal">Guardar Estado</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL ADMIN: REASIGNAR Y ESTADO -->
+<div class="modal-overlay" id="modal-admin" style="display:none; z-index: 9999;">
+  <div class="card" style="width:90%; max-width:400px; max-height: 90vh; overflow-y: auto;">
+    <div style="display:flex; flex-wrap: wrap; gap: 10px; justify-content:space-between; align-items:center; margin-bottom:15px;">
+        <h2 style="margin:0;"><i class="ph-fill ph-crown"></i> Administrar</h2>
+        <div>
+            <button class="btn-secondary" style="padding: 5px; color: #3b82f6;" onclick="verHistorial(ticketActual)" title="Ver Historial"><i class="ph-bold ph-clock-counter-clockwise"></i></button>
+            <button class="btn-secondary" style="padding: 5px; color: #ef4444;" onclick="eliminarTicket(ticketActual)" title="Eliminar"><i class="ph-bold ph-trash"></i></button>
+        </div>
+    </div>
+    
+    <div class="form-group">
+      <label class="form-label">Motivo / Titulo</label>
+      <textarea id="admin-motivo" class="form-control" rows="2"></textarea>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Prioridad</label>
+      <select id="admin-prioridad" class="form-control">
+        <option value="SIN PRIORIDAD">SIN PRIORIDAD</option>
+        <option value="NORMAL">NORMAL</option>
+        <option value="URGENTE">URGENTE</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Estado Actual</label>
+      <select id="admin-estado" class="form-control">
+        <option value="PENDIENTE">PENDIENTE</option>
+        <option value="EN_DIAGNOSTICO">EN_DIAGNOSTICO</option>
+        <option value="EN_REPARACION">EN_REPARACION</option>
+        <option value="ESPERANDO_REPUESTO">ESPERANDO_REPUESTO</option>
+        <option value="LISTO_PARA_RECOGER">LISTO_PARA_RECOGER</option>
+        <option value="ENTREGADO">ENTREGADO</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Asignado a Tecnico</label>
+      <select id="admin-tecnico" class="form-control"></select>
+    </div>
+    
+    <div style="display:flex; gap:10px; margin-top: 20px;">
+      <button class="btn btn-outline" onclick="document.getElementById('modal-admin').style.display='none'">Cancelar</button>
+      <button class="btn btn-primary" onclick="guardarAdmin()"><i class="ph-bold ph-floppy-disk"></i> Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL HISTORIAL -->
+<div class="modal-overlay" id="modal-historial" style="display:none; z-index: 10000;">
+  <div class="card" style="width:90%; max-width:600px; max-height: 90vh; display: flex; flex-direction: column;">
+    <div style="display:flex; flex-wrap: wrap; gap: 10px; justify-content:space-between; align-items:center; margin-bottom:15px;">
+        <h2 style="margin:0;"><i class="ph-bold ph-clock-counter-clockwise"></i> Historial de Cambios</h2>
+        <button class="btn-secondary" style="padding: 5px;" onclick="document.getElementById('modal-historial').style.display='none'"><i class="ph-bold ph-x"></i></button>
+    </div>
+    <div id="historial-content" style="flex: 1; overflow-y: auto; font-size: 13px;">
+        Cargando...
+    </div>
+  </div>
+</div>
+
+<!-- MODAL WHATSAPP -->
+<div class="modal-overlay" id="modal-wp" style="display:none;">
+  <div class="card" style="width:90%; max-width:400px">
+    <h2 ><i class="ph-fill ph-whatsapp-logo"></i> WhatsApp y Entregar</h2>
+    <p >Edita el mensaje si lo deseas. Al enviar, el ticket se marcara automaticamente como ENTREGADO.</p>
+    
+    <textarea id="wp-texto" class="form-control" rows="8" style="margin-bottom:15px"></textarea>
+    <input type="hidden" id="wp-ticket-id">
+    <input type="hidden" id="wp-tel">
+    
+    <div style="display:flex; gap:10px">
+      <button class="btn btn-outline" onclick="document.getElementById('modal-wp').style.display='none'">Cancelar</button>
+      <button class="btn btn-primary"  onclick="enviarWhatsApp()"><i class="ph-bold ph-paper-plane-right"></i> Enviar y Archivar</button>
+    </div>
+  </div>
+</div>
+
+<!-- (Rest of Modals: Tarea Interna, Asignar Lote) -->
+<div class="modal-overlay" id="modal-tarea" style="display:none;">
+  <div class="card" style="width:90%; max-width:400px">
+    <h2><i class="ph ph-plus"></i> Tarea Interna</h2>
+    <div class="form-group"><label class="form-label">Titulo</label><input type="text" id="t-titulo" class="form-control"></div>
+    <div class="form-group"><label class="form-label">Descripcion</label><textarea id="t-desc" class="form-control" rows="3"></textarea></div>
+    <div class="form-group"><label class="form-label">Tecnico</label><select id="t-tecnico" class="form-control"></select></div>
+    <div class="form-group"><label class="form-label">Prioridad</label><select id="t-prioridad" class="form-control"><option value="SIN PRIORIDAD">Sin Prioridad</option><option value="NORMAL">Normal</option><option value="ALTA">Alta</option><option value="URGENTE">Urgente</option></select></div>
+    <div style="display:flex; gap:10px"><button class="btn btn-outline" onclick="document.getElementById('modal-tarea').style.display='none'">Cancelar</button><button class="btn btn-primary" onclick="guardarTarea()">Crear</button></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-iniciar-interno" style="display:none;">
+  <div class="card" style="width:90%; max-width:400px">
+    <h2><i class="ph ph-play-circle"></i> Iniciar Tarea</h2>
+    <input type="hidden" id="i-ticket-id">
+    
+    <div class="form-group">
+      <label class="form-label">Detalle Rapido (Opcional)</label>
+      <textarea id="i-detalle" class="form-control" rows="3" placeholder="Ej: Empezando revision de equipos..."></textarea>
+    </div>
+    
+    <div style="margin-bottom:15px;">
+      <button class="btn btn-outline" style="width:100%; text-align:left; font-size:12px; padding:8px;" onclick="document.getElementById('i-opciones').style.display = document.getElementById('i-opciones').style.display === 'none' ? 'block' : 'none'">
+        <i class="ph ph-caret-down"></i> Mas Opciones (Pistolear Equipos)
+      </button>
+      <div id="i-opciones" style="display:none; margin-top:10px; padding:10px; border:1px solid var(--border); border-radius:8px;">
+        <label class="form-label">Pistolear Equipo por Codigo</label>
+        <input type="text" id="i-pistola" class="form-control" placeholder="Escanea aqui..." onkeypress="handlePistola(event)">
+        <small style="color:var(--text-light)">Al pistolear (Enter), se agregara automaticamente al detalle.</small>
+      </div>
+    </div>
+    
+    <div style="display:flex; gap:10px">
+      <button class="btn btn-outline" onclick="document.getElementById('modal-iniciar-interno').style.display='none'">Cancelar</button>
+      <button class="btn btn-primary" onclick="guardarIniciarInterno()">Guardar e Iniciar</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/sonidos.js"></script>
+<script src="js/check_auth.js"></script>
+
+<script>
+let miId = localStorage.getItem('tecnico_id');
+let miTipo = localStorage.getItem('tecnico_tipo');
+
+if (miTipo === 'admin') {
+    miId = 'admin';
+    const btnCrear = document.getElementById('btn-crear-tarea');
+    if (btnCrear) btnCrear.style.display = 'block';
+    const btnAsignar = document.getElementById('btn-asignar-rep');
+    if (btnAsignar) btnAsignar.style.display = 'block';
+}
+
+if (!miId) {
+    window.location.href = 'login.html';
+}
+
+const lblNombreEl = document.getElementById('lbl-nombre');
+if (lblNombreEl) lblNombreEl.textContent = localStorage.getItem('tecnico_nombre') || 'Usuario';
+
+let ultimosTickets = [];
+let todosMisTickets = [];
+let autoRefreshInterval = null;
+let modoVista = 'clientes'; // 'clientes' o 'internos'
+let listaTecnicos = [];
+let ticketActual = null;
+let accionActual = '';
+
+// Pre-cargar tecnicos para admin
+fetch('api/personas.php?action=list&tipo=tecnico').then(r=>r.json()).then(res => {
+    if(res.ok) {
+        listaTecnicos = res.data;
+        let htmlTec = '<option value="">-- Sin Asignar (Cualquiera) --</option>';
+        listaTecnicos.forEach(t => htmlTec += `<option value="${t.id}">${t.nombre} ${t.apellido||''}</option>`);
+        document.getElementById('t-tecnico').innerHTML = htmlTec;
+        if(document.getElementById('a-tecnico')) document.getElementById('a-tecnico').innerHTML = htmlTec;
+    }
+});
+
+function cambiarTab(tab) {
+  modoVista = tab;
+  
+  const colRep = document.querySelector('.k-col.rep');
+  const headerDiag = document.querySelector('.k-col.diag .k-header');
+  const headerListo = document.querySelector('.k-col.listo .k-header');
+  
+  if (tab === 'clientes') {
+    document.getElementById('tab-clientes').className = 'tab-btn active';
+    document.getElementById('tab-internos').className = 'tab-btn inactive';
+    colRep.style.display = 'flex';
+    headerDiag.innerHTML = '<i class="ph ph-magnifying-glass"></i> EN REVISION / REP. (<span id="c-diag">0</span>)';
+    headerListo.innerHTML = '<i class="ph ph-check-circle"></i> LISTOS / ENTREGADOS (<span id="c-listo">0</span>)';
+  } else {
+    document.getElementById('tab-internos').className = 'tab-btn active';
+    document.getElementById('tab-clientes').className = 'tab-btn inactive';
+    colRep.style.display = 'none';
+    headerDiag.innerHTML = '<i class="ph ph-magnifying-glass"></i> EN REVISION (<span id="c-diag">0</span>)';
+    headerListo.innerHTML = '<i class="ph ph-check-circle"></i> TERMINADO (<span id="c-listo">0</span>)';
+  }
+  cargarMisOrdenes();
+}
+
+async function cargarMisOrdenes() {
+  const res = await fetch('api/soporte.php?action=list').then(r=>r.json());
+  if (!res.ok) return;
+  
+  let misTickets = res.data;
+  todosMisTickets = res.data;
+  if (miId !== 'admin') {
+    misTickets = res.data.filter(t => t.tecnico_id == miId);
+  }
+  
+  misTickets = misTickets.filter(t => t.estado !== 'ENTREGADO');
+
+  if (modoVista === 'clientes') {
+    misTickets = misTickets.filter(t => t.es_externo != 2 && t.cliente_id != 1);
+  } else {
+    misTickets = misTickets.filter(t => t.es_externo == 2 || t.cliente_id == 1);
+  }
+  
+  const pendientesActuales = misTickets.filter(t => t.estado === 'PENDIENTE');
+  if (ultimosTickets.length > 0) {
+    const idsViejos = ultimosTickets.map(t => t.id);
+    const hayNuevos = pendientesActuales.some(t => !idsViejos.includes(t.id));
+    if (hayNuevos && typeof playSound === 'function') playSound('notification');
+  }
+  ultimosTickets = pendientesActuales;
+  
+  const cols = { pend:[], diag:[], rep:[], listo:[] };
+  misTickets.forEach(t => {
+    if (t.estado === 'PENDIENTE') cols.pend.push(t);
+    else if (t.estado === 'EN_DIAGNOSTICO' || t.estado === 'EN_REPARACION') cols.diag.push(t);
+    else if (t.estado === 'ESPERANDO_REPUESTO') cols.rep.push(t);
+    else if (t.estado === 'LISTO_PARA_RECOGER' || t.estado === 'ENTREGADO') cols.listo.push(t);
+  });
+  
+  renderCol('pend', cols.pend);
+  renderCol('diag', cols.diag);
+  renderCol('rep', cols.rep);
+  renderCol('listo', cols.listo);
+}
+
+function iniciarAutoRefresh() {
+  if (autoRefreshInterval) clearInterval(autoRefreshInterval);
+  autoRefreshInterval = setInterval(cargarMisOrdenes, 60000);
+}
+
+function toggleExpand(colId) {
+    const board = document.getElementById('kanban-board');
+    const col = document.getElementById(colId);
+    
+    if (col.classList.contains('expanded')) {
+        col.classList.remove('expanded');
+        board.classList.remove('has-expanded');
+        col.querySelector('.expand-icon').classList.replace('ph-arrows-in', 'ph-arrows-out');
+    } else {
+        document.querySelectorAll('.k-col').forEach(c => {
+            c.classList.remove('expanded');
+            c.querySelector('.expand-icon').classList.replace('ph-arrows-in', 'ph-arrows-out');
+        });
+        col.classList.add('expanded');
+        board.classList.add('has-expanded');
+        col.querySelector('.expand-icon').classList.replace('ph-arrows-out', 'ph-arrows-in');
+    }
+}
+
+function renderCol(colId, tickets) {
+  const container = document.getElementById('col-' + colId);
+  document.getElementById('c-' + colId).textContent = tickets.length;
+  
+  if (tickets.length === 0) {
+    container.innerHTML = '<div style="text-align:center; padding:30px 10px; color:var(--text-secondary); font-size:13px;"><i class="ph ph-ghost" style="font-size:32px; margin-bottom:10px; opacity:0.5; display:block;"></i>No hay tickets aqui</div>';
+    return;
+  }
+  
+  let html = '';
+  tickets.forEach(t => {
+    const esTarea = (t.es_externo == 2 || t.numero_atencion.startsWith('TAR'));
+    const urg = t.prioridad === 'URGENTE' ? '<span class="urgente">URGENTE</span>' : '';
+    const baseUrl = window.location.origin + window.location.pathname.replace('mis_ordenes.html','');
+    const linkSeguimiento = baseUrl + 'consulta.html?ticket=' + encodeURIComponent(t.numero_atencion);
+    const msgWP = encodeURIComponent(`Hola ${t.cliente_nombre}, somos PETULAP <i class="ph ph-wrench"></i>
+
+Tu equipo *${t.equipo_descripcion || t.equipo_codigo}* ya se encuentra LISTO para recoger.
+
+<i class="ph ph-clipboard"></i> *Ticket:* ${t.numero_atencion}
+
+Horario de atencion: Lunes a Sabado de 10am a 8pm.
+Te esperamos! ðŸ™Œ`);
+
+    const msgInitWP = encodeURIComponent(`Hola ${t.cliente_nombre}, somos PETULAP <i class="ph ph-wrench"></i>
+
+Tu equipo (*${t.equipo_descripcion || t.equipo_codigo}*) ha ingresado correctamente.
+
+<i class="ph ph-clipboard"></i> *Ticket:* ${t.numero_atencion}
+
+Puedes rastrear tu equipo aqui:
+${linkSeguimiento}
+
+Gracias por confiar en nosotros! ðŸ™Œ`);
+    
+    const d1 = new Date(t.fecha_ingreso);
+    const d2 = new Date();
+    
+    // Difference in hours
+    const ageHours = (d2 - d1) / (1000 * 60 * 60);
+    
+    // Check next calendar day
+    const nextDay = new Date(d1);
+    nextDay.setDate(nextDay.getDate() + 1);
+    const isNextDay = nextDay.getDate() === d2.getDate() && nextDay.getMonth() === d2.getMonth() && nextDay.getFullYear() === d2.getFullYear();
+
+    let ageColor = '';
+    let ageText = '';
+    let badgeColor = '';
+
+    if (ageHours >= 72) {
+        ageColor = 'border-left: 4px solid var(--color-danger); background: white;';
+        badgeColor = 'background: var(--bg-danger-subtle); color: var(--color-danger); border: 1px solid #fca5a5;';
+        ageText = '<i class="ph-bold ph-warning-circle"></i> > 72h';
+    } else if (ageHours >= 24) {
+        ageColor = 'border-left: 4px solid var(--color-warning); background: white;';
+        badgeColor = 'background: var(--bg-warning-subtle); color: #b45309; border: 1px solid #fcd34d;';
+        ageText = '<i class="ph-bold ph-hourglass-high"></i> > 24h';
+    } else if (isNextDay) {
+        ageColor = 'border-left: 4px solid var(--color-brand); background: white;';
+        badgeColor = 'background: var(--bg-brand-subtle); color: var(--color-brand); border: 1px solid #93c5fd;';
+        ageText = '<i class="ph-bold ph-clock"></i> Ayer';
+    } else {
+        ageColor = 'border-left: 4px solid var(--color-success); background: white;';
+        badgeColor = 'background: var(--bg-success-subtle); color: var(--color-success); border: 1px solid #86efac;';
+        ageText = '<i class="ph-bold ph-check-circle"></i> Hoy';
+    }
+
+    if (esTarea) {
+        ageColor = 'border-left: 4px solid #b5179e; background: white;';
+        badgeColor = 'background: rgba(181, 23, 158, 0.1); color: #b5179e; border: 1px solid #f9a8d4;';
+    }
+
+    html += `<div class="ticket" style="${ageColor} padding: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.04); display: flex; flex-direction: column; height: 100%;">
+      ${urg}
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:6px">
+        <div class="tkt-id" style="font-size: 11px; font-weight: 700; color: #64748b; word-break: break-all; margin-right: 5px;">${t.numero_atencion}</div>
+        ${!esTarea ? `<div style="${badgeColor} padding:2px 6px; border-radius:10px; letter-spacing:0.3px; display:flex; gap:3px; align-items:center; font-size:10px; font-weight:800; white-space:nowrap; flex-shrink:0;">${ageText}</div>` : `<div style="${badgeColor} padding:2px 6px; border-radius:10px; letter-spacing:0.3px; display:flex; gap:3px; align-items:center; font-size:10px; font-weight:800; white-space:nowrap; flex-shrink:0;"><i class="ph-bold ph-wrench"></i> TAREA</div>`}
+      </div>`;
+      
+      let equipoTitulo = esTarea ? (t.motivo_ingreso||'') : (t.equipo_descripcion||'');
+      equipoTitulo = equipoTitulo.replace(/\s*\(S\/N:[^)]+\)/i, '').trim();
+      const motivoTexto = esTarea ? (t.diagnostico||'') : (t.motivo_ingreso||'');
+      const clienteTexto = esTarea ? (t.tecnico_nombre||'No asignado') : (t.cliente_nombre||'');
+
+      html += `
+      <div class="tkt-title" style="font-size: 13.5px; font-weight: 800; color: #0f172a; margin-bottom: 6px; line-height: 1.3; word-break: break-word; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; white-space: pre-line;" title="${equipoTitulo}">${equipoTitulo}</div>
+      <p style="font-size: 11.5px; color: #475569; margin: 4px 0; line-height: 1.4; word-break: break-word; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; white-space: pre-line;" title="${motivoTexto}"><b>${esTarea?'Desc:':'Motivo:'}</b> ${motivoTexto}</p>
+      <p style="font-size: 11.5px; color: #475569; margin: 4px 0; word-break: break-word;" title="${clienteTexto}"><b>${esTarea?'Asignado a:':'Cliente:'}</b> ${clienteTexto}</p>
+      <p style="font-size: 11.5px; color: #475569; margin: 4px 0; display:flex; align-items:flex-start; gap:4px; word-break: break-word;"><i class="ph-bold ph-user" style="color:#94a3b8; flex-shrink:0; margin-top: 2px;"></i> <b>Tecnico:</b> <span>${t.tecnico_nombre||'Sin asignar'}</span></p>
+      
+      <div class="acciones" style="display:flex; gap:6px; margin-top: auto; padding-top: 10px; align-items: stretch; flex-wrap: wrap;">`;
+      
+      if (t.estado === 'PENDIENTE') {
+        if (esTarea) {
+          html += `<button class="btn-primary" style="flex:1; padding: 6px; font-size:11px;" onclick="abrirModalIniciarInterno(${t.id})"><i class="ph-bold ph-play-circle"></i> Iniciar</button>`;
+        } else {
+          html += `<button class="btn-primary" style="flex:1; padding: 6px; font-size:11px;" onclick="cambiarEstadoRapido(${t.id}, 'EN_DIAGNOSTICO', this)"><i class="ph-bold ph-play-circle"></i> Iniciar</button>`;
+        }
+      }
+      else if (t.estado === 'EN_DIAGNOSTICO' || t.estado === 'EN_REPARACION') {
+        if (!esTarea) html += `<button class="btn-secondary" style="flex:1; padding: 6px; font-size:11px;" onclick="abrirModal(${t.id}, 'repuesto')"><i class="ph-bold ph-package"></i> Repuesto</button>`;
+        html += `<button class="btn-primary" style="flex:1; padding: 6px; font-size:11px;" onclick="abrirModal(${t.id}, 'listo')"><i class="ph-bold ph-check-circle"></i> Terminar</button>`;
+      }
+      else if (t.estado === 'ESPERANDO_REPUESTO') {
+        html += `<button class="btn-primary" style="flex:1; padding: 6px; font-size:11px;" onclick="cambiarEstadoRapido(${t.id}, 'EN_REPARACION', this)"><i class="ph-bold ph-wrench"></i> Continuar</button>`;
+      }
+      else if (t.estado === 'LISTO_PARA_RECOGER') {
+        if (miId === 'admin' && !esTarea) {
+          html += `<button class="btn-primary" style="flex:1; padding: 6px; font-size:11px; background:#10b981; border:none;" onclick="abrirModalWhatsApp(${t.id}, '${t.cliente_tel}', \`${msgWP}\`)"><i class="ph-bold ph-whatsapp-logo"></i> Entregar</button>`;
+        } else {
+          html += `<button class="btn-secondary" style="flex:1; padding: 6px; font-size:11px;" onclick="cambiarEstadoRapido(${t.id}, 'ENTREGADO', this)"><i class="ph-bold ph-handshake"></i> ${esTarea?'Archivar':'Entregado'}</button>`;
+        }
+      }
+
+      if (miId === 'admin') {
+          html += `<button class="btn-secondary" style="padding:4px; width:28px; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:14px; margin-left: auto;" onclick="const el = document.getElementById('more-actions-${t.id}'); el.style.display = el.style.display==='none'?'flex':'none';"><i class="ph-bold ph-dots-three"></i></button>`;
+      }
+
+    html += `</div>`; 
+
+    if (miId === 'admin') {
+      html += `<div id="more-actions-${t.id}" style="display:none; margin-top:10px; padding-top:10px; border-top:1px solid var(--border-default); flex-direction:column; gap:6px;">`;
+      html += `<button class="btn-secondary" style="width:100%; padding:6px; font-size:11px;" onclick="abrirModalAdmin(${t.id})"><i class="ph-fill ph-crown"></i> Administrar Ticket</button>`;
+      
+      if (!esTarea) {
+        html += `<a href="https://wa.me/51${t.cliente_tel}?text=${msgInitWP}" target="_blank" style="text-decoration:none">
+                   <button class="btn-secondary" style="width:100%; padding:6px; font-size:11px;"><i class="ph-bold ph-whatsapp-logo"></i> Recibo Inicial (WP)</button>
+                 </a>`;
+        html += `<button class="btn-secondary" style="width:100%; padding:6px; font-size:11px;" onclick="window.open('imprimir_sticker.html?numero=${t.numero_atencion}&cliente=${encodeURIComponent(t.cliente_nombre)}', '_blank', 'width=300,height=200')"><i class="ph-bold ph-printer"></i> Imprimir Sticker</button>`;
+      }
+      html += `</div>`;
+    }
+
+    html += `</div>`;
+  });
+
+  document.getElementById(`col-${colId}`).innerHTML = html;
+}
+
+async function cambiarEstadoRapido(id, nuevoEstado, btnEl) {
+  if (btnEl) { btnEl.disabled = true; btnEl.innerHTML = '<i class="ph ph-spinner ph-spin"></i>'; }
+  try {
+    const body = { id: id, estado: nuevoEstado, usuario: localStorage.getItem('tecnico_nombre') || 'Usuario' };
+    const res = await fetch(`api/soporte.php?action=actualizar`, { method:'POST', body:JSON.stringify(body) }).then(r=>r.json());
+    if (res.ok) cargarMisOrdenes();
+    else alert("Error: " + res.msg);
+  } catch(e) {
+    alert("Error de conexion al cambiar estado");
+  } finally {
+    if (btnEl) { btnEl.disabled = false; btnEl.innerHTML = 'Listo'; }
+  }
+}
+
+function abrirModal(id, accion) {
+  ticketActual = id;
+  accionActual = accion;
+  
+  const t = todosMisTickets.find(x => x.id == id);
+  const esTarea = t && (t.es_externo == 2 || t.numero_atencion.startsWith('TAR'));
+  
+  document.getElementById('m-texto').value = '';
+  document.getElementById('m-repuesto').style.display = 'none';
+  document.getElementById('m-repuesto').value = '';
+  
+  if (esTarea) {
+      document.getElementById('m-subtitulo').style.display = 'none';
+  } else {
+      document.getElementById('m-subtitulo').style.display = 'block';
+  }
+  
+  if (accion === 'repuesto') {
+    document.getElementById('m-titulo').innerHTML = '<i class="ph ph-package"></i> Esperando Repuesto';
+    document.getElementById('lbl-input').textContent = 'Que pieza falta?';
+    
+    fetch('api/repuestos.php?action=list').then(r=>r.json()).then(res => {
+      if(res.ok) {
+        let h = '<option value="">-- Selecciona del catalogo (Opcional) --</option>';
+        res.data.forEach(r => h += `<option value="${r.nombre}" data-id="${r.id}">[Stock: ${r.stock}] ${r.nombre}</option>`);
+        document.getElementById('m-repuesto').innerHTML = h;
+        document.getElementById('m-repuesto').style.display = 'block';
+      }
+    });
+
+    document.getElementById('btn-guardar-modal').onclick = () => guardarModal('ESPERANDO_REPUESTO', 'diagnostico');
+  } else if (accion === 'listo') {
+    document.getElementById('m-titulo').innerHTML = esTarea ? '<i class="ph ph-check-circle"></i> Tarea Terminada' : '<i class="ph ph-check-circle"></i> Listo para Recoger';
+    document.getElementById('lbl-input').textContent = esTarea ? 'Detalle final (Opcional)' : 'Cual fue la solucion aplicada? (Opcional)';
+    document.getElementById('btn-guardar-modal').onclick = () => guardarModal('LISTO_PARA_RECOGER', 'solucion');
+  }
+  
+  document.getElementById('modal').style.display = 'flex';
+}
+
+function cerrarModal() {
+  document.getElementById('modal').style.display = 'none';
+}
+
+function abrirModalAdmin(id) {
+    ticketActual = id;
+    const t = todosMisTickets.find(x => x.id == id);
+    if (!t) return;
+    
+    document.getElementById('admin-estado').value = t.estado;
+    document.getElementById('admin-prioridad').value = t.prioridad || 'SIN PRIORIDAD';
+    document.getElementById('admin-motivo').value = t.motivo_ingreso || t.diagnostico || '';
+    
+    let htmlTec = '<option value="">-- Sin Asignar --</option>';
+    listaTecnicos.forEach(tec => {
+        htmlTec += `<option value="${tec.id}" ${tec.id == t.tecnico_id ? 'selected' : ''}>${tec.nombre} ${tec.apellido||''}</option>`;
+    });
+    document.getElementById('admin-tecnico').innerHTML = htmlTec;
+    
+    document.getElementById('modal-admin').style.display = 'flex';
+}
+
+function verHistorial(id) {
+    document.getElementById('modal-historial').style.display = 'flex';
+    document.getElementById('historial-content').innerHTML = '<div style="text-align:center; padding: 20px;"><i class="ph ph-spinner ph-spin" style="font-size: 24px;"></i></div>';
+    
+    fetch(`api/historial.php?action=ver&tabla=soporte_tecnico&id=${id}`)
+    .then(r => r.json())
+    .then(res => {
+        if (res.ok) {
+            if (res.data.length === 0) {
+                document.getElementById('historial-content').innerHTML = '<p style="text-align:center; color:#64748b;">No hay historial registrado.</p>';
+                return;
+            }
+            let html = '<table style="width:100%; border-collapse: collapse; text-align: left;"><thead><tr style="border-bottom:1px solid #e2e8f0;"><th style="padding:8px;">Fecha</th><th style="padding:8px;">Usuario</th><th style="padding:8px;">Campo</th><th style="padding:8px;">Cambio</th></tr></thead><tbody>';
+            res.data.forEach(h => {
+                const f = new Date(h.fecha_cambio).toLocaleString('es-PE');
+                html += `<tr style="border-bottom:1px solid #f1f5f9;">
+                    <td style="padding:8px; white-space:nowrap; color:#64748b;">${f}</td>
+                    <td style="padding:8px; font-weight:600;">${h.usuario_nombre}</td>
+                    <td style="padding:8px; text-transform:capitalize;">${h.campo_cambiado.replace('_',' ')}</td>
+                    <td style="padding:8px;">De <b>${h.valor_anterior||'-'}</b> a <b>${h.valor_nuevo||'-'}</b></td>
+                </tr>`;
+            });
+            html += '</tbody></table>';
+            document.getElementById('historial-content').innerHTML = html;
+        } else {
+            document.getElementById('historial-content').innerHTML = `<p style="color:red;">Error: ${res.msg}</p>`;
+        }
+    });
+}
+
+async function eliminarTicket(id) {
+    if (!confirm('Estas seguro de que deseas eliminar este ticket? La accion se registrara en el historial y se ocultara del panel.')) return;
+    
+    const usuario = encodeURIComponent(localStorage.getItem('tecnico_nombre') || 'Admin');
+    const res = await fetch(`api/soporte.php?action=eliminar&id=${id}&usuario=${usuario}`).then(r=>r.json());
+    if (res.ok) {
+        document.getElementById('modal-admin').style.display = 'none';
+        cargarMisOrdenes();
+    } else {
+        alert("Error al eliminar: " + res.msg);
+    }
+}
+
+async function guardarAdmin() {
+    const estado = document.getElementById('admin-estado').value;
+    const tec = document.getElementById('admin-tecnico').value;
+    const prioridad = document.getElementById('admin-prioridad').value;
+    const motivo = document.getElementById('admin-motivo').value;
+    
+    const t = todosMisTickets.find(x => x.id == ticketActual);
+    let esTarea = t && (t.es_externo == 2 || t.numero_atencion.startsWith('TAR'));
+    
+    const body = { 
+      id: ticketActual, 
+      estado: estado, 
+      prioridad: prioridad,
+      tecnico_id: tec ? parseInt(tec) : null,
+      usuario: localStorage.getItem('tecnico_nombre') || 'Usuario' 
+    };
+    
+    if (esTarea) {
+        body.diagnostico = motivo;
+    } else {
+        body.motivo_ingreso = motivo;
+    }
+    
+    const btn = document.querySelector('#modal-admin .btn-primary');
+    const txtOriginal = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<i class="ph ph-spinner ph-spin"></i> Guardando...';
+
+    try {
+        const res = await fetch(`api/soporte.php?action=actualizar`, { method:'POST', body:JSON.stringify(body) }).then(r=>r.json());
+        if (res.ok) {
+            document.getElementById('modal-admin').style.display = 'none';
+            cargarMisOrdenes();
+        } else {
+            alert("Error: " + res.msg);
+        }
+    } catch(e) {
+        alert("Error de conexion");
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = txtOriginal;
+    }
+}
+
+async function guardarModal(estado, campoTexto) {
+  let texto = document.getElementById('m-texto').value.trim();
+  const repuestoSel = document.getElementById('m-repuesto');
+  
+  if (estado === 'ESPERANDO_REPUESTO' && repuestoSel.value) {
+    texto = repuestoSel.value + (texto ? " - " + texto : "");
+  }
+  
+  if (estado === 'ESPERANDO_REPUESTO' && !texto && !repuestoSel.value) { 
+      alert('Debes escribir un mensaje o seleccionar un repuesto.'); 
+      return; 
+  }
+  
+  const btn = document.getElementById('btn-guardar-modal');
+  const txtOriginal = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = '<i class="ph ph-spinner ph-spin"></i> Guardando...';
+
+  try {
+    const body = { id: ticketActual, estado: estado, usuario: localStorage.getItem('tecnico_nombre') || 'Usuario' };
+    body[campoTexto] = texto; 
+    
+    if (estado === 'ESPERANDO_REPUESTO' && repuestoSel.value) {
+       body['repuesto_nombre'] = repuestoSel.value;
+    }
+    
+    const res = await fetch(`api/soporte.php?action=actualizar`, { method:'POST', body:JSON.stringify(body) }).then(r=>r.json());
+    if (res.ok) {
+      cerrarModal();
+      cargarMisOrdenes();
+    } else {
+      alert("Error: " + res.msg);
+    }
+  } catch(e) {
+    alert("Error de conexion");
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = txtOriginal;
+  }
+}
+
+function abrirModalWhatsApp(id, tel, msg) {
+  document.getElementById('wp-ticket-id').value = id;
+  document.getElementById('wp-tel').value = tel;
+  document.getElementById('wp-texto').value = decodeURIComponent(msg);
+  document.getElementById('modal-wp').style.display = 'flex';
+}
+
+function enviarWhatsApp() {
+  const id = document.getElementById('wp-ticket-id').value;
+  const tel = document.getElementById('wp-tel').value;
+  const texto = encodeURIComponent(document.getElementById('wp-texto').value);
+  window.open(`https://wa.me/51${tel}?text=${texto}`, '_blank');
+  document.getElementById('modal-wp').style.display = 'none';
+  cambiarEstadoRapido(id, 'ENTREGADO');
+}
+
+function abrirModalTarea() {
+  document.getElementById('t-titulo').value = '';
+  document.getElementById('t-desc').value = '';
+  document.getElementById('t-prioridad').value = 'SIN PRIORIDAD';
+  document.getElementById('modal-tarea').style.display = 'flex';
+}
+
+async function guardarTarea() {
+  const body = {
+    titulo: document.getElementById('t-titulo').value,
+    descripcion: document.getElementById('t-desc').value,
+    tecnico_id: document.getElementById('t-tecnico').value,
+    prioridad: document.getElementById('t-prioridad').value
+  };
+  if (!body.titulo) return alert('Pon un titulo');
+  
+  const btn = document.querySelector('#modal-tarea .btn-primary');
+  const txtOriginal = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = '<i class="ph ph-spinner ph-spin"></i> Guardando...';
+
+  try {
+    const res = await fetch(`api/soporte.php?action=crear_tarea`, { method:'POST', body:JSON.stringify(body) }).then(r=>r.json());
+    if (res.ok) {
+      document.getElementById('modal-tarea').style.display = 'none';
+      cargarMisOrdenes();
+    } else { alert("Error: " + res.msg); }
+  } catch(e) {
+    alert("Error de conexion");
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = txtOriginal;
+  }
+}
+
+function abrirModalIniciarInterno(id) {
+  document.getElementById('i-ticket-id').value = id;
+  document.getElementById('i-detalle').value = '';
+  document.getElementById('i-opciones').style.display = 'none';
+  document.getElementById('i-pistola').value = '';
+  document.getElementById('modal-iniciar-interno').style.display = 'flex';
+}
+
+function handlePistola(e) {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    const codigo = document.getElementById('i-pistola').value.trim();
+    if (codigo) {
+      const detalle = document.getElementById('i-detalle');
+      const prefix = detalle.value ? detalle.value + "\n" : "";
+      detalle.value = prefix + "- Equipo agregado: " + codigo;
+      document.getElementById('i-pistola').value = '';
+    }
+  }
+}
+
+async function guardarIniciarInterno() {
+  const id = document.getElementById('i-ticket-id').value;
+  const detalle = document.getElementById('i-detalle').value.trim();
+  
+  const body = { id: id, estado: 'EN_DIAGNOSTICO', usuario: localStorage.getItem('tecnico_nombre') || 'Usuario' };
+  
+  if (detalle) {
+    const ticket = todosMisTickets.find(t => t.id == id);
+    const oldDiag = ticket && ticket.diagnostico ? ticket.diagnostico + "\n\n" : "";
+    body.diagnostico = oldDiag + "--- DETALLE DE INICIO ---\n" + detalle;
+  }
+
+  const btn = document.querySelector('#modal-iniciar-interno .btn-primary');
+  const txtOriginal = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = '<i class="ph ph-spinner ph-spin"></i> Iniciando...';
+
+  try {
+    const res = await fetch(`api/soporte.php?action=actualizar`, { method:'POST', body:JSON.stringify(body) }).then(r=>r.json());
+    if (res.ok) {
+      document.getElementById('modal-iniciar-interno').style.display = 'none';
+      cargarMisOrdenes();
+    } else {
+      alert("Error: " + res.msg);
+    }
+  } catch(e) {
+    alert("Error de conexion");
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = txtOriginal;
+  }
+}
+
+cargarMisOrdenes();
+iniciarAutoRefresh();
+
+// Check if we need to auto-open the task creation modal
+document.addEventListener('DOMContentLoaded', () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('action') === 'crear_tarea') {
+        setTimeout(() => {
+            if (typeof cambiarTab === 'function') cambiarTab('internos');
+            if (typeof abrirModalTarea === 'function') abrirModalTarea();
+            // Clear URL param without reloading
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }, 500); // slight delay to ensure everything is loaded
+    }
+});
+</script>
+
+
+        </div>
+        
+        <!-- FAB Button -->
+        <button class="fab-chat" onclick="if(typeof abrirModalTareaGlobal === 'function') abrirModalTareaGlobal();" title="Crear Tarea Interna">
+            <i class="ph-bold ph-list-plus"></i>
+        </button>
+
+    </main>
+
+    <!-- Scripts -->
+    <script src="js/dashboard.js?v=3"></script>
+
+</body>
+</html>

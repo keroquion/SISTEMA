@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manual Oficial - Petulap SST</title>
+<link rel="stylesheet" href="css/tokens.css?v=1">
+    <link rel="stylesheet" href="css/styles.css?v=3">
+  
+
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#F8FAFC">
+<script>
+if ("serviceWorker" in navigator) { window.addEventListener("load", () => { navigator.serviceWorker.register("sw.js").then(r => console.log("SW ok")).catch(e => console.log("SW fail", e)); }); }
+</script>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <!-- Dashboard Styles -->
+    <link rel="stylesheet" href="css/dashboard.css?v=3">
+
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="apple-touch-icon" href="icon.jpg">
+
+    <script>
+      (function(){
+        if(localStorage.getItem('petulap-theme') === 'dark') {
+          document.documentElement.setAttribute('data-theme', 'dark');
+        }
+      })();
+    </script>
+</head>
+<body class="dashboard-body">
+
+    <!-- MOBILE HEADER -->
+    <header class="mobile-header">
+        <button class="menu-toggle" id="mobile-menu-toggle">
+            <i class="ph ph-list"></i>
+        </button>
+        <div class="logo-container">
+            <div class="logo-icon">P</div>
+            <span>PETULAP S.A.C.</span>
+        </div>
+        
+                <button class="theme-toggle-btn" aria-label="Cambiar tema" onclick="toggleTheme()" style="background: none; border: none; font-size: 20px; cursor: pointer; color: var(--text-secondary); margin-right: 15px; display: flex; align-items: center;">
+                    <i class="ph ph-moon"></i>
+                </button>
+                <button class="notification-btn">
+            <i class="ph ph-bell"></i>
+        </button>
+    </header>
+
+    <!-- MOBILE SIDEBAR (ACCORDION) -->
+    <div class="mobile-sidebar" id="mobile-sidebar">
+        <div class="accordion-item active">
+            <div class="accordion-header">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <i class="ph ph-headset"></i>
+                    SOPORTE Y TALLER
+                </div>
+                <i class="ph ph-caret-down"></i>
+            </div>
+            <div class="accordion-content">
+                <a href="soporte.html" class="accordion-link">
+                    <i class="ph-fill ph-ticket acc-icon-green"></i>
+                    Tickets
+                </a>
+                <a href="mis_ordenes.html" class="accordion-link">
+                    <i class="ph-fill ph-kanban acc-icon-orange"></i>
+                    Kanban
+                </a>
+                <a href="tecnicos.html" class="accordion-link">
+                    <i class="ph-fill ph-users acc-icon-blue"></i>
+                    Tecnicos
+                </a>
+                <a href="recepcion_movil.html" class="accordion-link">
+                    <i class="ph-fill ph-device-mobile acc-icon-gray"></i>
+                    App Recepcion
+                </a>
+                <a href="garantias.html" class="accordion-link">
+                    <i class="ph-fill ph-shield-check acc-icon-blue"></i>
+                    Garantias
+                </a>
+            </div>
+        </div>
+
+        <div class="accordion-item">
+            <div class="accordion-header">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <i class="ph ph-package"></i>
+                    INVENTARIO Y OPERACIONES
+                </div>
+                <i class="ph ph-caret-down"></i>
+            </div>
+            <div class="accordion-content">
+                <a href="inventario.html" class="accordion-link">
+                    <i class="ph-fill ph-archive-box acc-icon-orange"></i>
+                    Inventario General
+                </a>
+                <a href="inventario_soporte.html" class="accordion-link">
+                    <i class="ph-fill ph-scan acc-icon-green"></i>
+                    Escaneo / Triaje Masivo
+                </a>
+                <a href="importar.html" class="accordion-link">
+                    <i class="ph-fill ph-download-simple acc-icon-blue"></i>
+                    Importar Excel
+                </a>
+                <a href="caja.html" class="accordion-link">
+                    <i class="ph-fill ph-money acc-icon-green"></i>
+                    Caja / Entregas
+                </a>
+            </div>
+        </div>
+
+        <div class="accordion-item danger-border">
+            <div class="accordion-header">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <i class="ph ph-wrench"></i>
+                    GERENCIA Y CLIENTES
+                </div>
+                <i class="ph ph-caret-down"></i>
+            </div>
+            <div class="accordion-content">
+                <a href="lotes.html" class="accordion-link">
+                    <i class="ph-fill ph-stack acc-icon-blue"></i>
+                    Lotes Masivos
+                </a>
+                <a href="clientes.html" class="accordion-link">
+                    <i class="ph-fill ph-user-list acc-icon-green"></i>
+                    Actividades y Clientes
+                </a>
+            </div>
+        </div>
+
+        <div class="accordion-item">
+            <div class="accordion-header">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <i class="ph ph-chart-line-up"></i>
+                    ADMINISTRACION Y OTROS
+                </div>
+                <i class="ph ph-caret-down"></i>
+            </div>
+            <div class="accordion-content">
+                <a href="reportes.html" class="accordion-link">
+                    <i class="ph-fill ph-chart-bar acc-icon-blue"></i>
+                    Lotes y Equipos (Reportes)
+                </a>
+                <a href="turnos.html" class="accordion-link">
+                    <i class="ph-fill ph-clock acc-icon-orange"></i>
+                    Asignacion Turnos
+                </a>
+                <a href="admin_roles.html" class="accordion-link">
+                    <i class="ph-fill ph-crown acc-icon-blue"></i>
+                    Roles y Permisos
+                </a>
+                <a href="manual.html" class="accordion-link">
+                    <i class="ph-fill ph-book-open acc-icon-gray"></i>
+                    Manual de Usuario
+                </a>
+            </div>
+        </div>
+        <div class="accordion-item danger-border">
+            <div class="accordion-header">
+                <div style="display: flex; align-items: center; gap: 10px; color: var(--danger);">
+                    <i class="ph ph-power"></i>
+                    SISTEMA
+                </div>
+                <i class="ph ph-caret-down"></i>
+            </div>
+            <div class="accordion-content">
+                <a href="#" class="accordion-link" onclick="clearCache(event)">
+                    <i class="ph-fill ph-trash acc-icon-orange"></i>
+                    Eliminar Cache
+                </a>
+                <a href="#" class="accordion-link" onclick="logout(event)">
+                    <i class="ph-fill ph-sign-out acc-icon-gray"></i>
+                    Cerrar Sesion
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- MOBILE BOTTOM NAV -->
+    <nav class="mobile-nav">
+        <a href="index.html" class="nav-item">
+            <i class="ph ph-house"></i>
+            <span>Dashboard</span>
+        </a>
+        <a href="consulta.html" class="nav-item">
+            <i class="ph ph-magnifying-glass"></i>
+            <span>Buscar</span>
+        </a>
+        <a href="login.html" class="nav-item">
+            <i class="ph ph-user"></i>
+            <span>Mi Cuenta</span>
+        </a>
+    </nav>
+
+    <!-- DESKTOP SIDEBAR -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <button class="menu-toggle">
+                <i class="ph ph-list"></i>
+            </button>
+            <div class="logo-container">
+                <div class="logo-icon">P</div>
+                <span>PETULAP S.A.C.</span>
+            </div>
+        </div>
+
+        <div class="sidebar-menu">
+            <a href="index.html" class="menu-item">
+                <div class="menu-item-left">
+                    <i class="ph ph-house"></i>
+                    <span>Panel de Control</span>
+                </div>
+            </a>
+
+            <div class="menu-section">
+                <span class="menu-title">Soporte y Taller</span>
+                <a href="soporte.html" class="menu-item">
+                    <div class="menu-item-left">
+                        <i class="ph ph-ticket"></i>
+                        <span>Tickets de Soporte</span>
+                    </div>
+                    <div class="status-dot dot-green"></div>
+                </a>
+                <a href="mis_ordenes.html" class="menu-item">
+                    <div class="menu-item-left">
+                        <i class="ph ph-kanban"></i>
+                        <span>Panel Kanban</span>
+                    </div>
+                    <div class="status-dot dot-yellow"></div>
+                </a>
+                <a href="tecnicos.html" class="menu-item">
+                    <div class="menu-item-left">
+                        <i class="ph ph-users"></i>
+                        <span>Tecnicos</span>
+                    </div>
+                    <div class="status-dot dot-yellow"></div>
+                </a>
+                <a href="recepcion_movil.html" class="menu-item">
+                    <div class="menu-item-left">
+                        <i class="ph ph-device-mobile"></i>
+                        <span>App Recepcion</span>
+                    </div>
+                    <div class="status-dot dot-gray"></div>
+                </a>
+            </div>
+
+            <div class="menu-section">
+                <span class="menu-title">Inventario y Operaciones</span>
+                <a href="inventario.html" class="menu-item">
+                    <div class="menu-item-left">
+                        <i class="ph ph-archive-box"></i>
+                        <span>Inventario General</span>
+                    </div>
+                    <div class="status-dot dot-red"></div>
+                </a>
+                <a href="inventario_soporte.html" class="menu-item">
+                    <div class="menu-item-left">
+                        <i class="ph ph-scan"></i>
+                        <span>Escaneo / Triaje</span>
+                    </div>
+                    <div class="status-dot dot-green"></div>
+                </a>
+                <a href="caja.html" class="menu-item">
+                    <div class="menu-item-left">
+                        <i class="ph ph-money"></i>
+                        <span>Caja / Entregas</span>
+                    </div>
+                    <div class="status-dot dot-blue"></div>
+                </a>
+            </div>
+            
+            <div class="menu-section">
+                <span class="menu-title">Gerencia y Utilidades</span>
+                <a href="reportes.html" class="menu-item">
+                    <div class="menu-item-left">
+                        <i class="ph ph-chart-bar"></i>
+                        <span>Reportes</span>
+                    </div>
+                    <div class="status-dot dot-blue"></div>
+                </a>
+                <a href="lotes.html" class="menu-item">
+                    <div class="menu-item-left">
+                        <i class="ph ph-stack"></i>
+                        <span>Lotes Masivos</span>
+                    </div>
+                    <div class="status-dot dot-blue"></div>
+                </a>
+                <a href="admin_roles.html" class="menu-item">
+                    <div class="menu-item-left">
+                        <i class="ph ph-crown"></i>
+                        <span>Roles y Permisos</span>
+                    </div>
+                    <div class="status-dot dot-yellow"></div>
+                </a>
+            </div>
+            <div class="menu-section">
+                <div class="menu-title" style="color: var(--danger)">SISTEMA</div>
+                <a href="#" class="menu-item" onclick="clearCache(event)">
+                    <div class="menu-item-left">
+                        <i class="ph ph-trash"></i>
+                        <span>Eliminar Cache</span>
+                    </div>
+                </a>
+                <a href="#" class="menu-item" onclick="logout(event)">
+                    <div class="menu-item-left">
+                        <i class="ph ph-sign-out"></i>
+                        <span>Cerrar Sesion</span>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <div class="sidebar-footer">
+            <button class="btn-minimize">
+                <i class="ph ph-arrow-left"></i>
+                <span>Minimizar</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- MAIN WRAPPER -->
+    <main class="main-wrapper">
+        
+        <!-- DESKTOP TOPBAR -->
+        <header class="topbar">
+            <div class="search-bar">
+                <i class="ph ph-magnifying-glass"></i>
+                <input type="text" placeholder="Buscar en el sistema...">
+            </div>
+            
+            <div class="topbar-right">
+                <button class="notification-btn">
+                    <i class="ph ph-bell"></i>
+                    <span class="badge-counter">3</span>
+                </button>
+                <a href="login.html" class="user-profile">
+                    <img src="https://ui-avatars.com/api/?name=User+Profile&background=0D8ABC&color=fff" alt="User Profile">
+                </a>
+            </div>
+        </header>
+
+        <!-- DASHBOARD CONTENT -->
+        <div class="content">
+
+
+
+  <div class="header">
+    <h1>ðŸ“– Manual del Sistema Petulap SST</h1>
+    <p style="margin:5px 0 0">Flujo Cero Papel, Gestion de Lotes y Taller Kanban</p>
+  </div>
+
+  <div class="container">
+    
+    <!-- INDICE LATERAL PARA PC -->
+    <div class="sidebar">
+      <h3>Indice Rapido</h3>
+      <ul>
+        <li><a href="#recepcion">1. Recepcion (Celular)</a></li>
+        <li><a href="#kanban">2. Taller Kanban (PC)</a></li>
+        <li><a href="#flujo">3. Flujo de Estados</a></li>
+        <li><a href="#admin">4. Funciones de Administrador</a></li>
+        <li><a href="#lotes">5. Lotes e Importaciones</a></li>
+        <li><a href="#garantias">6. Gestion de Garantias</a></li>
+        <li><a href="#soporte">7. Buscador Maestro</a></li>
+      </ul>
+    </div>
+
+    <!-- CONTENIDO -->
+    <div class="content">
+
+      <!-- RECEPCION MOVIL -->
+      <div class="section" id="recepcion">
+        <h2><i class="ph ph-device-mobile"></i> 1. App de Recepcion Rapida (Cero Papel)</h2>
+        <p>Herramienta disenada para el celular del tecnico o recepcionista. Reemplaza el formulario pesado por un proceso de 3 pasos.</p>
+        
+        <h3>Como se usa?</h3>
+        <ul class="tips">
+          <li><b>Paso 1 (Cliente):</b> Digita el DNI (8 digitos) del cliente. El sistema se conectara a la <b>RENIEC</b> y llenara los nombres automaticamente. Agrega el numero de celular.</li>
+          <li><b>Paso 2 (Equipo):</b> Escribe la marca y el modelo. Si tiene codigo de barras previo, lo puedes pistolear. Detalla la falla que el cliente reporta.</li>
+          <li><b>Paso 3 (Confirmar):</b> Revisa los datos y presiona "Generar Orden".</li>
+        </ul>
+        <p><i>Nota: Al crear la orden, se emitira un sonido de alarma en la empresa (PC) y el ticket se auto-asignara al tecnico con menos carga laboral (Algoritmo Round-Robin).</i></p>
+        <a href="recepcion_movil.html" target="_blank" class="link-btn">— Abrir Recepcion Movil</a>
+      </div>
+
+      <!-- KANBAN Y ESTADOS -->
+      <div class="section" id="kanban">
+        <h2>ðŸŽ›ï¸ 2. Panel de Tecnicos (Mis Ordenes)</h2>
+        <p>La vista principal del taller. Un tablero Kanban donde los equipos fluyen de izquierda a derecha.</p>
+        
+        <h3 id="flujo">Flujo y Estados Oficiales</h3>
+        <ul class="tips">
+          <li><span class="badge bg-pend">PENDIENTE</span>: Equipos recien ingresados. El tecnico debe presionar "â–¶ï¸ Iniciar Revision".</li>
+          <li><span class="badge bg-diag">EN DIAGNOSTICO</span>: El tecnico esta desarmando o probando la PC.</li>
+          <li><span class="badge bg-rep">ESPERANDO REPUESTO</span>: Si se requiere una pieza (ej. Disco Duro), se pone aqui hasta que logistica lo consiga.</li>
+          <li><span class="badge bg-diag">EN REPARACION</span>: Llego la pieza y se esta arreglando, o se esta formateando.</li>
+          <li><span class="badge bg-listo">LISTO PARA RECOGER</span>: El equipo funciona. Se marca como Terminado.</li>
+          <li><span class="badge bg-listo" >ENTREGADO</span>: El cliente se llevo el equipo a casa. Desaparece del panel (se va al historial).</li>
+        </ul>
+        <a href="mis_ordenes.html" target="_blank" class="link-btn">— Abrir Panel Tecnico</a>
+      </div>
+
+      <!-- VISTA ADMIN Y COMPROBANTES -->
+      <div class="section" id="admin">
+        <h2>ðŸ‘‘ 3. Funciones del Administrador</h2>
+        <p>El administrador tiene el control total del taller y es responsable de la comunicacion oficial.</p>
+        
+        <h3>Ingreso y Visibilidad</h3>
+        <ul class="tips">
+          <li>En el panel `mis_ordenes.html`, debes seleccionar tu nombre como <b>"ðŸ‘‘ ADMINISTRADOR (Ver TODO)"</b>.</li>
+          <li>Inmediatamente el sistema ignorara los filtros y te mostrara absolutamente <b>todos los equipos de todos los tecnicos</b> al mismo tiempo.</li>
+        </ul>
+
+        <h3>Emision de Comprobantes (WhatsApp y Stickers)</h3>
+        <ul class="tips">
+          <li>Cuando el tecnico registra un equipo nuevo con su celular, este aparecera en tu columna "PENDIENTES".</li>
+          <li>Presiona <b>"ðŸ’¬ Comprobante Inicial (WhatsApp)"</b> para enviarle al cliente un enlace de seguimiento oficial desde el numero de la empresa. Esto reemplaza al papel.</li>
+          <li>Presiona <b>"<i class="ph ph-printer"></i> Imprimir Sticker (50x25)"</b>. Se abrira una pestana sin dialogos y la impresora termica imprimira un pequeno codigo de barras para pegar en la laptop.</li>
+        </ul>
+      </div>
+
+      <!-- LOTES -->
+      <div class="section" id="lotes">
+        <h2><i class="ph ph-package"></i> 4. Gestion de Lotes (Ingreso Masivo)</h2>
+        <p>Para ingresar remates o compras gigantes de equipos al almacen rapidamente.</p>
+        
+        <h3>Flujo de Ingreso por Pistola</h3>
+        <ul class="tips">
+          <li>Crea un "Nuevo Lote" en la parte superior.</li>
+          <li>Agarra tu pistola laser, pegale al codigo de barras del equipo (se llenara el campo automaticamente y se dara "Enter" simulado). Escucharas un sonido fuerte de escaneo exitoso.</li>
+          <li><b>Seleccion Global:</b> Puedes marcar el cuadro maestro arriba de la tabla para seleccionar todos los equipos del lote y aplicarles la misma falla (ej: "Sin Falla") o mandarlos directo a diagnostico masivamente.</li>
+          <li>El sistema detecta automaticamente si estas escaneando un equipo que ya estaba en la base de datos (cruza informacion para evitar duplicados).</li>
+        </ul>
+        <a href="lotes.html" target="_blank" class="link-btn">— Abrir Lotes</a>
+      </div>
+
+      <!-- GARANTIAS -->
+      <div class="section" id="garantias">
+        <h2><i class="ph ph-shield-check"></i> 5. Gestion de Garantias</h2>
+        <p>Control estricto de equipos que regresan fallando.</p>
+        <ul class="tips">
+          <li>Si un cliente regresa, crea una nueva "Garantia".</li>
+          <li>Puedes ligar la garantia directamente con el numero de Ticket anterior (Ej: ST-2026-042).</li>
+          <li>El sistema calcula los dias transcurridos y te alerta en rojo si la garantia ya expiro o sigue vigente, permitiendo ademas derivar el equipo directo a la marca externa.</li>
+        </ul>
+        <a href="garantias.html" target="_blank" class="link-btn">— Abrir Garantias</a>
+      </div>
+
+      <!-- SOPORTE Y BUSQUEDA MAESTRA -->
+      <div class="section" id="soporte">
+        <h2><i class="ph ph-magnifying-glass"></i> 6. Buscador Maestro (Soporte General)</h2>
+        <p>La herramienta para la recepcionista rapida.</p>
+        <ul class="tips">
+          <li>Si viene un cliente y solo trae su equipo con tu sticker, entra a esta pagina y <b>pistolea el sticker</b>.</li>
+          <li>El sistema buscara en la base de datos a la velocidad de la luz y te traera en una sola pantalla: Quien es el dueno, en que estado esta la reparacion actual, y todo su historial de las veces que trajo ese equipo antes.</li>
+          <li>Emitira alertas gigantes rojas/verdes indicando si ese equipo tiene garantia.</li>
+        </ul>
+        <a href="soporte.html" target="_blank" class="link-btn">— Abrir Buscador Maestro</a>
+      </div>
+
+      <!-- PORTAL CLIENTE -->
+      <div class="section" id="cliente">
+        <h2>ðŸŒ 7. Portal Publico del Cliente</h2>
+        <p>La pagina que ven los clientes (afuera de la empresa).</p>
+        <ul class="tips">
+          <li>El cliente no puede ver el sistema, solo ve la pagina `consulta.html`.</li>
+          <li>Ingresa su numero de ticket y el sistema le dibuja una linea de tiempo bonita (Recibido -> Reparando -> Listo). Elimina la necesidad de llamadas constantes preguntando "Ya esta mi equipo?".</li>
+        </ul>
+        <a href="consulta.html" target="_blank" class="link-btn">— Abrir Portal de Consulta</a>
+      </div>
+
+    </div>
+  </div>
+
+
+
+        </div>
+        
+        <!-- FAB Button -->
+        <button class="fab-chat" onclick="if(typeof abrirModalTareaGlobal === 'function') abrirModalTareaGlobal();" title="Crear Tarea Interna">
+            <i class="ph-bold ph-kanban"></i>
+        </button>
+
+    </main>
+
+    <!-- Scripts -->
+    <script src="js/dashboard.js?v=3"></script>
+
+</body>
+</html>

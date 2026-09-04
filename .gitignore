@@ -1,0 +1,6 @@
+backup.sql
+.gemini/
+*.log
+error_log*
+node_modules/
+.DS_Store

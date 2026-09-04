@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Turnos - Petulap SST</title>
+<link rel="stylesheet" href="css/tokens.css?v=1">
+    <link rel="stylesheet" href="css/styles.css?v=3">
+
+
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#F8FAFC">
+<script>
+if ("serviceWorker" in navigator) { window.addEventListener("load", () => { navigator.serviceWorker.register("sw.js").then(r => console.log("SW ok")).catch(e => console.log("SW fail", e)); }); }
+</script>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <!-- Dashboard Styles -->
+    <link rel="stylesheet" href="css/dashboard.css?v=3">
+
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="apple-touch-icon" href="icon.jpg">
+
+    <script>
+      (function(){
+        if(localStorage.getItem('petulap-theme') === 'dark') {
+          document.documentElement.setAttribute('data-theme', 'dark');
+        }
+      })();
+    </script>
+</head>
+<body class="dashboard-body">
+
+    <!-- MOBILE HEADER -->
+    <header class="mobile-header">
+        <button class="menu-toggle" id="mobile-menu-toggle">
+            <i class="ph ph-list"></i>
+        </button>
+        <div class="logo-container">
+            <div class="logo-icon">P</div>
+            <span>PETULAP S.A.C.</span>
+        </div>
+        
+                <button class="theme-toggle-btn" aria-label="Cambiar tema" onclick="toggleTheme()" style="background: none; border: none; font-size: 20px; cursor: pointer; color: var(--text-secondary); margin-right: 15px; display: flex; align-items: center;">
+                    <i class="ph ph-moon"></i>
+                </button>
+                <button class="notification-btn">
+            <i class="ph ph-bell"></i>
+        </button>
+    </header>
+
+    <!-- MOBILE SIDEBAR (ACCORDION) -->
+    <div class="mobile-sidebar" id="mobile-sidebar">
+        <div class="accordion-item active">
+            <div class="accordion-header">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <i class="ph ph-headset"></i>
+                    SOPORTE Y TALLER
+                </div>
+                <i class="ph ph-caret-down"></i>
+            </div>
+            <div class="accordion-content">
+                <a href="soporte.html" class="accordion-link">
+                    <i class="ph-fill ph-ticket acc-icon-green"></i>
+                    Tickets
+                </a>
+                <a href="mis_ordenes.html" class="accordion-link">
+                    <i class="ph-fill ph-kanban acc-icon-orange"></i>
+                    Kanban
+                </a>
+                <a href="tecnicos.html" class="accordion-link">
+                    <i class="ph-fill ph-users acc-icon-blue"></i>
+                    Tecnicos
+                </a>
+                <a href="recepcion_movil.html" class="accordion-link">
+                    <i class="ph-fill ph-device-mobile acc-icon-gray"></i>
+                    App Recepcion
+                </a>
+                <a href="garantias.html" class="accordion-link">
+                    <i class="ph-fill ph-shield-check acc-icon-blue"></i>
+                    Garantias
+                </a>
+            </div>
+        </div>
+
+        <div class="accordion-item">
+            <div class="accordion-header">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <i class="ph ph-package"></i>
+                    INVENTARIO Y OPERACIONES
+                </div>
+                <i class="ph ph-caret-down"></i>
+            </div>
+            <div class="accordion-content">
+                <a href="inventario.html" class="accordion-link">
+                    <i class="ph-fill ph-archive-box acc-icon-orange"></i>
+                    Inventario General
+                </a>
+                <a href="inventario_soporte.html" class="accordion-link">
+                    <i class="ph-fill ph-scan acc-icon-green"></i>
+                    Escaneo / Triaje Masivo
+                </a>
+                <a href="importar.html" class="accordion-link">
+                    <i class="ph-fill ph-download-simple acc-icon-blue"></i>
+                    Importar Excel
+                </a>
+                <a href="caja.html" class="accordion-link">
+                    <i class="ph-fill ph-money acc-icon-green"></i>
+                    Caja / Entregas
+                </a>
+            </div>
+        </div>
+
+        <div class="accordion-item danger-border">
+            <div class="accordion-header">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <i class="ph ph-wrench"></i>
+                    GERENCIA Y CLIENTES
+                </div>
+                <i class="ph ph-caret-down"></i>
+            </div>
+            <div class="accordion-content">
+                <a href="lotes.html" class="accordion-link">
+                    <i class="ph-fill ph-stack acc-icon-blue"></i>
+                    Lotes Masivos
+                </a>
+                <a href="clientes.html" class="accordion-link">
+                    <i class="ph-fill ph-user-list acc-icon-green"></i>
+                    Actividades y Clientes
+                </a>
+            </div>
+        </div>
+
+        <div class="accordion-item">
+            <div class="accordion-header">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <i class="ph ph-chart-line-up"></i>
+                    ADMINISTRACION Y OTROS
+                </div>
+                <i class="ph ph-caret-down"></i>
+            </div>
+            <div class="accordion-content">
+                <a href="reportes.html" class="accordion-link">
+                    <i class="ph-fill ph-chart-bar acc-icon-blue"></i>
+                    Lotes y Equipos (Reportes)
+                </a>
+                <a href="turnos.html" class="accordion-link">
+                    <i class="ph-fill ph-clock acc-icon-orange"></i>
+                    Asignacion Turnos
+                </a>
+                <a href="admin_roles.html" class="accordion-link">
+                    <i class="ph-fill ph-crown acc-icon-blue"></i>
+                    Roles y Permisos
+                </a>
+                <a href="manual.html" class="accordion-link">
+                    <i class="ph-fill ph-book-open acc-icon-gray"></i>
+                    Manual de Usuario
+                </a>
+            </div>
+        </div>
+        <div class="accordion-item danger-border">
+            <div class="accordion-header">
+                <div style="display: flex; align-items: center; gap: 10px; color: var(--danger);">
+                    <i class="ph ph-power"></i>
+                    SISTEMA
+                </div>
+                <i class="ph ph-caret-down"></i>
+            </div>
+            <div class="accordion-content">
+                <a href="#" class="accordion-link" onclick="clearCache(event)">
+                    <i class="ph-fill ph-trash acc-icon-orange"></i>
+                    Eliminar Cache
+                </a>
+                <a href="#" class="accordion-link" onclick="logout(event)">
+                    <i class="ph-fill ph-sign-out acc-icon-gray"></i>
+                    Cerrar Sesion
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- MOBILE BOTTOM NAV -->
+    <nav class="mobile-nav">
+        <a href="index.html" class="nav-item">
+            <i class="ph ph-house"></i>
+            <span>Dashboard</span>
+        </a>
+        <a href="consulta.html" class="nav-item">
+            <i class="ph ph-magnifying-glass"></i>
+            <span>Buscar</span>
+        </a>
+        <a href="login.html" class="nav-item">
+            <i class="ph ph-user"></i>
+            <span>Mi Cuenta</span>
+        </a>
+    </nav>
+
+    <!-- DESKTOP SIDEBAR -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <button class="menu-toggle">
+                <i class="ph ph-list"></i>
+            </button>
+            <div class="logo-container">
+                <div class="logo-icon">P</div>
+                <span>PETULAP S.A.C.</span>
+            </div>
+        </div>
+
+        <div class="sidebar-menu">
+            <a href="index.html" class="menu-item">
+                <div class="menu-item-left">
+                    <i class="ph ph-house"></i>
+                    <span>Panel de Control</span>
+                </div>
+            </a>
+
+            <div class="menu-section">
+                <span class="menu-title">Soporte y Taller</span>
+                <a href="soporte.html" class="menu-item">
+                    <div class="menu-item-left">
+                        <i class="ph ph-ticket"></i>
+                        <span>Tickets de Soporte</span>
+                    </div>
+                    <div class="status-dot dot-green"></div>
+                </a>
+                <a href="mis_ordenes.html" class="menu-item">
+                    <div class="menu-item-left">
+                        <i class="ph ph-kanban"></i>
+                        <span>Panel Kanban</span>
+                    </div>
+                    <div class="status-dot dot-yellow"></div>
+                </a>
+                <a href="tecnicos.html" class="menu-item">
+                    <div class="menu-item-left">
+                        <i class="ph ph-users"></i>
+                        <span>Tecnicos</span>
+                    </div>
+                    <div class="status-dot dot-yellow"></div>
+                </a>
+                <a href="recepcion_movil.html" class="menu-item">
+                    <div class="menu-item-left">
+                        <i class="ph ph-device-mobile"></i>
+                        <span>App Recepcion</span>
+                    </div>
+                    <div class="status-dot dot-gray"></div>
+                </a>
+            </div>
+
+            <div class="menu-section">
+                <span class="menu-title">Inventario y Operaciones</span>
+                <a href="inventario.html" class="menu-item">
+                    <div class="menu-item-left">
+                        <i class="ph ph-archive-box"></i>
+                        <span>Inventario General</span>
+                    </div>
+                    <div class="status-dot dot-red"></div>
+                </a>
+                <a href="inventario_soporte.html" class="menu-item">
+                    <div class="menu-item-left">
+                        <i class="ph ph-scan"></i>
+                        <span>Escaneo / Triaje</span>
+                    </div>
+                    <div class="status-dot dot-green"></div>
+                </a>
+                <a href="caja.html" class="menu-item">
+                    <div class="menu-item-left">
+                        <i class="ph ph-money"></i>
+                        <span>Caja / Entregas</span>
+                    </div>
+                    <div class="status-dot dot-blue"></div>
+                </a>
+            </div>
+            
+            <div class="menu-section">
+                <span class="menu-title">Gerencia y Utilidades</span>
+                <a href="reportes.html" class="menu-item">
+                    <div class="menu-item-left">
+                        <i class="ph ph-chart-bar"></i>
+                        <span>Reportes</span>
+                    </div>
+                    <div class="status-dot dot-blue"></div>
+                </a>
+                <a href="lotes.html" class="menu-item">
+                    <div class="menu-item-left">
+                        <i class="ph ph-stack"></i>
+                        <span>Lotes Masivos</span>
+                    </div>
+                    <div class="status-dot dot-blue"></div>
+                </a>
+                <a href="admin_roles.html" class="menu-item">
+                    <div class="menu-item-left">
+                        <i class="ph ph-crown"></i>
+                        <span>Roles y Permisos</span>
+                    </div>
+                    <div class="status-dot dot-yellow"></div>
+                </a>
+            </div>
+            <div class="menu-section">
+                <div class="menu-title" style="color: var(--danger)">SISTEMA</div>
+                <a href="#" class="menu-item" onclick="clearCache(event)">
+                    <div class="menu-item-left">
+                        <i class="ph ph-trash"></i>
+                        <span>Eliminar Cache</span>
+                    </div>
+                </a>
+                <a href="#" class="menu-item" onclick="logout(event)">
+                    <div class="menu-item-left">
+                        <i class="ph ph-sign-out"></i>
+                        <span>Cerrar Sesion</span>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <div class="sidebar-footer">
+            <button class="btn-minimize">
+                <i class="ph ph-arrow-left"></i>
+                <span>Minimizar</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- MAIN WRAPPER -->
+    <main class="main-wrapper">
+        
+        <!-- DESKTOP TOPBAR -->
+        <header class="topbar">
+            <div class="search-bar">
+                <i class="ph ph-magnifying-glass"></i>
+                <input type="text" placeholder="Buscar en el sistema...">
+            </div>
+            
+            <div class="topbar-right">
+                <button class="notification-btn">
+                    <i class="ph ph-bell"></i>
+                    <span class="badge-counter">3</span>
+                </button>
+                <a href="login.html" class="user-profile">
+                    <img src="https://ui-avatars.com/api/?name=User+Profile&background=0D8ABC&color=fff" alt="User Profile">
+                </a>
+            </div>
+        </header>
+
+        <!-- DASHBOARD CONTENT -->
+        <div class="content">
+
+
+
+<h2>ðŸ• Turnos de Tecnicos</h2>
+
+<!-- RELOJ EN TIEMPO REAL -->
+<div class="card" style="padding:10px 15px">
+  <span >Hora del servidor: </span>
+  <span class="reloj" id="reloj">--:--:--</span>
+  <span style="margin-left:15px">Dia: </span>
+  <span id="dia-hoy" ></span>
+</div>
+
+<!-- ESTADO ACTUAL DE TODOS LOS TECNICOS -->
+<div class="card">
+  <strong><i class="ph ph-users"></i> Estado de Turnos Ahora</strong>
+  <div id="estado-actual" style="margin-top:10px">Cargando...</div>
+</div>
+
+<!-- FORMULARIO EDICION -->
+<div class="card">
+  <strong id="form-titulo">Editar Turno</strong>
+  <div id="msg" class="msg"></div>
+  <div style="margin-top:10px">
+    <input type="hidden" id="edit-id">
+    <div style="margin-bottom:8px"><label>Tecnico: <span id="f-tecnico-nombre" >-</span></label></div>
+    <div style="margin-bottom:8px">
+      <label>Dias de trabajo</label>
+      <div id="dias-check" style="display:flex; flex-wrap:wrap; gap:5px; margin-top:5px">
+        <label style="display:flex; align-items:center; gap:4px"><input type="checkbox" class="dia-cb" value="Lunes"> Lun</label>
+        <label style="display:flex; align-items:center; gap:4px"><input type="checkbox" class="dia-cb" value="Martes"> Mar</label>
+        <label style="display:flex; align-items:center; gap:4px"><input type="checkbox" class="dia-cb" value="Miercoles"> Mie</label>
+        <label style="display:flex; align-items:center; gap:4px"><input type="checkbox" class="dia-cb" value="Jueves"> Jue</label>
+        <label style="display:flex; align-items:center; gap:4px"><input type="checkbox" class="dia-cb" value="Viernes"> Vie</label>
+        <label style="display:flex; align-items:center; gap:4px"><input type="checkbox" class="dia-cb" value="Sabado"> Sab</label>
+        <label style="display:flex; align-items:center; gap:4px"><input type="checkbox" class="dia-cb" value="Domingo"> Dom</label>
+        <button onclick="marcarTodos(true)" class="btn-sm" style="padding:3px 8px">Todos</button>
+        <button onclick="marcarTodos(false)" class="btn-sm" style="padding:3px 8px">Ninguno</button>
+      </div>
+    </div>
+    <div class="form-row">
+      <div><label>Hora inicio</label><input type="time" id="f-hora-ini" value="00:00"></div>
+      <div><label>Hora fin</label><input type="time" id="f-hora-fin" value="23:59"></div>
+    </div>
+    <div style="margin-bottom:8px">
+      <label><input type="checkbox" id="f-activo" checked> Turno activo</label>
+    </div>
+    <div style="display:flex; gap:10px">
+      <button class="btn-primary" onclick="guardar()">ðŸ’¾ Guardar Turno</button>
+      <button onclick="limpiar()" >Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- TABLA DE TURNOS -->
+<div id="tabla-container">Cargando...</div>
+
+<script src="js/sonidos.js"></script>
+<script src="js/check_auth.js"></script>
+<script>
+const API = 'api/turnos.php';
+let datos = [];
+let diaActual = '';
+let horaActual = '';
+
+// Reloj en tiempo real
+setInterval(async () => {
+  const res = await fetch(`${API}?action=estado_actual`).then(r=>r.json()).catch(()=>null);
+  if (res && res.ok) {
+    document.getElementById('reloj').textContent = res.hora_servidor;
+    document.getElementById('dia-hoy').textContent = res.dia;
+    diaActual = res.dia;
+    horaActual = res.hora_servidor;
+  }
+}, 5000);
+
+async function cargar() {
+  const [lista, estado] = await Promise.all([
+    fetch(`${API}?action=list`).then(r=>r.json()),
+    fetch(`${API}?action=estado_actual`).then(r=>r.json())
+  ]);
+
+  datos = lista.data || [];
+  horaActual = estado.hora_servidor || '';
+  diaActual = estado.dia || '';
+  document.getElementById('reloj').textContent = horaActual;
+  document.getElementById('dia-hoy').textContent = diaActual;
+
+  // Estado actual de todos
+  const tecEnTurno = (estado.data || []);
+  let htmlEst = '<div style="display:flex; flex-wrap:wrap; gap:10px">';
+  tecEnTurno.forEach(t => {
+    const cls = t.en_turno_ahora ? 'en-turno' : 'fuera-turno';
+    const ic = t.en_turno_ahora ? 'ðŸŸ¢' : '´';
+    htmlEst += `<div style="border-radius:6px; padding:8px 12px; min-width:160px">
+      <div >${ic} ${t.tecnico_nombre}</div>
+      <div >${t.especialidad||''}</div>
+      <div style="margin-top:4px"><span class="${cls}">${t.en_turno_ahora?'EN TURNO':'FUERA DE TURNO'}</span></div>
+      <div style="margin-top:3px">${t.hora_inicio.substring(0,5)}â€“${t.hora_fin.substring(0,5)}</div>
+    </div>`;
+  });
+  htmlEst += '</div>';
+  document.getElementById('estado-actual').innerHTML = htmlEst;
+
+  renderizar(datos);
+}
+
+const DIAS_TODOS = ["Lunes","Martes","Miercoles","Jueves","Viernes","Sabado","Domingo"];
+
+function renderizar(lista) {
+  if (!lista.length) { document.getElementById('tabla-container').innerHTML='<p >Sin turnos</p>'; return; }
+  let html = `<table><thead><tr><th>Tecnico</th><th>Especialidad</th><th>Dias</th><th>Horario</th><th>Estado Ahora</th><th>Activo</th><th>Editar</th></tr></thead><tbody>`;
+  lista.forEach(t => {
+    const dias = t.dias_trabajo ? t.dias_trabajo.split(',') : [];
+    const diasHtml = DIAS_TODOS.map(d => {
+      const activo = dias.includes(d);
+      return `<span class="dia-check ${activo?'dia-activo':'dia-inactivo'}">${d.substring(0,3)}</span>`;
+    }).join('');
+    // Calcular si esta en turno ahora
+    const enDia = dias.includes(diaActual);
+    const enHora = horaActual >= t.hora_inicio && horaActual <= t.hora_fin;
+    const enTurno = enDia && enHora;
+    const badgeTurno = enTurno
+      ? '<span class="en-turno">ðŸŸ¢ EN TURNO</span>'
+      : `<span class="fuera-turno">´ FUERA</span>`;
+    const badgeActivo = t.activo == 1
+      ? '<span >Activo</span>'
+      : '<span >Inactivo</span>';
+
+    html += `<tr>
+      <td><b>${t.tecnico_nombre}</b><br><small >DNI: ${t.dni}</small></td>
+      <td>${t.especialidad||'-'}</td>
+      <td>${diasHtml}</td>
+      <td >${t.hora_inicio.substring(0,5)} â€“ ${t.hora_fin.substring(0,5)}</td>
+      <td>${badgeTurno}</td>
+      <td>${badgeActivo}</td>
+      <td><button class="btn-primary btn-sm" onclick="editar(${t.id})">âœï¸ Editar</button></td>
+    </tr>`;
+  });
+  html += '</tbody></table>';
+  document.getElementById('tabla-container').innerHTML = html;
+}
+
+function editar(id) {
+  const t = datos.find(x=>x.id==id); if (!t) return;
+  document.getElementById('edit-id').value = t.id;
+  document.getElementById('f-tecnico-nombre').textContent = t.tecnico_nombre + ' (' + (t.especialidad||'') + ')';
+  document.getElementById('form-titulo').textContent = 'Editando Turno: ' + t.tecnico_nombre;
+
+  const dias = (t.dias_trabajo || '').split(',');
+  document.querySelectorAll('.dia-cb').forEach(cb => {
+    cb.checked = dias.includes(cb.value);
+  });
+  document.getElementById('f-hora-ini').value = t.hora_inicio.substring(0,5);
+  document.getElementById('f-hora-fin').value = t.hora_fin.substring(0,5);
+  document.getElementById('f-activo').checked = t.activo == 1;
+  window.scrollTo(0, 300);
+}
+
+function marcarTodos(val) {
+  document.querySelectorAll('.dia-cb').forEach(cb => cb.checked = val);
+}
+
+async function guardar() {
+  const id = document.getElementById('edit-id').value;
+  if (!id) { mostrarMsg('Selecciona un turno de la tabla para editar','err'); return; }
+  const dias = Array.from(document.querySelectorAll('.dia-cb:checked')).map(cb=>cb.value).join(',');
+  if (!dias) { mostrarMsg('Selecciona al menos un dia','err'); return; }
+  const body = {
+    id: parseInt(id),
+    dias_trabajo: dias,
+    hora_inicio: document.getElementById('f-hora-ini').value + ':00',
+    hora_fin: document.getElementById('f-hora-fin').value + ':59',
+    activo: document.getElementById('f-activo').checked ? 1 : 0
+  };
+  const res = await fetch(`${API}?action=editar`, { method:'POST', body:JSON.stringify(body) }).then(r=>r.json());
+  mostrarMsg(res.msg, res.ok?'ok':'err');
+  if (res.ok) { limpiar(); cargar(); }
+}
+
+function limpiar() {
+  document.getElementById('edit-id').value='';
+  document.getElementById('f-tecnico-nombre').textContent='-';
+  document.getElementById('form-titulo').textContent='Editar Turno';
+  mostrarMsg('','');
+}
+
+function mostrarMsg(txt, tipo) {
+  const el = document.getElementById('msg');
+  el.textContent=txt; el.className='msg '+(tipo||'');
+}
+
+cargar();
+</script>
+
+
+        </div>
+        
+        <!-- FAB Button -->
+        <button class="fab-chat" onclick="if(typeof abrirModalTareaGlobal === 'function') abrirModalTareaGlobal();" title="Crear Tarea Interna">
+            <i class="ph-bold ph-kanban"></i>
+        </button>
+
+    </main>
+
+    <!-- Scripts -->
+    <script src="js/dashboard.js?v=3"></script>
+
+</body>
+</html>

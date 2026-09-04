@@ -1,0 +1,96 @@
+/*
+   Petulap Design System - Premium Overhaul
+*/
+:root {
+    /* 1.1 Superficies (Premium Light) */
+    --bg-page: #F3F6F9;
+    --bg-surface: #FFFFFF;
+    --bg-surface-glass: rgba(255, 255, 255, 0.85);
+    --bg-surface-hover: #F8FAFC;
+    --bg-sidebar: #0F172A;
+    
+    /* Layout Variables */
+    --sidebar-width: 260px;
+    --header-height: 70px;
+
+    /* 1.2 Textos */
+    --text-primary: #1E293B;
+    --text-secondary: #64748B;
+    --text-muted: #94A3B8;
+    --text-on-brand: #FFFFFF;
+
+    /* 1.3 Bordes y sombras Premium */
+    --border-default: rgba(15, 23, 42, 0.15);
+    --border-strong: rgba(15, 23, 42, 0.25);
+    --shadow-sm: 0 2px 4px rgba(15, 23, 42, 0.05);
+    --shadow-md: 0 4px 12px rgba(15, 23, 42, 0.08), 0 2px 4px rgba(15, 23, 42, 0.04);
+    --shadow-lg: 0 15px 50px -10px rgba(0,0,0,0.15);
+    --shadow-card: 0 10px 40px -10px rgba(0,0,0,0.1);
+    --shadow-glow: 0 8px 16px -4px rgba(37, 99, 235, 0.35); /* Glow para primary */
+
+    /* 1.4 Colores Vibrantes (Semanticos) */
+    --color-brand: #2563EB;
+    --color-brand-hover: #1D4ED8;
+    --color-brand-gradient: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%);
+    
+    --color-success: #10B981;
+    --color-warning: #F59E0B;
+    --color-danger: #F43F5E;
+    --color-info: #0EA5E9;
+
+    --bg-success-subtle: #D1FAE5;
+    --bg-warning-subtle: #FEF3C7;
+    --bg-danger-subtle: #FFE4E6;
+    --bg-info-subtle: #E0F2FE;
+    --bg-brand-subtle: #EFF6FF;
+
+    --text-success: #047857;
+    --text-warning: #B45309;
+    --text-danger: #BE123C;
+    --text-info: #0369A1;
+
+    /* 1.5 Variables Base */
+    --radius-sm: 12px;
+    --radius-md: 20px; /* Bordes mas redondeados y modernos (WOW) */
+    --radius-lg: 24px;
+    --font-family: 'Inter', system-ui, sans-serif;
+    
+    /* Animaciones */
+    --transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    --transition-fast: all 0.15s ease-out;
+}
+
+[data-theme="dark"] {
+    /* Superficies (Premium Dark) */
+    --bg-page: #0B0F19;
+    --bg-surface: #131A2B;
+    --bg-surface-glass: rgba(19, 26, 43, 0.85);
+    --bg-surface-hover: #1E293B;
+    --bg-sidebar: #090C14;
+
+    /* Textos */
+    --text-primary: #F8FAFC;
+    --text-secondary: #94A3B8;
+    --text-muted: #64748B;
+
+    /* Bordes y sombras */
+    --border-default: rgba(255, 255, 255, 0.08);
+    --border-strong: rgba(255, 255, 255, 0.15);
+    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.4);
+    --shadow-md: 0 6px 12px rgba(0, 0, 0, 0.5);
+    --shadow-lg: 0 15px 30px rgba(0, 0, 0, 0.6);
+    --shadow-card: 0 10px 20px rgba(0, 0, 0, 0.4);
+    --shadow-glow: 0 8px 16px -4px rgba(59, 130, 246, 0.4);
+
+    /* Colores Semanticos (Ajustados para oscuro) */
+    --bg-success-subtle: rgba(16, 185, 129, 0.15);
+    --bg-warning-subtle: rgba(245, 158, 11, 0.15);
+    --bg-danger-subtle: rgba(244, 63, 94, 0.15);
+    --bg-info-subtle: rgba(14, 165, 233, 0.15);
+    --bg-brand-subtle: rgba(37, 99, 235, 0.15);
+
+    --text-success: #34D399;
+    --text-warning: #FBBF24;
+    --text-danger: #FB7185;
+    --text-info: #38BDF8;
+}

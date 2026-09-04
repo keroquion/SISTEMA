@@ -1,0 +1,113 @@
+<?php
+session_start();
+if (!isset($_SESSION['user_id'])) { header('HTTP/1.1 401 Unauthorized'); echo json_encode(['ok'=>false, 'msg'=>'No autorizado']); exit; }
+require_once "config.php";
+$db = getDB();
+$action = $_GET["action"] ?? "list";
+
+switch ($action) {
+
+    case "list":
+        $estado = isset($_GET["estado"]) ? $db->real_escape_string($_GET["estado"]) : "";
+        $where = $estado ? "WHERE gp.estado = '$estado'" : "";
+        $sql = "SELECT gp.*, l.titulo as lote_titulo, l.tipo as lote_tipo,
+                (SELECT COUNT(*) FROM garantia_items gi WHERE gi.garantia_id = gp.id) as total_items
+                FROM garantias_proveedor gp
+                LEFT JOIN lotes l ON gp.lote_id = l.lote_id
+                $where ORDER BY gp.fecha_creacion DESC";
+        $result = $db->query($sql);
+        $rows = [];
+        while ($row = $result->fetch_assoc()) $rows[] = $row;
+        echo json_encode(["ok" => true, "data" => $rows]);
+        break;
+
+    case "ver":
+        $id = (int)($_GET["id"] ?? 0);
+        $result = $db->query("SELECT gp.*, l.titulo as lote_titulo FROM garantias_proveedor gp LEFT JOIN lotes l ON gp.lote_id = l.lote_id WHERE gp.id=$id LIMIT 1");
+        $gar = $result->fetch_assoc();
+        if (!$gar) { echo json_encode(["ok" => false, "msg" => "No encontrado"]); break; }
+        $items = $db->query("SELECT * FROM garantia_items WHERE garantia_id=$id ORDER BY tipo_item, marca");
+        $gar["items"] = [];
+        while ($row = $items->fetch_assoc()) $gar["items"][] = $row;
+        echo json_encode(["ok" => true, "data" => $gar]);
+        break;
+
+    // Crear garantia desde lote NACIONAL (con sus items fallados)
+    case "crear_desde_lote":
+        $data = json_decode(file_get_contents("php://input"), true);
+        $lote_id = $db->real_escape_string($data["lote_id"] ?? "");
+
+        // Verificar que sea lote NACIONAL
+        $lote = $db->query("SELECT * FROM lotes WHERE lote_id='$lote_id' LIMIT 1")->fetch_assoc();
+        if (!$lote) { echo json_encode(["ok" => false, "msg" => "Lote no encontrado"]); break; }
+        if ($lote["tipo"] !== "NACIONAL") { echo json_encode(["ok" => false, "msg" => "Solo lotes NACIONAL pueden generar garantia de proveedor"]); break; }
+
+        // Generar numero de garantia
+        $fecha = date("Ymd");
+        $res = $db->query("SELECT COUNT(*) as c FROM garantias_proveedor WHERE numero_garantia LIKE 'GAR-$fecha-%'");
+        $seq = str_pad((int)$res->fetch_assoc()["c"] + 1, 3, "0", STR_PAD_LEFT);
+        $numero = "GAR-$fecha-$seq";
+
+        $stmt = $db->prepare("INSERT INTO garantias_proveedor (numero_garantia, lote_id, proveedor_nombre, proveedor_ruc, total_equipos, total_repuestos, notas) VALUES (?,?,?,?,?,?,?)");
+        $prov = $data["proveedor_nombre"] ?? $lote["proveedor_nombre"];
+        $ruc = $data["proveedor_ruc"] ?? $lote["proveedor_ruc"];
+        $items_data = $data["items"] ?? [];
+        $total_eq = count(array_filter($items_data, fn($i) => ($i["tipo_item"] ?? "EQUIPO") === "EQUIPO"));
+        $total_rep = count($items_data) - $total_eq;
+        $notas = $data["notas"] ?? "";
+        $stmt->bind_param("ssssiis", $numero, $lote_id, $prov, $ruc, $total_eq, $total_rep, $notas);
+
+        if (!$stmt->execute()) { echo json_encode(["ok" => false, "msg" => $db->error]); break; }
+        $gar_id = $db->insert_id;
+
+        // Insertar items
+        foreach ($items_data as $item) {
+            $stmt2 = $db->prepare("INSERT INTO garantia_items (garantia_id, equipo_codigo, equipo_serie, marca, modelo, falla, tipo_item, pieza) VALUES (?,?,?,?,?,?,?,?)");
+            $cod = $item["equipo_codigo"] ?? "";
+            $ser = $item["equipo_serie"] ?? "";
+            $mar = $item["marca"] ?? "";
+            $mod = $item["modelo"] ?? "";
+            $fal = $item["falla"] ?? "";
+            $tip = $item["tipo_item"] ?? "EQUIPO";
+            $pie = $item["pieza"] ?? "";
+            $stmt2->bind_param("isssssss", $gar_id, $cod, $ser, $mar, $mod, $fal, $tip, $pie);
+            $stmt2->execute();
+        }
+
+        echo json_encode(["ok" => true, "id" => $gar_id, "numero" => $numero, "msg" => "Garantia $numero creada con " . count($items_data) . " items"]);
+        break;
+
+    // Crear garantia manual
+    case "crear":
+        $data = json_decode(file_get_contents("php://input"), true);
+        $fecha = date("Ymd");
+        $res = $db->query("SELECT COUNT(*) as c FROM garantias_proveedor WHERE numero_garantia LIKE 'GAR-$fecha-%'");
+        $seq = str_pad((int)$res->fetch_assoc()["c"] + 1, 3, "0", STR_PAD_LEFT);
+        $numero = "GAR-$fecha-$seq";
+        $lote_id = !empty($data["lote_id"]) ? $data["lote_id"] : null;
+        $prov = $data["proveedor_nombre"] ?? "";
+        $ruc = $data["proveedor_ruc"] ?? "";
+        $notas = $data["notas"] ?? "";
+        $stmt = $db->prepare("INSERT INTO garantias_proveedor (numero_garantia, lote_id, proveedor_nombre, proveedor_ruc, notas) VALUES (?,?,?,?,?)");
+        $stmt->bind_param("sssss", $numero, $lote_id, $prov, $ruc, $notas);
+        if ($stmt->execute()) echo json_encode(["ok" => true, "id" => $db->insert_id, "numero" => $numero, "msg" => "Garantia $numero creada"]);
+        else echo json_encode(["ok" => false, "msg" => $db->error]);
+        break;
+
+    // Actualizar estado
+    case "actualizar":
+        $data = json_decode(file_get_contents("php://input"), true);
+        $id = (int)($data["id"] ?? 0);
+        $estado = $db->real_escape_string($data["estado"] ?? "");
+        $tipo_res = isset($data["tipo_resolucion"]) ? "'" . $db->real_escape_string($data["tipo_resolucion"]) . "'" : "NULL";
+        $notas = $db->real_escape_string($data["notas"] ?? "");
+        $fecha_envio = $estado === "ENVIADO" ? ", fecha_envio=NOW()" : "";
+        $fecha_res = in_array($estado, ["RESUELTO","RECHAZADO"]) ? ", fecha_resolucion=NOW()" : "";
+        $db->query("UPDATE garantias_proveedor SET estado='$estado', tipo_resolucion=$tipo_res, notas='$notas' $fecha_envio $fecha_res WHERE id=$id");
+        echo json_encode(["ok" => true, "msg" => "Estado actualizado a $estado"]);
+        break;
+
+    default:
+        echo json_encode(["ok" => false, "msg" => "Accion no valida"]);
+}
+$db->close();

@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Tecnicos - Petulap SST</title>
+<link rel="stylesheet" href="css/tokens.css?v=1">
+    <link rel="stylesheet" href="css/styles.css?v=3">
+
+
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#F8FAFC">
+<script>
+if ("serviceWorker" in navigator) { window.addEventListener("load", () => { navigator.serviceWorker.register("sw.js").then(r => console.log("SW ok")).catch(e => console.log("SW fail", e)); }); }
+</script>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <!-- Dashboard Styles -->
+    <link rel="stylesheet" href="css/dashboard.css?v=3">
+
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="apple-touch-icon" href="icon.jpg">
+
+    <script>
+      (function(){
+        if(localStorage.getItem('petulap-theme') === 'dark') {
+          document.documentElement.setAttribute('data-theme', 'dark');
+        }
+      })();
+    </script>
+</head>
+<body class="dashboard-body">
+
+    <!-- MOBILE HEADER -->
+    <header class="mobile-header">
+        <button class="menu-toggle" id="mobile-menu-toggle">
+            <i class="ph ph-list"></i>
+        </button>
+        <div class="logo-container">
+            <div class="logo-icon">P</div>
+            <span>PETULAP S.A.C.</span>
+        </div>
+        
+                <button class="theme-toggle-btn" aria-label="Cambiar tema" onclick="toggleTheme()" style="background: none; border: none; font-size: 20px; cursor: pointer; color: var(--text-secondary); margin-right: 15px; display: flex; align-items: center;">
+                    <i class="ph ph-moon"></i>
+                </button>
+                <button class="notification-btn">
+            <i class="ph ph-bell"></i>
+        </button>
+    </header>
+
+    <!-- MOBILE SIDEBAR (ACCORDION) -->
+    <div class="mobile-sidebar" id="mobile-sidebar">
+        <div class="accordion-item active">
+            <div class="accordion-header">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <i class="ph ph-headset"></i>
+                    SOPORTE Y TALLER
+                </div>
+                <i class="ph ph-caret-down"></i>
+            </div>
+            <div class="accordion-content">
+                <a href="soporte.html" class="accordion-link">
+                    <i class="ph-fill ph-ticket acc-icon-green"></i>
+                    Tickets
+                </a>
+                <a href="mis_ordenes.html" class="accordion-link">
+                    <i class="ph-fill ph-kanban acc-icon-orange"></i>
+                    Kanban
+                </a>
+                <a href="tecnicos.html" class="accordion-link">
+                    <i class="ph-fill ph-users acc-icon-blue"></i>
+                    Tecnicos
+                </a>
+                <a href="recepcion_movil.html" class="accordion-link">
+                    <i class="ph-fill ph-device-mobile acc-icon-gray"></i>
+                    App Recepcion
+                </a>
+                <a href="garantias.html" class="accordion-link">
+                    <i class="ph-fill ph-shield-check acc-icon-blue"></i>
+                    Garantias
+                </a>
+            </div>
+        </div>
+
+        <div class="accordion-item">
+            <div class="accordion-header">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <i class="ph ph-package"></i>
+                    INVENTARIO Y OPERACIONES
+                </div>
+                <i class="ph ph-caret-down"></i>
+            </div>
+            <div class="accordion-content">
+                <a href="inventario.html" class="accordion-link">
+                    <i class="ph-fill ph-archive-box acc-icon-orange"></i>
+                    Inventario General
+                </a>
+                <a href="inventario_soporte.html" class="accordion-link">
+                    <i class="ph-fill ph-scan acc-icon-green"></i>
+                    Escaneo / Triaje Masivo
+                </a>
+                <a href="importar.html" class="accordion-link">
+                    <i class="ph-fill ph-download-simple acc-icon-blue"></i>
+                    Importar Excel
+                </a>
+                <a href="caja.html" class="accordion-link">
+                    <i class="ph-fill ph-money acc-icon-green"></i>
+                    Caja / Entregas
+                </a>
+            </div>
+        </div>
+
+        <div class="accordion-item danger-border">
+            <div class="accordion-header">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <i class="ph ph-wrench"></i>
+                    GERENCIA Y CLIENTES
+                </div>
+                <i class="ph ph-caret-down"></i>
+            </div>
+            <div class="accordion-content">
+                <a href="lotes.html" class="accordion-link">
+                    <i class="ph-fill ph-stack acc-icon-blue"></i>
+                    Lotes Masivos
+                </a>
+                <a href="clientes.html" class="accordion-link">
+                    <i class="ph-fill ph-user-list acc-icon-green"></i>
+                    Actividades y Clientes
+                </a>
+            </div>
+        </div>
+
+        <div class="accordion-item">
+            <div class="accordion-header">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <i class="ph ph-chart-line-up"></i>
+                    ADMINISTRACION Y OTROS
+                </div>
+                <i class="ph ph-caret-down"></i>
+            </div>
+            <div class="accordion-content">
+                <a href="reportes.html" class="accordion-link">
+                    <i class="ph-fill ph-chart-bar acc-icon-blue"></i>
+                    Lotes y Equipos (Reportes)
+                </a>
+                <a href="turnos.html" class="accordion-link">
+                    <i class="ph-fill ph-clock acc-icon-orange"></i>
+                    Asignacion Turnos
+                </a>
+                <a href="admin_roles.html" class="accordion-link">
+                    <i class="ph-fill ph-crown acc-icon-blue"></i>
+                    Roles y Permisos
+                </a>
+                <a href="manual.html" class="accordion-link">
+                    <i class="ph-fill ph-book-open acc-icon-gray"></i>
+                    Manual de Usuario
+                </a>
+            </div>
+        </div>
+        <div class="accordion-item danger-border">
+            <div class="accordion-header">
+                <div style="display: flex; align-items: center; gap: 10px; color: var(--danger);">
+                    <i class="ph ph-power"></i>
+                    SISTEMA
+                </div>
+                <i class="ph ph-caret-down"></i>
+            </div>
+            <div class="accordion-content">
+                <a href="#" class="accordion-link" onclick="clearCache(event)">
+                    <i class="ph-fill ph-trash acc-icon-orange"></i>
+                    Eliminar Cache
+                </a>
+                <a href="#" class="accordion-link" onclick="logout(event)">
+                    <i class="ph-fill ph-sign-out acc-icon-gray"></i>
+                    Cerrar Sesion
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- MOBILE BOTTOM NAV -->
+    <nav class="mobile-nav">
+        <a href="index.html" class="nav-item">
+            <i class="ph ph-house"></i>
+            <span>Dashboard</span>
+        </a>
+        <a href="consulta.html" class="nav-item">
+            <i class="ph ph-magnifying-glass"></i>
+            <span>Buscar</span>
+        </a>
+        <a href="login.html" class="nav-item">
+            <i class="ph ph-user"></i>
+            <span>Mi Cuenta</span>
+        </a>
+    </nav>
+
+    <!-- DESKTOP SIDEBAR -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <button class="menu-toggle">
+                <i class="ph ph-list"></i>
+            </button>
+            <div class="logo-container">
+                <div class="logo-icon">P</div>
+                <span>PETULAP S.A.C.</span>
+            </div>
+        </div>
+
+        <div class="sidebar-menu">
+            <a href="index.html" class="menu-item">
+                <div class="menu-item-left">
+                    <i class="ph ph-house"></i>
+                    <span>Panel de Control</span>
+                </div>
+            </a>
+
+            <div class="menu-section">
+                <span class="menu-title">Soporte y Taller</span>
+                <a href="soporte.html" class="menu-item">
+                    <div class="menu-item-left">
+                        <i class="ph ph-ticket"></i>
+                        <span>Tickets de Soporte</span>
+                    </div>
+                    <div class="status-dot dot-green"></div>
+                </a>
+                <a href="mis_ordenes.html" class="menu-item">
+                    <div class="menu-item-left">
+                        <i class="ph ph-kanban"></i>
+                        <span>Panel Kanban</span>
+                    </div>
+                    <div class="status-dot dot-yellow"></div>
+                </a>
+                <a href="tecnicos.html" class="menu-item">
+                    <div class="menu-item-left">
+                        <i class="ph ph-users"></i>
+                        <span>Tecnicos</span>
+                    </div>
+                    <div class="status-dot dot-yellow"></div>
+                </a>
+                <a href="recepcion_movil.html" class="menu-item">
+                    <div class="menu-item-left">
+                        <i class="ph ph-device-mobile"></i>
+                        <span>App Recepcion</span>
+                    </div>
+                    <div class="status-dot dot-gray"></div>
+                </a>
+            </div>
+
+            <div class="menu-section">
+                <span class="menu-title">Inventario y Operaciones</span>
+                <a href="inventario.html" class="menu-item">
+                    <div class="menu-item-left">
+                        <i class="ph ph-archive-box"></i>
+                        <span>Inventario General</span>
+                    </div>
+                    <div class="status-dot dot-red"></div>
+                </a>
+                <a href="inventario_soporte.html" class="menu-item">
+                    <div class="menu-item-left">
+                        <i class="ph ph-scan"></i>
+                        <span>Escaneo / Triaje</span>
+                    </div>
+                    <div class="status-dot dot-green"></div>
+                </a>
+                <a href="caja.html" class="menu-item">
+                    <div class="menu-item-left">
+                        <i class="ph ph-money"></i>
+                        <span>Caja / Entregas</span>
+                    </div>
+                    <div class="status-dot dot-blue"></div>
+                </a>
+            </div>
+            
+            <div class="menu-section">
+                <span class="menu-title">Gerencia y Utilidades</span>
+                <a href="reportes.html" class="menu-item">
+                    <div class="menu-item-left">
+                        <i class="ph ph-chart-bar"></i>
+                        <span>Reportes</span>
+                    </div>
+                    <div class="status-dot dot-blue"></div>
+                </a>
+                <a href="lotes.html" class="menu-item">
+                    <div class="menu-item-left">
+                        <i class="ph ph-stack"></i>
+                        <span>Lotes Masivos</span>
+                    </div>
+                    <div class="status-dot dot-blue"></div>
+                </a>
+                <a href="admin_roles.html" class="menu-item">
+                    <div class="menu-item-left">
+                        <i class="ph ph-crown"></i>
+                        <span>Roles y Permisos</span>
+                    </div>
+                    <div class="status-dot dot-yellow"></div>
+                </a>
+            </div>
+            <div class="menu-section">
+                <div class="menu-title" style="color: var(--danger)">SISTEMA</div>
+                <a href="#" class="menu-item" onclick="clearCache(event)">
+                    <div class="menu-item-left">
+                        <i class="ph ph-trash"></i>
+                        <span>Eliminar Cache</span>
+                    </div>
+                </a>
+                <a href="#" class="menu-item" onclick="logout(event)">
+                    <div class="menu-item-left">
+                        <i class="ph ph-sign-out"></i>
+                        <span>Cerrar Sesion</span>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <div class="sidebar-footer">
+            <button class="btn-minimize">
+                <i class="ph ph-arrow-left"></i>
+                <span>Minimizar</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- MAIN WRAPPER -->
+    <main class="main-wrapper">
+        
+        <!-- DESKTOP TOPBAR -->
+        <header class="topbar">
+            <div class="search-bar">
+                <i class="ph ph-magnifying-glass"></i>
+                <input type="text" placeholder="Buscar en el sistema...">
+            </div>
+            
+            <div class="topbar-right">
+                <button class="notification-btn">
+                    <i class="ph ph-bell"></i>
+                    <span class="badge-counter">3</span>
+                </button>
+                <a href="login.html" class="user-profile">
+                    <img src="https://ui-avatars.com/api/?name=User+Profile&background=0D8ABC&color=fff" alt="User Profile">
+                </a>
+            </div>
+        </header>
+
+        <!-- DASHBOARD CONTENT -->
+        <div class="content">
+
+
+
+<h2><i class="ph ph-wrench"></i> Gestion de Tecnicos</h2>
+
+<div class="card">
+  <strong id="form-title">Nuevo Tecnico</strong>
+  <div id="msg" class="msg"></div>
+  <div style="margin-top:10px">
+    <input type="hidden" id="edit-id" value="">
+    <div class="form-row">
+      <div>
+        <label>DNI *</label>
+        <div style="display:flex; gap:5px">
+          <input type="text" id="f-dni" placeholder="12345678" maxlength="20" style="flex:1" oninput="if(this.value.trim().length===8 && !document.getElementById('edit-id').value) consultarDNI();">
+          <button onclick="consultarDNI()" type="button" style="white-space:nowrap; padding:7px 10px; background:transparent; border-radius:4px; cursor:pointer" onmouseover="this.style.background='#00c6ff'; this.style.color='#16213e';" onmouseout="this.style.background='transparent'; this.style.color='#00c6ff';"><i class="ph ph-magnifying-glass"></i> RENIEC</button>
+        </div>
+      </div>
+      <div><label>Telefono</label><input type="text" id="f-tel" placeholder="936183039" maxlength="20"></div>
+    </div>
+    <div class="form-row">
+      <div><label>Nombre *</label><input type="text" id="f-nombre" placeholder="Kevin"></div>
+      <div><label>Apellido</label><input type="text" id="f-apellido" placeholder="Rodriguez"></div>
+    </div>
+    <div class="form-row">
+      <div><label>Contrasena</label><input type="password" id="f-pass" placeholder="(Dejar vacio para no cambiar)"></div>
+    </div>
+    <div style="margin-bottom:8px">
+      <label>Especialidad</label>
+      <select id="f-espec">
+        <option value="">Sin especialidad</option>
+        <option value="Implementacion y Clonacion">Implementacion y Clonacion</option>
+        <option value="Limpieza y Testeo">Limpieza y Testeo</option>
+        <option value="Soporte Tecnico">Soporte Tecnico</option>
+        <option value="Encargado General">Encargado General</option>
+        <option value="Administrador">Administrador</option>
+      </select>
+    </div>
+    <div style="margin-bottom:8px"><label>Turno</label>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px">
+        <div><label>Hora inicio</label><input type="time" id="f-hora-ini" value="08:00"></div>
+        <div><label>Hora fin</label><input type="time" id="f-hora-fin" value="18:00"></div>
+      </div>
+    </div>
+    <div style="margin-bottom:8px"><label>Notas</label><textarea id="f-notas" rows="2" placeholder="Observaciones..."></textarea></div>
+    <div style="display:flex; gap:10px">
+      <button class="btn-primary" onclick="guardar()">ðŸ’¾ Guardar</button>
+      <button onclick="limpiarForm()" >Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<div style="display:flex; gap:10px; margin-bottom:10px">
+  <input type="text" id="buscar-input" placeholder="Buscar tecnico..." oninput="buscar(this.value)" style="flex:1">
+  <button class="btn-primary" onclick="cargar()"><i class="ph ph-arrow-clockwise"></i> Refrescar</button>
+</div>
+<div id="tabla-container">Cargando...</div>
+
+<script src="js/sonidos.js"></script>
+<script src="js/check_auth.js"></script>
+<script>
+const API = 'api/personas.php';
+let datos = [];
+
+async function cargar() {
+  const [tec, adm] = await Promise.all([
+    fetch(`${API}?action=list&tipo=tecnico`).then(r=>r.json()),
+    fetch(`${API}?action=list&tipo=admin`).then(r=>r.json())
+  ]);
+  datos = [...(tec.data||[]), ...(adm.data||[])];
+  renderizar(datos);
+}
+
+function buscar(q) {
+  if (!q) { renderizar(datos); return; }
+  q = q.toLowerCase();
+  renderizar(datos.filter(d => (d.nombre+' '+d.apellido+' '+d.dni+' '+d.especialidad).toLowerCase().includes(q)));
+}
+
+function renderizar(lista) {
+  if (!lista.length) { document.getElementById('tabla-container').innerHTML='<p >Sin resultados</p>'; return; }
+  let html = `<table><thead><tr><th>DNI</th><th>Nombre</th><th>Especialidad</th><th>Tipo</th><th>Telefono</th><th>Estado</th><th>Acciones</th></tr></thead><tbody>`;
+  lista.forEach(c => {
+    const badge = c.activo==1 ? '<span class="badge badge-activo">Activo</span>' : '<span class="badge badge-inactivo">Inactivo</span>';
+    const tipoBadge = c.tipo==='admin' ? '<span >Admin</span>' : '<span >Tecnico</span>';
+    html += `<tr>
+      <td><b>${c.dni}</b></td>
+      <td>${c.nombre} ${c.apellido}</td>
+      <td>${c.especialidad||'-'}</td>
+      <td>${tipoBadge}</td>
+      <td>${c.telefono||''}</td>
+      <td>${badge}</td>
+      <td>
+        <button class="btn-primary btn-sm" onclick="editar(${c.id})">âœï¸ Editar</button>
+        <button class="btn-sm" onclick="toggleActivo(${c.id},${c.activo})" >${c.activo?'Desactivar':'Activar'}</button>
+        <button class="btn-danger btn-sm" onclick="eliminar(${c.id},'${c.nombre}')"></button>
+      </td>
+    </tr>`;
+  });
+  html += '</tbody></table>';
+  document.getElementById('tabla-container').innerHTML = html;
+}
+
+function limpiarForm() {
+  document.getElementById('edit-id').value='';
+  ['f-dni','f-nombre','f-apellido','f-notas','f-pass'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('f-tel').value='936183039';
+  document.getElementById('f-espec').value='';
+  document.getElementById('f-hora-ini').value='08:00';
+  document.getElementById('f-hora-fin').value='18:00';
+  document.getElementById('form-title').textContent='Nuevo Tecnico';
+  mostrarMsg('','');
+}
+
+function editar(id) {
+  const c = datos.find(x=>x.id==id); if (!c) return;
+  document.getElementById('edit-id').value=c.id;
+  document.getElementById('f-dni').value=c.dni;
+  document.getElementById('f-nombre').value=c.nombre;
+  document.getElementById('f-apellido').value=c.apellido||'';
+  document.getElementById('f-tel').value=c.telefono||'';
+  document.getElementById('f-espec').value=c.especialidad||'';
+  document.getElementById('f-notas').value=c.notas||'';
+  document.getElementById('f-pass').value='';
+  document.getElementById('form-title').textContent='Editar: '+c.nombre+' '+c.apellido;
+  window.scrollTo(0,0);
+}
+
+async function guardar() {
+  const id = document.getElementById('edit-id').value;
+  const dni = document.getElementById('f-dni').value.trim();
+  const nombre = document.getElementById('f-nombre').value.trim();
+  const password = document.getElementById('f-pass').value.trim();
+  if (!nombre) { mostrarMsg('El nombre es obligatorio','err'); return; }
+  if (!dni) { mostrarMsg('El DNI es obligatorio','err'); return; }
+
+  const body = {
+    id: id||null, dni, nombre, password,
+    apellido: document.getElementById('f-apellido').value.trim(),
+    telefono: document.getElementById('f-tel').value.trim()||'936183039',
+    tipo: 'tecnico',
+    especialidad: document.getElementById('f-espec').value,
+    notas: document.getElementById('f-notas').value.trim(),
+    activo: 1
+  };
+
+  const action = id ? 'editar' : 'crear';
+  const res = await fetch(`${API}?action=${action}`, { method:'POST', body:JSON.stringify(body) }).then(r=>r.json());
+  mostrarMsg(res.msg||'OK', res.ok?'ok':'err');
+  if (res.ok) { limpiarForm(); cargar(); }
+}
+
+async function toggleActivo(id, activo) {
+  const c = datos.find(x=>x.id==id); if (!c) return;
+  const body = { id, nombre:c.nombre, apellido:c.apellido||'', telefono:c.telefono||'', especialidad:c.especialidad||'', activo: activo?0:1, notas:c.notas||'' };
+  const res = await fetch(`${API}?action=editar`, { method:'POST', body:JSON.stringify(body) }).then(r=>r.json());
+  mostrarMsg(res.msg, res.ok?'ok':'err');
+  if (res.ok) cargar();
+}
+
+async function eliminar(id, nombre) {
+  if (!confirm(`Eliminar a ${nombre}?`)) return;
+  const res = await fetch(`${API}?action=eliminar&id=${id}`).then(r=>r.json());
+  mostrarMsg(res.msg, res.ok?'ok':'err');
+  if (res.ok) cargar();
+}
+
+function mostrarMsg(txt, tipo) {
+  const el = document.getElementById('msg');
+  el.textContent=txt; el.className='msg '+(tipo||'');
+}
+
+async function consultarDNI() {
+  const dni = document.getElementById('f-dni').value.trim();
+  if (dni.length !== 8) { mostrarMsg('El DNI debe tener 8 digitos', 'err'); return; }
+  mostrarMsg('Consultando RENIEC...', '');
+  const res = await fetch(`api/personas.php?action=consultar_dni&dni=${dni}`).then(r=>r.json());
+  if (res.ok) {
+    document.getElementById('f-nombre').value = res.data.nombre;
+    document.getElementById('f-apellido').value = res.data.apellido;
+    mostrarMsg('Datos autocompletados desde RENIEC âœ“', 'ok');
+  } else {
+    mostrarMsg(res.msg, 'err');
+  }
+}
+
+cargar();
+</script>
+
+
+        </div>
+        
+        <!-- FAB Button -->
+        <button class="fab-chat" onclick="if(typeof abrirModalTareaGlobal === 'function') abrirModalTareaGlobal();" title="Crear Tarea Interna">
+            <i class="ph-bold ph-kanban"></i>
+        </button>
+
+    </main>
+
+    <!-- Scripts -->
+    <script src="js/dashboard.js?v=3"></script>
+
+</body>
+</html>

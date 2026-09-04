@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Reportes Generales - Petulap SST</title>
+<link rel="stylesheet" href="css/tokens.css?v=1">
+    <link rel="stylesheet" href="css/styles.css?v=3">
+
+
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#F8FAFC">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <!-- Dashboard Styles -->
+    <link rel="stylesheet" href="css/dashboard.css?v=3">
+
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="apple-touch-icon" href="icon.jpg">
+
+    <script>
+      (function(){
+        if(localStorage.getItem('petulap-theme') === 'dark') {
+          document.documentElement.setAttribute('data-theme', 'dark');
+        }
+      })();
+    </script>
+<script>
+if ("serviceWorker" in navigator) { window.addEventListener("load", () => { navigator.serviceWorker.register("sw.js").then(r => console.log("SW ok")).catch(e => console.log("SW fail", e)); }); }
+</script>
+</head>
+<body class="dashboard-body">
+
+    <!-- MOBILE HEADER -->
+    <header class="mobile-header">
+        <button class="menu-toggle" id="mobile-menu-toggle">
+            <i class="ph ph-list"></i>
+        </button>
+        <div class="logo-container">
+            <div class="logo-icon">P</div>
+            <span>PETULAP S.A.C.</span>
+        </div>
+        
+                <button class="theme-toggle-btn" aria-label="Cambiar tema" onclick="toggleTheme()" style="background: none; border: none; font-size: 20px; cursor: pointer; color: var(--text-secondary); margin-right: 15px; display: flex; align-items: center;">
+                    <i class="ph ph-moon"></i>
+                </button>
+                <button class="notification-btn">
+            <i class="ph ph-bell"></i>
+        </button>
+    </header>
+
+    <!-- MOBILE SIDEBAR (ACCORDION) -->
+    <div class="mobile-sidebar" id="mobile-sidebar">
+        <div class="accordion-item active">
+            <div class="accordion-header">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <i class="ph ph-headset"></i>
+                    SOPORTE Y TALLER
+                </div>
+                <i class="ph ph-caret-down"></i>
+            </div>
+            <div class="accordion-content">
+                <a href="soporte.html" class="accordion-link">
+                    <i class="ph-fill ph-ticket acc-icon-green"></i>
+                    Tickets
+                </a>
+                <a href="mis_ordenes.html" class="accordion-link">
+                    <i class="ph-fill ph-kanban acc-icon-orange"></i>
+                    Kanban
+                </a>
+                <a href="tecnicos.html" class="accordion-link">
+                    <i class="ph-fill ph-users acc-icon-blue"></i>
+                    Tecnicos
+                </a>
+                <a href="recepcion_movil.html" class="accordion-link">
+                    <i class="ph-fill ph-device-mobile acc-icon-gray"></i>
+                    App Recepcion
+                </a>
+                <a href="garantias.html" class="accordion-link">
+                    <i class="ph-fill ph-shield-check acc-icon-blue"></i>
+                    Garantias
+                </a>
+            </div>
+        </div>
+
+        <div class="accordion-item">
+            <div class="accordion-header">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <i class="ph ph-package"></i>
+                    INVENTARIO Y OPERACIONES
+                </div>
+                <i class="ph ph-caret-down"></i>
+            </div>
+            <div class="accordion-content">
+                <a href="inventario.html" class="accordion-link">
+                    <i class="ph-fill ph-archive-box acc-icon-orange"></i>
+                    Inventario General
+                </a>
+                <a href="inventario_soporte.html" class="accordion-link">
+                    <i class="ph-fill ph-scan acc-icon-green"></i>
+                    Escaneo / Triaje Masivo
+                </a>
+                <a href="importar.html" class="accordion-link">
+                    <i class="ph-fill ph-download-simple acc-icon-blue"></i>
+                    Importar Excel
+                </a>
+                <a href="caja.html" class="accordion-link">
+                    <i class="ph-fill ph-money acc-icon-green"></i>
+                    Caja / Entregas
+                </a>
+            </div>
+        </div>
+
+        <div class="accordion-item danger-border">
+            <div class="accordion-header">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <i class="ph ph-wrench"></i>
+                    GERENCIA Y CLIENTES
+                </div>
+                <i class="ph ph-caret-down"></i>
+            </div>
+            <div class="accordion-content">
+                <a href="lotes.html" class="accordion-link">
+                    <i class="ph-fill ph-stack acc-icon-blue"></i>
+                    Lotes Masivos
+                </a>
+                <a href="clientes.html" class="accordion-link">
+                    <i class="ph-fill ph-user-list acc-icon-green"></i>
+                    Actividades y Clientes
+                </a>
+            </div>
+        </div>
+
+        <div class="accordion-item">
+            <div class="accordion-header">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <i class="ph ph-chart-line-up"></i>
+                    ADMINISTRACION Y OTROS
+                </div>
+                <i class="ph ph-caret-down"></i>
+            </div>
+            <div class="accordion-content">
+                <a href="reportes.html" class="accordion-link">
+                    <i class="ph-fill ph-chart-bar acc-icon-blue"></i>
+                    Lotes y Equipos (Reportes)
+                </a>
+                <a href="turnos.html" class="accordion-link">
+                    <i class="ph-fill ph-clock acc-icon-orange"></i>
+                    Asignacion Turnos
+                </a>
+                <a href="admin_roles.html" class="accordion-link">
+                    <i class="ph-fill ph-crown acc-icon-blue"></i>
+                    Roles y Permisos
+                </a>
+                <a href="manual.html" class="accordion-link">
+                    <i class="ph-fill ph-book-open acc-icon-gray"></i>
+                    Manual de Usuario
+                </a>
+            </div>
+        </div>
+        <div class="accordion-item danger-border">
+            <div class="accordion-header">
+                <div style="display: flex; align-items: center; gap: 10px; color: var(--danger);">
+                    <i class="ph ph-power"></i>
+                    SISTEMA
+                </div>
+                <i class="ph ph-caret-down"></i>
+            </div>
+            <div class="accordion-content">
+                <a href="#" class="accordion-link" onclick="clearCache(event)">
+                    <i class="ph-fill ph-trash acc-icon-orange"></i>
+                    Eliminar Cache
+                </a>
+                <a href="#" class="accordion-link" onclick="logout(event)">
+                    <i class="ph-fill ph-sign-out acc-icon-gray"></i>
+                    Cerrar Sesion
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- MOBILE BOTTOM NAV -->
+    <nav class="mobile-nav">
+        <a href="index.html" class="nav-item">
+            <i class="ph ph-house"></i>
+            <span>Dashboard</span>
+        </a>
+        <a href="consulta.html" class="nav-item">
+            <i class="ph ph-magnifying-glass"></i>
+            <span>Buscar</span>
+        </a>
+        <a href="login.html" class="nav-item">
+            <i class="ph ph-user"></i>
+            <span>Mi Cuenta</span>
+        </a>
+    </nav>
+
+    <!-- DESKTOP SIDEBAR -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <button class="menu-toggle">
+                <i class="ph ph-list"></i>
+            </button>
+            <div class="logo-container">
+                <div class="logo-icon">P</div>
+                <span>PETULAP S.A.C.</span>
+            </div>
+        </div>
+
+        <div class="sidebar-menu">
+            <a href="index.html" class="menu-item">
+                <div class="menu-item-left">
+                    <i class="ph ph-house"></i>
+                    <span>Panel de Control</span>
+                </div>
+            </a>
+
+            <div class="menu-section">
+                <span class="menu-title">Soporte y Taller</span>
+                <a href="soporte.html" class="menu-item">
+                    <div class="menu-item-left">
+                        <i class="ph ph-ticket"></i>
+                        <span>Tickets de Soporte</span>
+                    </div>
+                    <div class="status-dot dot-green"></div>
+                </a>
+                <a href="mis_ordenes.html" class="menu-item">
+                    <div class="menu-item-left">
+                        <i class="ph ph-kanban"></i>
+                        <span>Panel Kanban</span>
+                    </div>
+                    <div class="status-dot dot-yellow"></div>
+                </a>
+                <a href="tecnicos.html" class="menu-item">
+                    <div class="menu-item-left">
+                        <i class="ph ph-users"></i>
+                        <span>Tecnicos</span>
+                    </div>
+                    <div class="status-dot dot-yellow"></div>
+                </a>
+                <a href="recepcion_movil.html" class="menu-item">
+                    <div class="menu-item-left">
+                        <i class="ph ph-device-mobile"></i>
+                        <span>App Recepcion</span>
+                    </div>
+                    <div class="status-dot dot-gray"></div>
+                </a>
+            </div>
+
+            <div class="menu-section">
+                <span class="menu-title">Inventario y Operaciones</span>
+                <a href="inventario.html" class="menu-item">
+                    <div class="menu-item-left">
+                        <i class="ph ph-archive-box"></i>
+                        <span>Inventario General</span>
+                    </div>
+                    <div class="status-dot dot-red"></div>
+                </a>
+                <a href="inventario_soporte.html" class="menu-item">
+                    <div class="menu-item-left">
+                        <i class="ph ph-scan"></i>
+                        <span>Escaneo / Triaje</span>
+                    </div>
+                    <div class="status-dot dot-green"></div>
+                </a>
+                <a href="caja.html" class="menu-item">
+                    <div class="menu-item-left">
+                        <i class="ph ph-money"></i>
+                        <span>Caja / Entregas</span>
+                    </div>
+                    <div class="status-dot dot-blue"></div>
+                </a>
+            </div>
+            
+            <div class="menu-section">
+                <span class="menu-title">Gerencia y Utilidades</span>
+                <a href="reportes.html" class="menu-item">
+                    <div class="menu-item-left">
+                        <i class="ph ph-chart-bar"></i>
+                        <span>Reportes</span>
+                    </div>
+                    <div class="status-dot dot-blue"></div>
+                </a>
+                <a href="lotes.html" class="menu-item">
+                    <div class="menu-item-left">
+                        <i class="ph ph-stack"></i>
+                        <span>Lotes Masivos</span>
+                    </div>
+                    <div class="status-dot dot-blue"></div>
+                </a>
+                <a href="admin_roles.html" class="menu-item">
+                    <div class="menu-item-left">
+                        <i class="ph ph-crown"></i>
+                        <span>Roles y Permisos</span>
+                    </div>
+                    <div class="status-dot dot-yellow"></div>
+                </a>
+            </div>
+            <div class="menu-section">
+                <div class="menu-title" style="color: var(--danger)">SISTEMA</div>
+                <a href="#" class="menu-item" onclick="clearCache(event)">
+                    <div class="menu-item-left">
+                        <i class="ph ph-trash"></i>
+                        <span>Eliminar Cache</span>
+                    </div>
+                </a>
+                <a href="#" class="menu-item" onclick="logout(event)">
+                    <div class="menu-item-left">
+                        <i class="ph ph-sign-out"></i>
+                        <span>Cerrar Sesion</span>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <div class="sidebar-footer">
+            <button class="btn-minimize">
+                <i class="ph ph-arrow-left"></i>
+                <span>Minimizar</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- MAIN WRAPPER -->
+    <main class="main-wrapper">
+        
+        <!-- DESKTOP TOPBAR -->
+        <header class="topbar">
+            <div class="search-bar">
+                <i class="ph ph-magnifying-glass"></i>
+                <input type="text" placeholder="Buscar en el sistema...">
+            </div>
+            
+            <div class="topbar-right">
+                <button class="notification-btn">
+                    <i class="ph ph-bell"></i>
+                    <span class="badge-counter">3</span>
+                </button>
+                <a href="login.html" class="user-profile">
+                    <img src="https://ui-avatars.com/api/?name=User+Profile&background=0D8ABC&color=fff" alt="User Profile">
+                </a>
+            </div>
+        </header>
+
+        <!-- DASHBOARD CONTENT -->
+        <div class="content">
+
+
+
+<style>
+.lote-label {
+    display: block;
+    background: #ffffff;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+}
+.lote-label:hover {
+    border-color: #3b82f6;
+    box-shadow: 0 8px 15px rgba(59, 130, 246, 0.1);
+    transform: translateY(-2px);
+}
+.lote-checkbox {
+    width: 24px;
+    height: 24px;
+    accent-color: #2563eb;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+.fechas-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr auto;
+    gap: 15px;
+    align-items: flex-end;
+}
+.acciones-grid-fixed {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 12px;
+    align-items: center;
+    overflow-x: auto;
+    padding-bottom: 5px;
+    /* Hide scrollbar for cleaner look */
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+}
+.acciones-grid-fixed::-webkit-scrollbar {
+    display: none;
+}
+.btn-solid-dark {
+    background: #1e293b; color: white; border: none; font-weight: 700; padding: 10px 20px; border-radius: 8px; cursor: pointer; transition: 0.2s; white-space: nowrap; box-shadow: 0 4px 10px rgba(30,41,59,0.3); display: flex; align-items: center; gap: 8px;
+}
+.btn-solid-dark:hover { background: #0f172a; transform: translateY(-1px); }
+
+.btn-solid-blue {
+    background: #2563eb; color: white; border: none; font-weight: 700; padding: 10px 20px; border-radius: 8px; cursor: pointer; transition: 0.2s; white-space: nowrap; box-shadow: 0 4px 10px rgba(37,99,235,0.3); display: flex; align-items: center; gap: 8px;
+}
+.btn-solid-blue:hover { background: #1d4ed8; transform: translateY(-1px); }
+
+.btn-solid-gray {
+    background: #64748b; color: white; border: none; font-weight: 700; padding: 10px 20px; border-radius: 8px; cursor: pointer; transition: 0.2s; white-space: nowrap; box-shadow: 0 4px 10px rgba(100,116,139,0.3); display: flex; align-items: center; gap: 8px;
+}
+.btn-solid-gray:hover { background: #475569; transform: translateY(-1px); }
+
+@media (max-width: 768px) {
+    .fechas-grid { grid-template-columns: 1fr; }
+}
+</style>
+
+<div class="reception-container" style="max-width: 1000px; padding-bottom: 20px;">
+    
+    <div class="step-header">
+        <div class="step-icon-wrapper icon-1">
+            <i class="ph-bold ph-chart-bar"></i>
+        </div>
+        <div>
+            <h2>Reportes y Avance de Lotes</h2>
+            <p style="margin:0; font-size:14px;">Filtra, analiza y exporta el estado de los equipos.</p>
+        </div>
+    </div>
+       <div id="view-lista">
+    <div class="card" style="margin-bottom: 25px; border-top: 4px solid var(--color-brand);">
+      <div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+          <h3 style="color: var(--color-brand); display: flex; align-items: center; gap: 8px; margin: 0;">
+            <i class="ph-bold ph-funnel"></i> Filtros y Seleccion
+          </h3>
+          <button class="btn-solid-dark" onclick="abrirDetalle('')" style="padding: 8px 16px; font-size: 14px;"><i class="ph-bold ph-globe"></i> Reporte Global</button>
+      </div>
+      
+      <div class="fechas-grid" style="margin-bottom: 25px; background: linear-gradient(to right, #f8fafc, #f1f5f9); padding: 20px; border-radius: var(--radius-md); border: 1px solid #cbd5e1; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);">
+        <div class="form-group" style="margin-bottom: 0;">
+          <label for="fecha-inicio" class="form-label" style="color: var(--color-brand);"><i class="ph-bold ph-calendar-blank"></i> Desde (Fecha Compra):</label>
+          <input type="date" id="fecha-inicio" class="form-control" style="font-weight: 600; background: #ffffff; border-color: #cbd5e1; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
+        </div>
+        <div class="form-group" style="margin-bottom: 0;">
+          <label for="fecha-fin" class="form-label" style="color: var(--color-brand);"><i class="ph-bold ph-calendar-check"></i> Hasta:</label>
+          <input type="date" id="fecha-fin" class="form-control" style="font-weight: 600; background: #ffffff; border-color: #cbd5e1; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
+        </div>
+        <div class="form-group" style="margin-bottom: 0;">
+          <button class="btn-primary" onclick="cargarLotes()" style="width: 100%; height: 48px; box-shadow: 0 4px 12px rgba(37,99,235,0.25);"><i class="ph-bold ph-magnifying-glass"></i> Buscar Lotes</button>
+        </div>
+      </div>
+
+      <div style="background: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
+        <h4 style="margin: 0; padding: 18px 25px; font-size: 16px; font-weight: 800; color: #ffffff; background: linear-gradient(90deg, #2563eb, #3b82f6); display: flex; align-items: center; gap: 10px;">
+            <i class="ph-bold ph-list-bullets" style="font-size: 22px;"></i> Selecciona un lote para ver sus detalles:
+        </h4>
+        <div id="lotes-container" style="padding: 20px; background: #f8fafc;">
+          <div style="padding: 20px; text-align: center; color: var(--text-secondary); font-weight: 600;">Cargando lotes...</div>
+        </div>
+      </div>
+    </div>
+    </div>
+    
+    <div id="view-detalle" style="display:none;">
+      <div style="margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 15px;">
+        <div style="display: flex; align-items: center; gap: 15px;">
+           <button class="btn-solid-gray" onclick="volverALista()"><i class="ph-bold ph-arrow-left"></i> Volver a la Lista</button>
+           <h2 id="detalle-titulo" style="margin: 0; font-size: 22px; color: var(--color-brand); font-weight: 800;">Detalle de Lote</h2>
+        </div>
+        <button id="btn-ver-tabla-top" class="btn-solid-blue" onclick="document.getElementById('panel-tabla').style.display='block'; this.style.display='none'; window.scrollTo({top: document.getElementById('panel-tabla').offsetTop, behavior: 'smooth'});"><i class="ph-bold ph-list-magnifying-glass"></i> Ver Lista Detallada de Equipos</button>
+      </div>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; margin-bottom: 24px;">
+    <!-- KPIS -->
+    <div id="panel-kpis" style="display:none; height: 100%;">
+        <h3 style="margin-bottom: 16px; font-weight: 800; color: #0f172a; display: flex; align-items: center; gap: 8px;"><i class="ph-bold ph-chart-bar" style="color: #2563eb; font-size: 22px;"></i> Indicadores Clave</h3>
+        <div id="stats" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 15px;">Cargando metricas...</div>
+    </div>
+
+    <!-- CHART -->
+    <div id="panel-chart" style="display:none; height: 100%;">
+        <div class="card" style="padding: 20px; border-radius: 12px; border: 1px solid #e2e8f0; background: #ffffff; box-shadow: 0 4px 15px rgba(0,0,0,0.03); height: 100%; display: flex; flex-direction: column;">
+            <h3 style="margin-bottom: 15px; font-weight: 800; color: #0f172a; display: flex; align-items: center; gap: 8px;">
+                <i class="ph-bold ph-chart-donut" style="color: #2563eb; font-size: 22px;"></i> Estado General
+            </h3>
+            <div style="display: flex; flex: 1; align-items: center; justify-content: center; min-height: 200px;">
+                <div id="chart-container" style="position: relative; width: 100%; max-width: 250px;">
+                    <canvas id="estadoChart"></canvas>
+                    <div id="chart-placeholder" style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); color: var(--text-muted); font-weight: 500;">Generando grafico...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="panel-tabla" style="display:none;">
+<div class="card table-container" style="margin-bottom: 24px; padding: 0;">
+    <div style="display:flex; justify-content:space-between; align-items:center; padding: 16px 24px; border-bottom: 1px solid #e2e8f0; flex-wrap: wrap; gap: 15px;">
+        <h3 style="margin: 0; white-space: nowrap; flex-shrink: 0;">Detalle de Equipos</h3>
+        <div style="display:flex; gap:10px; align-items:center; flex-wrap: wrap;">
+            <select id="filtro-estado" onchange="filtrarTabla()" class="form-control" style="min-width: 220px; font-weight: 800; background: #eff6ff; border: 2px solid #3b82f6; color: #1e3a8a; box-shadow: 0 2px 5px rgba(59,130,246,0.15); padding: 8px 15px; border-radius: 8px; cursor: pointer; font-size: 13px;">
+                <option value="all">ðŸŽ¯ Filtro: Mostrar Todos</option>
+                <option value="operativos"> Operativos (Sin Falla)</option>
+                <option value="soporte">ðŸ› ï¸ En Soporte (Danos)</option>
+                <option value="FALLA_MENOR">â†³ Solo Falla Menor</option>
+                <option value="NECESITA_REPUESTO">â†³ Solo Repuesto</option>
+                <option value="DANO_GRAVE">â†³ Solo Dano Grave</option>
+            </select>
+            <button class="btn-solid-gray" style="background: #0d9488; color: #ffffff; padding: 8px 16px; font-size: 13px; box-shadow: 0 4px 10px rgba(13, 148, 136, 0.3);" onclick="window.print()"><i class="ph-bold ph-printer"></i> Imprimir</button>
+        </div>
+    </div>
+    <div id="tabla-reporte" style="padding: 24px;">Cargando datos...</div>
+</div>
+</div>
+    </div> <!-- end view-detalle -->
+
+<script src="js/check_auth.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+const API = 'api/equipos.php';
+let estadoChartInstance = null;
+
+async function cargarLotes() {
+  const fInicio = document.getElementById('fecha-inicio').value;
+  const fFin = document.getElementById('fecha-fin').value;
+  const url = `${API}?action=list_docs&fec_inicio=${fInicio}&fec_fin=${fFin}`;
+  try {
+    const res = await fetch(url).then(r=>r.json());
+    if (res.ok && res.data) {
+      let html = '';
+      res.data.forEach(lote => {
+        let op = parseInt(lote.operativos) || 0;
+        let da = parseInt(lote.danados) || 0;
+        let pct_op = lote.cantidad > 0 ? Math.round((op / lote.cantidad) * 100) : 0;
+        let pct_da = lote.cantidad > 0 ? Math.round((da / lote.cantidad) * 100) : 0;
+        let is_critical = (da / (lote.cantidad || 1)) >= 0.3;
+        let badge_critico = is_critical ? `<span style="padding:4px 10px; border-radius:12px; margin-left:10px; box-shadow: 0 0 12px rgba(239,68,68,0.6); letter-spacing:0.5px">¥ CRITICO</span>` : '';
+        
+        let label = `
+          <div style="display:flex; flex-direction:column; gap: 14px; width:100%; padding: 4px">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start">
+                <div>
+                    <div style="font-weight: 800; font-size: 17px; color: #1e293b;">${lote.observacion || lote.doc_compra || 'Sin doc'} ${badge_critico}</div>
+                    <div style="margin-top:10px; display: flex; align-items: center; gap: 12px; font-size: 14px; font-weight: 700;">
+                        <span style="background: #10b981; color: #ffffff; padding: 6px 12px; border-radius: 8px; display: flex; align-items: center; gap: 6px; font-size: 15px; box-shadow: 0 2px 6px rgba(16,185,129,0.4);">
+                            <i class="ph-bold ph-laptop" style="font-size: 18px;"></i> ${lote.cantidad} equipos
+                        </span>
+                        <span style="color: #2563eb; display: flex; align-items: center; gap: 6px;">
+                            <i class="ph-bold ph-calendar"></i> ${lote.fecha}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            
+            <div style="display:flex; gap: 15px; margin-top: 5px; flex-wrap: wrap;">
+                <div style="flex:1; min-width: 140px; padding:15px; border-radius:10px; background: #10b981; box-shadow: 0 4px 10px rgba(16, 185, 129, 0.4);">
+                    <div style="text-transform:uppercase; letter-spacing:1px; font-size: 13px; font-weight: 800; color: #ffffff;"><i class="ph-bold ph-check-circle"></i> Sin Fallas</div>
+                    <div style="margin-top:5px; font-size: 20px; font-weight: 900; color: #ffffff;">${pct_op}% <span style="font-size: 14px; font-weight: 700; color: #d1fae5;">(${op} eq)</span></div>
+                </div>
+                
+                <div style="flex:1; min-width: 140px; padding:15px; border-radius:10px; background: #ef4444; box-shadow: 0 4px 10px rgba(239, 68, 68, 0.4);">
+                    <div style="text-transform:uppercase; letter-spacing:1px; font-size: 13px; font-weight: 800; color: #ffffff;"><i class="ph-bold ph-warning"></i> Danados</div>
+                    <div style="margin-top:5px; font-size: 20px; font-weight: 900; color: #ffffff;">${pct_da}% <span style="font-size: 14px; font-weight: 700; color: #fecaca;">(${da} eq)</span></div>
+                </div>
+            </div>
+          </div>
+        `;
+        
+        let borderClass = is_critical ? 'border-color: rgba(239, 68, 68, 0.5);' : '';
+        
+        html += `<div class="lote-label" style="cursor: pointer; ${borderClass}" onclick="abrirDetalle('${lote.doc_compra}', '${lote.observacion || lote.doc_compra}')">
+          <div style="display:flex; gap:18px; align-items:center">
+            <div style="flex:1">${label}</div>
+            <i class="ph-bold ph-caret-right" style="font-size: 24px; color: #94a3b8;"></i>
+          </div>
+        </div>`;
+      });
+      document.getElementById('lotes-container').innerHTML = html;
+    }
+  } catch(e) {
+    document.getElementById('lotes-container').innerHTML = '<span >Error cargando lotes</span>';
+  }
+}
+
+function abrirDetalle(doc, titulo = 'Reporte Global') {
+    document.getElementById('view-lista').style.display = 'none';
+    document.getElementById('view-detalle').style.display = 'block';
+    document.getElementById('detalle-titulo').innerText = doc ? 'Detalle de Lote: ' + titulo : 'Reporte Global de Todos los Lotes';
+    cargarReporte(doc);
+    window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+function volverALista() {
+    document.getElementById('view-lista').style.display = 'block';
+    document.getElementById('view-detalle').style.display = 'none';
+    window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+async function cargarReporte(doc = '') {
+  const url = `${API}?action=reporte_avanzado${doc ? '&doc_compra='+encodeURIComponent(doc) : ''}`;
+  
+  document.getElementById('tabla-reporte').innerHTML = '<p >Generando reporte...</p>';
+  const resText = await fetch(url).then(r=>r.text()).catch(e => { alert("Error de red: " + e); return null; });
+  if (!resText) return;
+  
+  let res;
+  try { res = JSON.parse(resText); } catch(e) {
+    document.getElementById('tabla-reporte').innerHTML = '<p >Error grave en servidor.</p>';
+    return;
+  }
+  
+  if (!res.ok) {
+    document.getElementById('tabla-reporte').innerHTML = `<p >Error: ${res.msg}</p>`;
+    return;
+  }
+
+  document.getElementById('panel-kpis').style.display = 'block';
+  document.getElementById('panel-chart').style.display = 'block';
+  document.getElementById('panel-tabla').style.display = 'none';
+  document.getElementById('btn-ver-tabla-top').style.display = 'inline-flex';
+
+  // Render Stats
+  const st = res.stats;
+  const st_hist = res.stats_hist || {};
+  const totOp = st.SIN_FALLA || 0;
+  const totDan = (st.FALLA_MENOR||0) + (st.NECESITA_REPUESTO||0) + (st.DANO_GRAVE||0) + (st.SOPORTE||0);
+  const total = totOp + totDan;
+  
+  let pctOp = total > 0 ? Math.round((totOp / total) * 100) : 0;
+  let pctDan = total > 0 ? Math.round((totDan / total) * 100) : 0;
+
+  const totOpHist = st_hist.SIN_FALLA || 0;
+  const totDanHist = total - totOpHist;
+  const pctOpHist = total > 0 ? Math.round((totOpHist / total) * 100) : 0;
+
+  document.getElementById('stats').innerHTML = `
+  <div class="stat-card stat-total">
+    <div class="num">${total}</div>
+    <div class="lbl">Total Equipos</div>
+  </div>
+  <div class="stat-card stat-hist">
+    <div class="num">${pctOpHist}%</div>
+    <div class="lbl">Operativos al Recibir</div>
+    <div style="margin-top:8px; font-size:12px; color:var(--text-muted)">${totDanHist} llegaron danados</div>
+  </div>
+  <div class="stat-card stat-ok">
+    <div class="num" style="color: var(--color-success)">${pctOp}%</div>
+    <div class="lbl">Operativos Actualmente</div>
+    <div style="margin-top:8px; font-size:12px; color:var(--text-muted)">${totOp} equipos</div>
+  </div>
+  <div class="stat-card stat-bad">
+    <div class="num" style="color: var(--color-danger)">${pctDan}%</div>
+    <div class="lbl">Danados / Soporte</div>
+    <div style="margin-top:15px; text-align:left; padding:12px; border-radius:var(--radius-sm); background: var(--bg-surface-hover); font-size: 13px;">
+      <div style="display:flex; justify-content:space-between; margin-bottom:8px"><span><i class="ph ph-warning"></i> Falla Menor:</span> <b>${st.FALLA_MENOR||0}</b></div>
+      <div style="display:flex; justify-content:space-between; margin-bottom:8px"><span><i class="ph ph-wrench"></i> Repuesto:</span> <b>${st.NECESITA_REPUESTO||0}</b></div>
+      <div style="display:flex; justify-content:space-between; color: var(--color-danger)"><span><i class="ph ph-x-circle"></i> Dano Grave:</span> <b>${st.DANO_GRAVE||0}</b></div>
+    </div>
+  </div>`;
+
+  // Render Chart
+  const ph = document.getElementById('chart-placeholder');
+  if (ph) ph.style.display = 'none';
+
+  if (window.estadoChartInstance) {
+      window.estadoChartInstance.destroy();
+  }
+  const ctx = document.getElementById('estadoChart');
+  if (ctx) {
+      window.estadoChartInstance = new Chart(ctx.getContext('2d'), {
+          type: 'doughnut',
+          data: {
+              labels: ['Operativos', 'Falla Menor', 'Necesita Repuesto', 'Dano Grave'],
+              datasets: [{
+                  data: [st.SIN_FALLA || 0, st.FALLA_MENOR || 0, st.NECESITA_REPUESTO || 0, (st.DANO_GRAVE || 0) + (st.SOPORTE || 0)],
+                  backgroundColor: [
+                      '#10b981', // Emerald 500 for Operativos
+                      '#f59e0b', // Amber 500 for Falla Menor
+                      '#f97316', // Orange 500 for Repuesto
+                      '#ef4444'  // Red 500 for Dano grave
+                  ],
+                  borderWidth: 0,
+                  hoverOffset: 4
+              }]
+          },
+          options: {
+              responsive: true,
+              cutout: '65%',
+              plugins: {
+                  legend: {
+                      position: 'right',
+                      labels: {
+                          font: { family: 'Inter', size: 14, weight: '600' },
+                          color: '#1e293b',
+                          padding: 20
+                      }
+                  }
+              },
+              animation: {
+                  animateScale: true,
+                  animateRotate: true
+              }
+          }
+      });
+  }
+
+  // Render Table
+  if (!res.data.length) {
+    document.getElementById('tabla-reporte').innerHTML = '<p >No se encontraron equipos para este filtro.</p>';
+    return;
+  }
+
+  let html = `<div style="text-align:right; margin-bottom:5px"><small id="contador-registros" >Mostrando ${res.data.length} registros</small></div>`;
+  html += `<table><thead><tr>
+    <th>Proveedor (Obs)</th><th>Doc. Compra</th><th>Codigo</th><th>Serie</th><th>Marca/Modelo</th><th>Falla Registrada</th><th>Triaje Inicial (Historial)</th><th>Triaje Actual</th>
+  </tr></thead><tbody>`;
+  
+  res.data.forEach(item => {
+    let rowStyle = "";
+    
+    // 1. Vendido (Verde)
+    const tieneFecVenta = item.fec_venta && item.fec_venta !== '0000-00-00' && item.fec_venta.trim() !== '';
+    const esVendido = tieneFecVenta || item.estado === 'C' || item.estado === 'Vendido';
+    
+    // 2. Soporte (Azul)
+    const enSoporte = item.estado === 'M' || item.estado === 'Soporte' || (item.triaje && item.triaje !== 'SIN_FALLA');
+    
+    // 3. No encontrado (Rojo)
+    const str = (item.estado || '') + ' ' + (item.observacion || '') + ' ' + (item.falla || '');
+    const noEncontrado = item.estado === 'N' || item.estado === 'No Encontrado' || str.toLowerCase().includes("no encontrado");
+
+    if (noEncontrado) {
+        rowStyle = "background-color: rgba(255, 77, 109, 0.15); border-left: 3px solid #ff4d6d;";
+    } else if (esVendido) {
+        rowStyle = "background-color: rgba(0, 224, 158, 0.15); border-left: 3px solid #00e09e;";
+    } else if (enSoporte) {
+        rowStyle = "background-color: rgba(0, 198, 255, 0.15); border-left: 3px solid #00c6ff;";
+    }
+
+    html += `<tr >
+      <td >${item.observacion||'-'}</td>
+      <td>${item.doc_compra||'-'}</td>
+      <td>
+        <b>${item.codigo||'-'}</b>
+        ${tieneFecVenta ? `<br><small >Venta: ${item.fec_venta}</small>` : ''}
+      </td>
+      <td>${item.serie||'-'}</td>
+      <td>${item.marca||''} ${item.modelo||''}</td>
+      <td >${item.falla||'-'}</td>
+      <td class="triaje-${item.triaje_inicial}" style="opacity:0.8">${(item.triaje_inicial||'').replace(/_/g,' ')}</td>
+      <td class="triaje-${item.triaje}" >${(item.triaje||'').replace(/_/g,' ')}</td>
+    </tr>`;
+  });
+  html += '</tbody></table>';
+  
+  document.getElementById('tabla-reporte').innerHTML = html;
+  
+  // Aplicar filtro si ya habia uno seleccionado
+  filtrarTabla();
+}
+
+function filtrarTabla() {
+    const filtro = document.getElementById('filtro-estado').value;
+    const filas = document.querySelectorAll('#tabla-reporte tbody tr');
+    if (!filas.length) return;
+    
+    let visibles = 0;
+    
+    filas.forEach(fila => {
+        const triajeTd = fila.querySelector('td:last-child');
+        if (!triajeTd) return;
+        const triajeClass = triajeTd.className; // e.g. "triaje-SIN_FALLA"
+        
+        let mostrar = false;
+        if (filtro === 'all') mostrar = true;
+        else if (filtro === 'operativos' && triajeClass.includes('SIN_FALLA')) mostrar = true;
+        else if (filtro === 'soporte' && !triajeClass.includes('SIN_FALLA')) mostrar = true;
+        else if (filtro === 'FALLA_MENOR' && triajeClass.includes('FALLA_MENOR')) mostrar = true;
+        else if (filtro === 'NECESITA_REPUESTO' && triajeClass.includes('NECESITA_REPUESTO')) mostrar = true;
+        else if (filtro === 'DANO_GRAVE' && triajeClass.includes('DANO_GRAVE')) mostrar = true;
+        
+        fila.style.display = mostrar ? '' : 'none';
+        if (mostrar) visibles++;
+    });
+    
+    const counter = document.getElementById('contador-registros');
+    if (counter) counter.innerText = `Mostrando ${visibles} registros`;
+}
+
+// Cargar global al inicio
+window.onload = async () => {
+  const hoy = new Date();
+  const y = hoy.getFullYear();
+  const m = String(hoy.getMonth() + 1).padStart(2, '0');
+  const d = new Date(y, hoy.getMonth() + 1, 0).getDate(); // Ultimo dia del mes
+  document.getElementById('fecha-inicio').value = `${y}-${m}-01`;
+  document.getElementById('fecha-fin').value = `${y}-${m}-${d}`;
+
+  await cargarLotes();
+};
+</script>
+
+
+        </div>
+        
+        <!-- FAB Button -->
+        <button class="fab-chat" onclick="if(typeof abrirModalTareaGlobal === 'function') abrirModalTareaGlobal();" title="Crear Tarea Interna">
+            <i class="ph-bold ph-kanban"></i>
+        </button>
+
+    </main>
+
+    <!-- Scripts -->
+    <script src="js/dashboard.js?v=3"></script>
+
+</body>
+</html>

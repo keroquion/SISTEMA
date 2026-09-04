@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Seguimiento de Servicio - Petulap</title>
+<link rel="stylesheet" href="css/tokens.css?v=1">
+    <link rel="stylesheet" href="css/styles.css?v=3">
+
+
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#F8FAFC">
+<script>
+if ("serviceWorker" in navigator) { window.addEventListener("load", () => { navigator.serviceWorker.register("sw.js").then(r => console.log("SW ok")).catch(e => console.log("SW fail", e)); }); }
+</script>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <!-- Dashboard Styles -->
+    <link rel="stylesheet" href="css/dashboard.css?v=3">
+
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="apple-touch-icon" href="icon.jpg">
+
+    <script>
+      (function(){
+        if(localStorage.getItem('petulap-theme') === 'dark') {
+          document.documentElement.setAttribute('data-theme', 'dark');
+        }
+      })();
+    </script>
+</head>
+<body class="dashboard-body">
+
+    <!-- MOBILE HEADER -->
+    <header class="mobile-header">
+        <button class="menu-toggle" id="mobile-menu-toggle">
+            <i class="ph ph-list"></i>
+        </button>
+        <div class="logo-container">
+            <div class="logo-icon">P</div>
+            <span>PETULAP S.A.C.</span>
+        </div>
+        
+                <button class="theme-toggle-btn" aria-label="Cambiar tema" onclick="toggleTheme()" style="background: none; border: none; font-size: 20px; cursor: pointer; color: var(--text-secondary); margin-right: 15px; display: flex; align-items: center;">
+                    <i class="ph ph-moon"></i>
+                </button>
+                <button class="notification-btn">
+            <i class="ph ph-bell"></i>
+        </button>
+    </header>
+
+    <!-- MOBILE SIDEBAR (ACCORDION) -->
+    <div class="mobile-sidebar" id="mobile-sidebar">
+        <div class="accordion-item active">
+            <div class="accordion-header">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <i class="ph ph-headset"></i>
+                    SOPORTE Y TALLER
+                </div>
+                <i class="ph ph-caret-down"></i>
+            </div>
+            <div class="accordion-content">
+                <a href="soporte.html" class="accordion-link">
+                    <i class="ph-fill ph-ticket acc-icon-green"></i>
+                    Tickets
+                </a>
+                <a href="mis_ordenes.html" class="accordion-link">
+                    <i class="ph-fill ph-kanban acc-icon-orange"></i>
+                    Kanban
+                </a>
+                <a href="tecnicos.html" class="accordion-link">
+                    <i class="ph-fill ph-users acc-icon-blue"></i>
+                    Tecnicos
+                </a>
+                <a href="recepcion_movil.html" class="accordion-link">
+                    <i class="ph-fill ph-device-mobile acc-icon-gray"></i>
+                    App Recepcion
+                </a>
+                <a href="garantias.html" class="accordion-link">
+                    <i class="ph-fill ph-shield-check acc-icon-blue"></i>
+                    Garantias
+                </a>
+            </div>
+        </div>
+
+        <div class="accordion-item">
+            <div class="accordion-header">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <i class="ph ph-package"></i>
+                    INVENTARIO Y OPERACIONES
+                </div>
+                <i class="ph ph-caret-down"></i>
+            </div>
+            <div class="accordion-content">
+                <a href="inventario.html" class="accordion-link">
+                    <i class="ph-fill ph-archive-box acc-icon-orange"></i>
+                    Inventario General
+                </a>
+                <a href="inventario_soporte.html" class="accordion-link">
+                    <i class="ph-fill ph-scan acc-icon-green"></i>
+                    Escaneo / Triaje Masivo
+                </a>
+                <a href="importar.html" class="accordion-link">
+                    <i class="ph-fill ph-download-simple acc-icon-blue"></i>
+                    Importar Excel
+                </a>
+                <a href="caja.html" class="accordion-link">
+                    <i class="ph-fill ph-money acc-icon-green"></i>
+                    Caja / Entregas
+                </a>
+            </div>
+        </div>
+
+        <div class="accordion-item danger-border">
+            <div class="accordion-header">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <i class="ph ph-wrench"></i>
+                    GERENCIA Y CLIENTES
+                </div>
+                <i class="ph ph-caret-down"></i>
+            </div>
+            <div class="accordion-content">
+                <a href="lotes.html" class="accordion-link">
+                    <i class="ph-fill ph-stack acc-icon-blue"></i>
+                    Lotes Masivos
+                </a>
+                <a href="clientes.html" class="accordion-link">
+                    <i class="ph-fill ph-user-list acc-icon-green"></i>
+                    Actividades y Clientes
+                </a>
+            </div>
+        </div>
+
+        <div class="accordion-item">
+            <div class="accordion-header">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <i class="ph ph-chart-line-up"></i>
+                    ADMINISTRACION Y OTROS
+                </div>
+                <i class="ph ph-caret-down"></i>
+            </div>
+            <div class="accordion-content">
+                <a href="reportes.html" class="accordion-link">
+                    <i class="ph-fill ph-chart-bar acc-icon-blue"></i>
+                    Lotes y Equipos (Reportes)
+                </a>
+                <a href="turnos.html" class="accordion-link">
+                    <i class="ph-fill ph-clock acc-icon-orange"></i>
+                    Asignacion Turnos
+                </a>
+                <a href="admin_roles.html" class="accordion-link">
+                    <i class="ph-fill ph-crown acc-icon-blue"></i>
+                    Roles y Permisos
+                </a>
+                <a href="manual.html" class="accordion-link">
+                    <i class="ph-fill ph-book-open acc-icon-gray"></i>
+                    Manual de Usuario
+                </a>
+            </div>
+        </div>
+        <div class="accordion-item danger-border">
+            <div class="accordion-header">
+                <div style="display: flex; align-items: center; gap: 10px; color: var(--danger);">
+                    <i class="ph ph-power"></i>
+                    SISTEMA
+                </div>
+                <i class="ph ph-caret-down"></i>
+            </div>
+            <div class="accordion-content">
+                <a href="#" class="accordion-link" onclick="clearCache(event)">
+                    <i class="ph-fill ph-trash acc-icon-orange"></i>
+                    Eliminar Cache
+                </a>
+                <a href="#" class="accordion-link" onclick="logout(event)">
+                    <i class="ph-fill ph-sign-out acc-icon-gray"></i>
+                    Cerrar Sesion
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- MOBILE BOTTOM NAV -->
+    <nav class="mobile-nav">
+        <a href="index.html" class="nav-item">
+            <i class="ph ph-house"></i>
+            <span>Dashboard</span>
+        </a>
+        <a href="consulta.html" class="nav-item">
+            <i class="ph ph-magnifying-glass"></i>
+            <span>Buscar</span>
+        </a>
+        <a href="login.html" class="nav-item">
+            <i class="ph ph-user"></i>
+            <span>Mi Cuenta</span>
+        </a>
+    </nav>
+
+    <!-- DESKTOP SIDEBAR -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <button class="menu-toggle">
+                <i class="ph ph-list"></i>
+            </button>
+            <div class="logo-container">
+                <div class="logo-icon">P</div>
+                <span>PETULAP S.A.C.</span>
+            </div>
+        </div>
+
+        <div class="sidebar-menu">
+            <a href="index.html" class="menu-item">
+                <div class="menu-item-left">
+                    <i class="ph ph-house"></i>
+                    <span>Panel de Control</span>
+                </div>
+            </a>
+
+            <div class="menu-section">
+                <span class="menu-title">Soporte y Taller</span>
+                <a href="soporte.html" class="menu-item">
+                    <div class="menu-item-left">
+                        <i class="ph ph-ticket"></i>
+                        <span>Tickets de Soporte</span>
+                    </div>
+                    <div class="status-dot dot-green"></div>
+                </a>
+                <a href="mis_ordenes.html" class="menu-item">
+                    <div class="menu-item-left">
+                        <i class="ph ph-kanban"></i>
+                        <span>Panel Kanban</span>
+                    </div>
+                    <div class="status-dot dot-yellow"></div>
+                </a>
+                <a href="tecnicos.html" class="menu-item">
+                    <div class="menu-item-left">
+                        <i class="ph ph-users"></i>
+                        <span>Tecnicos</span>
+                    </div>
+                    <div class="status-dot dot-yellow"></div>
+                </a>
+                <a href="recepcion_movil.html" class="menu-item">
+                    <div class="menu-item-left">
+                        <i class="ph ph-device-mobile"></i>
+                        <span>App Recepcion</span>
+                    </div>
+                    <div class="status-dot dot-gray"></div>
+                </a>
+            </div>
+
+            <div class="menu-section">
+                <span class="menu-title">Inventario y Operaciones</span>
+                <a href="inventario.html" class="menu-item">
+                    <div class="menu-item-left">
+                        <i class="ph ph-archive-box"></i>
+                        <span>Inventario General</span>
+                    </div>
+                    <div class="status-dot dot-red"></div>
+                </a>
+                <a href="inventario_soporte.html" class="menu-item">
+                    <div class="menu-item-left">
+                        <i class="ph ph-scan"></i>
+                        <span>Escaneo / Triaje</span>
+                    </div>
+                    <div class="status-dot dot-green"></div>
+                </a>
+                <a href="caja.html" class="menu-item">
+                    <div class="menu-item-left">
+                        <i class="ph ph-money"></i>
+                        <span>Caja / Entregas</span>
+                    </div>
+                    <div class="status-dot dot-blue"></div>
+                </a>
+            </div>
+            
+            <div class="menu-section">
+                <span class="menu-title">Gerencia y Utilidades</span>
+                <a href="reportes.html" class="menu-item">
+                    <div class="menu-item-left">
+                        <i class="ph ph-chart-bar"></i>
+                        <span>Reportes</span>
+                    </div>
+                    <div class="status-dot dot-blue"></div>
+                </a>
+                <a href="lotes.html" class="menu-item">
+                    <div class="menu-item-left">
+                        <i class="ph ph-stack"></i>
+                        <span>Lotes Masivos</span>
+                    </div>
+                    <div class="status-dot dot-blue"></div>
+                </a>
+                <a href="admin_roles.html" class="menu-item">
+                    <div class="menu-item-left">
+                        <i class="ph ph-crown"></i>
+                        <span>Roles y Permisos</span>
+                    </div>
+                    <div class="status-dot dot-yellow"></div>
+                </a>
+            </div>
+            <div class="menu-section">
+                <div class="menu-title" style="color: var(--danger)">SISTEMA</div>
+                <a href="#" class="menu-item" onclick="clearCache(event)">
+                    <div class="menu-item-left">
+                        <i class="ph ph-trash"></i>
+                        <span>Eliminar Cache</span>
+                    </div>
+                </a>
+                <a href="#" class="menu-item" onclick="logout(event)">
+                    <div class="menu-item-left">
+                        <i class="ph ph-sign-out"></i>
+                        <span>Cerrar Sesion</span>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <div class="sidebar-footer">
+            <button class="btn-minimize">
+                <i class="ph ph-arrow-left"></i>
+                <span>Minimizar</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- MAIN WRAPPER -->
+    <main class="main-wrapper">
+        
+        <!-- DESKTOP TOPBAR -->
+        <header class="topbar">
+            <div class="search-bar">
+                <i class="ph ph-magnifying-glass"></i>
+                <input type="text" placeholder="Buscar en el sistema...">
+            </div>
+            
+            <div class="topbar-right">
+                <button class="notification-btn">
+                    <i class="ph ph-bell"></i>
+                    <span class="badge-counter">3</span>
+                </button>
+                <a href="login.html" class="user-profile">
+                    <img src="https://ui-avatars.com/api/?name=User+Profile&background=0D8ABC&color=fff" alt="User Profile">
+                </a>
+            </div>
+        </header>
+
+        <!-- DASHBOARD CONTENT -->
+        <div class="content">
+
+
+
+<header>
+  <h1>PETULAP</h1>
+  <p>Centro de Soporte Tecnico Especializado</p>
+</header>
+
+<div class="container">
+  <div class="card" id="search-box">
+    <h2 style="margin-top:0">Rastrea tu Servicio</h2>
+    <p style="margin-bottom:20px">Ingresa tus datos para conocer el estado actual de tu equipo en nuestro taller.</p>
+    
+    <input type="text" id="f-ticket" placeholder="NÂ° de Ticket (Ej: ST-2026-001)" autofocus>
+    <input type="text" id="f-dni" placeholder="DNI del titular" onkeydown="if(event.key==='Enter') consultar()">
+    
+    <button onclick="consultar()" id="btn-consultar"><i class="ph ph-magnifying-glass"></i> Consultar Estado</button>
+    
+    <div id="msg-error" class="error"></div>
+  </div>
+
+  <div class="progress-container" id="result-box">
+    <button onclick="volver()" style="width:auto; padding:8px 15px; margin-bottom:20px">â† Nueva Consulta</button>
+    
+    <h3 style="margin-top:0">Ticket: <span id="lbl-ticket" ></span></h3>
+    <p style="margin:0 0 5px 0"><b>Equipo:</b> <span id="lbl-equipo"></span></p>
+    <p style="margin:0 0 20px 0"><b>Cliente:</b> <span id="lbl-cliente"></span></p>
+
+    <!-- STEPPER -->
+    <div class="stepper">
+      <div class="step" id="step-1">
+        <div class="circle">1</div>
+        <span class="step-label">Recibido</span>
+      </div>
+      <div class="step" id="step-2">
+        <div class="circle">2</div>
+        <span class="step-label">Revision</span>
+      </div>
+      <div class="step" id="step-3">
+        <div class="circle">3</div>
+        <span class="step-label">Reparacion</span>
+      </div>
+      <div class="step" id="step-4">
+        <div class="circle">4</div>
+        <span class="step-label">Listo</span>
+      </div>
+    </div>
+
+    <!-- DETAILS -->
+    <div class="info-box">
+      <div><strong>Estado Actual:</strong> <span id="lbl-estado-txt" ></span></div>
+      <div style="margin-top:8px"><strong>Fecha de Ingreso:</strong> <span id="lbl-ingreso"></span></div>
+      <div style="margin-top:8px"><strong>Motivo:</strong> <span id="lbl-motivo"></span></div>
+      <div id="lbl-garantia"></div>
+      
+      <div id="box-tech-notes" style="margin-top:15px; padding-top:15px; display:none">
+        <div id="lbl-diagnostico" style="margin-bottom:10px"></div>
+        <div id="lbl-solucion"></div>
+      </div>
+    </div>
+    
+    <div id="box-recoger" style="margin-top:20px; padding:15px; border-radius:6px; text-align:center; display:none">
+      <h3 style="margin:0 0 10px 0">ðŸŽ‰ Tu equipo esta listo!</h3>
+      <p style="margin:0">Puedes pasar a recogerlo dentro de nuestros horarios de atencion.</p>
+    </div>
+  </div>
+</div>
+
+<footer>
+  Dudas o consultas: <a href="https://wa.me/51936183039" target="_blank">Escribenos al WhatsApp</a><br>
+  © 2026 Petulap. Todos los derechos reservados.
+</footer>
+
+<script src="js/sonidos.js"></script>
+<script src="js/check_auth.js"></script>
+<script>
+async function consultar() {
+  const tkt = document.getElementById('f-ticket').value.trim();
+  const dni = document.getElementById('f-dni').value.trim();
+  const err = document.getElementById('msg-error');
+  
+  if (!tkt) {
+    err.textContent = "Por favor, ingresa el numero de ticket.";
+    err.style.display = 'block';
+    return;
+  }
+  
+  document.getElementById('btn-consultar').textContent = 'Consultando...';
+  
+  // Si no hay DNI, lo intentamos sin validar
+  const url = dni 
+    ? `api/consulta.php?action=estado&ticket=${encodeURIComponent(tkt)}&dni=${encodeURIComponent(dni)}`
+    : `api/consulta.php?action=estado&ticket=${encodeURIComponent(tkt)}`;
+  const res = await fetch(url).then(r=>r.json());
+  
+  document.getElementById('btn-consultar').textContent = '<i class="ph ph-magnifying-glass"></i> Consultar Estado';
+  
+  if (!res.ok) {
+    err.textContent = res.msg;
+    err.style.display = 'block';
+  } else {
+    err.style.display = 'none';
+    mostrarResultados(res.data);
+  }
+}
+
+// Pre-rellenar desde URL al cargar
+window.addEventListener('DOMContentLoaded', () => {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('ticket')) {
+    document.getElementById('f-ticket').value = params.get('ticket');
+  }
+  if (params.get('dni')) {
+    document.getElementById('f-dni').value = params.get('dni');
+  }
+  // Si viene ticket en la URL, consultar automaticamente
+  if (params.get('ticket')) {
+    consultar();
+  }
+});
+
+function mostrarResultados(data) {
+  document.getElementById('search-box').style.display = 'none';
+  document.getElementById('result-box').style.display = 'block';
+  
+  document.getElementById('lbl-ticket').textContent = data.numero_atencion;
+  document.getElementById('lbl-equipo').textContent = data.equipo_descripcion;
+  document.getElementById('lbl-cliente').textContent = data.cliente_nombre;
+  document.getElementById('lbl-ingreso').textContent = data.fecha_ingreso;
+  document.getElementById('lbl-motivo').textContent = data.motivo_ingreso;
+  
+  const st = data.estado;
+  document.getElementById('lbl-estado-txt').textContent = st.replace(/_/g, ' ');
+  
+  // Limpiar stepper
+  for(let i=1; i<=4; i++) {
+    document.getElementById(`step-${i}`).className = 'step';
+  }
+  
+  // Logica de stepper
+  let activeStep = 1;
+  if (st === 'EN_DIAGNOSTICO') activeStep = 2;
+  else if (st === 'ESPERANDO_REPUESTO' || st === 'EN_REPARACION') activeStep = 3;
+  else if (st === 'LISTO_PARA_RECOGER' || st === 'ENTREGADO') activeStep = 4;
+  else if (st === 'CANCELADO') activeStep = 0; // Cancelado rompe el stepper
+  
+  if (activeStep > 0) {
+    for (let i = 1; i <= 4; i++) {
+      if (i < activeStep) document.getElementById(`step-${i}`).classList.add('done');
+      if (i === activeStep) document.getElementById(`step-${i}`).classList.add('active');
+    }
+  }
+
+  // Notas tecnicas
+  const boxNotes = document.getElementById('box-tech-notes');
+  let hasNotes = false;
+  if (data.diagnostico) {
+    document.getElementById('lbl-diagnostico').innerHTML = `<strong>Diagnostico:</strong> ${data.diagnostico}`;
+    hasNotes = true;
+  } else document.getElementById('lbl-diagnostico').innerHTML = '';
+  
+  if (data.solucion) {
+    document.getElementById('lbl-solucion').innerHTML = `<strong>Solucion / Notas:</strong> ${data.solucion}`;
+    hasNotes = true;
+  } else document.getElementById('lbl-solucion').innerHTML = '';
+  
+  boxNotes.style.display = hasNotes ? 'block' : 'none';
+  
+  // Garantia
+  const garBox = document.getElementById('lbl-garantia');
+  if (data.en_garantia == "1") {
+    garBox.innerHTML = '<span class="badge-garantia"><i class="ph ph-shield-check"></i> Atencion por Garantia</span>';
+  } else garBox.innerHTML = '';
+  
+  // Mensaje final
+  const recBox = document.getElementById('box-recoger');
+  recBox.style.display = (st === 'LISTO_PARA_RECOGER') ? 'block' : 'none';
+}
+
+function volver() {
+  document.getElementById('search-box').style.display = 'block';
+  document.getElementById('result-box').style.display = 'none';
+  document.getElementById('f-ticket').value = '';
+  document.getElementById('f-dni').value = '';
+  document.getElementById('msg-error').style.display = 'none';
+}
+</script>
+
+
+        </div>
+        
+        <!-- FAB Button -->
+        <button class="fab-chat" onclick="if(typeof abrirModalTareaGlobal === 'function') abrirModalTareaGlobal();" title="Crear Tarea Interna">
+            <i class="ph-bold ph-kanban"></i>
+        </button>
+
+    </main>
+
+    <!-- Scripts -->
+    <script src="js/dashboard.js?v=3"></script>
+
+</body>
+</html>
