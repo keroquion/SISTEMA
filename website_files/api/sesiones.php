@@ -153,6 +153,28 @@ switch ($action) {
 
     default:
         echo json_encode(["ok" => false, "msg" => "Accion no valida"]);
+        break;
+
+    case "listar_sesiones_libres":
+        if (!$es_admin) { echo json_encode(["ok"=>false, "msg"=>"Solo admin"]); break; }
+        // Selecciona sesiones CERRADAS que NO esten ya en garantias_proveedor
+        $res = $db->query("SELECT s.*, p.nombre as usuario, (SELECT COUNT(*) FROM sesiones_items WHERE sesion_id = s.id AND triaje_asignado='CON_FALLA') as fallas
+                           FROM sesiones_inventario s 
+                           JOIN personas p ON s.usuario_id = p.id 
+                           WHERE s.estado = 'CERRADA' 
+                             AND s.id NOT IN (SELECT sesion_triaje_id FROM garantias_proveedor WHERE sesion_triaje_id IS NOT NULL)
+                           ORDER BY s.id DESC");
+        $list = [];
+        if($res) {
+            while ($row = $res->fetch_assoc()) {
+                if ($row['fallas'] > 0) { // Solo si tiene fallas
+                    $list[] = $row;
+                }
+            }
+        }
+        echo json_encode(["ok" => true, "data" => $list]);
+        break;
+
 }
 $db->close();
 ?>

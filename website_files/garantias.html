@@ -363,9 +363,13 @@
             <p style="margin-top:0">Equipos/repuestos enviados a garantia con proveedores nacionales (post-Lote
                 NACIONAL).</p>
 
+            <div style="display:flex; gap:10px; margin-bottom:15px; flex-wrap:wrap;">
+                <button class="btn-primary" style="background:var(--color-warning); color:#000;" onclick="abrirModalTriaje()"><i class="ph-bold ph-magic-wand"></i> Nueva Garantía (Desde Triaje)</button>
+            </div>
+
             <!-- CREAR GARANTIA MANUAL -->
             <div class="card">
-                <strong><i class="ph ph-plus"></i> Nueva Garantia Manual</strong>
+                <strong><i class="ph ph-plus"></i> Nueva Garantia Manual (Lote / Individual)</strong>
                 <div id="msg-form" class="msg"></div>
                 <div
                     style="margin-top:10px; display:grid; grid-template-columns:repeat(auto-fit, minmax(250px, 1fr)); gap:15px">
@@ -526,10 +530,102 @@
                     el.textContent = txt; el.className = 'msg ' + (tipo || '');
                 }
 
+                // --- NUEVO: MODAL TRIAJE ---
+                async function abrirModalTriaje() {
+                    document.getElementById('modal-triaje').style.display = 'block';
+                    document.getElementById('modal-triaje-overlay').style.display = 'block';
+                    document.getElementById('triaje-sesiones-list').innerHTML = 'Cargando sesiones...';
+                    
+                    try {
+                        const res = await fetch('api/sesiones.php?action=listar_sesiones_libres').then(r=>r.json());
+                        if(res.ok && res.data.length > 0) {
+                            let html = '<select id="t-sesion-id" class="form-control" style="margin-bottom:10px;">';
+                            res.data.forEach(s => {
+                                html += `<option value="${s.id}">${s.nombre} (${s.fallas} equipos con falla)</option>`;
+                            });
+                            html += '</select>';
+                            document.getElementById('triaje-sesiones-list').innerHTML = html;
+                            document.getElementById('btn-crear-triaje').disabled = false;
+                        } else {
+                            document.getElementById('triaje-sesiones-list').innerHTML = 'No hay sesiones de triaje cerradas disponibles para garantía.';
+                            document.getElementById('btn-crear-triaje').disabled = true;
+                        }
+                    } catch(e) {
+                        document.getElementById('triaje-sesiones-list').innerHTML = 'Error al cargar sesiones.';
+                    }
+                }
+
+                function cerrarModalTriaje() {
+                    document.getElementById('modal-triaje').style.display = 'none';
+                    document.getElementById('modal-triaje-overlay').style.display = 'none';
+                }
+
+                async function crearGarantiaDesdeTriaje() {
+                    const sesion_id = document.getElementById('t-sesion-id').value;
+                    if(!sesion_id) return;
+                    
+                    const prov = document.getElementById('t-prov').value.trim();
+                    if(!prov) { alert("El proveedor es obligatorio"); return; }
+                    
+                    const ruc = document.getElementById('t-ruc').value.trim();
+                    const notas = document.getElementById('t-notas').value.trim();
+                    
+                    document.getElementById('btn-crear-triaje').disabled = true;
+                    document.getElementById('btn-crear-triaje').innerText = 'Creando...';
+                    
+                    try {
+                        const body = { sesion_id, proveedor_nombre: prov, proveedor_ruc: ruc, notas };
+                        const res = await fetch(`${API}?action=crear_desde_triaje`, { method:'POST', body:JSON.stringify(body) }).then(r=>r.json());
+                        if (res.ok) {
+                            alert("Éxito: " + res.msg);
+                            cerrarModalTriaje();
+                            cargar();
+                        } else {
+                            alert("Error: " + res.msg);
+                        }
+                    } catch(e) {
+                        alert("Error de conexión");
+                    }
+                    
+                    document.getElementById('btn-crear-triaje').disabled = false;
+                    document.getElementById('btn-crear-triaje').innerHTML = '<i class="ph ph-magic-wand"></i> Generar Garantía';
+                }
+
                 cargar();
             </script>
 
-
+        </div>
+        
+        <!-- MODAL TRIAJE -->
+        <div class="modal-overlay" id="modal-triaje-overlay" onclick="cerrarModalTriaje()"></div>
+        <div class="modal card" id="modal-triaje">
+            <h3 style="margin-top:0"><i class="ph-bold ph-magic-wand"></i> Crear desde Triaje</h3>
+            <p style="font-size:13px; color:var(--text-secondary);">Selecciona una lista de triaje CERRADA. Se enviarán automáticamente todos los equipos marcados como <strong>CON_FALLA</strong>.</p>
+            
+            <div style="margin-bottom:15px;">
+                <label>Lista de Triaje Cerrada:</label>
+                <div id="triaje-sesiones-list"></div>
+            </div>
+            
+            <div style="margin-bottom:15px;">
+                <label>Proveedor (Obligatorio)</label>
+                <input type="text" id="t-prov" class="form-control" placeholder="Ej: Lenovo Peru">
+            </div>
+            
+            <div style="margin-bottom:15px;">
+                <label>RUC del Proveedor (Opcional)</label>
+                <input type="text" id="t-ruc" class="form-control">
+            </div>
+            
+            <div style="margin-bottom:15px;">
+                <label>Notas Adicionales</label>
+                <textarea id="t-notas" class="form-control" rows="2">Generado desde Triaje Masivo</textarea>
+            </div>
+            
+            <div style="display:flex; gap:10px; justify-content:flex-end;">
+                <button class="btn-outline" onclick="cerrarModalTriaje()">Cancelar</button>
+                <button class="btn-primary" id="btn-crear-triaje" onclick="crearGarantiaDesdeTriaje()"><i class="ph ph-magic-wand"></i> Generar Garantía</button>
+            </div>
         </div>
 
         <!-- FAB Button -->
