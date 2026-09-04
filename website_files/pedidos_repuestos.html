@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Pedidos de Repuestos - Petulap SST</title>
+<link rel="stylesheet" href="css/tokens.css?v=1">
+<link rel="stylesheet" href="css/styles.css?v=3">
+<link rel="stylesheet" href="css/dashboard.css?v=3">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/@phosphor-icons/web"></script>
+<script>
+  (function(){
+    if(localStorage.getItem('petulap-theme') === 'dark') {
+      document.documentElement.setAttribute('data-theme', 'dark');
+    }
+  })();
+</script>
+<style>
+  .badge-pagado { background: var(--bg-success-subtle); color: var(--success); padding: 4px 8px; border-radius: 12px; font-size: 11px; font-weight: 700; border: 1px solid #86efac; }
+  .badge-pendiente { background: var(--bg-warning-subtle); color: #b45309; padding: 4px 8px; border-radius: 12px; font-size: 11px; font-weight: 700; border: 1px solid #fcd34d; }
+  .rep-card { background: var(--bg-card); border-radius: 12px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid var(--border); display: flex; flex-direction: column; gap: 10px; }
+  .rep-header { display: flex; justify-content: space-between; align-items: flex-start; }
+  .rep-info { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 13px; }
+  .rep-actions { display: flex; gap: 8px; margin-top: 10px; border-top: 1px solid var(--border); padding-top: 10px; }
+</style>
+</head>
+<body class="dashboard-body">
+
+    <!-- MOBILE HEADER -->
+    <header class="mobile-header">
+        <button class="menu-toggle" id="mobile-menu-toggle"><i class="ph ph-list"></i></button>
+        <div class="logo-container"><div class="logo-icon">P</div><span>PETULAP S.A.C.</span></div>
+        <button class="theme-toggle-btn" aria-label="Cambiar tema" onclick="toggleTheme()" style="background: none; border: none; font-size: 20px; cursor: pointer; color: var(--text-secondary); margin-right: 15px; display: flex; align-items: center;"><i class="ph ph-moon"></i></button>
+    </header>
+
+    <!-- MOBILE SIDEBAR -->
+    <div class="mobile-sidebar" id="mobile-sidebar">
+        <!-- (Simplified for brevity, user can use desktop sidebar or navigate via URL) -->
+        <div class="accordion-item active">
+            <div class="accordion-content">
+                <a href="index.html" class="accordion-link"><i class="ph-fill ph-house"></i> Inicio</a>
+                <a href="mis_ordenes.html" class="accordion-link"><i class="ph-fill ph-kanban"></i> Kanban</a>
+                <a href="pedidos_repuestos.html" class="accordion-link"><i class="ph-fill ph-truck"></i> Pedidos Repuestos</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- DESKTOP SIDEBAR -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <button class="menu-toggle"><i class="ph ph-list"></i></button>
+            <div class="logo-container"><div class="logo-icon">P</div><span>PETULAP S.A.C.</span></div>
+        </div>
+        <div class="sidebar-menu">
+            <a href="index.html" class="menu-item"><div class="menu-item-left"><i class="ph ph-house"></i><span>Panel de Control</span></div></a>
+            <div class="menu-section">
+                <span class="menu-title">Soporte y Taller</span>
+                <a href="mis_ordenes.html" class="menu-item"><div class="menu-item-left"><i class="ph ph-kanban"></i><span>Panel Kanban</span></div></a>
+                <a href="pedidos_repuestos.html" class="menu-item"><div class="menu-item-left"><i class="ph ph-truck"></i><span>Pedidos Repuestos</span></div><div class="status-dot dot-yellow"></div></a>
+            </div>
+            <div class="menu-section">
+                <a href="#" class="menu-item" onclick="logout(event)"><div class="menu-item-left"><i class="ph ph-sign-out"></i><span>Cerrar Sesion</span></div></a>
+            </div>
+        </div>
+    </aside>
+
+    <main class="main-wrapper">
+        <header class="topbar">
+            <div class="search-bar"><i class="ph ph-magnifying-glass"></i><input type="text" placeholder="Buscar..."></div>
+            <div class="topbar-right">
+                <a href="login.html" class="user-profile"><img src="https://ui-avatars.com/api/?name=User+Profile&background=0D8ABC&color=fff" alt="User"></a>
+            </div>
+        </header>
+
+        <div class="content">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom: 20px;">
+              <h2><i class="ph-fill ph-truck" style="color: var(--primary);"></i> Gestión de Pedidos de Repuestos</h2>
+              <button class="btn-secondary" onclick="cargarPedidos()"><i class="ph ph-arrows-clockwise"></i> Actualizar</button>
+            </div>
+
+            <div id="contenedor-pedidos">
+                <div style="text-align: center; padding: 40px;"><i class="ph ph-spinner ph-spin" style="font-size: 32px;"></i></div>
+            </div>
+        </div>
+    </main>
+
+    <!-- MODAL EDITAR PEDIDO -->
+    <div class="modal-overlay" id="modal-editar" style="display:none;">
+      <div class="card" style="width:90%; max-width:400px">
+        <h2><i class="ph ph-pencil-simple"></i> Editar Pedido</h2>
+        <input type="hidden" id="e-id">
+        
+        <div class="form-group">
+          <label class="form-label">Estado de Pago</label>
+          <select id="e-pagado" class="form-control">
+            <option value="0">Pendiente de Pago</option>
+            <option value="1">Pagado</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Comprobante (Boleta/Factura)</label>
+          <input type="text" id="e-comprobante" class="form-control" placeholder="Ej: B001-000123">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Fecha Llegada Aproximada</label>
+          <input type="date" id="e-llegada" class="form-control">
+        </div>
+        
+        <div style="display:flex; gap:10px">
+          <button class="btn btn-outline" onclick="document.getElementById('modal-editar').style.display='none'">Cancelar</button>
+          <button class="btn btn-primary" onclick="guardarPedido()">Guardar Cambios</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="js/dashboard.js?v=3"></script>
+    <script>
+        async function cargarPedidos() {
+            const container = document.getElementById('contenedor-pedidos');
+            container.innerHTML = '<div style="text-align: center; padding: 40px;"><i class="ph ph-spinner ph-spin" style="font-size: 32px;"></i></div>';
+            
+            try {
+                const res = await fetch('api/soporte.php?action=repuestos_pendientes').then(r=>r.json());
+                if (!res.ok) {
+                    container.innerHTML = `<div style="color:red">Error: ${res.msg}</div>`;
+                    return;
+                }
+
+                if (res.data.length === 0) {
+                    container.innerHTML = '<div style="text-align:center; padding: 40px; color: var(--text-secondary);"><i class="ph ph-check-circle" style="font-size:48px; opacity:0.5; margin-bottom:10px; display:block;"></i>No hay repuestos pendientes de llegada.</div>';
+                    return;
+                }
+
+                let html = '';
+                res.data.forEach(p => {
+                    const pagadoHtml = p.repuesto_pagado == 1 
+                        ? `<span class="badge-pagado"><i class="ph-bold ph-check"></i> Pagado</span>` 
+                        : `<span class="badge-pendiente"><i class="ph-bold ph-clock"></i> Pendiente Pago</span>`;
+                    
+                    const comprobanteStr = p.repuesto_comprobante ? `<b>Doc:</b> ${p.repuesto_comprobante}` : `<span style="color:#94a3b8">Sin comprobante</span>`;
+                    const llegadaStr = p.repuesto_fecha_llegada_aprox ? `<b>Llega:</b> ${p.repuesto_fecha_llegada_aprox}` : `<span style="color:#94a3b8">Fecha sin definir</span>`;
+
+                    html += `
+                    <div class="rep-card">
+                        <div class="rep-header">
+                            <div>
+                                <div style="font-weight: 800; color: var(--text-main); font-size: 15px;">${p.repuesto_nombre}</div>
+                                <div style="font-size: 12px; color: var(--text-secondary); margin-top: 4px;"><b>Ticket:</b> ${p.numero_atencion} | <b>Cliente:</b> ${p.cliente_nombre}</div>
+                            </div>
+                            <div style="text-align: right;">
+                                ${pagadoHtml}
+                                <div style="font-weight: 800; color: var(--text-main); margin-top: 5px;">S/ ${p.repuesto_precio || '0.00'}</div>
+                            </div>
+                        </div>
+                        
+                        <div class="rep-info">
+                            <div><i class="ph-fill ph-receipt" style="color:var(--text-secondary)"></i> ${comprobanteStr}</div>
+                            <div><i class="ph-fill ph-calendar-blank" style="color:var(--text-secondary)"></i> ${llegadaStr}</div>
+                            <div style="grid-column: 1 / -1;"><i class="ph-fill ph-laptop" style="color:var(--text-secondary)"></i> <b>Equipo:</b> ${p.equipo_descripcion}</div>
+                        </div>
+
+                        <div class="rep-actions">
+                            <button class="btn-secondary" style="flex:1; padding: 8px; font-size: 12px;" onclick='abrirEditar(${JSON.stringify(p).replace(/'/g, "&apos;")})'>
+                                <i class="ph-bold ph-pencil-simple"></i> Editar Pago/Fecha
+                            </button>
+                            <button class="btn-primary" style="flex:1; padding: 8px; font-size: 12px; background: #10b981; border:none;" onclick="marcarLlegada(${p.id})">
+                                <i class="ph-bold ph-check-circle"></i> Marcar Recibido
+                            </button>
+                        </div>
+                    </div>
+                    `;
+                });
+                container.innerHTML = html;
+            } catch(e) {
+                container.innerHTML = `<div style="color:red">Error de conexión.</div>`;
+            }
+        }
+
+        function abrirEditar(p) {
+            document.getElementById('e-id').value = p.id;
+            document.getElementById('e-pagado').value = p.repuesto_pagado == 1 ? "1" : "0";
+            document.getElementById('e-comprobante').value = p.repuesto_comprobante || '';
+            document.getElementById('e-llegada').value = p.repuesto_fecha_llegada_aprox || '';
+            document.getElementById('modal-editar').style.display = 'flex';
+        }
+
+        async function guardarPedido() {
+            const id = document.getElementById('e-id').value;
+            const body = {
+                id: id,
+                repuesto_pagado: document.getElementById('e-pagado').value,
+                repuesto_comprobante: document.getElementById('e-comprobante').value,
+                repuesto_fecha_llegada_aprox: document.getElementById('e-llegada').value || null
+            };
+
+            const btn = document.querySelector('#modal-editar .btn-primary');
+            const originalHtml = btn.innerHTML;
+            btn.innerHTML = 'Guardando...';
+            btn.disabled = true;
+
+            try {
+                const res = await fetch('api/soporte.php?action=actualizar', { method: 'POST', body: JSON.stringify(body) }).then(r=>r.json());
+                if (res.ok) {
+                    document.getElementById('modal-editar').style.display = 'none';
+                    cargarPedidos();
+                } else {
+                    alert("Error: " + res.msg);
+                }
+            } catch(e) {
+                alert("Error de conexión");
+            } finally {
+                btn.innerHTML = originalHtml;
+                btn.disabled = false;
+            }
+        }
+
+        async function marcarLlegada(id) {
+            if(!confirm("¿Confirmas que el repuesto ha llegado? El ticket pasará a EN REPARACIÓN y se notificará al técnico.")) return;
+            
+            const body = {
+                id: id,
+                estado: 'EN_REPARACION'
+            };
+
+            try {
+                const res = await fetch('api/soporte.php?action=actualizar', { method: 'POST', body: JSON.stringify(body) }).then(r=>r.json());
+                if (res.ok) {
+                    cargarPedidos();
+                } else {
+                    alert("Error: " + res.msg);
+                }
+            } catch(e) {
+                alert("Error de conexión");
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', cargarPedidos);
+    </script>
+</body>
+</html>

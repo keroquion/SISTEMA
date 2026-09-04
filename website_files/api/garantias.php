@@ -77,6 +77,43 @@ switch ($action) {
         echo json_encode(["ok" => true, "id" => $gar_id, "numero" => $numero, "msg" => "Garantia $numero creada con " . count($items_data) . " items"]);
         break;
 
+    // Crear garantia desde sesion de triaje masivo
+    case "crear_desde_triaje":
+        $data = json_decode(file_get_contents("php://input"), true);
+        $sesion_id = (int)($data["sesion_id"] ?? 0);
+        $prov = $db->real_escape_string($data["proveedor_nombre"] ?? "");
+        $ruc = $db->real_escape_string($data["proveedor_ruc"] ?? "");
+        $notas = $db->real_escape_string($data["notas"] ?? "");
+
+        $chk = $db->query("SELECT nombre FROM sesiones_inventario WHERE id=$sesion_id AND estado='CERRADA'");
+        if ($chk->num_rows == 0) { echo json_encode(["ok" => false, "msg" => "Sesión no existe o no está cerrada"]); break; }
+        
+        $fecha = date("Ymd");
+        $res = $db->query("SELECT COUNT(*) as c FROM garantias_proveedor WHERE numero_garantia LIKE 'GAR-$fecha-%'");
+        $seq = str_pad((int)$res->fetch_assoc()["c"] + 1, 3, "0", STR_PAD_LEFT);
+        $numero = "GAR-$fecha-$seq";
+
+        // Obtener items con falla
+        $items_fallados = $db->query("SELECT e.codigo, e.serie, e.marca, e.modelo, e.falla FROM sesiones_items si JOIN equipos e ON si.equipo_id = e.id WHERE si.sesion_id=$sesion_id AND si.triaje_asignado='CON_FALLA'");
+        $total_eq = $items_fallados->num_rows;
+
+        if ($total_eq == 0) { echo json_encode(["ok" => false, "msg" => "No hay equipos CON_FALLA en esta sesión"]); break; }
+
+        $stmt = $db->prepare("INSERT INTO garantias_proveedor (numero_garantia, sesion_triaje_id, proveedor_nombre, proveedor_ruc, total_equipos, total_repuestos, notas, ultima_alerta_fecha) VALUES (?,?,?,?,?,?,? , CURDATE())");
+        $tot_rep = 0;
+        $stmt->bind_param("sisssis", $numero, $sesion_id, $prov, $ruc, $total_eq, $tot_rep, $notas);
+        if (!$stmt->execute()) { echo json_encode(["ok" => false, "msg" => $db->error]); break; }
+        $gar_id = $db->insert_id;
+
+        while ($it = $items_fallados->fetch_assoc()) {
+            $st2 = $db->prepare("INSERT INTO garantia_items (garantia_id, equipo_codigo, equipo_serie, marca, modelo, falla, tipo_item) VALUES (?,?,?,?,?,?,'EQUIPO')");
+            $st2->bind_param("isssss", $gar_id, $it['codigo'], $it['serie'], $it['marca'], $it['modelo'], $it['falla']);
+            $st2->execute();
+        }
+
+        echo json_encode(["ok" => true, "id" => $gar_id, "numero" => $numero, "msg" => "Garantía $numero creada con $total_eq equipos"]);
+        break;
+
     // Crear garantia manual
     case "crear":
         $data = json_decode(file_get_contents("php://input"), true);
@@ -101,10 +138,12 @@ switch ($action) {
         $estado = $db->real_escape_string($data["estado"] ?? "");
         $tipo_res = isset($data["tipo_resolucion"]) ? "'" . $db->real_escape_string($data["tipo_resolucion"]) . "'" : "NULL";
         $notas = $db->real_escape_string($data["notas"] ?? "");
+        $alerta_dias = isset($data["alerta_dias"]) ? (int)$data["alerta_dias"] : 10;
+        
         $fecha_envio = $estado === "ENVIADO" ? ", fecha_envio=NOW()" : "";
         $fecha_res = in_array($estado, ["RESUELTO","RECHAZADO"]) ? ", fecha_resolucion=NOW()" : "";
-        $db->query("UPDATE garantias_proveedor SET estado='$estado', tipo_resolucion=$tipo_res, notas='$notas' $fecha_envio $fecha_res WHERE id=$id");
-        echo json_encode(["ok" => true, "msg" => "Estado actualizado a $estado"]);
+        $db->query("UPDATE garantias_proveedor SET estado='$estado', tipo_resolucion=$tipo_res, notas='$notas', alerta_dias=$alerta_dias $fecha_envio $fecha_res WHERE id=$id");
+        echo json_encode(["ok" => true, "msg" => "Garantía actualizada a $estado"]);
         break;
 
     default:

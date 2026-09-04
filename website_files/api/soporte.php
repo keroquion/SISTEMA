@@ -16,7 +16,7 @@ switch ($action) {
                 st.fecha_ingreso, st.fecha_estimada, st.fecha_entrega,
                 CONCAT(c.nombre,' ',c.apellido) as cliente_nombre, c.dni as cliente_dni, c.telefono as cliente_tel,
                 CONCAT(COALESCE(t.nombre,''),IF(t.apellido IS NOT NULL AND t.apellido != '',' ',''),COALESCE(t.apellido,'')) as tecnico_nombre,
-                st.cliente_id, st.tecnico_id
+                st.cliente_id, st.tecnico_id, st.tecnicos_adicionales
                 FROM soporte_tecnico st
                 JOIN personas c ON st.cliente_id = c.id
                 LEFT JOIN personas t ON st.tecnico_id = t.id
@@ -77,7 +77,10 @@ switch ($action) {
                     require_once 'push.php';
                     sendPushToUser($db, $tec_id, "\xF0\x9F\x93\x8B Nueva Orden Asignada", "Orden $numero te fue asignada", '/mis_ordenes.html');
                 } catch (Exception $e) { /* silent */ }
+                $db->query("INSERT INTO notificaciones (usuario_id, titulo, mensaje, link) VALUES ($tec_id, 'Nueva Orden', 'La orden $numero te fue asignada', 'mis_ordenes.html')");
             }
+            // Notify admins
+            $db->query("INSERT INTO notificaciones (usuario_id, titulo, mensaje, link) SELECT id, 'Nuevo Ticket', 'Ticket $numero ha ingresado', 'soporte.html' FROM personas WHERE tipo='admin' AND estado='ACTIVO'");
         }
         else echo json_encode(["ok" => false, "msg" => $db->error]);
         break;
@@ -114,6 +117,7 @@ switch ($action) {
                 require_once 'push.php';
                 sendPushToAdmins($db, "\xF0\x9F\x93\x8C Tarea Creada", "$numero: $motivo", '/mis_ordenes.html');
             } catch (Exception $e) { /* silent */ }
+            $db->query("INSERT INTO notificaciones (usuario_id, titulo, mensaje, link) SELECT id, 'Nueva Tarea', '$numero: $motivo', 'mis_ordenes.html' FROM personas WHERE tipo='admin' AND estado='ACTIVO'");
         }
         else echo json_encode(["ok" => false, "msg" => $db->error]);
         break;
@@ -177,10 +181,11 @@ switch ($action) {
         $ant = $ant_res->fetch_assoc();
 
         $fields = []; $values = []; $types = "";
-        $allowed = ["estado","prioridad","diagnostico","solucion","notas_internas","tecnico_id",
+        $allowed = ["estado","prioridad","diagnostico","solucion","notas_internas","tecnico_id","tecnicos_adicionales",
                     "equipo_codigo","equipo_serie","equipo_descripcion","es_externo","motivo_ingreso",
                     "fecha_estimada","en_garantia",
                     "repuesto_nombre","repuesto_pn","repuesto_precio",
+                    "repuesto_pagado","repuesto_comprobante","repuesto_fecha_llegada_aprox",
                     "monto_cobrado","metodo_pago"];
         foreach ($allowed as $f) {
             if (array_key_exists($f, $data)) { $fields[] = "$f=?"; $types .= "s"; $values[] = $data[$f]; }
@@ -232,6 +237,7 @@ switch ($action) {
                     $emoji = $data['estado'] === 'ENTREGADO' ? "\xF0\x9F\x93\xA6" : "\xE2\x9C\x85";
                     sendPushToAdmins($db, "$emoji $titulo_tk", "Ticket: $num\nMarcada como " . str_replace('_', ' ', $data['estado']) . " por $tecNombre", '/mis_ordenes.html');
                 } catch (Exception $e) { /* silent */ }
+                $db->query("INSERT INTO notificaciones (usuario_id, titulo, mensaje, link) SELECT id, 'Ticket Actualizado', 'El ticket $num cambió a {$data['estado']}', 'mis_ordenes.html' FROM personas WHERE tipo='admin' AND estado='ACTIVO'");
             }
             // Notify technician when a ticket is assigned/reassigned to them
             if (isset($data['tecnico_id']) && $data['tecnico_id'] != ($ant['tecnico_id'] ?? null) && $data['tecnico_id']) {
@@ -243,6 +249,8 @@ switch ($action) {
                     
                     sendPushToUser($db, (int)$data['tecnico_id'], "\xF0\x9F\x93\x8B $titulo_tk", "Ticket: $num te fue asignado.", '/mis_ordenes.html');
                 } catch (Exception $e) { /* silent */ }
+                $tid = (int)$data['tecnico_id'];
+                $db->query("INSERT INTO notificaciones (usuario_id, titulo, mensaje, link) VALUES ($tid, 'Ticket Asignado', 'El ticket $num te fue asignado', 'mis_ordenes.html')");
             }
         } else echo json_encode(["ok" => false, "msg" => $db->error]);
         break;
@@ -328,6 +336,7 @@ switch ($action) {
         // Vista compacta de todos los tickets en ESPERANDO_REPUESTO
         $sql = "SELECT st.id, st.numero_atencion, st.repuesto_nombre, st.repuesto_pn, st.repuesto_precio,
                        st.fecha_pedido_repuesto, st.fecha_llegada_repuesto, st.equipo_codigo, st.equipo_descripcion,
+                       st.repuesto_pagado, st.repuesto_comprobante, st.repuesto_fecha_llegada_aprox,
                        CONCAT(p.nombre,' ',IFNULL(p.apellido,'')) AS cliente_nombre,
                        CONCAT(tp.nombre,' ',IFNULL(tp.apellido,'')) AS tecnico_nombre
                 FROM soporte_tecnico st

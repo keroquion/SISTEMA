@@ -467,8 +467,15 @@ if ("serviceWorker" in navigator) { window.addEventListener("load", () => { navi
     </div>
 
     <div class="form-group">
-      <label class="form-label">Asignado a Tecnico</label>
+      <label class="form-label">Asignado a (Encargado)</label>
       <select id="admin-tecnico" class="form-control"></select>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Tecnicos de Apoyo <small>(Opcional)</small></label>
+      <div id="admin-tecnicos-extra-container" style="border: 1px solid var(--border); border-radius: 6px; padding: 10px; max-height: 120px; overflow-y: auto; background: var(--bg-card); display: flex; flex-direction: column; gap: 8px;">
+        <!-- Checkboxes dinamicos -->
+      </div>
     </div>
     
     <div style="display:flex; gap:10px; margin-top: 20px;">
@@ -765,9 +772,18 @@ Gracias por confiar en nosotros! ðŸ™Œ`);
       <div class="tkt-title" style="font-size: 13.5px; font-weight: 800; color: #0f172a; margin-bottom: 6px; line-height: 1.3; word-break: break-word; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; white-space: pre-line;" title="${equipoTitulo}">${equipoTitulo}</div>
       <p style="font-size: 11.5px; color: #475569; margin: 4px 0; line-height: 1.4; word-break: break-word; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; white-space: pre-line;" title="${motivoTexto}"><b>${esTarea?'Desc:':'Motivo:'}</b> ${motivoTexto}</p>
       <p style="font-size: 11.5px; color: #475569; margin: 4px 0; word-break: break-word;" title="${clienteTexto}"><b>${esTarea?'Asignado a:':'Cliente:'}</b> ${clienteTexto}</p>
-      <p style="font-size: 11.5px; color: #475569; margin: 4px 0; display:flex; align-items:flex-start; gap:4px; word-break: break-word;"><i class="ph-bold ph-user" style="color:#94a3b8; flex-shrink:0; margin-top: 2px;"></i> <b>Tecnico:</b> <span>${t.tecnico_nombre||'Sin asignar'}</span></p>
+      <p style="font-size: 11.5px; color: #475569; margin: 4px 0; display:flex; align-items:flex-start; gap:4px; word-break: break-word;"><i class="ph-bold ph-user" style="color:#94a3b8; flex-shrink:0; margin-top: 2px;"></i> <b>Tecnico:</b> <span>${t.tecnico_nombre||'Sin asignar'}</span></p>`;
+
+      if (t.tecnicos_adicionales && listaTecnicos.length > 0) {
+          const ids = t.tecnicos_adicionales.split(',');
+          const nombres = ids.map(id => {
+              const tec = listaTecnicos.find(x => x.id == id);
+              return tec ? (tec.nombre + ' ' + (tec.apellido||'')).trim() : 'Tec. ' + id;
+          });
+          html += `<div style="font-size: 10.5px; color: #64748b; margin-top: 2px; padding-left: 18px; margin-bottom: 4px;"><i class="ph-bold ph-users" style="margin-right:2px"></i> + ${nombres.join(', ')}</div>`;
+      }
       
-      <div class="acciones" style="display:flex; gap:6px; margin-top: auto; padding-top: 10px; align-items: stretch; flex-wrap: wrap;">`;
+      html += `<div class="acciones" style="display:flex; gap:6px; margin-top: auto; padding-top: 10px; align-items: stretch; flex-wrap: wrap;">`;
       
       if (t.estado === 'PENDIENTE') {
         if (esTarea) {
@@ -884,10 +900,19 @@ function abrirModalAdmin(id) {
     document.getElementById('admin-motivo').value = t.motivo_ingreso || t.diagnostico || '';
     
     let htmlTec = '<option value="">-- Sin Asignar --</option>';
+    let htmlTecExtra = '';
+    const tecsExtraArr = t.tecnicos_adicionales ? t.tecnicos_adicionales.split(',') : [];
+
     listaTecnicos.forEach(tec => {
         htmlTec += `<option value="${tec.id}" ${tec.id == t.tecnico_id ? 'selected' : ''}>${tec.nombre} ${tec.apellido||''}</option>`;
+        const isSelectedExtra = tecsExtraArr.includes(String(tec.id)) ? 'checked' : '';
+        htmlTecExtra += `<label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:13px; color:var(--text-main);">
+          <input type="checkbox" class="tec-extra-cb" value="${tec.id}" ${isSelectedExtra}>
+          ${tec.nombre} ${tec.apellido||''}
+        </label>`;
     });
     document.getElementById('admin-tecnico').innerHTML = htmlTec;
+    document.getElementById('admin-tecnicos-extra-container').innerHTML = htmlTecExtra;
     
     document.getElementById('modal-admin').style.display = 'flex';
 }
@@ -923,7 +948,7 @@ function verHistorial(id) {
 }
 
 async function eliminarTicket(id) {
-    if (!confirm('Estas seguro de que deseas eliminar este ticket? La accion se registrara en el historial y se ocultara del panel.')) return;
+    if (!confirm('¿Estás seguro de que deseas eliminar este ticket? La acción se registrará en el historial y se ocultará del panel.')) return;
     
     const usuario = encodeURIComponent(localStorage.getItem('tecnico_nombre') || 'Admin');
     const res = await fetch(`api/soporte.php?action=eliminar&id=${id}&usuario=${usuario}`).then(r=>r.json());
@@ -944,11 +969,15 @@ async function guardarAdmin() {
     const t = todosMisTickets.find(x => x.id == ticketActual);
     let esTarea = t && (t.es_externo == 2 || t.numero_atencion.startsWith('TAR'));
     
+    const tecsExtraSelect = document.querySelectorAll('.tec-extra-cb:checked');
+    const seleccionados = Array.from(tecsExtraSelect).map(cb => cb.value);
+
     const body = { 
       id: ticketActual, 
       estado: estado, 
       prioridad: prioridad,
       tecnico_id: tec ? parseInt(tec) : null,
+      tecnicos_adicionales: seleccionados.length > 0 ? seleccionados.join(',') : null,
       usuario: localStorage.getItem('tecnico_nombre') || 'Usuario' 
     };
     

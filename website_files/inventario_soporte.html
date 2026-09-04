@@ -1,42 +1,44 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>Escaneo / Triaje Masivo - Petulap SST</title>
-<link rel="stylesheet" href="css/tokens.css?v=1">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <title>Escaneo / Triaje Masivo - Petulap SST</title>
+    <link rel="stylesheet" href="css/tokens.css?v=1">
     <link rel="stylesheet" href="css/styles.css?v=3">
 
 
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#F8FAFC">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#F8FAFC">
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
+
     <!-- Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
-    
+
     <!-- Dashboard Styles -->
     <link rel="stylesheet" href="css/dashboard.css?v=3">
 
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<link rel="apple-touch-icon" href="icon.jpg">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="icon.jpg">
 
     <script>
-      (function(){
-        if(localStorage.getItem('petulap-theme') === 'dark') {
-          document.documentElement.setAttribute('data-theme', 'dark');
-        }
-      })();
+        (function () {
+            if (localStorage.getItem('petulap-theme') === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            }
+        })();
     </script>
-<script>
-if ("serviceWorker" in navigator) { window.addEventListener("load", () => { navigator.serviceWorker.register("sw.js").then(r => console.log("SW ok")).catch(e => console.log("SW fail", e)); }); }
-</script>
+    <script>
+        if ("serviceWorker" in navigator) { window.addEventListener("load", () => { navigator.serviceWorker.register("sw.js").then(r => console.log("SW ok")).catch(e => console.log("SW fail", e)); }); }
+    </script>
 </head>
+
 <body class="dashboard-body">
 
     <!-- MOBILE HEADER -->
@@ -48,11 +50,12 @@ if ("serviceWorker" in navigator) { window.addEventListener("load", () => { navi
             <div class="logo-icon">P</div>
             <span>PETULAP S.A.C.</span>
         </div>
-        
-                <button class="theme-toggle-btn" aria-label="Cambiar tema" onclick="toggleTheme()" style="background: none; border: none; font-size: 20px; cursor: pointer; color: var(--text-secondary); margin-right: 15px; display: flex; align-items: center;">
-                    <i class="ph ph-moon"></i>
-                </button>
-                <button class="notification-btn">
+
+        <button class="theme-toggle-btn" aria-label="Cambiar tema" onclick="toggleTheme()"
+            style="background: none; border: none; font-size: 20px; cursor: pointer; color: var(--text-secondary); margin-right: 15px; display: flex; align-items: center;">
+            <i class="ph ph-moon"></i>
+        </button>
+        <button class="notification-btn">
             <i class="ph ph-bell"></i>
         </button>
     </header>
@@ -279,7 +282,7 @@ if ("serviceWorker" in navigator) { window.addEventListener("load", () => { navi
                     <div class="status-dot dot-blue"></div>
                 </a>
             </div>
-            
+
             <div class="menu-section">
                 <span class="menu-title">Gerencia y Utilidades</span>
                 <a href="reportes.html" class="menu-item">
@@ -331,21 +334,22 @@ if ("serviceWorker" in navigator) { window.addEventListener("load", () => { navi
 
     <!-- MAIN WRAPPER -->
     <main class="main-wrapper">
-        
+
         <!-- DESKTOP TOPBAR -->
         <header class="topbar">
             <div class="search-bar">
                 <i class="ph ph-magnifying-glass"></i>
                 <input type="text" placeholder="Buscar en el sistema...">
             </div>
-            
+
             <div class="topbar-right">
                 <button class="notification-btn">
                     <i class="ph ph-bell"></i>
                     <span class="badge-counter">3</span>
                 </button>
                 <a href="login.html" class="user-profile">
-                    <img src="https://ui-avatars.com/api/?name=User+Profile&background=0D8ABC&color=fff" alt="User Profile">
+                    <img src="https://ui-avatars.com/api/?name=User+Profile&background=0D8ABC&color=fff"
+                        alt="User Profile">
                 </a>
             </div>
         </header>
@@ -356,117 +360,140 @@ if ("serviceWorker" in navigator) { window.addEventListener("load", () => { navi
 
 
 
-<h2><i class="ph-bold ph-barcode" style="color: var(--color-brand)"></i> Escaneo / Triaje Masivo</h2>
-<p style="margin-bottom: 15px; color: var(--text-secondary)">Escanea equipos aqui. Se guardaran en tu sesion actual de inventario.</p>
+            <h2><i class="ph-bold ph-barcode" style="color: var(--color-brand)"></i> Escaneo / Triaje Masivo</h2>
+            <p style="margin-bottom: 15px; color: var(--text-secondary)">Escanea equipos aqui. Se guardaran en tu sesion
+                actual de inventario.</p>
 
-<div class="card" style="padding: 20px; border-radius: 16px; margin-bottom: 25px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
-  <div>
-    <b style="text-transform:uppercase; color: var(--text-muted); font-size: 0.9rem;">Sesion Activa:</b> <span id="nombre-sesion" style="margin-left:5px; font-weight: bold; font-size: 1.1rem; color: var(--color-brand);">Cargando...</span>
-  </div>
-  <div style="display:flex; gap:10px">
-    <button id="btn-admin-listas" class="btn-secondary" style="display:none" onclick="abrirAdminListas()"><i class="ph-bold ph-crown"></i> Gestionar Listas</button>
-    <button id="btn-terminar-lista" class="btn-primary" onclick="terminarLista()"><i class="ph-bold ph-check-circle"></i> Terminar Lista</button>
-  </div>
-</div>
+            <div class="card"
+                style="padding: 20px; border-radius: 16px; margin-bottom: 25px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+                <div>
+                    <b style="text-transform:uppercase; color: var(--text-muted); font-size: 0.9rem;">Sesion Activa:</b>
+                    <span id="nombre-sesion"
+                        style="margin-left:5px; font-weight: bold; font-size: 1.1rem; color: var(--color-brand);">Cargando...</span>
+                </div>
+                <div style="display:flex; gap:10px">
+                    <button id="btn-admin-listas" class="btn-secondary" style="display:none"
+                        onclick="abrirAdminListas()"><i class="ph-bold ph-crown"></i> Gestionar Listas</button>
+                    <button id="btn-terminar-lista" class="btn-primary" onclick="terminarLista()"><i
+                            class="ph-bold ph-check-circle"></i> Terminar Lista</button>
+                </div>
+            </div>
 
-<!-- ESCANER -->
-<div class="card" style="margin-bottom: 30px;">
-  <div class="step-header">
-    <div class="step-icon-wrapper icon-1"><i class="ph-bold ph-barcode"></i></div>
-    <h2>1. Pistolear Equipo</h2>
-  </div>
-  <div style="display:flex; gap:12px; margin-top:15px; flex-wrap: wrap;">
-    <input type="text" id="scan-codigo" class="form-control" placeholder="Escanea codigo del equipo... (Enter)" 
-           onkeydown="if(event.key==='Enter'){agregarEquipo()}" autofocus style="flex: 1; min-width: 100%; max-width: 100%;">
-    
-    <div style="display:flex; gap:12px; width: 100%;">
-        <select id="scan-triaje" class="form-control" style="flex:1">
-          <option value="SOPORTE">Soporte / Falla</option>
-          <option value="SIN_FALLA">Sin Falla</option>
-          <option value="FALLA_MENOR">Falla Menor</option>
-          <option value="NECESITA_REPUESTO">Necesita Repuesto</option>
-          <option value="DANO_GRAVE">Dano Grave</option>
-        </select>
-        <button class="btn-primary" onclick="agregarEquipo()" style="padding: 0 20px; white-space: nowrap; flex-shrink: 0;" title="Procesar"><i class="ph-bold ph-paper-plane-right" style="font-size: 20px;"></i></button>
-    </div>
-  </div>
-  <div style="display:flex; gap:12px; margin-top:12px">
-    <input type="text" id="scan-falla" class="form-control" placeholder="Descripcion de falla (opcional)" style="flex:1">
-  </div>
-  <div id="scan-feedback" style="margin-top:15px; min-height:20px; font-weight: 500;"></div>
-</div>
+            <!-- ESCANER -->
+            <div class="card" style="margin-bottom: 30px;">
+                <div class="step-header">
+                    <div class="step-icon-wrapper icon-1"><i class="ph-bold ph-barcode"></i></div>
+                    <h2>1. Pistolear Equipo</h2>
+                </div>
+                <div style="display:flex; gap:12px; margin-top:15px; flex-wrap: wrap;">
+                    <input type="text" id="scan-codigo" class="form-control"
+                        placeholder="Escanea codigo del equipo... (Enter)"
+                        onkeydown="if(event.key==='Enter'){agregarEquipo()}" autofocus
+                        style="flex: 1; min-width: 100%; max-width: 100%;">
 
-<!-- RESUMEN TRIAJE SESION -->
-<div id="resumen-triaje" style="display:flex; gap:10px; margin-bottom:15px; flex-wrap:wrap"></div>
+                    <div style="display:flex; gap:12px; width: 100%;">
+                        <select id="scan-triaje" class="form-control" style="flex:1">
+                            <option value="SOPORTE">Soporte / Falla</option>
+                            <option value="SIN_FALLA">Sin Falla</option>
+                            <option value="FALLA_MENOR">Falla Menor</option>
+                            <option value="NECESITA_REPUESTO">Necesita Repuesto</option>
+                            <option value="DANO_GRAVE">Dano Grave</option>
+                        </select>
+                        <button class="btn-primary" onclick="agregarEquipo()"
+                            style="padding: 0 20px; white-space: nowrap; flex-shrink: 0;" title="Procesar"><i
+                                class="ph-bold ph-paper-plane-right" style="font-size: 20px;"></i></button>
+                    </div>
+                </div>
+                <div style="display:flex; gap:12px; margin-top:12px">
+                    <input type="text" id="scan-falla" class="form-control"
+                        placeholder="Descripcion de falla (opcional)" style="flex:1">
+                </div>
+                <div id="scan-feedback" style="margin-top:15px; min-height:20px; font-weight: 500;"></div>
+            </div>
 
-<!-- LISTA DE EQUIPOS ESCANEADOS EN SESION -->
-<div class="lista-container" id="lista-items">
-  <p style="text-align:center; padding:30px">Cargando equipos de la sesion...</p>
-</div>
+            <!-- RESUMEN TRIAJE SESION -->
+            <div id="resumen-triaje" style="display:flex; gap:10px; margin-bottom:15px; flex-wrap:wrap"></div>
 
-<!-- MODAL ADMIN -->
-<div id="modal-admin" class="modal-overlay" style="display: none;">
-  <div class="modal-content card" style="max-width: 650px; width: 95%; max-height: 90vh; display: flex; flex-direction: column; padding: 0;">
-    
-    <div style="padding: 20px 25px; border-bottom: 1px solid var(--border-default); display: flex; align-items: center; gap: 15px;">
-      <div class="step-icon-wrapper icon-2" style="width: 40px; height: 40px; font-size: 20px;"><i class="ph-bold ph-crown"></i></div>
-      <h3 style="margin: 0; font-size: 1.2rem; font-weight: 700;">Historial de Listas (Admin)</h3>
-    </div>
-    
-    <div style="padding: 15px 25px;">
-        <p style="margin-bottom: 10px; font-size: 14px; color: var(--text-secondary);"><i class="ph-bold ph-info"></i> Al eliminar una lista, se borrara el triaje de todos los equipos que estaban dentro de ella.</p>
-        
-        <!-- Contenedor con Scroll -->
-        <div id="lista-admin" class="lista-container" style="flex: 1; overflow-y: auto; border: 2px solid var(--border-default); border-radius: 12px; padding: 15px; max-height: 50vh; background: var(--bg-surface-hover);">Cargando...</div>
-    </div>
-    
-    <!-- Botonera fija al fondo -->
-    <div style="padding: 15px 25px; border-top: 1px solid var(--border-default); background: var(--bg-page); border-radius: 0 0 var(--radius-md) var(--radius-md); display: flex; justify-content: space-between; align-items: center;">
-      <button class="btn-secondary" onclick="imprimirSeleccionadas()" style="background: var(--color-brand); color: white; border:none;"><i class="ph-bold ph-printer"></i> Imprimir Seleccionados</button>
-      <button class="btn-secondary" onclick="document.getElementById('modal-admin').style.display='none'">Cerrar Historial</button>
-    </div>
-  </div>
-</div>
+            <!-- LISTA DE EQUIPOS ESCANEADOS EN SESION -->
+            <div class="lista-container" id="lista-items">
+                <p style="text-align:center; padding:30px">Cargando equipos de la sesion...</p>
+            </div>
 
-<script src="js/sonidos.js"></script>
-<script src="js/check_auth.js"></script>
-<script>
-const API = 'api/sesiones.php';
-let itemsSesion = [];
-let sesionActual = null;
-let isAdmin = false;
+            <!-- MODAL ADMIN -->
+            <div id="modal-admin" class="modal-overlay" style="display: none;">
+                <div class="modal-content card"
+                    style="max-width: 650px; width: 95%; max-height: 90vh; display: flex; flex-direction: column; padding: 0;">
 
-window.onload = async () => {
-    // Verificar si es admin
-    const auth = await fetch('api/auth.php?action=check').then(r=>r.json());
-    if(auth.ok && auth.data.tipo === 'admin'){
-        isAdmin = true;
-        document.getElementById('btn-admin-listas').style.display = 'block';
-    }
-    cargarSesion();
-};
+                    <div
+                        style="padding: 20px 25px; border-bottom: 1px solid var(--border-default); display: flex; align-items: center; gap: 15px;">
+                        <div class="step-icon-wrapper icon-2" style="width: 40px; height: 40px; font-size: 20px;"><i
+                                class="ph-bold ph-crown"></i></div>
+                        <h3 style="margin: 0; font-size: 1.2rem; font-weight: 700;">Historial de Listas (Admin)</h3>
+                    </div>
 
-async function cargarSesion() {
-    try {
-        const res = await fetch(`${API}?action=get_activa`).then(r=>r.json());
-        if(res.ok) {
-            sesionActual = res.data;
-            document.getElementById('nombre-sesion').innerText = sesionActual.nombre;
-            itemsSesion = sesionActual.items || [];
-            renderizarItems();
-        } else {
-            alert("Error cargando sesion: " + res.msg);
-        }
-    } catch(e) {
-        console.error(e);
-    }
-}
+                    <div style="padding: 15px 25px;">
+                        <p style="margin-bottom: 10px; font-size: 14px; color: var(--text-secondary);"><i
+                                class="ph-bold ph-info"></i> Al eliminar una lista, se borrara el triaje de todos los
+                            equipos que estaban dentro de ella.</p>
 
-function renderizarItems() {
-  const triajeCounts = { SOPORTE:0, SIN_FALLA:0, FALLA_MENOR:0, NECESITA_REPUESTO:0, DANO_GRAVE:0 };
-  itemsSesion.forEach(i => { if(triajeCounts.hasOwnProperty(i.triaje_asignado)) triajeCounts[i.triaje_asignado]++; });
-  
-  document.getElementById('resumen-triaje').innerHTML = `
+                        <!-- Contenedor con Scroll -->
+                        <div id="lista-admin" class="lista-container"
+                            style="flex: 1; overflow-y: auto; border: 2px solid var(--border-default); border-radius: 12px; padding: 15px; max-height: 50vh; background: var(--bg-surface-hover);">
+                            Cargando...</div>
+                    </div>
+
+                    <!-- Botonera fija al fondo -->
+                    <div
+                        style="padding: 15px 25px; border-top: 1px solid var(--border-default); background: var(--bg-page); border-radius: 0 0 var(--radius-md) var(--radius-md); display: flex; justify-content: space-between; align-items: center;">
+                        <button class="btn-secondary" onclick="imprimirSeleccionadas()"
+                            style="background: var(--color-brand); color: white; border:none;"><i
+                                class="ph-bold ph-printer"></i> Imprimir Seleccionados</button>
+                        <button class="btn-secondary"
+                            onclick="document.getElementById('modal-admin').style.display='none'">Cerrar
+                            Historial</button>
+                    </div>
+                </div>
+            </div>
+
+            <script src="js/sonidos.js"></script>
+            <script src="js/check_auth.js"></script>
+            <script>
+                const API = 'api/sesiones.php';
+                let itemsSesion = [];
+                let sesionActual = null;
+                let isAdmin = false;
+
+                window.onload = async () => {
+                    // Verificar si es admin
+                    const auth = await fetch('api/auth.php?action=check').then(r => r.json());
+                    if (auth.ok && auth.data.tipo === 'admin') {
+                        isAdmin = true;
+                        document.getElementById('btn-admin-listas').style.display = 'block';
+                    }
+                    cargarSesion();
+                };
+
+                async function cargarSesion() {
+                    try {
+                        const res = await fetch(`${API}?action=get_activa`).then(r => r.json());
+                        if (res.ok) {
+                            sesionActual = res.data;
+                            document.getElementById('nombre-sesion').innerText = sesionActual.nombre;
+                            itemsSesion = sesionActual.items || [];
+                            renderizarItems();
+                        } else {
+                            alert("Error cargando sesion: " + res.msg);
+                        }
+                    } catch (e) {
+                        console.error(e);
+                    }
+                }
+
+                function renderizarItems() {
+                    const triajeCounts = { SOPORTE: 0, SIN_FALLA: 0, FALLA_MENOR: 0, NECESITA_REPUESTO: 0, DANO_GRAVE: 0 };
+                    itemsSesion.forEach(i => { if (triajeCounts.hasOwnProperty(i.triaje_asignado)) triajeCounts[i.triaje_asignado]++; });
+
+                    document.getElementById('resumen-triaje').innerHTML = `
     <div class="badge badge-triaje triaje-SOPORTE"><i class="ph-bold ph-wrench"></i> Soporte: <b>${triajeCounts.SOPORTE}</b></div>
     <div class="badge badge-triaje triaje-SIN_FALLA"><i class="ph-bold ph-check-circle"></i> Sin Falla: <b>${triajeCounts.SIN_FALLA}</b></div>
     <div class="badge badge-triaje triaje-FALLA_MENOR"><i class="ph-bold ph-warning"></i> Falla Menor: <b>${triajeCounts.FALLA_MENOR}</b></div>
@@ -475,12 +502,12 @@ function renderizarItems() {
     <div class="badge badge-triaje" ><i class="ph-bold ph-package"></i> Total: <b>${itemsSesion.length}</b></div>
   `;
 
-  if (!itemsSesion.length) {
-      document.getElementById('lista-items').innerHTML = '<p style="text-align:center; padding:20px">Sin equipos escaneados en esta sesion. Usa el pistoleo de arriba.</p>';
-      return;
-  }
+                    if (!itemsSesion.length) {
+                        document.getElementById('lista-items').innerHTML = '<p style="text-align:center; padding:20px">Sin equipos escaneados en esta sesion. Usa el pistoleo de arriba.</p>';
+                        return;
+                    }
 
-  let html = `<table style="width:100%; border-collapse:collapse"><thead>
+                    let html = `<table style="width:100%; border-collapse:collapse"><thead>
     <tr >
         <th style="padding:10px">#</th>
         <th style="padding:10px">Codigo</th>
@@ -489,95 +516,95 @@ function renderizarItems() {
         <th style="padding:10px">Triaje</th>
         <th style="padding:10px">Accion</th>
     </tr></thead><tbody>`;
-  
-  [...itemsSesion].reverse().forEach((item, idx) => {
-    html += `<tr >
+
+                    [...itemsSesion].reverse().forEach((item, idx) => {
+                        html += `<tr >
       <td style="padding:10px">${itemsSesion.length - idx}</td>
-      <td style="padding:10px"><b>${item.codigo||'-'}</b></td>
-      <td style="padding:10px">${item.observacion||'-'}</td>
-      <td style="padding:10px">${item.marca||''} ${item.modelo||''}<br><span >${item.falla_asignada||'-'}</span></td>
-      <td style="padding:10px"><span class="badge triaje-${item.triaje_asignado}">${(item.triaje_asignado||'').replace(/_/g,' ')}</span></td>
+      <td style="padding:10px"><b>${item.codigo || '-'}</b></td>
+      <td style="padding:10px">${item.observacion || '-'}</td>
+      <td style="padding:10px">${item.marca || ''} ${item.modelo || ''}<br><span >${item.falla_asignada || '-'}</span></td>
+      <td style="padding:10px"><span class="badge triaje-${item.triaje_asignado}">${(item.triaje_asignado || '').replace(/_/g, ' ')}</span></td>
       <td style="padding:10px"><button class="btn-danger" style="padding:4px 8px" onclick="deshacer(${item.sesion_item_id})"><i class="ph ph-x"></i></button></td>
     </tr>`;
-  });
-  html += '</tbody></table>';
-  document.getElementById('lista-items').innerHTML = html;
-}
+                    });
+                    html += '</tbody></table>';
+                    document.getElementById('lista-items').innerHTML = html;
+                }
 
-async function deshacer(sesion_item_id) {
-    if(!confirm("Seguro que deseas deshacer este escaneo? Se borrara de la lista y se limpiara en la BD.")) return;
-    try {
-        const res = await fetch(`${API}?action=deshacer_item`, { method:'POST', body:JSON.stringify({sesion_item_id}) }).then(r=>r.json());
-        if(res.ok) {
-            itemsSesion = itemsSesion.filter(i => i.sesion_item_id != sesion_item_id);
-            renderizarItems();
-        } else {
-            alert("Error: " + res.msg);
-        }
-    } catch(e) {
-        alert("Error de conexion");
-    }
-}
+                async function deshacer(sesion_item_id) {
+                    if (!confirm("Seguro que deseas deshacer este escaneo? Se borrara de la lista y se limpiara en la BD.")) return;
+                    try {
+                        const res = await fetch(`${API}?action=deshacer_item`, { method: 'POST', body: JSON.stringify({ sesion_item_id }) }).then(r => r.json());
+                        if (res.ok) {
+                            itemsSesion = itemsSesion.filter(i => i.sesion_item_id != sesion_item_id);
+                            renderizarItems();
+                        } else {
+                            alert("Error: " + res.msg);
+                        }
+                    } catch (e) {
+                        alert("Error de conexion");
+                    }
+                }
 
-async function agregarEquipo() {
-  if(!sesionActual) { alert("Cargando sesion, espera..."); return; }
-  const codigo = document.getElementById('scan-codigo').value.trim();
-  if (!codigo) return;
-  
-  const body = {
-    sesion_id: sesionActual.id,
-    codigo: codigo,
-    falla: document.getElementById('scan-falla').value.trim(),
-    triaje: document.getElementById('scan-triaje').value
-  };
+                async function agregarEquipo() {
+                    if (!sesionActual) { alert("Cargando sesion, espera..."); return; }
+                    const codigo = document.getElementById('scan-codigo').value.trim();
+                    if (!codigo) return;
 
-  const fb = document.getElementById('scan-feedback');
-  fb.innerHTML = '<span >Procesando...</span>';
+                    const body = {
+                        sesion_id: sesionActual.id,
+                        codigo: codigo,
+                        falla: document.getElementById('scan-falla').value.trim(),
+                        triaje: document.getElementById('scan-triaje').value
+                    };
 
-  let res;
-  try {
-    const resText = await fetch(`${API}?action=inventario_rapido`, { method:'POST', body:JSON.stringify(body) }).then(r=>r.text());
-    res = JSON.parse(resText);
-  } catch(e) {
-    if (typeof playSound === 'function') playSound('scan_error');
-    fb.innerHTML = `<span ><i class="ph ph-x"></i> Error de Servidor. Posiblemente las columnas en Base de Datos no existen.</span>`;
-    return;
-  }
-  
-  if (res.ok) {
-    if (typeof playSound === 'function') playSound('scan');
-    const eq = res.data;
-    fb.innerHTML = `<span ><i class="ph ph-check-circle"></i> ${codigo} marcado como ${body.triaje.replace(/_/g,' ')} (${eq.marca} ${eq.modelo})</span>`;
-    
-    // Check if it was already scanned in this session, to update instead of duplicate
-    let existingIndex = itemsSesion.findIndex(i => i.sesion_item_id == eq.sesion_item_id);
-    if (existingIndex >= 0) {
-        itemsSesion[existingIndex] = eq;
-    } else {
-        itemsSesion.push(eq);
-    }
-    
-    document.getElementById('scan-codigo').value='';
-    document.getElementById('scan-falla').value='';
-    document.getElementById('scan-codigo').focus();
-    renderizarItems();
-  } else {
-    if (typeof playSound === 'function') playSound('scan_error');
-    fb.innerHTML = `<span ><i class="ph ph-x"></i> Error: ${res.msg}</span>`;
-  }
-}
+                    const fb = document.getElementById('scan-feedback');
+                    fb.innerHTML = '<span >Procesando...</span>';
 
-async function abrirAdminListas() {
-    document.getElementById('modal-admin').style.display='flex';
-    document.getElementById('lista-admin').innerHTML = 'Cargando...';
-    try {
-        const res = await fetch(`${API}?action=listar_sesiones`).then(r=>r.json());
-        if(res.ok) {
-            let html = '';
-            res.data.forEach(s => {
-                const badge = s.estado === 'ACTIVA' ? '<span class="badge" >ACTIVA</span>' : '<span class="badge" >CERRADA</span>';
-                
-                const htmlBotonesCerrada = s.estado === 'CERRADA' ? `
+                    let res;
+                    try {
+                        const resText = await fetch(`${API}?action=inventario_rapido`, { method: 'POST', body: JSON.stringify(body) }).then(r => r.text());
+                        res = JSON.parse(resText);
+                    } catch (e) {
+                        if (typeof playSound === 'function') playSound('scan_error');
+                        fb.innerHTML = `<span ><i class="ph ph-x"></i> Error de Servidor. Posiblemente las columnas en Base de Datos no existen.</span>`;
+                        return;
+                    }
+
+                    if (res.ok) {
+                        if (typeof playSound === 'function') playSound('scan');
+                        const eq = res.data;
+                        fb.innerHTML = `<span ><i class="ph ph-check-circle"></i> ${codigo} marcado como ${body.triaje.replace(/_/g, ' ')} (${eq.marca} ${eq.modelo})</span>`;
+
+                        // Check if it was already scanned in this session, to update instead of duplicate
+                        let existingIndex = itemsSesion.findIndex(i => i.sesion_item_id == eq.sesion_item_id);
+                        if (existingIndex >= 0) {
+                            itemsSesion[existingIndex] = eq;
+                        } else {
+                            itemsSesion.push(eq);
+                        }
+
+                        document.getElementById('scan-codigo').value = '';
+                        document.getElementById('scan-falla').value = '';
+                        document.getElementById('scan-codigo').focus();
+                        renderizarItems();
+                    } else {
+                        if (typeof playSound === 'function') playSound('scan_error');
+                        fb.innerHTML = `<span ><i class="ph ph-x"></i> Error: ${res.msg}</span>`;
+                    }
+                }
+
+                async function abrirAdminListas() {
+                    document.getElementById('modal-admin').style.display = 'flex';
+                    document.getElementById('lista-admin').innerHTML = 'Cargando...';
+                    try {
+                        const res = await fetch(`${API}?action=listar_sesiones`).then(r => r.json());
+                        if (res.ok) {
+                            let html = '';
+                            res.data.forEach(s => {
+                                const badge = s.estado === 'ACTIVA' ? '<span class="badge" >ACTIVA</span>' : '<span class="badge" >CERRADA</span>';
+
+                                const htmlBotonesCerrada = s.estado === 'CERRADA' ? `
                     <button class="btn-secondary" style="padding:6px 10px; white-space:nowrap; flex-shrink:0;" onclick="imprimirSesion(${s.id}, '${s.nombre.replace(/'/g, "\\'")}')"><i class="ph-bold ph-printer"></i> Imprimir</button>
                     <button class="btn-primary" style="padding:6px 10px; white-space:nowrap; flex-shrink:0; background:var(--color-success);" onclick="exportarCsvSesion(${s.id}, '${s.nombre.replace(/'/g, "\\'")}')"><i class="ph-bold ph-download-simple"></i> Excel</button>
                     <button class="btn-secondary" style="padding:6px 10px; white-space:nowrap; flex-shrink:0;" onclick="editarNombreSesion(${s.id}, '${s.nombre.replace(/'/g, "\\'")}')"><i class="ph-bold ph-pencil-simple"></i> Editar</button>
@@ -589,7 +616,7 @@ async function abrirAdminListas() {
                     <button class="btn-secondary" style="padding:6px 10px; white-space:nowrap; flex-shrink:0;" onclick="cerrarSesionAdmin(${s.id})"><i class="ph-bold ph-check-circle"></i> Cerrar</button>
                 `;
 
-                html += `<div class="item card" style="display: flex; justify-content: space-between; align-items: center; flex-wrap:wrap; gap:10px; margin-bottom:12px; padding:15px;">
+                                html += `<div class="item card" style="display: flex; justify-content: space-between; align-items: center; flex-wrap:wrap; gap:10px; margin-bottom:12px; padding:15px;">
                     <div style="flex: 1 1 100%; min-width: 200px; display:flex; align-items:center; gap:10px;">
                         <input type="checkbox" class="chk-print-sesion" value="${s.id}" data-nombre="${s.nombre.replace(/'/g, "\\'")}" style="width: 18px; height: 18px; cursor: pointer;">
                         <div>
@@ -602,36 +629,36 @@ async function abrirAdminListas() {
                         <button class="btn-primary" style="padding:6px 10px; white-space:nowrap; flex-shrink:0; background:var(--color-danger);" onclick="eliminarSesion(${s.id})"><i class="ph-bold ph-trash"></i> Borrar</button>
                     </div>
                 </div>`;
-            });
-            document.getElementById('lista-admin').innerHTML = html;
-        } else {
-            document.getElementById('lista-admin').innerHTML = 'Error: ' + res.msg;
-        }
-    } catch(e) {
-        document.getElementById('lista-admin').innerHTML = 'Error de conexion';
-    }
-}
+                            });
+                            document.getElementById('lista-admin').innerHTML = html;
+                        } else {
+                            document.getElementById('lista-admin').innerHTML = 'Error: ' + res.msg;
+                        }
+                    } catch (e) {
+                        document.getElementById('lista-admin').innerHTML = 'Error de conexion';
+                    }
+                }
 
-async function eliminarSesion(id) {
-    if(!confirm('<i class="ph ph-warning"></i> CUIDADO: Deseas eliminar TODA esta lista? Esto revertira (limpiara) el triaje de TODOS los equipos que fueron escaneados en ella.')) return;
-    try {
-        const res = await fetch(`${API}?action=eliminar_sesion`, { method:'POST', body:JSON.stringify({sesion_id: id}) }).then(r=>r.json());
-        if(res.ok) {
-            abrirAdminListas(); // Recargar
-            if (sesionActual && sesionActual.id == id) {
-                // If admin deleted their own current session
-                window.location.reload();
-            }
-        } else {
-            alert("Error: " + res.msg);
-        }
-    } catch(e) {
-        alert("Error de conexion");
-    }
-}
+                async function eliminarSesion(id) {
+                    if (!confirm('<i class="ph ph-warning"></i> CUIDADO: Deseas eliminar TODA esta lista? Esto revertira (limpiara) el triaje de TODOS los equipos que fueron escaneados en ella.')) return;
+                    try {
+                        const res = await fetch(`${API}?action=eliminar_sesion`, { method: 'POST', body: JSON.stringify({ sesion_id: id }) }).then(r => r.json());
+                        if (res.ok) {
+                            abrirAdminListas(); // Recargar
+                            if (sesionActual && sesionActual.id == id) {
+                                // If admin deleted their own current session
+                                window.location.reload();
+                            }
+                        } else {
+                            alert("Error: " + res.msg);
+                        }
+                    } catch (e) {
+                        alert("Error de conexion");
+                    }
+                }
 
-function getPrintTemplate(title, itemsHtml) {
-    return `
+                function getPrintTemplate(title, itemsHtml) {
+                    return `
     <html><head><title>Reporte - ${title}</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
@@ -660,34 +687,34 @@ function getPrintTemplate(title, itemsHtml) {
         <button class="print-btn" onclick="window.print()">Imprimir Documento</button>
         ${itemsHtml}
     </body></html>`;
-}
+                }
 
-async function imprimirSeleccionadas() {
-    const checkboxes = document.querySelectorAll('.chk-print-sesion:checked');
-    if (checkboxes.length === 0) {
-        alert("Selecciona al menos una lista marcando la casilla de la izquierda.");
-        return;
-    }
-    document.getElementById('lista-admin').innerHTML = 'Generando reporte consolidado...';
-    
-    let htmlContent = '';
-    let titulos = [];
-    
-    try {
-        for (let chk of checkboxes) {
-            const id = chk.value;
-            const nombre = chk.getAttribute('data-nombre');
-            titulos.push(nombre);
-            
-            const res = await fetch(`api/sesiones.php?action=get_sesion_items&id=${id}`).then(r=>r.json());
-            if (res.ok) {
-                htmlContent += `<h3 class="list-title">${nombre}</h3>`;
-                htmlContent += `<table>
+                async function imprimirSeleccionadas() {
+                    const checkboxes = document.querySelectorAll('.chk-print-sesion:checked');
+                    if (checkboxes.length === 0) {
+                        alert("Selecciona al menos una lista marcando la casilla de la izquierda.");
+                        return;
+                    }
+                    document.getElementById('lista-admin').innerHTML = 'Generando reporte consolidado...';
+
+                    let htmlContent = '';
+                    let titulos = [];
+
+                    try {
+                        for (let chk of checkboxes) {
+                            const id = chk.value;
+                            const nombre = chk.getAttribute('data-nombre');
+                            titulos.push(nombre);
+
+                            const res = await fetch(`api/sesiones.php?action=get_sesion_items&id=${id}`).then(r => r.json());
+                            if (res.ok) {
+                                htmlContent += `<h3 class="list-title">${nombre}</h3>`;
+                                htmlContent += `<table>
                 <tr><th width="5%">#</th><th width="10%">Codigo</th><th width="10%">Proveedor</th><th width="11%">Marca</th><th width="12%">Modelo</th><th width="12%">Serie</th><th width="10%">Triaje</th><th width="30%">Falla</th></tr>`;
-                
-                res.data.forEach((e, i) => {
-                    htmlContent += `<tr>
-                        <td>${i+1}</td>
+
+                                res.data.forEach((e, i) => {
+                                    htmlContent += `<tr>
+                        <td>${i + 1}</td>
                         <td class="fw-bold">${e.codigo || '-'}</td>
                         <td>${e.observacion || '-'}</td>
                         <td>${e.marca || '-'}</td>
@@ -696,37 +723,37 @@ async function imprimirSeleccionadas() {
                         <td><span style="background:#f3f4f6; padding:3px 6px; border-radius:4px; white-space:nowrap;">${(e.triaje_asignado || 'SIN_FALLA').replace(/_/g, ' ')}</span></td>
                         <td>${e.falla_asignada || '-'}</td>
                     </tr>`;
-                });
-                htmlContent += `</table>`;
-            }
-        }
-        
-        abrirAdminListas(); // Restaurar el modal
-        
-        let printWindow = window.open('', '_blank');
-        printWindow.document.write(getPrintTemplate(titulos.join(" y "), htmlContent));
-        printWindow.document.close();
-        
-    } catch(e) {
-        alert("Error al cargar datos.");
-        abrirAdminListas();
-    }
-}
+                                });
+                                htmlContent += `</table>`;
+                            }
+                        }
 
-async function imprimirSesion(id, nombre) {
-    document.getElementById('lista-admin').innerHTML = 'Generando reporte para imprimir...';
-    try {
-        const res = await fetch(`api/sesiones.php?action=get_sesion_items&id=${id}`).then(r=>r.json());
-        if(res.ok) {
-            abrirAdminListas();
-            
-            let htmlContent = `<h3 class="list-title">${nombre}</h3>`;
-            htmlContent += `<table>
+                        abrirAdminListas(); // Restaurar el modal
+
+                        let printWindow = window.open('', '_blank');
+                        printWindow.document.write(getPrintTemplate(titulos.join(" y "), htmlContent));
+                        printWindow.document.close();
+
+                    } catch (e) {
+                        alert("Error al cargar datos.");
+                        abrirAdminListas();
+                    }
+                }
+
+                async function imprimirSesion(id, nombre) {
+                    document.getElementById('lista-admin').innerHTML = 'Generando reporte para imprimir...';
+                    try {
+                        const res = await fetch(`api/sesiones.php?action=get_sesion_items&id=${id}`).then(r => r.json());
+                        if (res.ok) {
+                            abrirAdminListas();
+
+                            let htmlContent = `<h3 class="list-title">${nombre}</h3>`;
+                            htmlContent += `<table>
             <tr><th width="5%">#</th><th width="10%">Codigo</th><th width="10%">Proveedor</th><th width="11%">Marca</th><th width="12%">Modelo</th><th width="12%">Serie</th><th width="10%">Triaje</th><th width="30%">Falla</th></tr>`;
-            
-            res.data.forEach((e, i) => {
-                htmlContent += `<tr>
-                    <td>${i+1}</td>
+
+                            res.data.forEach((e, i) => {
+                                htmlContent += `<tr>
+                    <td>${i + 1}</td>
                     <td class="fw-bold">${e.codigo || '-'}</td>
                     <td>${e.observacion || '-'}</td>
                     <td>${e.marca || '-'}</td>
@@ -735,127 +762,128 @@ async function imprimirSesion(id, nombre) {
                     <td><span style="background:#f3f4f6; padding:3px 6px; border-radius:4px; white-space:nowrap;">${(e.triaje_asignado || 'SIN_FALLA').replace(/_/g, ' ')}</span></td>
                     <td>${e.falla_asignada || '-'}</td>
                 </tr>`;
-            });
-            htmlContent += `</table>`;
-            
-            let printWindow = window.open('', '_blank');
-            printWindow.document.write(getPrintTemplate(nombre, htmlContent));
-            printWindow.document.close();
-        } else {
-            alert("Error: " + res.msg);
-            abrirAdminListas();
-        }
-    } catch(e) {
-        alert("Error al cargar datos.");
-        abrirAdminListas();
-    }
-}
+                            });
+                            htmlContent += `</table>`;
 
-async function exportarCsvSesion(id, nombre) {
-    try {
-        const res = await fetch(`api/sesiones.php?action=get_sesion_items&id=${id}`).then(r=>r.json());
-        if(res.ok) {
-            let csv = "ID,Codigo,Proveedor,Marca,Modelo,Serie,Triaje Asignado,Falla Asignada\n";
-            res.data.forEach(e => {
-                const fila = [
-                    e.id,
-                    `"${e.codigo || ''}"`,
-                    `"${(e.observacion || '').replace(/"/g, '""')}"`,
-                    `"${e.marca || ''}"`,
-                    `"${e.modelo || ''}"`,
-                    `"${e.serie || ''}"`,
-                    `"${e.triaje_asignado || 'SIN_FALLA'}"`,
-                    `"${(e.falla_asignada || '').replace(/"/g, '""')}"`
-                ].join(",");
-                csv += fila + "\n";
-            });
-            
-            const blob = new Blob(["\ufeff" + csv], { type: 'text/csv;charset=utf-8;' }); // \ufeff for excel utf-8 BOM
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement("a");
-            link.setAttribute("href", url);
-            link.setAttribute("download", `Backup_${nombre.replace(/[^a-z0-9]/gi, '_')}.csv`);
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        } else {
-            alert("Error: " + res.msg);
-        }
-    } catch(e) {
-        alert("Error al descargar backup.");
-    }
-}
-
-async function editarNombreSesion(id, nombreActual) {
-    const nuevoNombre = prompt("Nuevo nombre para la sesion:", nombreActual);
-    if (nuevoNombre && nuevoNombre !== nombreActual) {
-        try {
-            const res = await fetch(`api/sesiones.php?action=editar_sesion_nombre`, { method:'POST', body:JSON.stringify({sesion_id: id, nombre: nuevoNombre}) }).then(r=>r.json());
-            if (res.ok) {
-                abrirAdminListas();
-            } else {
-                alert("Error: " + res.msg);
-            }
-        } catch(e) {
-            alert("Error de conexion");
-        }
-    }
-}
-
-async function cerrarSesionAdmin(id) {
-    if(confirm("Seguro que deseas forzar el cierre de esta sesion manualmente?")) {
-        try {
-            const res = await fetch(`api/sesiones.php?action=terminar_sesion`, { method:'POST', body:JSON.stringify({sesion_id: id}) }).then(r=>r.json());
-            if (res.ok) {
-                abrirAdminListas();
-                if (sesionActual && sesionActual.id == id) {
-                    window.location.reload();
+                            let printWindow = window.open('', '_blank');
+                            printWindow.document.write(getPrintTemplate(nombre, htmlContent));
+                            printWindow.document.close();
+                        } else {
+                            alert("Error: " + res.msg);
+                            abrirAdminListas();
+                        }
+                    } catch (e) {
+                        alert("Error al cargar datos.");
+                        abrirAdminListas();
+                    }
                 }
-            } else {
-                alert("Error: " + res.msg);
-            }
-        } catch(e) {
-            alert("Error de conexion");
-        }
-    }
-}
 
-async function reabrirSesionAdmin(id) {
-    if(confirm("Deseas reabrir esta sesion? Podras seguir editandola y escaneando equipos en ella.")) {
-        try {
-            const res = await fetch(`api/sesiones.php?action=reabrir_sesion`, { method:'POST', body:JSON.stringify({sesion_id: id}) }).then(r=>r.json());
-            if (res.ok) {
-                abrirAdminListas();
-                window.location.reload();
-            } else {
-                alert("Error: " + res.msg);
-            }
-        } catch(e) {
-            alert("Error de conexion");
-        }
-    }
-}
+                async function exportarCsvSesion(id, nombre) {
+                    try {
+                        const res = await fetch(`api/sesiones.php?action=get_sesion_items&id=${id}`).then(r => r.json());
+                        if (res.ok) {
+                            let csv = "ID,Codigo,Proveedor,Marca,Modelo,Serie,Triaje Asignado,Falla Asignada\n";
+                            res.data.forEach(e => {
+                                const fila = [
+                                    e.id,
+                                    `"${e.codigo || ''}"`,
+                                    `"${(e.observacion || '').replace(/"/g, '""')}"`,
+                                    `"${e.marca || ''}"`,
+                                    `"${e.modelo || ''}"`,
+                                    `"${e.serie || ''}"`,
+                                    `"${e.triaje_asignado || 'SIN_FALLA'}"`,
+                                    `"${(e.falla_asignada || '').replace(/"/g, '""')}"`
+                                ].join(",");
+                                csv += fila + "\n";
+                            });
 
-async function terminarLista() {
-    if(!sesionActual) return alert("No hay sesion activa");
-    if(!confirm("Seguro que deseas terminar esta lista? Se cerrara y empezaras una lista nueva en blanco la proxima vez que escanees.")) return;
-    try {
-        const res = await fetch(`${API}?action=terminar_sesion`, { method:'POST', body:JSON.stringify({sesion_id: sesionActual.id}) }).then(r=>r.json());
-        if(res.ok) {
-            window.location.reload();
-        } else {
-            alert("Error al terminar la lista: " + res.msg);
-        }
-    } catch(e) {
-        alert("Error de conexion");
-    }
-}
-</script>
+                            const blob = new Blob(["\ufeff" + csv], { type: 'text/csv;charset=utf-8;' }); // \ufeff for excel utf-8 BOM
+                            const url = URL.createObjectURL(blob);
+                            const link = document.createElement("a");
+                            link.setAttribute("href", url);
+                            link.setAttribute("download", `Backup_${nombre.replace(/[^a-z0-9]/gi, '_')}.csv`);
+                            document.body.appendChild(link);
+                            link.click();
+                            document.body.removeChild(link);
+                        } else {
+                            alert("Error: " + res.msg);
+                        }
+                    } catch (e) {
+                        alert("Error al descargar backup.");
+                    }
+                }
+
+                async function editarNombreSesion(id, nombreActual) {
+                    const nuevoNombre = prompt("Nuevo nombre para la sesion:", nombreActual);
+                    if (nuevoNombre && nuevoNombre !== nombreActual) {
+                        try {
+                            const res = await fetch(`api/sesiones.php?action=editar_sesion_nombre`, { method: 'POST', body: JSON.stringify({ sesion_id: id, nombre: nuevoNombre }) }).then(r => r.json());
+                            if (res.ok) {
+                                abrirAdminListas();
+                            } else {
+                                alert("Error: " + res.msg);
+                            }
+                        } catch (e) {
+                            alert("Error de conexion");
+                        }
+                    }
+                }
+
+                async function cerrarSesionAdmin(id) {
+                    if (confirm("Seguro que deseas forzar el cierre de esta sesion manualmente?")) {
+                        try {
+                            const res = await fetch(`api/sesiones.php?action=terminar_sesion`, { method: 'POST', body: JSON.stringify({ sesion_id: id }) }).then(r => r.json());
+                            if (res.ok) {
+                                abrirAdminListas();
+                                if (sesionActual && sesionActual.id == id) {
+                                    window.location.reload();
+                                }
+                            } else {
+                                alert("Error: " + res.msg);
+                            }
+                        } catch (e) {
+                            alert("Error de conexion");
+                        }
+                    }
+                }
+
+                async function reabrirSesionAdmin(id) {
+                    if (confirm("Deseas reabrir esta sesion? Podras seguir editandola y escaneando equipos en ella.")) {
+                        try {
+                            const res = await fetch(`api/sesiones.php?action=reabrir_sesion`, { method: 'POST', body: JSON.stringify({ sesion_id: id }) }).then(r => r.json());
+                            if (res.ok) {
+                                abrirAdminListas();
+                                window.location.reload();
+                            } else {
+                                alert("Error: " + res.msg);
+                            }
+                        } catch (e) {
+                            alert("Error de conexion");
+                        }
+                    }
+                }
+
+                async function terminarLista() {
+                    if (!sesionActual) return alert("No hay sesion activa");
+                    if (!confirm("Seguro que deseas terminar esta lista? Se cerrara y empezaras una lista nueva en blanco la proxima vez que escanees.")) return;
+                    try {
+                        const res = await fetch(`${API}?action=terminar_sesion`, { method: 'POST', body: JSON.stringify({ sesion_id: sesionActual.id }) }).then(r => r.json());
+                        if (res.ok) {
+                            window.location.reload();
+                        } else {
+                            alert("Error al terminar la lista: " + res.msg);
+                        }
+                    } catch (e) {
+                        alert("Error de conexion");
+                    }
+                }
+            </script>
 
     </main>
 
     <!-- FAB Button -->
-    <button class="fab-chat" onclick="if(typeof abrirModalTareaGlobal === 'function') abrirModalTareaGlobal();" title="Crear Tarea Interna">
+    <button class="fab-chat" onclick="if(typeof abrirModalTareaGlobal === 'function') abrirModalTareaGlobal();"
+        title="Crear Tarea Interna">
         <i class="ph-bold ph-kanban"></i>
     </button>
 
@@ -863,4 +891,5 @@ async function terminarLista() {
     <script src="js/dashboard.js?v=3"></script>
 
 </body>
+
 </html>
