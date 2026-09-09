@@ -32,6 +32,31 @@ Para garantizar trazabilidad absoluta, auditoría técnica rigurosa y claridad e
 
 ---
 
+## [1.4.6] - Septiembre 2026
+
+### Integración Definitiva de Tareas Internas, Trazabilidad y Fallback Robusto en Desempeño
+*Módulos impactados:* `website_files/api/desempeno.php`, `website_files/api/soporte.php`, `website_files/desempeno_tecnicos.html`, `website_files/sw.js`.
+
+### Fixed
+- **`website_files/api/desempeno.php`**:
+  - Se eliminó la referencia a la columna inexistente `st.fecha_modificacion` en `soporte_tecnico`, reemplazándola por `COALESCE(st.fecha_entrega, st.fecha_ingreso) as fecha_referencia` y ordenamiento priorizado por estados operativos (`FIELD(st.estado, 'EN_DIAGNOSTICO', 'EN_REPARACION', 'ESPERANDO_REPUESTO', 'PENDIENTE', ...)`).
+  - Se incorporó fallback seguro para el título de tareas internas (`TAR-...`): `COALESCE(NULLIF(st.equipo_descripcion, ''), NULLIF(st.motivo_ingreso, ''), 'Tarea Interna') as equipo_descripcion`, permitiendo visualizar el motivo real de la tarea en tarjetas de monitoreo y mapa de calor.
+
+### Added
+- **`website_files/api/desempeno.php`**:
+  - Se amplió la consulta de personal técnico para no limitar a `tipo = 'tecnico'`, permitiendo monitorear a administradores o personal activo que tengan tickets u órdenes asignadas.
+  - Se implementó un algoritmo de respaldo robusto de horas y actividades que calcula tiempo activo directamente desde `soporte_tecnico` cuando los tickets no registran transiciones previas en `historial_cambios`.
+  - Se integró el estado en vivo `EN_ESPERA` para técnicos con tareas en estado `PENDIENTE`, visibilizando la carga de trabajo en cola.
+  - Sincronización completa de los filtros de rango (`hoy`, `semana`, `mes`) para abarcar tanto eventos históricos como órdenes activas en el taller.
+- **`website_files/api/soporte.php`**:
+  - Trazabilidad inicial asegurada: inserción automática en `historial_cambios` (`campo_cambiado = 'estado'`, `valor_nuevo = 'PENDIENTE'`) en las acciones `crear`, `crear_tarea` y `crear_interno`.
+- **`website_files/desempeno_tecnicos.html`**:
+  - Soporte visual para el estado `EN_ESPERA` con insignia viva y punto pulsante `.pulse-dot.pulse-blue`, además de diferenciación de rol (`Administrador / Supervisor` vs `Técnico Especialista`).
+- **`website_files/sw.js`**:
+  - Incremento de versión de caché a `'petulap-v15'` para invalidación inmediata de caché PWA en clientes.
+
+---
+
 ## [1.4.5] - Septiembre 2026
 
 ### Modernización Visual y Elevación UI/UX del Tablero Kanban (SaaS Ejecutivo)

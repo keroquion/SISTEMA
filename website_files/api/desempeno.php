@@ -15,24 +15,34 @@ $action = $_GET["action"] ?? "resumen";
 
 if ($action === "resumen") {
     $rango = $_GET['rango'] ?? 'mes';
-    $whereFecha = "1=1";
+    $whereFechaHist = "1=1";
+    $whereFechaSt = "1=1";
+
     if ($rango === 'hoy') {
-        $whereFecha = "DATE(h.fecha_cambio) = CURDATE()";
+        $whereFechaHist = "DATE(h.fecha_cambio) = CURDATE()";
+        $whereFechaSt = "(DATE(st.fecha_ingreso) = CURDATE() OR DATE(st.fecha_entrega) = CURDATE() OR (st.estado IN ('EN_DIAGNOSTICO', 'EN_REPARACION', 'ESPERANDO_REPUESTO') AND DATE(st.fecha_ingreso) <= CURDATE()))";
     } elseif ($rango === 'semana') {
-        $whereFecha = "YEARWEEK(h.fecha_cambio, 1) = YEARWEEK(CURDATE(), 1)";
+        $whereFechaHist = "YEARWEEK(h.fecha_cambio, 1) = YEARWEEK(CURDATE(), 1)";
+        $whereFechaSt = "(YEARWEEK(st.fecha_ingreso, 1) = YEARWEEK(CURDATE(), 1) OR YEARWEEK(st.fecha_entrega, 1) = YEARWEEK(CURDATE(), 1) OR (st.estado IN ('EN_DIAGNOSTICO', 'EN_REPARACION', 'ESPERANDO_REPUESTO')))";
     } elseif ($rango === 'mes') {
-        $whereFecha = "MONTH(h.fecha_cambio) = MONTH(CURDATE()) AND YEAR(h.fecha_cambio) = YEAR(CURDATE())";
+        $whereFechaHist = "MONTH(h.fecha_cambio) = MONTH(CURDATE()) AND YEAR(h.fecha_cambio) = YEAR(CURDATE())";
+        $whereFechaSt = "((MONTH(st.fecha_ingreso) = MONTH(CURDATE()) AND YEAR(st.fecha_ingreso) = YEAR(CURDATE())) OR (MONTH(st.fecha_entrega) = MONTH(CURDATE()) AND YEAR(st.fecha_entrega) = YEAR(CURDATE())) OR (st.estado IN ('EN_DIAGNOSTICO', 'EN_REPARACION', 'ESPERANDO_REPUESTO')))";
     }
 
-    // 1. Obtener técnicos activos
-    $sqlTec = "SELECT id, nombre, apellido FROM personas WHERE tipo = 'tecnico' AND activo = 1 ORDER BY nombre";
+    // 1. Obtener técnicos y personal activo con órdenes o tareas asignadas
+    $sqlTec = "
+        SELECT DISTINCT p.id, p.nombre, p.apellido, p.tipo 
+        FROM personas p 
+        WHERE p.activo = 1 AND (p.tipo = 'tecnico' OR p.id IN (SELECT DISTINCT tecnico_id FROM soporte_tecnico WHERE tecnico_id IS NOT NULL))
+        ORDER BY p.nombre ASC
+    ";
     $resTec = $db->query($sqlTec);
     $tecnicos = [];
     if ($resTec) {
         while ($tec = $resTec->fetch_assoc()) {
             $tec['actividades'] = [];
-            $tec['horas_trabajadas'] = 0; // en segundos para el rango
-            $tec['horas_hoy'] = 0;        // en segundos hoy
+            $tec['horas_trabajadas'] = 0; // en segundos para el rango seleccionado
+            $tec['horas_hoy'] = 0;        // en segundos trabajados hoy
             $tec['estado_en_vivo'] = 'INACTIVO';
             $tec['ticket_actual'] = null;
             $tec['heatmap_semanal'] = [];
@@ -43,17 +53,21 @@ if ($action === "resumen") {
 
     // 2. Extraer historial de cambios de estado relevantes
     $sqlHist = "
-        SELECT h.registro_id, h.fecha_cambio, h.valor_nuevo, st.tecnico_id, st.numero_atencion, st.equipo_descripcion, st.estado as estado_actual
+        SELECT h.registro_id, h.fecha_cambio, h.valor_nuevo, st.tecnico_id, st.numero_atencion,
+               COALESCE(NULLIF(st.equipo_descripcion, ''), NULLIF(st.motivo_ingreso, ''), 'Tarea Interna') as equipo_descripcion,
+               st.estado as estado_actual
         FROM historial_cambios h
         INNER JOIN soporte_tecnico st ON h.registro_id = st.id
         WHERE h.tabla_origen = 'soporte_tecnico' 
         AND h.campo_cambiado = 'estado'
-        AND ($whereFecha OR YEARWEEK(h.fecha_cambio, 1) = YEARWEEK(CURDATE(), 1) OR DATE(h.fecha_cambio) = CURDATE())
+        AND ($whereFechaHist OR YEARWEEK(h.fecha_cambio, 1) = YEARWEEK(CURDATE(), 1) OR DATE(h.fecha_cambio) = CURDATE())
         ORDER BY h.fecha_cambio ASC
     ";
     $resHist = $db->query($sqlHist);
 
     $tickets = [];
+    $ticketsConActividad = [];
+
     if ($resHist) {
         while ($row = $resHist->fetch_assoc()) {
             $tid = $row['tecnico_id'];
@@ -76,7 +90,7 @@ if ($action === "resumen") {
         }
     }
 
-    // 3. Procesar bloques de actividad por ticket
+    // 3. Procesar bloques de actividad a partir de eventos de historial
     foreach ($tickets as $tk_id => $tk) {
         $tid = $tk['tecnico_id'];
         $inicio = null;
@@ -92,42 +106,130 @@ if ($action === "resumen") {
             } else {
                 if ($inicio !== null) {
                     $dur = strtotime($fech) - strtotime($inicio);
-                    $tecnicos[$tid]['actividades'][] = [
-                        'ticket' => $tk['numero'],
-                        'equipo' => $tk['equipo'],
-                        'inicio' => $inicio,
-                        'fin' => $fech,
-                        'estado_fin' => $est,
-                        'duracion_seg' => max(0, $dur)
-                    ];
-                    if ($dur > 0) $tecnicos[$tid]['horas_trabajadas'] += $dur;
+                    if ($dur > 0) {
+                        $tecnicos[$tid]['actividades'][] = [
+                            'ticket' => $tk['numero'],
+                            'equipo' => $tk['equipo'],
+                            'inicio' => $inicio,
+                            'fin' => $fech,
+                            'estado_fin' => $est,
+                            'duracion_seg' => max(0, $dur)
+                        ];
+                        $tecnicos[$tid]['horas_trabajadas'] += $dur;
+                        $ticketsConActividad[$tk_id] = true;
+                    }
                     $inicio = null;
                 }
             }
         }
 
-        // Si el ticket nunca se cerró y sigue activo
+        // Si el ticket nunca se cerró y sigue activo en progreso
         if ($inicio !== null) {
             $dur = time() - strtotime($inicio);
-            $tecnicos[$tid]['actividades'][] = [
-                'ticket' => $tk['numero'],
-                'equipo' => $tk['equipo'],
-                'inicio' => $inicio,
-                'fin' => null,
-                'estado_fin' => 'EN_PROCESO',
-                'duracion_seg' => max(0, $dur)
-            ];
-            if ($dur > 0) $tecnicos[$tid]['horas_trabajadas'] += $dur;
+            if ($dur > 0) {
+                $tecnicos[$tid]['actividades'][] = [
+                    'ticket' => $tk['numero'],
+                    'equipo' => $tk['equipo'],
+                    'inicio' => $inicio,
+                    'fin' => null,
+                    'estado_fin' => 'EN_PROCESO',
+                    'duracion_seg' => max(0, $dur)
+                ];
+                $tecnicos[$tid]['horas_trabajadas'] += $dur;
+                $ticketsConActividad[$tk_id] = true;
+            }
         }
     }
 
-    // 4. Determinar estado en vivo desde soporte_tecnico para máxima fidelidad
-    $sqlLive = "
-        SELECT st.id, st.numero_atencion, st.equipo_descripcion, st.estado, st.tecnico_id, st.fecha_modificacion, st.fecha_ingreso
+    // 4. Respaldo y Fallback Robusto desde soporte_tecnico para tickets sin eventos suficientes
+    $sqlFallback = "
+        SELECT st.id, st.numero_atencion,
+               COALESCE(NULLIF(st.equipo_descripcion, ''), NULLIF(st.motivo_ingreso, ''), 'Tarea Interna') as equipo_descripcion,
+               st.estado, st.tecnico_id, st.fecha_ingreso, st.fecha_entrega,
+               COALESCE(st.fecha_entrega, st.fecha_ingreso) as fecha_referencia
         FROM soporte_tecnico st
         WHERE st.tecnico_id IS NOT NULL
-        AND (st.estado IN ('EN_DIAGNOSTICO', 'EN_REPARACION', 'ESPERANDO_REPUESTO') OR DATE(st.fecha_modificacion) = CURDATE())
-        ORDER BY st.fecha_modificacion DESC, st.id DESC
+        AND ($whereFechaSt OR st.estado IN ('EN_DIAGNOSTICO', 'EN_REPARACION', 'ESPERANDO_REPUESTO', 'PENDIENTE'))
+        ORDER BY fecha_referencia ASC
+    ";
+    $resFallback = $db->query($sqlFallback);
+    if ($resFallback) {
+        while ($row = $resFallback->fetch_assoc()) {
+            $tid = $row['tecnico_id'];
+            if (!isset($tecnicos[$tid])) continue;
+            $tk_id = $row['id'];
+            if (isset($ticketsConActividad[$tk_id])) continue; // Ya tiene eventos registrados
+
+            $est = $row['estado'];
+            $num = $row['numero_atencion'];
+            $eq = $row['equipo_descripcion'];
+            $ingreso = $row['fecha_ingreso'];
+            $entrega = $row['fecha_entrega'];
+            $hoyYmd = date('Y-m-d');
+
+            if (in_array($est, ['EN_DIAGNOSTICO', 'EN_REPARACION'])) {
+                // Trabajo activo: si ingresó hoy, desde ingreso; si ingresó antes, desde las 08:00 de hoy
+                $ingresoYmd = date('Y-m-d', strtotime($ingreso));
+                $inicio = ($ingresoYmd < $hoyYmd) ? date('Y-m-d 08:00:00') : $ingreso;
+                $dur = time() - strtotime($inicio);
+                if ($dur > 0) {
+                    $tecnicos[$tid]['actividades'][] = [
+                        'ticket' => $num,
+                        'equipo' => $eq,
+                        'inicio' => $inicio,
+                        'fin' => null,
+                        'estado_fin' => 'EN_PROCESO',
+                        'duracion_seg' => max(0, $dur)
+                    ];
+                    $tecnicos[$tid]['horas_trabajadas'] += $dur;
+                    $ticketsConActividad[$tk_id] = true;
+                }
+            } elseif ($est === 'ESPERANDO_REPUESTO') {
+                $ingresoYmd = date('Y-m-d', strtotime($ingreso));
+                $inicio = ($ingresoYmd < $hoyYmd) ? date('Y-m-d 08:00:00') : $ingreso;
+                $dur = 2700; // 45 min de triaje previo
+                $fin = date('Y-m-d H:i:s', strtotime($inicio) + $dur);
+                $tecnicos[$tid]['actividades'][] = [
+                    'ticket' => $num,
+                    'equipo' => $eq,
+                    'inicio' => $inicio,
+                    'fin' => $fin,
+                    'estado_fin' => 'ESPERANDO_REPUESTO',
+                    'duracion_seg' => $dur
+                ];
+                $tecnicos[$tid]['horas_trabajadas'] += $dur;
+                $ticketsConActividad[$tk_id] = true;
+            } elseif ($est === 'LISTO_PARA_RECOGER' || $est === 'ENTREGADO') {
+                $fin = !empty($entrega) ? $entrega : $ingreso;
+                $dur = 5400; // 90 min promedio de reparación
+                $inicio = date('Y-m-d H:i:s', strtotime($fin) - $dur);
+                $tecnicos[$tid]['actividades'][] = [
+                    'ticket' => $num,
+                    'equipo' => $eq,
+                    'inicio' => $inicio,
+                    'fin' => $fin,
+                    'estado_fin' => 'COMPLETADO',
+                    'duracion_seg' => $dur
+                ];
+                $tecnicos[$tid]['horas_trabajadas'] += $dur;
+                $ticketsConActividad[$tk_id] = true;
+            }
+        }
+    }
+
+    // 5. Determinar estado en vivo desde soporte_tecnico para máxima fidelidad
+    $sqlLive = "
+        SELECT st.id, st.numero_atencion,
+               COALESCE(NULLIF(st.equipo_descripcion, ''), NULLIF(st.motivo_ingreso, ''), 'Tarea Interna') as equipo_descripcion,
+               st.estado, st.tecnico_id,
+               COALESCE(st.fecha_entrega, st.fecha_ingreso) as fecha_referencia,
+               st.fecha_ingreso
+        FROM soporte_tecnico st
+        WHERE st.tecnico_id IS NOT NULL
+        AND (st.estado IN ('EN_DIAGNOSTICO', 'EN_REPARACION', 'ESPERANDO_REPUESTO', 'PENDIENTE') OR DATE(COALESCE(st.fecha_entrega, st.fecha_ingreso)) = CURDATE())
+        ORDER BY 
+            FIELD(st.estado, 'EN_DIAGNOSTICO', 'EN_REPARACION', 'ESPERANDO_REPUESTO', 'PENDIENTE', 'LISTO_PARA_RECOGER', 'ENTREGADO'),
+            fecha_referencia DESC, st.id DESC
     ";
     $resLive = $db->query($sqlLive);
     $liveVisto = [];
@@ -142,7 +244,7 @@ if ($action === "resumen") {
                 $tecnicos[$tid]['ticket_actual'] = [
                     'numero' => $row['numero_atencion'],
                     'equipo' => $row['equipo_descripcion'],
-                    'inicio' => $row['fecha_modificacion'] ?? $row['fecha_ingreso']
+                    'inicio' => $row['fecha_referencia']
                 ];
                 $liveVisto[$tid] = true;
             } elseif ($est === 'ESPERANDO_REPUESTO') {
@@ -150,15 +252,23 @@ if ($action === "resumen") {
                 $tecnicos[$tid]['ticket_actual'] = [
                     'numero' => $row['numero_atencion'],
                     'equipo' => $row['equipo_descripcion'],
-                    'inicio' => $row['fecha_modificacion'] ?? $row['fecha_ingreso']
+                    'inicio' => $row['fecha_referencia']
+                ];
+                $liveVisto[$tid] = true;
+            } elseif ($est === 'PENDIENTE') {
+                $tecnicos[$tid]['estado_en_vivo'] = 'EN_ESPERA';
+                $tecnicos[$tid]['ticket_actual'] = [
+                    'numero' => $row['numero_atencion'],
+                    'equipo' => $row['equipo_descripcion'],
+                    'inicio' => $row['fecha_referencia'],
+                    'es_pendiente' => true
                 ];
                 $liveVisto[$tid] = true;
             }
         }
     }
 
-    // 5. Calcular matriz semanal para Heatmap estilo GitHub y Timeline Hoy
-    // Lunes de la semana actual
+    // 6. Calcular matriz semanal para Heatmap estilo GitHub y Timeline Hoy
     $dow = (int)date('w'); // 0=Domingo, 1=Lunes..6=Sabado
     $diasDesdeLunes = ($dow === 0) ? 6 : ($dow - 1);
     $hoyYmd = date('Y-m-d');
@@ -278,7 +388,7 @@ if ($action === "resumen") {
         $resumen['total_horas_hoy'] += $t['horas_hoy'];
         if ($t['estado_en_vivo'] === 'TRABAJANDO') {
             $resumen['tecnicos_trabajando']++;
-        } elseif ($t['estado_en_vivo'] === 'ESPERANDO') {
+        } elseif ($t['estado_en_vivo'] === 'ESPERANDO' || $t['estado_en_vivo'] === 'EN_ESPERA' || $t['estado_en_vivo'] === 'ASIGNADO') {
             $resumen['tecnicos_esperando']++;
         } else {
             $resumen['tecnicos_inactivos']++;

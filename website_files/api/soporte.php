@@ -78,6 +78,15 @@ switch ($action) {
         $stmt->bind_param("sisssisssi", $numero, $cliente_id, $eq_cod, $eq_ser, $eq_desc, $es_ext, $motivo, $prior, $fecha_est, $tec_id);
         if ($stmt->execute()) {
             $insert_id = $db->insert_id;
+            
+            // Trazabilidad inicial en historial_cambios
+            $usuario_creador = $data["usuario"] ?? ($_SESSION['user_nombre'] ?? 'Recepción');
+            $stmt_h = $db->prepare("INSERT INTO historial_cambios (tabla_origen, registro_id, numero_referencia, campo_cambiado, valor_anterior, valor_nuevo, usuario_nombre) VALUES ('soporte_tecnico', ?, ?, 'estado', NULL, 'PENDIENTE', ?)");
+            if ($stmt_h) {
+                $stmt_h->bind_param("iss", $insert_id, $numero, $usuario_creador);
+                $stmt_h->execute();
+            }
+
             echo json_encode(["ok" => true, "id" => $insert_id, "numero" => $numero, "msg" => "Atencion $numero creada" . ($tec_id ? "" : " (Sin asignar)")]);
             // Push notification to assigned technician
             if ($tec_id) {
@@ -112,7 +121,17 @@ switch ($action) {
         $stmt->bind_param("siisssi", $numero, $cliente_id, $es_ext, $motivo, $diag, $prior, $tec_id);
         
         if ($stmt->execute()) {
-            echo json_encode(["ok" => true, "msg" => "Tarea $numero asignada"]);
+            $nuevo_id = $db->insert_id;
+            
+            // Trazabilidad inicial en historial_cambios
+            $usuario_creador = $data["usuario"] ?? ($_SESSION['user_nombre'] ?? 'Administrador');
+            $stmt_h = $db->prepare("INSERT INTO historial_cambios (tabla_origen, registro_id, numero_referencia, campo_cambiado, valor_anterior, valor_nuevo, usuario_nombre) VALUES ('soporte_tecnico', ?, ?, 'estado', NULL, 'PENDIENTE', ?)");
+            if ($stmt_h) {
+                $stmt_h->bind_param("iss", $nuevo_id, $numero, $usuario_creador);
+                $stmt_h->execute();
+            }
+
+            echo json_encode(["ok" => true, "id" => $nuevo_id, "numero" => $numero, "msg" => "Tarea $numero asignada"]);
             // Push notification to assigned technician
             if ($tec_id) {
                 try {
@@ -182,8 +201,21 @@ switch ($action) {
         $eq_desc = $eq["descripcion"] ?? "Equipo Interno";
         $stmt->bind_param("sisssisssi", $numero, $cliente_id, $cod, $eq_ser, $eq_desc, $es_ext, $motivo, $falla, $prior, $tec_id);
         
-        if ($stmt->execute()) echo json_encode(["ok" => true, "numero" => $numero, "msg" => "Asignado correctamente"]);
-        else echo json_encode(["ok" => false, "msg" => $db->error]);
+        if ($stmt->execute()) {
+            $nuevo_id = $db->insert_id;
+            
+            // Trazabilidad inicial en historial_cambios
+            $usuario_creador = $data["usuario"] ?? ($_SESSION['user_nombre'] ?? 'Sistema');
+            $stmt_h = $db->prepare("INSERT INTO historial_cambios (tabla_origen, registro_id, numero_referencia, campo_cambiado, valor_anterior, valor_nuevo, usuario_nombre) VALUES ('soporte_tecnico', ?, ?, 'estado', NULL, 'PENDIENTE', ?)");
+            if ($stmt_h) {
+                $stmt_h->bind_param("iss", $nuevo_id, $numero, $usuario_creador);
+                $stmt_h->execute();
+            }
+
+            echo json_encode(["ok" => true, "id" => $nuevo_id, "numero" => $numero, "msg" => "Asignado correctamente"]);
+        } else {
+            echo json_encode(["ok" => false, "msg" => $db->error]);
+        }
         break;
 
     case "actualizar":

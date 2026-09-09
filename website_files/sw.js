@@ -1,6 +1,6 @@
-// Service Worker - Petulap PWA v14 (Diseño SaaS Ejecutivo Kanban y Componentes en Tiempo Real)
+// Service Worker - Petulap PWA v15 (Integración Backend Desempeño, Tareas y Kanban)
  
-var CACHE_NAME = 'petulap-v14';
+var CACHE_NAME = 'petulap-v15';
 var ASSETS = [
     './',
     'index.html',
