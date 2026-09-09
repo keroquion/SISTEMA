@@ -86,6 +86,10 @@ if ("serviceWorker" in navigator) { window.addEventListener("load", () => { navi
                     <i class="ph-fill ph-shield-check acc-icon-blue"></i>
                     Garantias
                 </a>
+                <a href="pedidos_repuestos.html" class="accordion-link">
+                    <i class="ph-fill ph-wrench acc-icon-blue"></i>
+                    Pedidos de Repuestos
+                </a>
             </div>
         </div>
 
@@ -106,6 +110,14 @@ if ("serviceWorker" in navigator) { window.addEventListener("load", () => { navi
                     <i class="ph-fill ph-scan acc-icon-green"></i>
                     Escaneo / Triaje Masivo
                 </a>
+                <a href="repuestos.html" class="accordion-link">
+                    <i class="ph-fill ph-cpu acc-icon-orange"></i>
+                    Repuestos
+                </a>
+                <a href="historial_entregados.html" class="accordion-link">
+                    <i class="ph-fill ph-clock-counter-clockwise acc-icon-gray"></i>
+                    Historial de Entregados
+                </a>
                 <a href="importar.html" class="accordion-link">
                     <i class="ph-fill ph-download-simple acc-icon-blue"></i>
                     Importar Excel
@@ -120,7 +132,7 @@ if ("serviceWorker" in navigator) { window.addEventListener("load", () => { navi
         <div class="accordion-item danger-border">
             <div class="accordion-header">
                 <div style="display: flex; align-items: center; gap: 10px;">
-                    <i class="ph ph-wrench"></i>
+                    <i class="ph ph-briefcase"></i>
                     GERENCIA Y CLIENTES
                 </div>
                 <i class="ph ph-caret-down"></i>
@@ -130,9 +142,13 @@ if ("serviceWorker" in navigator) { window.addEventListener("load", () => { navi
                     <i class="ph-fill ph-stack acc-icon-blue"></i>
                     Lotes Masivos
                 </a>
+                <a href="desempeno_tecnicos.html" class="accordion-link">
+                    <i class="ph-fill ph-chart-line-up acc-icon-blue"></i>
+                    Desempeño y Actividades Técnicos
+                </a>
                 <a href="clientes.html" class="accordion-link">
                     <i class="ph-fill ph-user-list acc-icon-green"></i>
-                    Actividades y Clientes
+                    Clientes y Contactos
                 </a>
             </div>
         </div>
@@ -175,7 +191,7 @@ if ("serviceWorker" in navigator) { window.addEventListener("load", () => { navi
             <div class="accordion-content">
                 <a href="#" class="accordion-link" onclick="clearCache(event)">
                     <i class="ph-fill ph-trash acc-icon-orange"></i>
-                    Eliminar Cache
+                    Limpiar Cache
                 </a>
                 <a href="#" class="accordion-link" onclick="logout(event)">
                     <i class="ph-fill ph-sign-out acc-icon-gray"></i>

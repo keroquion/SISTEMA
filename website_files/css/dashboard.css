@@ -680,6 +680,7 @@ body.dashboard-body {
     .acc-icon-green { color: var(--color-success); }
     .acc-icon-orange { color: var(--color-warning); }
     .acc-icon-blue { color: var(--color-brand); }
+    .acc-icon-gray { color: var(--text-muted); }
 
     /* Dashboard Grid on Mobile */
     .content { padding: 10px; overflow-x: hidden; }

@@ -1,6 +1,6 @@
-// Service Worker - Petulap PWA v9 (Scalability & Smart Polling)
-
-var CACHE_NAME = 'petulap-v9';
+// Service Worker - Petulap PWA v10 (Estandarización de Navegación Móvil)
+ 
+var CACHE_NAME = 'petulap-v10';
 var ASSETS = [
     './',
     'index.html',

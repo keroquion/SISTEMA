@@ -32,6 +32,26 @@ Para garantizar trazabilidad absoluta, auditoría técnica rigurosa y claridad e
 
 ---
 
+## [1.4.0] - Septiembre 2026
+
+### Estandarización de Navegación Móvil: Incorporación de 4 Módulos Críticos en Menú Desplegable
+*Módulos impactados:* `desempeno_tecnicos.html`, `repuestos.html`, `pedidos_repuestos.html`, `historial_entregados.html`, `clientes.html` en las 20 pantallas operativas del sistema.
+
+### Added
+- **`website_files/*.html` (20 pantallas)**: Se incorporaron los 4 módulos operativos críticos previamente omitidos en el contenedor de navegación colapsable para smartphones (`<div id="mobile-sidebar">`):
+  1. `pedidos_repuestos.html` (*Pedidos de Repuestos*, icono `.acc-icon-blue`) en el acordeón **"SOPORTE Y TALLER"**.
+  2. `repuestos.html` (*Repuestos*, icono `.acc-icon-orange`) en el acordeón **"INVENTARIO Y OPERACIONES"**.
+  3. `historial_entregados.html` (*Historial de Entregados*, icono `.acc-icon-gray`) en el acordeón **"INVENTARIO Y OPERACIONES"**.
+  4. `desempeno_tecnicos.html` (*Desempeño y Actividades Técnicos*, icono `.acc-icon-blue`) en el acordeón **"GERENCIA Y CLIENTES"**.
+  *¿Por qué?* El menú de escritorio (`<aside class="sidebar">`) disponía de estos accesos, pero la vista móvil de 19 pantallas utilizaba una plantilla heredada recortada. Como consecuencia directa, los técnicos en taller y supervisores gerenciales que acceden exclusivamente desde teléfonos celulares quedaban privados de registrar solicitudes de piezas, verificar stock de repuestos, auditar entregas finalizadas o monitorear el desempeño del equipo técnico en tiempo real sin disponer de una computadora física.
+
+### Changed
+- **`website_files/*.html` (20 pantallas)**: Se homogeneizó el texto y destino del enlace a clientes en el acordeón **"GERENCIA Y CLIENTES"** a `<a href="clientes.html" class="accordion-link"><i class="ph-fill ph-user-list acc-icon-green"></i> Clientes y Contactos</a>`, unificando su semántica y preservando el filtrado dinámico de privilegios gobernado por [website_files/js/check_auth.js](website_files/js/check_auth.js).
+- **`website_files/css/dashboard.css`**: Se incorporó la regla utilitaria `.acc-icon-gray { color: var(--text-muted); }`, garantizando contraste armónico y legibilidad tanto en tema claro como en modo oscuro para iconos de estado secundario en el menú móvil.
+- **`website_files/sw.js`**: Se incrementó la versión de la memoria caché del Service Worker PWA de `'petulap-v9'` a `'petulap-v10'`, forzando la invalidación inmediata de caché en los navegadores móviles de los colaboradores y garantizando que reciban la nueva arquitectura de navegación sin requerir borrados manuales de datos del navegador.
+
+---
+
 ## [1.3.0] - Septiembre 2026
 
 ### Escalabilidad Fase 1: Desbloqueo de Sesiones Concurrentes, Smart Polling, Compresión HTTP y Optimización de Consultas

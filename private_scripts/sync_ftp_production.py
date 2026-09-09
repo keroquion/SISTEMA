@@ -14,17 +14,31 @@ ftp.set_pasv(True)
 print('Conectado exitosamente a', FTP_HOST)
 
 # 1. Subir archivos a public_html/ (raiz)
-root_uploads = [
-    ('website_files/admin_roles.html', 'admin_roles.html'),
-    ('website_files/desempeno_tecnicos.html', 'desempeno_tecnicos.html'),
-    ('website_files/inventario.html', 'inventario.html'),
-    ('website_files/lotes.html', 'lotes.html'),
-    ('website_files/mis_ordenes.html', 'mis_ordenes.html'),
-    ('website_files/pedidos_repuestos.html', 'pedidos_repuestos.html'),
-    ('website_files/reportes.html', 'reportes.html'),
-    ('website_files/sw.js', 'sw.js'),
-    ('website_files/.htaccess', '.htaccess'),
+html_files = [
+    'admin_roles.html',
+    'caja.html',
+    'clientes.html',
+    'desempeno_tecnicos.html',
+    'garantias.html',
+    'historial_entregados.html',
+    'importar.html',
+    'index.html',
+    'inventario.html',
+    'inventario_soporte.html',
+    'lotes.html',
+    'manual.html',
+    'mis_ordenes.html',
+    'pedidos_repuestos.html',
+    'recepcion_movil.html',
+    'reportes.html',
+    'repuestos.html',
+    'soporte.html',
+    'tecnicos.html',
+    'turnos.html',
+    'sw.js',
+    '.htaccess'
 ]
+root_uploads = [(os.path.join('website_files', f), f) for f in html_files]
 
 ftp.cwd('public_html')
 print('\n--- 1. Subiendo archivos principales a public_html/ ---')
@@ -37,13 +51,20 @@ for local_file, remote_file in root_uploads:
     else:
         print(f'  [ERROR] No existe localmente: {local_file}')
 
-# 2. Subir dashboard.js a public_html/js/
-print('\n--- 2. Subiendo js/dashboard.js a public_html/js/ ---')
+# 2. Subir dashboard.js a public_html/js/ y dashboard.css a public_html/css/
+print('\n--- 2. Subiendo js/dashboard.js y css/dashboard.css ---')
 ftp.cwd('js')
 with open('website_files/js/dashboard.js', 'rb') as f:
     ftp.storbinary('STOR dashboard.js', f)
 size_dash = os.path.getsize('website_files/js/dashboard.js')
 print(f'  [SUBIDO OK] js/dashboard.js ({size_dash} bytes)')
+
+ftp.cwd('../css')
+with open('website_files/css/dashboard.css', 'rb') as f:
+    ftp.storbinary('STOR dashboard.css', f)
+size_css = os.path.getsize('website_files/css/dashboard.css')
+print(f'  [SUBIDO OK] css/dashboard.css ({size_css} bytes)')
+ftp.cwd('../js')
 
 # 3. Eliminar navbar.js de public_html/js/ (si existiera)
 print('\n--- 3. Verificando js/navbar.js en public_html/js/ ---')
