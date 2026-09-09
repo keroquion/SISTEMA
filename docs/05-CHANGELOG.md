@@ -32,6 +32,40 @@ Para garantizar trazabilidad absoluta, auditoría técnica rigurosa y claridad e
 
 ---
 
+## [1.4.4] - Septiembre 2026
+
+### Formalización y Documentación del Sistema de Diseño UI/UX Ejecutivo
+*Módulos impactados:* `docs/12-SISTEMA-DE-DISENO-UI-UX.md`, `docs/00-PROTOCOLO-DE-CAMBIOS-Y-PROMPTS.md`, `docs/05-CHANGELOG.md`.
+
+### Added
+- **`docs/12-SISTEMA-DE-DISENO-UI-UX.md`**:
+  - Se creó el manual oficial de diseño de interfaces y componentes en tiempo real, catalogando los tokens semánticos de superficie (`--bg-surface`, `--bg-card`, `--border-default`), la matriz de colores de estado operativo (`#10B981`, `#F59E0B`, `#64748B`, `#EF4444`), animaciones de pulso (`.pulse-dot`), chips interactivos (`.live-chip`), tarjetas ejecutivas (`.live-tech-card`), mini-líneas de tiempo (`.mini-timeline-bar`), mapas de calor semanales estilo GitHub (`.heatmap-grid`), tooltips inteligentes con glassmorphism (`#heatmap-tooltip`) y cabeceras de acciones (`.top-action-bar`).
+  - *¿Por qué?* Tras la validación exitosa del rediseño en `desempeno_tecnicos.html`, se requiere una referencia arquitectónica canónica para que desarrolladores y agentes de IA repliquen de forma coherente este estándar visual premium en las 22 pantallas restantes del sistema sin introducir inconsistencias ni librerías externas pesadas.
+- **`docs/00-PROTOCOLO-DE-CAMBIOS-Y-PROMPTS.md`**:
+  - Se incorporó la referencia obligatoria a `docs/12-SISTEMA-DE-DISENO-UI-UX.md` dentro de la plantilla maestra de prompts y se agregó la sub-plantilla especializada `4.4` para proyectos de modernización y rediseño UI/UX.
+
+---
+
+## [1.4.3] - Septiembre 2026
+
+### Rediseño Ejecutivo de Monitoreo en Tiempo Real y Mapa de Calor Semanal de Técnicos
+*Módulos impactados:* `desempeno_tecnicos.html`, `api/desempeno.php`, `sw.js`.
+
+### Added
+- **`website_files/desempeno_tecnicos.html`**:
+  - Se incorporó la vista de **Monitoreo en Tiempo Real** (`#tab-live-content`) con tarjetas ejecutivas (`.live-tech-card`) que muestran estado en vivo (`.pulse-green`, `.pulse-amber`, `.pulse-slate`), tarea activa con ticket asociado, y mini-línea de tiempo cromática de 11 slots (08:00 a 18:00).
+  - Se construyó la **Matriz Semanal de Calor Estilo GitHub** (`.heatmap-grid`) con 4 niveles de intensidad verde (`level-0` a `level-3`) que permite auditar la densidad de horas productivas de Lunes a Sábado por técnico.
+  - Se implementó un **Tooltip Inteligente Flotante** (`#heatmap-tooltip`) con efecto glassmorphism y seguimiento de ratón (`mousemove`), desplegando día, rango horario, minutos trabajados, ticket y modelo de equipo atendido al hacer hover sobre cualquier celda activa.
+  - Se integró un selector de pestañas segmentado (`.tabs-header`) para alternar instantáneamente entre la vista en vivo y el historial semanal.
+- **`website_files/api/desempeno.php`**:
+  - Se añadieron las acciones `get_live_team` y `get_weekly_heatmap` con consultas optimizadas contra `cronometro_tecnicos`, `usuarios` y `soporte` para suministrar la actividad en vivo y la matriz horaria en milisegundos.
+
+### Changed
+- **`website_files/sw.js`**:
+  - Se actualizó el identificador de caché a `'petulap-v13'` para asegurar la propagación instantánea de los nuevos estilos y scripts en clientes PWA y móviles.
+
+---
+
 ## [1.4.2] - Septiembre 2026
 
 ### Blindaje Estructural de Botones Globales en Enlaces `<a>` y Ajuste Responsivo de Desempeño

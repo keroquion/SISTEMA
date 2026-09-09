@@ -60,6 +60,7 @@ Antes de generar código o modificar cualquier archivo, consulta los documentos 
 - docs/08-CHECKLIST-TESTING.md (Protocolo de pruebas de humo)
 - docs/10-REMEDIACION-NAVEGACION-MOVIL.md (Estandarización de menú móvil en 20 pantallas)
 - docs/11-REMEDIACION-UI-INNERHTML-Y-LOGIN.md (Erradicación de HTML crudo, saneamiento de alertas y pulido de login)
+- docs/12-SISTEMA-DE-DISENO-UI-UX.md (Sistema oficial de diseño UI/UX, componentes en vivo, heatmaps y tokens semánticos)
 
 REGLAS GENERALES INNEGOCIABLES:
 1. Jerarquía CSS estricta: tokens.css -> styles.css -> dashboard.css.
@@ -128,6 +129,20 @@ RESTRICCIONES:
 - Convertir todas las consultas a sentencias preparadas ($stmt = $conn->prepare() + bind_param).
 - Retornar siempre respuestas uniformes en formato JSON con código HTTP apropiado (401, 403, 200).
 - Registrar en CHANGELOG.md bajo la sección [Security].
+### 4.4. Para Rediseño UI/UX y Modernización Visual (`[Changed] / [UI-UX]`)
+```markdown
+ROL: Diseñador UI/UX & Lead Frontend Engineer.
+TAREA: Modernizar y elevar la interfaz de la pantalla [NOMBRE_PANTALLA.html] bajo el estándar ejecutivo SaaS.
+REFERENCIA OBLIGATORIA:
+- Consultar docs/12-SISTEMA-DE-DISENO-UI-UX.md (Tokens, .live-chip, .pulse-dot, .live-tech-card, etc.).
+- Consultar docs/03-FRONTEND.md (Sección 7: 'Cosas Frágiles').
+RESTRICCIONES:
+- Cero librerías externas (solo Vanilla CSS, CSS Grid, Flexbox y Phosphor Icons).
+- Soporte 100% de Modo Oscuro consumiendo estrictamente variables semánticas: var(--bg-surface), var(--bg-card), var(--text-primary), var(--border-default).
+- Indicadores de estado vivos: Usar .live-chip y puntos pulsantes .pulse-dot (@keyframes pulse-*).
+- En pantallas móviles (<= 768px): Controles apilados verticalmente y contenedores con scroll horizontal táctil para tablas o matrices densas.
+- Incrementar versión en sw.js (ej: petulap-v13 -> petulap-v14).
+- Registrar en CHANGELOG.md bajo [Changed].
 ```
 
 ---
@@ -152,3 +167,5 @@ Para referencia rápida de qué archivo consultar según la necesidad:
 | `docs/09-ESCALABILIDAD.md` | Plan proyectivo de cuellos de botella y arquitectura a escala 100x. |
 | `docs/10-REMEDIACION-NAVEGACION-MOVIL.md` | Estandarización de navegación móvil y 4 módulos en mobile-sidebar (v1.4.0). |
 | `docs/11-REMEDIACION-UI-INNERHTML-Y-LOGIN.md` | Erradicación de HTML crudo, saneamiento de alertas y pulido de login (v1.4.1). |
+| `docs/12-SISTEMA-DE-DISENO-UI-UX.md` | Sistema oficial de diseño UI/UX: componentes en vivo, heatmaps, chips y tokens. |
+
