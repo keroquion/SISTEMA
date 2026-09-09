@@ -663,7 +663,7 @@
                 }
 
                 async function eliminarSesion(id) {
-                    if (!confirm('<i class="ph ph-warning"></i> CUIDADO: Deseas eliminar TODA esta lista? Esto revertira (limpiara) el triaje de TODOS los equipos que fueron escaneados en ella.')) return;
+                    if (!confirm('⚠ CUIDADO: Deseas eliminar TODA esta lista? Esto revertira (limpiara) el triaje de TODOS los equipos que fueron escaneados en ella.')) return;
                     try {
                         const res = await fetch(`${API}?action=eliminar_sesion`, { method: 'POST', body: JSON.stringify({ sesion_id: id }) }).then(r => r.json());
                         if (res.ok) {

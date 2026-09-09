@@ -137,6 +137,26 @@
           document.documentElement.setAttribute('data-theme', 'dark');
         }
       })();
+
+      function toggleTheme() {
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        if (isDark) {
+          document.documentElement.removeAttribute('data-theme');
+          localStorage.setItem('petulap-theme', 'light');
+        } else {
+          document.documentElement.setAttribute('data-theme', 'dark');
+          localStorage.setItem('petulap-theme', 'dark');
+        }
+        const icon = document.querySelector('.theme-toggle-btn i');
+        if (icon) icon.className = isDark ? 'ph ph-moon' : 'ph ph-sun';
+      }
+      window.toggleTheme = toggleTheme;
+
+      document.addEventListener('DOMContentLoaded', () => {
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        const icon = document.querySelector('.theme-toggle-btn i');
+        if (icon && isDark) icon.className = 'ph ph-sun';
+      });
     </script>
 </head>
 <body>
@@ -146,7 +166,7 @@
 
   <div class="login-container">
     <div class="card login-card">
-      <div class="login-logo">🔒</div>
+      <div class="login-logo"><i class="ph ph-lock-key"></i></div>
       <h2>Petulap SST</h2>
       <p class="login-subtitle">Acceso Seguro al Sistema</p>
 
@@ -186,7 +206,7 @@
       }
 
       btn.disabled = true;
-      btn.innerHTML = "⏳ Validando...";
+      btn.innerHTML = '<i class="ph ph-spinner ph-spin"></i> Validando...';
       errorDiv.style.display = "none";
 
       try {

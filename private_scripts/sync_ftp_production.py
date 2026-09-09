@@ -35,6 +35,7 @@ html_files = [
     'soporte.html',
     'tecnicos.html',
     'turnos.html',
+    'login.html',
     'sw.js',
     '.htaccess'
 ]
@@ -60,10 +61,12 @@ size_dash = os.path.getsize('website_files/js/dashboard.js')
 print(f'  [SUBIDO OK] js/dashboard.js ({size_dash} bytes)')
 
 ftp.cwd('../css')
-with open('website_files/css/dashboard.css', 'rb') as f:
-    ftp.storbinary('STOR dashboard.css', f)
-size_css = os.path.getsize('website_files/css/dashboard.css')
-print(f'  [SUBIDO OK] css/dashboard.css ({size_css} bytes)')
+for css_file in ['styles.css', 'tokens.css', 'dashboard.css', 'missing.css']:
+    local_css = os.path.join('website_files', 'css', css_file)
+    if os.path.exists(local_css):
+        with open(local_css, 'rb') as f:
+            ftp.storbinary(f'STOR {css_file}', f)
+        print(f'  [SUBIDO OK] css/{css_file} ({os.path.getsize(local_css)} bytes)')
 ftp.cwd('../js')
 
 # 3. Eliminar navbar.js de public_html/js/ (si existiera)
@@ -94,6 +97,7 @@ api_files = [
     'sesiones.php',
     'soporte.php',
     'turnos.php',
+    'auth.php',
 ]
 
 for fname in api_files:

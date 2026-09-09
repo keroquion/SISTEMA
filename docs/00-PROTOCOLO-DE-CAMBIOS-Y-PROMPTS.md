@@ -59,6 +59,7 @@ Antes de generar código o modificar cualquier archivo, consulta los documentos 
 - docs/05-CHANGELOG.md (Historial de cambios y formato SemVer)
 - docs/08-CHECKLIST-TESTING.md (Protocolo de pruebas de humo)
 - docs/10-REMEDIACION-NAVEGACION-MOVIL.md (Estandarización de menú móvil en 20 pantallas)
+- docs/11-REMEDIACION-UI-INNERHTML-Y-LOGIN.md (Erradicación de HTML crudo, saneamiento de alertas y pulido de login)
 
 REGLAS GENERALES INNEGOCIABLES:
 1. Jerarquía CSS estricta: tokens.css -> styles.css -> dashboard.css.
@@ -150,3 +151,4 @@ Para referencia rápida de qué archivo consultar según la necesidad:
 | `docs/08-CHECKLIST-TESTING.md` | Protocolo de pruebas de humo pre-despliegue en 15 minutos. |
 | `docs/09-ESCALABILIDAD.md` | Plan proyectivo de cuellos de botella y arquitectura a escala 100x. |
 | `docs/10-REMEDIACION-NAVEGACION-MOVIL.md` | Estandarización de navegación móvil y 4 módulos en mobile-sidebar (v1.4.0). |
+| `docs/11-REMEDIACION-UI-INNERHTML-Y-LOGIN.md` | Erradicación de HTML crudo, saneamiento de alertas y pulido de login (v1.4.1). |

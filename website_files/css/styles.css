@@ -378,7 +378,7 @@ tr:hover td { background-color: var(--bg-brand-subtle); color: var(--color-brand
     transform: translateY(-2px);
     border-color: var(--border-strong);
 }
-.btn, button:not(.navbar-toggle) {
+.btn, a.btn, a.btn-secondary, a.btn-primary, button:not(.navbar-toggle) {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -397,10 +397,10 @@ tr:hover td { background-color: var(--bg-brand-subtle); color: var(--color-brand
     color: var(--text-primary);
     box-shadow: var(--shadow-sm);
 }
-.btn:hover, button:not(.navbar-toggle):hover {
+.btn:hover, a.btn:hover, button:not(.navbar-toggle):hover {
     background-color: var(--bg-surface-hover);
 }
-.btn-primary, button.btn-primary {
+.btn-primary, a.btn-primary, button.btn-primary {
     background: var(--color-brand-gradient);
     color: var(--text-on-brand);
     box-shadow: var(--shadow-glow);
@@ -408,35 +408,35 @@ tr:hover td { background-color: var(--bg-brand-subtle); color: var(--color-brand
     font-weight: 700;
     letter-spacing: 1px;
 }
-.btn-primary:hover {
+.btn-primary:hover, a.btn-primary:hover {
     transform: translateY(-2px);
     box-shadow: 0 12px 25px rgba(37, 99, 235, 0.4);
     filter: brightness(1.1);
 }
-.btn-secondary, button.btn-secondary {
+.btn-secondary, a.btn-secondary, button.btn-secondary {
     background-color: var(--bg-surface);
     color: var(--text-primary);
     border: 1px solid var(--border-strong);
     box-shadow: 0 2px 5px rgba(0,0,0,0.05);
     font-weight: 600;
 }
-.btn-secondary:hover {
+.btn-secondary:hover, a.btn-secondary:hover {
     border-color: var(--color-brand);
     color: var(--color-brand);
     box-shadow: 0 4px 8px rgba(0,0,0,0.08);
     transform: translateY(-1px);
     background-color: var(--bg-surface-hover);
 }
-.btn-danger, button.btn-danger {
+.btn-danger, a.btn-danger, button.btn-danger {
     background-color: var(--bg-danger-subtle);
     color: var(--color-danger);
     border: 1px solid transparent;
 }
-.btn-danger:hover {
+.btn-danger:hover, a.btn-danger:hover {
     background-color: var(--color-danger);
     color: var(--text-on-brand);
 }
-.btn-outline {
+.btn-outline, a.btn-outline, button.btn-outline {
     background: transparent;
     border: 1px solid var(--border-default);
     color: var(--text-primary);

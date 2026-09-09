@@ -1,6 +1,6 @@
-// Service Worker - Petulap PWA v10 (Estandarización de Navegación Móvil)
+// Service Worker - Petulap PWA v12 (Blindaje Estructural de Botones <a> y Vistas)
  
-var CACHE_NAME = 'petulap-v10';
+var CACHE_NAME = 'petulap-v12';
 var ASSETS = [
     './',
     'index.html',

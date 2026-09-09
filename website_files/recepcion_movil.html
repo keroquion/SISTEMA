@@ -519,7 +519,7 @@
 
     function showToast(msg, ok=false) {
       const toast = document.getElementById('toast');
-      toast.textContent = msg;
+      toast.innerHTML = msg;
       toast.style.borderLeft = ok ? '4px solid var(--success)' : '4px solid var(--danger)';
       toast.style.display = 'block';
       setTimeout(() => toast.style.display='none', 3000);
@@ -596,7 +596,7 @@
                badge.style.cssText = 'background:rgba(16,185,129,0.1);border:1px solid var(--success);color:var(--success);padding:12px;border-radius:8px;margin-top:10px;font-weight:600;font-size:14px;';
                document.getElementById('f-eq-nombre').parentNode.after(badge);
              }
-             badge.textContent = '<i class="ph ph-shield-check"></i> EQUIPO EN GARANTIA - ' + eq.meses_garantia_restantes + ' meses restantes desde venta el ' + eq.fec_venta;
+             badge.innerHTML = '<i class="ph ph-shield-check"></i> EQUIPO EN GARANTIA - ' + eq.meses_garantia_restantes + ' meses restantes desde venta el ' + eq.fec_venta;
            } else {
              const badge = document.getElementById('garantia-badge');
              if (badge) badge.remove();

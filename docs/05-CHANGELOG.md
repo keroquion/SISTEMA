@@ -32,6 +32,53 @@ Para garantizar trazabilidad absoluta, auditoría técnica rigurosa y claridad e
 
 ---
 
+## [1.4.2] - Septiembre 2026
+
+### Blindaje Estructural de Botones Globales en Enlaces `<a>` y Ajuste Responsivo de Desempeño
+*Módulos impactados:* `css/styles.css`, `desempeno_tecnicos.html`, `login.html`, `sw.js`.
+
+### Fixed
+- **`website_files/desempeno_tecnicos.html`**:
+  - Se corrigió la declaración del enlace 'Volver a Reportes' agregando la clase base `.btn` (`<a href="reportes.html" class="btn btn-secondary">`).
+  - *¿Por qué?* El elemento carecía de la clase base `.btn`, ocasionando que el navegador ignorara los estilos estructurales de caja (`inline-flex`, `min-height: 44px`, `padding`, `border-radius`), mostrándolo como un enlace de texto plano con borde cuadrado crudo de 1px.
+  - Se modularizó la barra de acciones con las clases semánticas `.top-action-bar` y `.top-action-controls`, incorporando reglas `@media (max-width: 768px)` y `@media (max-width: 480px)` para evitar deformaciones y solapamientos con el selector de rango `#filtro-rango` en pantallas móviles de 375px.
+- **`website_files/css/styles.css`**:
+  - Se blindó la regla dimensional de botones para extender el soporte a elementos `<a>` con clases de botón: `.btn, a.btn, a.btn-secondary, a.btn-primary, button:not(.navbar-toggle)`.
+  - Se añadieron selectores explícitos para variantes y estados interactivos: `a.btn:hover`, `a.btn-primary`, `a.btn-secondary`, `a.btn-danger`, `a.btn-outline`.
+  - *¿Por qué?* Previene que cualquier futuro enlace de navegación que emplee una clase modificadora (`.btn-secondary`, `.btn-primary`) sin la clase raíz `.btn` pierda su geometría, tipografía y efectos visuales de interacción.
+- **`website_files/login.html`**:
+  - Se aseguró la asignación explícita `window.toggleTheme = toggleTheme;` en el script inicial de cabecera para prevenir errores de referencia ante eventos inline en navegadores móviles.
+
+### Changed
+- **`website_files/sw.js`**:
+  - Se incrementó el identificador de caché a `'petulap-v12'` para invalidar la hoja de estilos global en los clientes PWA y garantizar la recarga inmediata de los estilos corregidos.
+
+---
+
+## [1.4.1] - Septiembre 2026
+
+### Erradicación de Roturas Visuales HTML, Saneamiento de Alertas y Pulido de Login
+*Módulos impactados:* `tecnicos.html`, `clientes.html`, `caja.html`, `recepcion_movil.html`, `lotes.html`, `inventario_soporte.html`, `login.html`, `api/auth.php`, `sw.js`.
+
+### Fixed
+- **`website_files/tecnicos.html`, `clientes.html`, `caja.html`, `recepcion_movil.html`**: Se sustituyeron asignaciones erróneas de `element.textContent` por `element.innerHTML` en las funciones de retroalimentación en pantalla (`mostrarMsg`, `showToast` y `garantia-badge`).
+  - *¿Por qué?* El navegador interpretaba las etiquetas Phosphor Icons (`<i class="ph ...">`) inyectadas dinámicamente como cadenas de texto plano, provocando que los usuarios vieran fragmentos de código HTML crudo en la interfaz gráfica (ej: `"Datos autocompletados desde RENIEC <i class='ph ph-check-circle'></i>"`).
+- **`website_files/lotes.html`**:
+  - En llamadas a `alert()` y `confirm()`: Se erradicó el uso de etiquetas HTML internas, sustituyéndolas por caracteres unificados y limpios (`✓`, `✕`, `⚠`). Dado que los diálogos nativos del navegador no interpretan el DOM ni ejecutan CSS, las etiquetas `<i class="...">` se mostraban como texto literal antiestético.
+  - En botones de fase y mensajes de retroalimentación (`#btn-siguiente-fase`, `#msg-detalle`): Se corrigió la asignación a `innerHTML` y se reemplazaron caracteres mojibake por el icono Phosphor `<i class="ph ph-lock-key"></i> Lote Cerrado`.
+- **`website_files/inventario_soporte.html`**: Se limpió el cuadro de diálogo `confirm()` al eliminar listas escaneadas, sustituyendo la etiqueta `<i class="ph ph-warning"></i>` por el símbolo nativo `⚠`.
+- **`website_files/login.html`**:
+  - Se implementó de forma nativa la función `toggleTheme()` con sincronización en `localStorage` y actualización del icono luna/sol en el evento `DOMContentLoaded`, subsanando el fallo en el botón de tema provocado por la ausencia de `dashboard.js` en dicha vista.
+  - Se reemplazó el emoji Unicode crudo `🔒` del logo por el icono vectorial `<i class="ph ph-lock-key"></i>` y el emoji `⏳` del botón de validación por `<i class="ph ph-spinner ph-spin"></i> Validando...`, eliminando el riesgo de renderizado de cajas rotas (*tofu*) o signos de interrogación en dispositivos móviles con tipografías incompletas.
+
+### Security
+- **`website_files/api/auth.php`**: Se añadió la cabecera explícita `header('Content-Type: application/json; charset=utf-8');` al inicio del script para prevenir anomalías de codificación de caracteres (mojibake) en mensajes de error o confirmación de credenciales que contengan tildes o caracteres especiales.
+
+### Changed
+- **`website_files/sw.js`**: Se incrementó la versión de la memoria caché del Service Worker PWA de `'petulap-v10'` a `'petulap-v11'` para forzar la actualización inmediata de las pantallas de acceso y paneles en los teléfonos y navegadores de todos los usuarios.
+
+---
+
 ## [1.4.0] - Septiembre 2026
 
 ### Estandarización de Navegación Móvil: Incorporación de 4 Módulos Críticos en Menú Desplegable

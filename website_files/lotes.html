@@ -775,7 +775,7 @@ async function cargarComprasDisponibles() {
 
 function mostrarMsg(txt, tipo) {
   const el = document.getElementById('msg-form');
-  el.textContent=txt; el.className='msg '+(tipo||'');
+  el.innerHTML=txt; el.className='msg '+(tipo||'');
 }
 
 // ===================== DETALLE DE LOTE =====================
@@ -906,7 +906,7 @@ async function guardarEdicionInline(le_id) {
     
     const res = await fetch(`${API}?action=editar_item`, { method:'POST', body:JSON.stringify(body) }).then(r=>r.json());
     if (res.ok) {
-        alert('<i class="ph ph-check-circle"></i> Guardado correctamente');
+        alert('✓ Guardado correctamente');
         // Update local object
         const it = itemsLote.find(i => i.id == le_id);
         if (it) {
@@ -914,7 +914,7 @@ async function guardarEdicionInline(le_id) {
         }
         renderizarItems();
     } else {
-        alert('<i class="ph ph-x"></i> Error al guardar: ' + res.msg);
+        alert('✕ Error al guardar: ' + res.msg);
     }
 }
 
@@ -928,9 +928,9 @@ async function guardarRepuestos() {
     };
     const res = await fetch(`${API}?action=editar_repuestos`, { method:'POST', body:JSON.stringify(body) }).then(r=>r.json());
     if (res.ok) {
-        alert('<i class="ph ph-check-circle"></i> Datos de repuestos actualizados');
+        alert('✓ Datos de repuestos actualizados');
     } else {
-        alert('<i class="ph ph-x"></i> Error: ' + res.msg);
+        alert('✕ Error: ' + res.msg);
     }
 }
 
@@ -989,7 +989,7 @@ async function confirmarMoverPendientes() {
     const body = { lote_origen: loteActual.lote_id, lote_destino: destino };
     const res = await fetch(`${API}?action=mover_pendientes`, { method:'POST', body:JSON.stringify(body) }).then(r=>r.json());
     if (res.ok) {
-        alert('<i class="ph ph-check-circle"></i> Traslado exitoso');
+        alert('✓ Traslado exitoso');
         document.getElementById('modal-mover').style.display = 'none';
         // Recargar lote actual
         const detRes = await fetch(`${API}?action=ver&id=${encodeURIComponent(loteActual.lote_id)}`).then(r=>r.json());
@@ -999,7 +999,7 @@ async function confirmarMoverPendientes() {
             renderizarItems(); 
         }
     } else {
-        alert('<i class="ph ph-x"></i> Error: ' + res.msg);
+        alert('✕ Error: ' + res.msg);
     }
 }
 
@@ -1074,20 +1074,20 @@ function actualizarBotonFase() {
   const idx = FLUJO_ESTADOS.indexOf(est);
   const btn = document.getElementById('btn-siguiente-fase');
   if (est === 'CERRADO') {
-    btn.textContent = '’ Lote Cerrado';
+    btn.innerHTML = '<i class="ph ph-lock-key"></i> Lote Cerrado';
     btn.disabled = true;
     btn.style.opacity = '0.5';
   } else if (idx >= 0 && idx < FLUJO_ESTADOS.length - 1) {
     const siguiente = FLUJO_ESTADOS[idx + 1];
-    btn.textContent = `<i class="ph ph-arrow-right"></i> Pasar a: ${LABELS_ESTADOS[siguiente]}`;
+    btn.innerHTML = `<i class="ph ph-arrow-right"></i> Pasar a: ${LABELS_ESTADOS[siguiente]}`;
     btn.disabled = false;
     btn.style.opacity = '1';
   } else if (est === 'COMPLETO') {
-    btn.textContent = '’ Cerrar Lote Definitivamente';
+    btn.innerHTML = '<i class="ph ph-lock-key"></i> Cerrar Lote Definitivamente';
     btn.disabled = false;
     btn.style.opacity = '1';
   } else {
-    btn.textContent = '<i class="ph ph-arrow-right"></i> Siguiente Fase';
+    btn.innerHTML = '<i class="ph ph-arrow-right"></i> Siguiente Fase';
   }
 }
 
@@ -1144,11 +1144,11 @@ async function ejecutarAvance(nuevoEstado) {
     const badge = document.getElementById('detalle-estado-badge');
     badge.textContent = nuevoEstado.replace(/_/g,' ');
     badge.className = 'badge ' + nuevoEstado;
-    fb.textContent = `<i class="ph ph-check-circle"></i> Lote avanzado a: ${LABELS_ESTADOS[nuevoEstado]||nuevoEstado}`;
+    fb.innerHTML = `<i class="ph ph-check-circle"></i> Lote avanzado a: ${LABELS_ESTADOS[nuevoEstado]||nuevoEstado}`;
     fb.className = 'msg ok';
     actualizarBotonFase();
   } else {
-    fb.textContent = '<i class="ph ph-x"></i> ' + res.msg;
+    fb.innerHTML = '<i class="ph ph-x"></i> ' + res.msg;
     fb.className = 'msg err';
   }
 }
@@ -1156,9 +1156,7 @@ async function ejecutarAvance(nuevoEstado) {
 function confirmarCerrar() {
   const pendientes = itemsLote.filter(i => i.triaje === 'NECESITA_REPUESTO' || i.triaje === 'FALLA_MENOR');
   const msg = pendientes.length > 0
-    ? `<i class="ph ph-warning"></i> Aun quedan ${pendientes.length} equipos con falla/repuesto pendiente.
-
-Seguro que deseas CERRAR DEFINITIVAMENTE este lote? Ya no se podra modificar.`
+    ? `⚠ Aun quedan ${pendientes.length} equipos con falla/repuesto pendiente.\n\nSeguro que deseas CERRAR DEFINITIVAMENTE este lote? Ya no se podra modificar.`
     : `Cerrar este lote definitivamente? No se podran hacer mas cambios.`;
   if (confirm(msg)) ejecutarAvance('CERRADO');
 }
@@ -1186,10 +1184,10 @@ function editarLote() {
       if (res.ok) {
         loteActual.titulo = titulo;
         document.getElementById('detalle-titulo').textContent = `${loteActual.lote_id} - ${titulo}`;
-        fb.textContent = '<i class="ph ph-check-circle"></i> Lote actualizado';
+        fb.innerHTML = '<i class="ph ph-check-circle"></i> Lote actualizado';
         fb.className = 'msg ok';
       } else {
-        fb.textContent = '<i class="ph ph-x"></i> ' + res.msg;
+        fb.innerHTML = '<i class="ph ph-x"></i> ' + res.msg;
         fb.className = 'msg err';
       }
     });
@@ -1204,17 +1202,14 @@ async function eliminarLoteActual() {
 }
 
 async function eliminarLoteDesdeListado(lote_id, doc_compra) {
-  const confirm1 = confirm(`<i class="ph ph-warning"></i> Eliminar el lote ${lote_id}?
-
-Se borraran todos sus items del lote.
-El triaje de los equipos asociados sera reseteado a SIN_FALLA.`);
+  const confirm1 = confirm(`⚠ Eliminar el lote ${lote_id}?\n\nSe borraran todos sus items del lote.\nEl triaje de los equipos asociados sera reseteado a SIN_FALLA.`);
   if (!confirm1) return;
   const res = await fetch(`${API}?action=eliminar`, { method:'POST', body:JSON.stringify({ lote_id, doc_compra }) }).then(r=>r.json());
   if (res.ok) {
-    alert(`<i class="ph ph-check-circle"></i> Lote ${lote_id} eliminado. Triaje de equipos reseteado.`);
+    alert(`✓ Lote ${lote_id} eliminado. Triaje de equipos reseteado.`);
     volverLista();
   } else {
-    alert('<i class="ph ph-x"></i> Error: ' + res.msg);
+    alert('✕ Error: ' + res.msg);
   }
 }
 

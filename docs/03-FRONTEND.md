@@ -383,6 +383,11 @@ graph TD
   ```
 - Si este pequeño bloque se borra o se mueve al final de la página, la pantalla mostrará un fogonazo blanco incómodo para la vista en cada transición entre páginas.
 
+### 7.7. Enlaces `<a>` Utilizados Como Botones de Acción (`.btn`)
+- **El Mecanismo:** En `css/styles.css`, las dimensiones estructurales (`inline-flex`, `min-height: 44px`, `padding: 0 20px`, `border-radius: var(--radius-sm)`) están asignadas a `.btn, a.btn, a.btn-secondary, a.btn-primary, button:not(.navbar-toggle)`.
+- **La Fragilidad:** Si un desarrollador escribe `<a href="reportes.html" class="btn-secondary">` omitiendo la clase base `.btn`, anteriormente el enlace perdía su alineación, padding y curvatura, renderizándose como un texto plano con un recuadro cuadrado tosco de 1px.
+- **Regla Estándar:** Aunque `css/styles.css` ya cuenta con blindaje para enlaces `a.btn-secondary` y `a.btn-primary`, todo enlace interactivo debe declararse explícitamente con ambas clases: `class="btn btn-secondary"` o `class="btn btn-primary"`.
+
 ---
 
 ## 8. Resumen Ejecutivo de Mantenimiento para la Gerencia

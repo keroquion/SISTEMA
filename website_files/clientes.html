@@ -515,7 +515,7 @@ if ("serviceWorker" in navigator) { window.addEventListener("load", () => { navi
 
     function mostrarMsg(txt, tipo) {
       const el = document.getElementById('msg');
-      el.textContent = txt; el.className = 'msg ' + (tipo || '');
+      el.innerHTML = txt; el.className = 'msg ' + (tipo || '');
     }
 
     async function consultarDNI() {
