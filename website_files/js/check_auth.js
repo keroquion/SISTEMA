@@ -42,13 +42,15 @@ document.addEventListener("DOMContentLoaded", async () => {
         } else {
             // Guardar modulos
             window.userModulos = res.data.modulos || [];
-            if (window.userModulos.length > 0 && pageName !== 'login.html' && !publicPages.includes(pageName) && pageName !== '' && !window.userModulos.includes(pageName)) {
+            const esAdmin = (res.data.tipo === 'admin');
+
+            if (!esAdmin && window.userModulos.length > 0 && pageName !== 'login.html' && !publicPages.includes(pageName) && pageName !== '' && !window.userModulos.includes(pageName)) {
                 window.location.href = res.data.start_url || 'index.html';
                 return;
             }
 
-            // Ocultar links no permitidos en el DOM
-            if (window.userModulos.length > 0) {
+            // Ocultar links no permitidos en el DOM (el rol admin siempre tiene acceso a todos los modulos)
+            if (!esAdmin && window.userModulos.length > 0) {
                 document.querySelectorAll('a[href$=".html"]').forEach(link => {
                     const href = link.getAttribute('href');
                     if (href && !publicPages.includes(href) && href !== 'index.html' && !window.userModulos.includes(href)) {

@@ -466,6 +466,7 @@ const paginasDisponibles = [
     {id: 'importar.html', nombre: 'Importar Excel', icon: 'ph-download-simple'},
     {id: 'caja.html', nombre: 'Caja / Entregas', icon: 'ph-money'},
     {id: 'reportes.html', nombre: 'Lotes y Equipos (Reportes)', icon: 'ph-chart-bar'},
+    {id: 'desempeno_tecnicos.html', nombre: 'Desempeño de Técnicos (Reportes)', icon: 'ph-chart-line-up'},
     {id: 'lotes.html', nombre: 'Lotes Masivos (Gerencia)', icon: 'ph-stack'},
     {id: 'clientes.html', nombre: 'Actividades y Clientes', icon: 'ph-user-list'},
     {id: 'turnos.html', nombre: 'Asignacion Turnos', icon: 'ph-clock'},
@@ -473,6 +474,7 @@ const paginasDisponibles = [
     {id: 'historial_entregados.html', nombre: 'Historial Entregados', icon: 'ph-clock-counter-clockwise'},
     {id: 'consulta.html', nombre: 'Buscar / Consulta Rapida', icon: 'ph-magnifying-glass'},
     {id: 'repuestos.html', nombre: 'Repuestos', icon: 'ph-nut'},
+    {id: 'pedidos_repuestos.html', nombre: 'Pedidos de Repuestos', icon: 'ph-truck'},
     {id: 'admin_roles.html', nombre: 'Administrar Roles (Solo Admin)', icon: 'ph-crown'}
 ];
 
@@ -538,7 +540,12 @@ function cargarRol() {
 
     const modulosPermitidos = roleConf.modulos_permitidos || [];
     document.querySelectorAll('.chk-modulo').forEach(chk => {
-        chk.checked = modulosPermitidos.includes(chk.value);
+        // Si es rol admin, siempre tiene todos los modulos marcados
+        if (rolSel === 'admin') {
+            chk.checked = true;
+        } else {
+            chk.checked = modulosPermitidos.includes(chk.value);
+        }
     });
 
     panel.style.display = 'block';
@@ -553,6 +560,15 @@ async function guardarRol() {
     document.querySelectorAll('.chk-modulo:checked').forEach(chk => {
         modulos_permitidos.push(chk.value);
     });
+
+    // El rol admin siempre debe tener todos los modulos o permisos del sistema
+    if (rol === 'admin') {
+        paginasDisponibles.forEach(p => {
+            if (!modulos_permitidos.includes(p.id)) {
+                modulos_permitidos.push(p.id);
+            }
+        });
+    }
 
     const bodyData = { rol, pagina_defecto, modulos_permitidos };
     
