@@ -58,6 +58,7 @@ Antes de generar código o modificar cualquier archivo, consulta los documentos 
 - docs/03-FRONTEND.md (Interfaces, componentes compartidos y Sección 7: 'Cosas Frágiles')
 - docs/05-CHANGELOG.md (Historial de cambios y formato SemVer)
 - docs/08-CHECKLIST-TESTING.md (Protocolo de pruebas de humo)
+- docs/10-REMEDIACION-NAVEGACION-MOVIL.md (Estandarización de menú móvil en 20 pantallas)
 
 REGLAS GENERALES INNEGOCIABLES:
 1. Jerarquía CSS estricta: tokens.css -> styles.css -> dashboard.css.
@@ -148,3 +149,4 @@ Para referencia rápida de qué archivo consultar según la necesidad:
 | `docs/07-REMEDIACION-FRONTEND-PARTE2.md` | Rediseño responsive móvil de tablas densas y Kanban vertical. |
 | `docs/08-CHECKLIST-TESTING.md` | Protocolo de pruebas de humo pre-despliegue en 15 minutos. |
 | `docs/09-ESCALABILIDAD.md` | Plan proyectivo de cuellos de botella y arquitectura a escala 100x. |
+| `docs/10-REMEDIACION-NAVEGACION-MOVIL.md` | Estandarización de navegación móvil y 4 módulos en mobile-sidebar (v1.4.0). |
