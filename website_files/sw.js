@@ -1,6 +1,6 @@
-// Service Worker - Petulap PWA v12 (Blindaje Estructural de Botones <a> y Vistas)
+// Service Worker - Petulap PWA v13 (Monitoreo en Vivo y Heatmap Semanal GitHub)
  
-var CACHE_NAME = 'petulap-v12';
+var CACHE_NAME = 'petulap-v13';
 var ASSETS = [
     './',
     'index.html',
