@@ -32,6 +32,32 @@ Para garantizar trazabilidad absoluta, auditoría técnica rigurosa y claridad e
 
 ---
 
+## [1.4.7] - Septiembre 2026
+
+### Navegador de Semanas en Heatmap, Fechas en Filas y Tiempo Asignado en Desempeño
+*Módulos impactados:* `website_files/desempeno_tecnicos.html`, `website_files/api/desempeno.php`, `website_files/api/soporte.php`, `website_files/mis_ordenes.html`, `website_files/js/dashboard.js`, `website_files/sw.js`.
+
+### Added
+- **`website_files/api/desempeno.php`**:
+  - Soporte del parámetro `semana_offset` (entero) para auditoría de semanas históricas y futuras sin depender exclusivamente de la fecha actual.
+  - Generación de metadatos `semana_info` con rango textual (`Semana del DD/MM al DD/MM, AAAA`), fechas ISO y etiquetas legibles.
+  - Inclusión de `dia_mes` (`DD/MM`) y `es_hoy` en cada fila de la matriz semanal del heatmap.
+  - Inclusión del campo `tiempo_estimado` en las actividades extraídas de `soporte_tecnico` e historial.
+- **`website_files/desempeno_tecnicos.html`**:
+  - Componente de barra de navegación de semana (`.week-nav-bar`) con botones `[< Semana Anterior]`, `[Semana Siguiente >]`, `[Esta Semana]` y título dinámico de rango de fechas.
+  - Visualización del día y su fecha (`Lunes 07/09`, `Martes 08/09`, etc.) en los encabezados de fila del heatmap (`.heatmap-row-header`), con insignia `HOY` en tiempo real.
+  - Reestructuración de la tabla de historial cronológico a 6 columnas: `Inicio` (~110px), `Fin` (~110px), `Tiempo Real` (~90px), `Tiempo Asignado` (~110px), `Ticket y Equipo / Tarea` (flexible), `Estado` (~110px).
+  - Formateador `formatDateTimeShort(fecha)` para visualizar fecha y hora legible (`DD/MM HH:mm`) en celdas de inicio y fin.
+  - Columna `Tiempo Asignado` mostrando el tiempo estimado ingresado con icono o guión de ausencia (`—`).
+- **`website_files/mis_ordenes.html` & `website_files/js/dashboard.js`**:
+  - Campo `Tiempo Estimado / Asignado` en modal de tareas internas (`#modal-tarea` y `#modal-tarea-global`) con opciones predeterminadas (`30 min`, `1 hora`, `2 horas`, `3 horas`, `4 horas`, `8 horas`) e ingreso personalizado.
+- **`website_files/api/soporte.php`**:
+  - Captura y persistencia de `tiempo_estimado` en la tabla `soporte_tecnico` (con respaldo en `notas_internas`) en las acciones `crear_tarea` y `crear`.
+- **`website_files/sw.js`**:
+  - Incremento de versión de caché a `'petulap-v16'`.
+
+---
+
 ## [1.4.6] - Septiembre 2026
 
 ### Integración Definitiva de Tareas Internas, Trazabilidad y Fallback Robusto en Desempeño

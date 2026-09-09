@@ -431,6 +431,23 @@
                         </div>
                     </div>
 
+                    <!-- Barra de Navegación de Semanas -->
+                    <div class="week-nav-bar" style="display:flex; justify-content:space-between; align-items:center; background:var(--bg-surface-hover); padding:10px 16px; border-radius:var(--radius-md); border:1px solid var(--border-default); margin-bottom:18px; flex-wrap:wrap; gap:10px;">
+                        <button class="btn btn-secondary" style="font-size:0.85rem; padding:0 14px; min-height:36px;" onclick="navegarSemana(-1)">
+                            <i class="ph-bold ph-caret-left"></i> Semana Anterior
+                        </button>
+                        <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; justify-content:center;">
+                            <i class="ph-bold ph-calendar-blank" style="color:var(--color-brand); font-size:1.2rem;"></i>
+                            <span id="semana-rango-texto" style="font-weight:700; font-size:0.95rem; color:var(--text-primary);">Cargando semana...</span>
+                            <button id="btn-esta-semana" class="btn btn-secondary" style="display:none; padding:2px 10px; font-size:0.75rem; min-height:26px; border-radius:20px; font-weight:600;" onclick="irEstaSemana()">
+                                <i class="ph-bold ph-arrow-counter-clockwise"></i> Esta Semana
+                            </button>
+                        </div>
+                        <button id="btn-semana-siguiente" class="btn btn-secondary" style="font-size:0.85rem; padding:0 14px; min-height:36px;" onclick="navegarSemana(1)">
+                            Semana Siguiente <i class="ph-bold ph-caret-right"></i>
+                        </button>
+                    </div>
+
                     <!-- Cuadrícula Heatmap Estilo GitHub -->
                     <div>
                         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 15px; flex-wrap:wrap; gap:10px;">
@@ -443,7 +460,7 @@
                         </div>
 
                         <div class="heatmap-container" style="overflow-x: auto; -webkit-overflow-scrolling: touch; padding: 10px 0;">
-                            <div id="heatmap-matrix-wrapper" style="min-width: 580px;">
+                            <div id="heatmap-matrix-wrapper" style="min-width: 620px;">
                                 <!-- Matriz renderizada por JS -->
                             </div>
                         </div>
@@ -469,11 +486,12 @@
                         <table class="timesheet-table">
                             <thead>
                                 <tr>
-                                    <th style="width:14%">Inicio</th>
-                                    <th style="width:14%">Fin</th>
-                                    <th style="width:14%">Tiempo</th>
-                                    <th style="width:42%">Ticket y Equipo</th>
-                                    <th style="width:16%">Estado</th>
+                                    <th style="width:110px;">Inicio</th>
+                                    <th style="width:110px;">Fin</th>
+                                    <th style="width:90px;">Tiempo Real</th>
+                                    <th style="width:110px;">Tiempo Asignado</th>
+                                    <th style="min-width:200px;">Ticket y Equipo / Tarea</th>
+                                    <th style="width:110px;">Estado</th>
                                 </tr>
                             </thead>
                             <tbody id="tbody-historial-individual">
@@ -611,7 +629,7 @@
         /* Matriz Heatmap Estilo GitHub */
         .heatmap-grid {
             display: grid;
-            grid-template-columns: 85px repeat(11, minmax(36px, 1fr));
+            grid-template-columns: 125px repeat(11, minmax(36px, 1fr));
             gap: 6px;
             align-items: center;
         }
@@ -752,13 +770,15 @@
         }
     </style>
     <script src="js/check_auth.js"></script>
-    <script src="js/dashboard.js?v=3"></script>
+    <script src="js/dashboard.js?v=4"></script>
     <script>
         const API = 'api/desempeno.php';
         let gData = [];
         let gResumen = null;
+        let gSemanaInfo = null;
         let gVistaActual = 'live';
         let gTecnicoSeleccionadoId = null;
+        let gSemanaOffset = 0;
 
         function formatDurationSeconds(sec) {
             if (!sec || sec < 0) return '0m';
@@ -768,11 +788,15 @@
             return `${mins}m`;
         }
 
-        function formatTimeOnly(dateStr) {
-            if (!dateStr) return '--:--';
+        function formatDateTimeShort(dateStr) {
+            if (!dateStr) return '—';
             const d = new Date(dateStr.replace(/-/g, '/'));
-            if (isNaN(d.getTime())) return '--:--';
-            return d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            if (isNaN(d.getTime())) return dateStr;
+            const dia = String(d.getDate()).padStart(2, '0');
+            const mes = String(d.getMonth() + 1).padStart(2, '0');
+            const hora = String(d.getHours()).padStart(2, '0');
+            const min = String(d.getMinutes()).padStart(2, '0');
+            return `${dia}/${mes} ${hora}:${min}`;
         }
 
         function formatDurationDates(startStr, endStr) {
@@ -783,6 +807,17 @@
             let diffMs = end - start;
             if (diffMs < 0) diffMs = 0;
             return formatDurationSeconds(Math.floor(diffMs / 1000));
+        }
+
+        // Navegación de semanas en el Heatmap
+        function navegarSemana(diff) {
+            gSemanaOffset += diff;
+            cargarDesempeno();
+        }
+
+        function irEstaSemana() {
+            gSemanaOffset = 0;
+            cargarDesempeno();
         }
 
         // Cambio entre Vista 1 (Live) y Vista 2 (Individual / Heatmap)
@@ -820,6 +855,12 @@
             const liveContainer = document.getElementById('live-tech-list');
             const resumenDiv = document.getElementById('resumen-global');
 
+            // Actualizar visibilidad de botón "Esta Semana"
+            const btnEstaSemana = document.getElementById('btn-esta-semana');
+            if (btnEstaSemana) {
+                btnEstaSemana.style.display = (gSemanaOffset !== 0) ? 'inline-flex' : 'none';
+            }
+
             liveContainer.innerHTML = `
                 <div style="text-align: center; padding: 40px; color: var(--text-muted);">
                     <i class="ph ph-spinner ph-spin" style="font-size: 2rem;"></i>
@@ -828,10 +869,17 @@
             `;
 
             try {
-                const res = await fetch(`${API}?action=resumen&rango=${rango}`).then(r => r.json());
+                const res = await fetch(`${API}?action=resumen&rango=${rango}&semana_offset=${gSemanaOffset}`).then(r => r.json());
                 if (res.ok) {
                     gData = res.data || [];
                     gResumen = res.resumen || {};
+                    gSemanaInfo = res.semana_info || null;
+
+                    if (gSemanaInfo) {
+                        const lblSemana = document.getElementById('semana-rango-texto');
+                        if (lblSemana) lblSemana.textContent = gSemanaInfo.rango_texto;
+                    }
+
                     renderResumen(gResumen);
                     renderVistaLive(gData);
                     poblarSelectTecnicos(gData);
@@ -1084,8 +1132,9 @@
 
             // 2. Filas de Días (Lunes a Sábado)
             heatmap.forEach(dia => {
-                const hoyBadge = dia.es_hoy ? '<span style="font-size:0.7rem; background:var(--color-brand); color:white; padding:1px 5px; border-radius:3px; font-weight:700;">HOY</span>' : '';
-                html += `<div class="heatmap-row-header">${dia.dia_nombre} ${hoyBadge}</div>`;
+                const hoyBadge = dia.es_hoy ? '<span style="font-size:0.65rem; background:var(--color-brand); color:white; padding:1px 5px; border-radius:3px; font-weight:700; margin-left:4px;">HOY</span>' : '';
+                const fechaLabel = dia.dia_mes ? `<span style="font-size:0.78rem; color:var(--text-secondary); font-weight:500; margin-left:4px;">${dia.dia_mes}</span>` : '';
+                html += `<div class="heatmap-row-header" style="white-space:nowrap;"><span>${dia.dia_nombre}</span>${fechaLabel}${hoyBadge}</div>`;
 
                 horasHeaders.forEach((h, idx) => {
                     const slot = (dia.horas && dia.horas[idx]) ? dia.horas[idx] : { minutos: 0, ticket: null, equipo: null };
@@ -1119,7 +1168,7 @@
         function renderTablaActividades(actividades) {
             const tbody = document.getElementById('tbody-historial-individual');
             if (!actividades || actividades.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:var(--text-muted); padding:20px;">Sin actividades registradas en el periodo seleccionado.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:var(--text-muted); padding:20px;">Sin actividades registradas en el periodo seleccionado.</td></tr>';
                 return;
             }
 
@@ -1132,16 +1181,24 @@
                 if (act.estado_fin === 'EN_PROCESO') {
                     badgeClass = 'status-en-proceso';
                     estadoTexto = 'En Proceso';
-                } else if (act.estado_fin === 'LISTO_PARA_RECOGER' || act.estado_fin === 'ENTREGADO') {
+                } else if (act.estado_fin === 'LISTO_PARA_RECOGER' || act.estado_fin === 'ENTREGADO' || act.estado_fin === 'COMPLETADO') {
                     badgeClass = 'status-completado';
                     estadoTexto = 'Completado';
+                } else if (act.estado_fin === 'ESPERANDO_REPUESTO') {
+                    badgeClass = 'status-en-proceso';
+                    estadoTexto = 'Esperando Repuesto';
                 }
+
+                const tiempoAsignado = act.tiempo_estimado 
+                    ? `<span style="display:inline-flex; align-items:center; gap:4px; font-weight:600; color:var(--text-primary);"><i class="ph ph-timer" style="color:var(--color-brand)"></i> ${act.tiempo_estimado}</span>`
+                    : '<span style="color:var(--text-muted);">—</span>';
 
                 rows += `
                     <tr>
-                        <td>${formatTimeOnly(act.inicio)}</td>
-                        <td>${act.fin ? formatTimeOnly(act.fin) : '<span style="color:var(--color-warning); font-weight:bold;">Actual</span>'}</td>
-                        <td><strong>${duracion}</strong></td>
+                        <td style="white-space:nowrap; font-size:0.85rem; color:var(--text-secondary);">${formatDateTimeShort(act.inicio)}</td>
+                        <td style="white-space:nowrap; font-size:0.85rem;">${act.fin ? formatDateTimeShort(act.fin) : '<span class="status-badge status-en-proceso" style="font-size:0.75rem;">En Curso</span>'}</td>
+                        <td style="white-space:nowrap; font-weight:700; color:var(--text-primary);">${duracion}</td>
+                        <td style="white-space:nowrap;">${tiempoAsignado}</td>
                         <td>
                             <span style="color:var(--color-brand); font-weight:bold;">${act.ticket}</span>
                             <span style="color:var(--text-secondary); margin-left:6px;">${act.equipo || 'Equipo Laptop'}</span>

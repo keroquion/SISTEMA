@@ -216,6 +216,19 @@ document.addEventListener('DOMContentLoaded', function() {
           + '<div class="form-group"><label class="form-label">Descripcion</label><textarea id="g-t-desc" class="form-control" rows="3"></textarea></div>'
           + '<div class="form-group"><label class="form-label">Tecnico</label><select id="g-t-tecnico" class="form-control"></select></div>'
           + '<div class="form-group"><label class="form-label">Prioridad</label><select id="g-t-prioridad" class="form-control"><option value="SIN PRIORIDAD">Sin Prioridad</option><option value="NORMAL">Normal</option><option value="ALTA">Alta</option><option value="URGENTE">Urgente</option></select></div>'
+          + '<div class="form-group"><label class="form-label"><i class="ph ph-timer"></i> Tiempo Estimado / Asignado</label>'
+          + '<select id="g-t-tiempo" class="form-control" onchange="window.toggleTiempoGlobalCustom()">'
+          + '<option value="">— Sin estimar —</option>'
+          + '<option value="30 min">30 min</option>'
+          + '<option value="1 hora">1 hora</option>'
+          + '<option value="2 horas">2 horas</option>'
+          + '<option value="3 horas">3 horas</option>'
+          + '<option value="4 horas">4 horas</option>'
+          + '<option value="8 horas">8 horas (Jornada)</option>'
+          + '<option value="otro">Personalizado...</option>'
+          + '</select>'
+          + '<input type="text" id="g-t-tiempo-custom" class="form-control" style="display:none; margin-top:8px;" placeholder="Ej: 1h 30m, 45 min...">'
+          + '</div>'
           + '<div style="display:flex; gap:10px"><button class="btn btn-outline" onclick="document.getElementById(\'modal-tarea-global\').style.display=\'none\'">Cancelar</button><button class="btn btn-primary" onclick="guardarTareaGlobal()">Crear</button></div>'
           + '</div>'
           + '</div>';
@@ -233,19 +246,38 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
+window.toggleTiempoGlobalCustom = function() {
+    var sel = document.getElementById('g-t-tiempo');
+    var custom = document.getElementById('g-t-tiempo-custom');
+    if (sel && custom) {
+        custom.style.display = (sel.value === 'otro') ? 'block' : 'none';
+        if (sel.value === 'otro') custom.focus();
+    }
+};
+
 window.abrirModalTareaGlobal = function() {
   document.getElementById('g-t-titulo').value = '';
   document.getElementById('g-t-desc').value = '';
   document.getElementById('g-t-prioridad').value = 'SIN PRIORIDAD';
+  var selT = document.getElementById('g-t-tiempo');
+  if (selT) selT.value = '';
+  var custT = document.getElementById('g-t-tiempo-custom');
+  if (custT) { custT.value = ''; custT.style.display = 'none'; }
   document.getElementById('modal-tarea-global').style.display = 'flex';
 };
 
 window.guardarTareaGlobal = function() {
+  var tiempoEstimado = document.getElementById('g-t-tiempo') ? document.getElementById('g-t-tiempo').value : '';
+  if (tiempoEstimado === 'otro') {
+    tiempoEstimado = document.getElementById('g-t-tiempo-custom') ? document.getElementById('g-t-tiempo-custom').value.trim() : '';
+  }
+
   var body = {
     titulo: document.getElementById('g-t-titulo').value,
     descripcion: document.getElementById('g-t-desc').value,
     tecnico_id: document.getElementById('g-t-tecnico').value,
-    prioridad: document.getElementById('g-t-prioridad').value
+    prioridad: document.getElementById('g-t-prioridad').value,
+    tiempo_estimado: tiempoEstimado || null
   };
   if (!body.titulo) { alert('Pon un titulo'); return; }
   fetch('api/soporte.php?action=crear_tarea', { method:'POST', body:JSON.stringify(body) }).then(function(r){return r.json()}).then(function(res) {

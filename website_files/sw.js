@@ -1,6 +1,6 @@
-// Service Worker - Petulap PWA v15 (Integración Backend Desempeño, Tareas y Kanban)
+// Service Worker - Petulap PWA v16 (Navegador Semanal, Fechas en Heatmap y Tiempo Asignado)
  
-var CACHE_NAME = 'petulap-v15';
+var CACHE_NAME = 'petulap-v16';
 var ASSETS = [
     './',
     'index.html',

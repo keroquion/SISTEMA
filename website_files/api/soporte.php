@@ -12,7 +12,7 @@ switch ($action) {
         $estado = isset($_GET["estado"]) ? trim($_GET["estado"]) : "";
         $where = $estado ? "WHERE st.estado = ?" : "";
         $sql = "SELECT st.id, st.numero_atencion, st.equipo_codigo, st.equipo_serie, st.equipo_descripcion,
-                st.es_externo, st.motivo_ingreso, st.diagnostico, st.solucion, st.notas_internas,
+                st.es_externo, st.motivo_ingreso, st.diagnostico, st.solucion, st.notas_internas, st.tiempo_estimado,
                 st.estado, st.prioridad, st.en_garantia, st.meses_garantia_restantes,
                 st.fecha_ingreso, st.fecha_estimada, st.fecha_entrega,
                 CONCAT(c.nombre,' ',c.apellido) as cliente_nombre, c.dni as cliente_dni, c.telefono as cliente_tel,
@@ -71,11 +71,12 @@ switch ($action) {
         $motivo = $data["motivo_ingreso"] ?? "";
         $prior = $data["prioridad"] ?? "SIN PRIORIDAD";
         $fecha_est = !empty($data["fecha_estimada"]) ? $data["fecha_estimada"] : null;
+        $tiempo_est = !empty($data["tiempo_estimado"]) ? trim($data["tiempo_estimado"]) : null;
         
         // Segun peticion: Por defecto se deja sin asignar
         $tec_id = !empty($data["tecnico_id"]) ? (int)$data["tecnico_id"] : null;
 
-        $stmt->bind_param("sisssisssi", $numero, $cliente_id, $eq_cod, $eq_ser, $eq_desc, $es_ext, $motivo, $prior, $fecha_est, $tec_id);
+        $stmt->bind_param("sisssissssi", $numero, $cliente_id, $eq_cod, $eq_ser, $eq_desc, $es_ext, $motivo, $prior, $fecha_est, $tiempo_est, $tec_id);
         if ($stmt->execute()) {
             $insert_id = $db->insert_id;
             
@@ -97,6 +98,10 @@ switch ($action) {
                 $db->query("INSERT INTO notificaciones (usuario_id, titulo, mensaje, link) VALUES ($tec_id, 'Nueva Orden', 'La orden $numero te fue asignada', 'mis_ordenes.html')");
             }
             // Notify admins
+            try {
+                require_once 'push.php';
+                sendPushToAdmins($db, "\xF0\x9F\x93\x8B Nueva Orden", "Orden $numero ingresada: $eq_desc", '/soporte.html');
+            } catch (Exception $e) { /* silent */ }
             $db->query("INSERT INTO notificaciones (usuario_id, titulo, mensaje, link) SELECT id, 'Nuevo Ticket', 'Ticket $numero ha ingresado', 'soporte.html' FROM personas WHERE tipo='admin' AND estado='ACTIVO'");
         }
         else echo json_encode(["ok" => false, "msg" => $db->error]);
@@ -115,10 +120,12 @@ switch ($action) {
         $diag = $data["descripcion"] ?? "";
         $es_ext = 2; // Indicador de Tarea Interna
         $prior = !empty($data["prioridad"]) ? $db->real_escape_string($data["prioridad"]) : "SIN PRIORIDAD";
+        $tiempo_est = !empty($data["tiempo_estimado"]) ? trim($data["tiempo_estimado"]) : null;
+        $notas_internas = !empty($tiempo_est) ? "[Tiempo Estimado: $tiempo_est]" : null;
         $tec_id = !empty($data["tecnico_id"]) ? (int)$data["tecnico_id"] : null;
         
-        $stmt = $db->prepare("INSERT INTO soporte_tecnico (numero_atencion, cliente_id, es_externo, motivo_ingreso, diagnostico, prioridad, tecnico_id) VALUES (?,?,?,?,?,?,?)");
-        $stmt->bind_param("siisssi", $numero, $cliente_id, $es_ext, $motivo, $diag, $prior, $tec_id);
+        $stmt = $db->prepare("INSERT INTO soporte_tecnico (numero_atencion, cliente_id, es_externo, motivo_ingreso, diagnostico, prioridad, tiempo_estimado, notas_internas, tecnico_id) VALUES (?,?,?,?,?,?,?,?,?)");
+        $stmt->bind_param("siisssssi", $numero, $cliente_id, $es_ext, $motivo, $diag, $prior, $tiempo_est, $notas_internas, $tec_id);
         
         if ($stmt->execute()) {
             $nuevo_id = $db->insert_id;

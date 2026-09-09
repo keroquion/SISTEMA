@@ -15,18 +15,35 @@ $action = $_GET["action"] ?? "resumen";
 
 if ($action === "resumen") {
     $rango = $_GET['rango'] ?? 'mes';
+    $semanaOffset = isset($_GET['semana_offset']) ? (int)$_GET['semana_offset'] : 0;
+
+    // Calcular lunes de la semana según el offset solicitado
+    $dow = (int)date('w'); // 0=Domingo, 1=Lunes..6=Sabado
+    $diasDesdeLunes = ($dow === 0) ? 6 : ($dow - 1);
+    $hoyYmd = date('Y-m-d');
+    $lunesBaseTs = strtotime("-$diasDesdeLunes days", strtotime($hoyYmd));
+    $lunesTs = strtotime(($semanaOffset >= 0 ? "+$semanaOffset weeks" : "$semanaOffset weeks"), $lunesBaseTs);
+    $sabadoTs = strtotime("+5 days", $lunesTs);
+    $lunesSql = date('Y-m-d 00:00:00', $lunesTs);
+    $sabadoSql = date('Y-m-d 23:59:59', $sabadoTs);
+
     $whereFechaHist = "1=1";
     $whereFechaSt = "1=1";
 
-    if ($rango === 'hoy') {
-        $whereFechaHist = "DATE(h.fecha_cambio) = CURDATE()";
-        $whereFechaSt = "(DATE(st.fecha_ingreso) = CURDATE() OR DATE(st.fecha_entrega) = CURDATE() OR (st.estado IN ('EN_DIAGNOSTICO', 'EN_REPARACION', 'ESPERANDO_REPUESTO') AND DATE(st.fecha_ingreso) <= CURDATE()))";
-    } elseif ($rango === 'semana') {
-        $whereFechaHist = "YEARWEEK(h.fecha_cambio, 1) = YEARWEEK(CURDATE(), 1)";
-        $whereFechaSt = "(YEARWEEK(st.fecha_ingreso, 1) = YEARWEEK(CURDATE(), 1) OR YEARWEEK(st.fecha_entrega, 1) = YEARWEEK(CURDATE(), 1) OR (st.estado IN ('EN_DIAGNOSTICO', 'EN_REPARACION', 'ESPERANDO_REPUESTO')))";
-    } elseif ($rango === 'mes') {
-        $whereFechaHist = "MONTH(h.fecha_cambio) = MONTH(CURDATE()) AND YEAR(h.fecha_cambio) = YEAR(CURDATE())";
-        $whereFechaSt = "((MONTH(st.fecha_ingreso) = MONTH(CURDATE()) AND YEAR(st.fecha_ingreso) = YEAR(CURDATE())) OR (MONTH(st.fecha_entrega) = MONTH(CURDATE()) AND YEAR(st.fecha_entrega) = YEAR(CURDATE())) OR (st.estado IN ('EN_DIAGNOSTICO', 'EN_REPARACION', 'ESPERANDO_REPUESTO')))";
+    if ($semanaOffset !== 0) {
+        $whereFechaHist = "h.fecha_cambio BETWEEN '$lunesSql' AND '$sabadoSql'";
+        $whereFechaSt = "((st.fecha_ingreso BETWEEN '$lunesSql' AND '$sabadoSql') OR (st.fecha_entrega BETWEEN '$lunesSql' AND '$sabadoSql') OR (st.estado IN ('EN_DIAGNOSTICO', 'EN_REPARACION', 'ESPERANDO_REPUESTO', 'PENDIENTE')))";
+    } else {
+        if ($rango === 'hoy') {
+            $whereFechaHist = "DATE(h.fecha_cambio) = CURDATE()";
+            $whereFechaSt = "(DATE(st.fecha_ingreso) = CURDATE() OR DATE(st.fecha_entrega) = CURDATE() OR (st.estado IN ('EN_DIAGNOSTICO', 'EN_REPARACION', 'ESPERANDO_REPUESTO') AND DATE(st.fecha_ingreso) <= CURDATE()))";
+        } elseif ($rango === 'semana') {
+            $whereFechaHist = "YEARWEEK(h.fecha_cambio, 1) = YEARWEEK(CURDATE(), 1)";
+            $whereFechaSt = "(YEARWEEK(st.fecha_ingreso, 1) = YEARWEEK(CURDATE(), 1) OR YEARWEEK(st.fecha_entrega, 1) = YEARWEEK(CURDATE(), 1) OR (st.estado IN ('EN_DIAGNOSTICO', 'EN_REPARACION', 'ESPERANDO_REPUESTO')))";
+        } elseif ($rango === 'mes') {
+            $whereFechaHist = "MONTH(h.fecha_cambio) = MONTH(CURDATE()) AND YEAR(h.fecha_cambio) = YEAR(CURDATE())";
+            $whereFechaSt = "((MONTH(st.fecha_ingreso) = MONTH(CURDATE()) AND YEAR(st.fecha_ingreso) = YEAR(CURDATE())) OR (MONTH(st.fecha_entrega) = MONTH(CURDATE()) AND YEAR(st.fecha_entrega) = YEAR(CURDATE())) OR (st.estado IN ('EN_DIAGNOSTICO', 'EN_REPARACION', 'ESPERANDO_REPUESTO')))";
+        }
     }
 
     // 1. Obtener técnicos y personal activo con órdenes o tareas asignadas
@@ -55,12 +72,13 @@ if ($action === "resumen") {
     $sqlHist = "
         SELECT h.registro_id, h.fecha_cambio, h.valor_nuevo, st.tecnico_id, st.numero_atencion,
                COALESCE(NULLIF(st.equipo_descripcion, ''), NULLIF(st.motivo_ingreso, ''), 'Tarea Interna') as equipo_descripcion,
-               st.estado as estado_actual
+               st.estado as estado_actual,
+               st.tiempo_estimado
         FROM historial_cambios h
         INNER JOIN soporte_tecnico st ON h.registro_id = st.id
         WHERE h.tabla_origen = 'soporte_tecnico' 
         AND h.campo_cambiado = 'estado'
-        AND ($whereFechaHist OR YEARWEEK(h.fecha_cambio, 1) = YEARWEEK(CURDATE(), 1) OR DATE(h.fecha_cambio) = CURDATE())
+        AND ($whereFechaHist OR (h.fecha_cambio BETWEEN '$lunesSql' AND '$sabadoSql') OR DATE(h.fecha_cambio) = CURDATE())
         ORDER BY h.fecha_cambio ASC
     ";
     $resHist = $db->query($sqlHist);
@@ -80,6 +98,7 @@ if ($action === "resumen") {
                     'equipo' => $row['equipo_descripcion'],
                     'tecnico_id' => $tid,
                     'estado_actual' => $row['estado_actual'],
+                    'tiempo_estimado' => $row['tiempo_estimado'] ?? null,
                     'eventos' => []
                 ];
             }
@@ -113,7 +132,8 @@ if ($action === "resumen") {
                             'inicio' => $inicio,
                             'fin' => $fech,
                             'estado_fin' => $est,
-                            'duracion_seg' => max(0, $dur)
+                            'duracion_seg' => max(0, $dur),
+                            'tiempo_estimado' => $tk['tiempo_estimado']
                         ];
                         $tecnicos[$tid]['horas_trabajadas'] += $dur;
                         $ticketsConActividad[$tk_id] = true;
@@ -133,7 +153,8 @@ if ($action === "resumen") {
                     'inicio' => $inicio,
                     'fin' => null,
                     'estado_fin' => 'EN_PROCESO',
-                    'duracion_seg' => max(0, $dur)
+                    'duracion_seg' => max(0, $dur),
+                    'tiempo_estimado' => $tk['tiempo_estimado']
                 ];
                 $tecnicos[$tid]['horas_trabajadas'] += $dur;
                 $ticketsConActividad[$tk_id] = true;
@@ -145,11 +166,11 @@ if ($action === "resumen") {
     $sqlFallback = "
         SELECT st.id, st.numero_atencion,
                COALESCE(NULLIF(st.equipo_descripcion, ''), NULLIF(st.motivo_ingreso, ''), 'Tarea Interna') as equipo_descripcion,
-               st.estado, st.tecnico_id, st.fecha_ingreso, st.fecha_entrega,
+               st.estado, st.tecnico_id, st.fecha_ingreso, st.fecha_entrega, st.tiempo_estimado,
                COALESCE(st.fecha_entrega, st.fecha_ingreso) as fecha_referencia
         FROM soporte_tecnico st
         WHERE st.tecnico_id IS NOT NULL
-        AND ($whereFechaSt OR st.estado IN ('EN_DIAGNOSTICO', 'EN_REPARACION', 'ESPERANDO_REPUESTO', 'PENDIENTE'))
+        AND ($whereFechaSt OR (COALESCE(st.fecha_entrega, st.fecha_ingreso) BETWEEN '$lunesSql' AND '$sabadoSql') OR st.estado IN ('EN_DIAGNOSTICO', 'EN_REPARACION', 'ESPERANDO_REPUESTO', 'PENDIENTE'))
         ORDER BY fecha_referencia ASC
     ";
     $resFallback = $db->query($sqlFallback);
@@ -165,7 +186,7 @@ if ($action === "resumen") {
             $eq = $row['equipo_descripcion'];
             $ingreso = $row['fecha_ingreso'];
             $entrega = $row['fecha_entrega'];
-            $hoyYmd = date('Y-m-d');
+            $tiempoEst = $row['tiempo_estimado'] ?? null;
 
             if (in_array($est, ['EN_DIAGNOSTICO', 'EN_REPARACION'])) {
                 // Trabajo activo: si ingresó hoy, desde ingreso; si ingresó antes, desde las 08:00 de hoy
@@ -179,7 +200,8 @@ if ($action === "resumen") {
                         'inicio' => $inicio,
                         'fin' => null,
                         'estado_fin' => 'EN_PROCESO',
-                        'duracion_seg' => max(0, $dur)
+                        'duracion_seg' => max(0, $dur),
+                        'tiempo_estimado' => $tiempoEst
                     ];
                     $tecnicos[$tid]['horas_trabajadas'] += $dur;
                     $ticketsConActividad[$tk_id] = true;
@@ -195,7 +217,8 @@ if ($action === "resumen") {
                     'inicio' => $inicio,
                     'fin' => $fin,
                     'estado_fin' => 'ESPERANDO_REPUESTO',
-                    'duracion_seg' => $dur
+                    'duracion_seg' => $dur,
+                    'tiempo_estimado' => $tiempoEst
                 ];
                 $tecnicos[$tid]['horas_trabajadas'] += $dur;
                 $ticketsConActividad[$tk_id] = true;
@@ -209,7 +232,8 @@ if ($action === "resumen") {
                     'inicio' => $inicio,
                     'fin' => $fin,
                     'estado_fin' => 'COMPLETADO',
-                    'duracion_seg' => $dur
+                    'duracion_seg' => $dur,
+                    'tiempo_estimado' => $tiempoEst
                 ];
                 $tecnicos[$tid]['horas_trabajadas'] += $dur;
                 $ticketsConActividad[$tk_id] = true;
@@ -269,10 +293,6 @@ if ($action === "resumen") {
     }
 
     // 6. Calcular matriz semanal para Heatmap estilo GitHub y Timeline Hoy
-    $dow = (int)date('w'); // 0=Domingo, 1=Lunes..6=Sabado
-    $diasDesdeLunes = ($dow === 0) ? 6 : ($dow - 1);
-    $hoyYmd = date('Y-m-d');
-    $lunesTs = strtotime("-$diasDesdeLunes days", strtotime($hoyYmd));
     $nombresDias = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
 
     foreach ($tecnicos as $tid => &$tec) {
@@ -280,6 +300,7 @@ if ($action === "resumen") {
         $heatmap = [];
         for ($d = 0; $d <= 5; $d++) {
             $fechaDia = date('Y-m-d', strtotime("+$d days", $lunesTs));
+            $diaMes = date('d/m', strtotime($fechaDia));
             $horasDia = [];
             for ($h = 8; $h <= 18; $h++) {
                 $horasDia[] = [
@@ -295,6 +316,7 @@ if ($action === "resumen") {
                 'dia_indice' => $d,
                 'dia_nombre' => $nombresDias[$d],
                 'fecha' => $fechaDia,
+                'dia_mes' => $diaMes,
                 'es_hoy' => ($fechaDia === $hoyYmd),
                 'horas' => $horasDia
             ];
@@ -395,7 +417,17 @@ if ($action === "resumen") {
         }
     }
 
-    echo json_encode(["ok" => true, "resumen" => $resumen, "data" => $data]);
+    $semanaInfo = [
+        'offset' => $semanaOffset,
+        'lunes_fecha' => date('Y-m-d', $lunesTs),
+        'sabado_fecha' => date('Y-m-d', $sabadoTs),
+        'lunes_label' => date('d/m', $lunesTs),
+        'sabado_label' => date('d/m', $sabadoTs),
+        'ano' => date('Y', $lunesTs),
+        'rango_texto' => 'Semana del ' . date('d/m', $lunesTs) . ' al ' . date('d/m', $sabadoTs) . ', ' . date('Y', $lunesTs)
+    ];
+
+    echo json_encode(["ok" => true, "semana_info" => $semanaInfo, "resumen" => $resumen, "data" => $data]);
     exit;
 }
 ?>

@@ -697,7 +697,7 @@ if ("serviceWorker" in navigator) { window.addEventListener("load", () => { navi
         <button class="btn btn-primary" id="btn-asignar-rep" style="display:none; min-height:38px; padding:0 14px; font-size:12.5px; background: linear-gradient(135deg, #f59e0b, #d97706); border: none; align-items:center; gap:6px;" onclick="abrirModalAsignar()">
           <i class="ph-bold ph-crosshair"></i> <span>Lote/Interno</span>
         </button>
-        <button class="btn btn-primary" id="btn-crear-tarea" style="display:none; min-height:38px; padding:0 14px; font-size:12.5px; background: linear-gradient(135deg, #8b5cf6, #6d28d9); border: none; align-items:center; gap:6px;" onclick="if(typeof abrirModalTareaGlobal === 'function') abrirModalTareaGlobal();">
+        <button class="btn btn-primary" id="btn-crear-tarea" style="display:none; min-height:38px; padding:0 14px; font-size:12.5px; background: linear-gradient(135deg, #8b5cf6, #6d28d9); border: none; align-items:center; gap:6px;" onclick="abrirModalTarea()">
           <i class="ph-bold ph-plus"></i> <span>Crear Tarea</span>
         </button>
       </div>
@@ -862,6 +862,20 @@ if ("serviceWorker" in navigator) { window.addEventListener("load", () => { navi
     <div class="form-group"><label class="form-label">Descripcion</label><textarea id="t-desc" class="form-control" rows="3"></textarea></div>
     <div class="form-group"><label class="form-label">Tecnico</label><select id="t-tecnico" class="form-control"></select></div>
     <div class="form-group"><label class="form-label">Prioridad</label><select id="t-prioridad" class="form-control"><option value="SIN PRIORIDAD">Sin Prioridad</option><option value="NORMAL">Normal</option><option value="ALTA">Alta</option><option value="URGENTE">Urgente</option></select></div>
+    <div class="form-group">
+      <label class="form-label"><i class="ph ph-timer"></i> Tiempo Estimado / Asignado</label>
+      <select id="t-tiempo" class="form-control" onchange="toggleTiempoCustom('t')">
+        <option value="">— Sin estimar —</option>
+        <option value="30 min">30 min</option>
+        <option value="1 hora">1 hora</option>
+        <option value="2 horas">2 horas</option>
+        <option value="3 horas">3 horas</option>
+        <option value="4 horas">4 horas</option>
+        <option value="8 horas">8 horas (Jornada)</option>
+        <option value="otro">Personalizado...</option>
+      </select>
+      <input type="text" id="t-tiempo-custom" class="form-control" style="display:none; margin-top:8px;" placeholder="Ej: 1h 30m, 45 min...">
+    </div>
     <div style="display:flex; gap:10px"><button class="btn btn-outline" onclick="document.getElementById('modal-tarea').style.display='none'">Cancelar</button><button class="btn btn-primary" onclick="guardarTarea()">Crear</button></div>
   </div>
 </div>
@@ -1482,19 +1496,38 @@ function enviarWhatsApp() {
   cambiarEstadoRapido(id, 'ENTREGADO');
 }
 
+function toggleTiempoCustom(prefix) {
+  const sel = document.getElementById(prefix + '-tiempo');
+  const custom = document.getElementById(prefix + '-tiempo-custom');
+  if (sel && custom) {
+    custom.style.display = (sel.value === 'otro') ? 'block' : 'none';
+    if (sel.value === 'otro') custom.focus();
+  }
+}
+
 function abrirModalTarea() {
   document.getElementById('t-titulo').value = '';
   document.getElementById('t-desc').value = '';
   document.getElementById('t-prioridad').value = 'SIN PRIORIDAD';
+  const selTiempo = document.getElementById('t-tiempo');
+  if (selTiempo) selTiempo.value = '';
+  const customTiempo = document.getElementById('t-tiempo-custom');
+  if (customTiempo) { customTiempo.value = ''; customTiempo.style.display = 'none'; }
   document.getElementById('modal-tarea').style.display = 'flex';
 }
 
 async function guardarTarea() {
+  let tiempoEstimado = document.getElementById('t-tiempo') ? document.getElementById('t-tiempo').value : '';
+  if (tiempoEstimado === 'otro') {
+    tiempoEstimado = document.getElementById('t-tiempo-custom') ? document.getElementById('t-tiempo-custom').value.trim() : '';
+  }
+
   const body = {
     titulo: document.getElementById('t-titulo').value,
     descripcion: document.getElementById('t-desc').value,
     tecnico_id: document.getElementById('t-tecnico').value,
-    prioridad: document.getElementById('t-prioridad').value
+    prioridad: document.getElementById('t-prioridad').value,
+    tiempo_estimado: tiempoEstimado || null
   };
   if (!body.titulo) return alert('Pon un titulo');
   
@@ -1599,7 +1632,7 @@ document.addEventListener('DOMContentLoaded', () => {
     </main>
 
     <!-- Scripts -->
-    <script src="js/dashboard.js?v=3"></script>
+    <script src="js/dashboard.js?v=4"></script>
 
 </body>
 </html>
