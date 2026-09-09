@@ -36,16 +36,19 @@ switch ($action) {
     case "inventario_rapido":
         $data = json_decode(file_get_contents("php://input"), true);
         $sesion_id = (int)($data["sesion_id"] ?? 0);
-        $codigo = $db->real_escape_string($data["codigo"] ?? "");
-        $triaje = $db->real_escape_string($data["triaje"] ?? "SIN_FALLA");
-        $falla = $db->real_escape_string($data["falla"] ?? "");
+        $codigo = trim($data["codigo"] ?? "");
+        $triaje = trim($data["triaje"] ?? "SIN_FALLA");
+        $falla = trim($data["falla"] ?? "");
 
         if (!$codigo || !$sesion_id) {
             echo json_encode(["ok" => false, "msg" => "Faltan datos (codigo o sesion)"]);
             break;
         }
 
-        $res = $db->query("SELECT * FROM equipos WHERE codigo='$codigo' OR serie='$codigo' LIMIT 1");
+        $stmt_eq = $db->prepare("SELECT * FROM equipos WHERE codigo=? OR serie=? LIMIT 1");
+        $stmt_eq->bind_param("ss", $codigo, $codigo);
+        $stmt_eq->execute();
+        $res = $stmt_eq->get_result();
         $equipo = $res->fetch_assoc();
         
         if (!$equipo) {
@@ -58,7 +61,9 @@ switch ($action) {
         $chk = $db->query("SELECT id FROM sesiones_items WHERE sesion_id=$sesion_id AND equipo_id=$equipo_id");
         if ($chk->num_rows > 0) {
             $si_id = $chk->fetch_assoc()['id'];
-            $db->query("UPDATE sesiones_items SET triaje_asignado='$triaje', falla_asignada='$falla' WHERE id=$si_id");
+            $stmt_upd = $db->prepare("UPDATE sesiones_items SET triaje_asignado=?, falla_asignada=? WHERE id=?");
+            $stmt_upd->bind_param("ssi", $triaje, $falla, $si_id);
+            $stmt_upd->execute();
             $sesion_item_id = $si_id;
         } else {
             $stmt = $db->prepare("INSERT INTO sesiones_items (sesion_id, equipo_id, triaje_asignado, falla_asignada) VALUES (?, ?, ?, ?)");
@@ -146,8 +151,10 @@ switch ($action) {
         if (!$es_admin) { echo json_encode(["ok"=>false, "msg"=>"Solo admin"]); break; }
         $data = json_decode(file_get_contents("php://input"), true);
         $sesion_id = (int)($data["sesion_id"] ?? 0);
-        $nombre = $db->real_escape_string($data["nombre"] ?? "");
-        $db->query("UPDATE sesiones_inventario SET nombre='$nombre' WHERE id=$sesion_id");
+        $nombre = trim($data["nombre"] ?? "");
+        $stmt_nom = $db->prepare("UPDATE sesiones_inventario SET nombre=? WHERE id=?");
+        $stmt_nom->bind_param("si", $nombre, $sesion_id);
+        $stmt_nom->execute();
         echo json_encode(["ok" => true]);
         break;
 

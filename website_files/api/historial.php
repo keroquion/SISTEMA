@@ -18,16 +18,19 @@ switch ($action) {
         $ant = $data["valor_anterior"] ?? null;
         $nuevo = $data["valor_nuevo"] ?? null;
         $usuario = $data["usuario"] ?? "Sistema";
-        $stmt->bind_param("sississs", $tabla, $reg_id, $num_ref, $campo, $ant, $nuevo, $usuario);
+        $stmt->bind_param("sisssss", $tabla, $reg_id, $num_ref, $campo, $ant, $nuevo, $usuario);
         if ($stmt->execute()) echo json_encode(["ok" => true]);
         else echo json_encode(["ok" => false, "msg" => $db->error]);
         break;
 
     // Ver historial de un registro especifico
     case "ver":
-        $tabla = $db->real_escape_string($_GET["tabla"] ?? "soporte_tecnico");
+        $tabla = trim($_GET["tabla"] ?? "soporte_tecnico");
         $id = (int)($_GET["id"] ?? 0);
-        $result = $db->query("SELECT * FROM historial_cambios WHERE tabla_origen='$tabla' AND registro_id=$id ORDER BY fecha_cambio DESC");
+        $stmt = $db->prepare("SELECT * FROM historial_cambios WHERE tabla_origen=? AND registro_id=? ORDER BY fecha_cambio DESC");
+        $stmt->bind_param("si", $tabla, $id);
+        $stmt->execute();
+        $result = $stmt->get_result();
         $rows = [];
         while ($row = $result->fetch_assoc()) $rows[] = $row;
         echo json_encode(["ok" => true, "data" => $rows]);

@@ -14,17 +14,18 @@ if ($action === "estado") {
     }
 
     // Consulta ultra segura: Solo cruza si el DNI pertenece al cliente de esa atencion
-    $query = "
+    $stmt = $db->prepare("
         SELECT st.numero_atencion, st.estado, st.fecha_ingreso, st.fecha_entrega, st.en_garantia, 
                st.diagnostico, st.solucion, st.equipo_descripcion, st.motivo_ingreso,
                p.nombre as cliente_nombre
         FROM soporte_tecnico st
         JOIN personas p ON st.cliente_id = p.id
-        WHERE st.numero_atencion = '$ticket' AND p.dni = '$dni'
+        WHERE st.numero_atencion = ? AND p.dni = ?
         LIMIT 1
-    ";
-
-    $res = $db->query($query);
+    ");
+    $stmt->bind_param("ss", $ticket, $dni);
+    $stmt->execute();
+    $res = $stmt->get_result();
 
     if ($res->num_rows === 0) {
         // Anti-bots generico

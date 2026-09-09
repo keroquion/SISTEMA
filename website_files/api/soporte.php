@@ -8,8 +8,8 @@ $action = $_GET["action"] ?? "list";
 switch ($action) {
 
     case "list":
-        $estado = isset($_GET["estado"]) ? $db->real_escape_string($_GET["estado"]) : "";
-        $where = $estado ? "WHERE st.estado = '$estado'" : "";
+        $estado = isset($_GET["estado"]) ? trim($_GET["estado"]) : "";
+        $where = $estado ? "WHERE st.estado = ?" : "";
         $sql = "SELECT st.id, st.numero_atencion, st.equipo_codigo, st.equipo_serie, st.equipo_descripcion,
                 st.es_externo, st.motivo_ingreso, st.diagnostico, st.solucion, st.notas_internas,
                 st.estado, st.prioridad, st.en_garantia, st.meses_garantia_restantes,
@@ -22,7 +22,14 @@ switch ($action) {
                 LEFT JOIN personas t ON st.tecnico_id = t.id
                 $where
                 ORDER BY FIELD(st.estado,'PENDIENTE','EN_DIAGNOSTICO','ESPERANDO_REPUESTO','EN_REPARACION','LISTO_PARA_RECOGER','ENTREGADO','CANCELADO'), st.prioridad DESC, st.fecha_ingreso DESC";
-        $result = $db->query($sql);
+        if ($estado) {
+            $stmt = $db->prepare($sql);
+            $stmt->bind_param("s", $estado);
+            $stmt->execute();
+            $result = $stmt->get_result();
+        } else {
+            $result = $db->query($sql);
+        }
         $rows = [];
         while ($row = $result->fetch_assoc()) $rows[] = $row;
         echo json_encode(["ok" => true, "data" => $rows]);
@@ -117,18 +124,24 @@ switch ($action) {
                 require_once 'push.php';
                 sendPushToAdmins($db, "\xF0\x9F\x93\x8C Tarea Creada", "$numero: $motivo", '/mis_ordenes.html');
             } catch (Exception $e) { /* silent */ }
-            $db->query("INSERT INTO notificaciones (usuario_id, titulo, mensaje, link) SELECT id, 'Nueva Tarea', '$numero: $motivo', 'mis_ordenes.html' FROM personas WHERE tipo='admin' AND estado='ACTIVO'");
+            $notif_msg = "$numero: $motivo";
+            $stmt_notif = $db->prepare("INSERT INTO notificaciones (usuario_id, titulo, mensaje, link) SELECT id, 'Nueva Tarea', ?, 'mis_ordenes.html' FROM personas WHERE tipo='admin' AND estado='ACTIVO'");
+            $stmt_notif->bind_param("s", $notif_msg);
+            $stmt_notif->execute();
         }
         else echo json_encode(["ok" => false, "msg" => $db->error]);
         break;
 
     case "crear_interno":
         $data = json_decode(file_get_contents("php://input"), true);
-        $cod = $db->real_escape_string($data["equipo_codigo"] ?? "");
+        $cod = trim($data["equipo_codigo"] ?? "");
         $tec_id = !empty($data["tecnico_id"]) ? (int)$data["tecnico_id"] : null;
         
         // Buscar el equipo y su falla en la BD
-        $resEq = $db->query("SELECT id, serie, descripcion, falla FROM equipos WHERE codigo='$cod' LIMIT 1");
+        $stmtEq = $db->prepare("SELECT id, serie, descripcion, falla FROM equipos WHERE codigo=? LIMIT 1");
+        $stmtEq->bind_param("s", $cod);
+        $stmtEq->execute();
+        $resEq = $stmtEq->get_result();
         if ($resEq->num_rows == 0) {
             echo json_encode(["ok" => false, "msg" => "Equipo no existe en inventario"]);
             break;
@@ -237,7 +250,10 @@ switch ($action) {
                     $emoji = $data['estado'] === 'ENTREGADO' ? "\xF0\x9F\x93\xA6" : "\xE2\x9C\x85";
                     sendPushToAdmins($db, "$emoji $titulo_tk", "Ticket: $num\nMarcada como " . str_replace('_', ' ', $data['estado']) . " por $tecNombre", '/mis_ordenes.html');
                 } catch (Exception $e) { /* silent */ }
-                $db->query("INSERT INTO notificaciones (usuario_id, titulo, mensaje, link) SELECT id, 'Ticket Actualizado', 'El ticket $num cambió a {$data['estado']}', 'mis_ordenes.html' FROM personas WHERE tipo='admin' AND estado='ACTIVO'");
+                $notif_msg = "El ticket $num cambió a " . ($data['estado'] ?? '');
+                $stmt_upd_notif = $db->prepare("INSERT INTO notificaciones (usuario_id, titulo, mensaje, link) SELECT id, 'Ticket Actualizado', ?, 'mis_ordenes.html' FROM personas WHERE tipo='admin' AND estado='ACTIVO'");
+                $stmt_upd_notif->bind_param("s", $notif_msg);
+                $stmt_upd_notif->execute();
             }
             // Notify technician when a ticket is assigned/reassigned to them
             if (isset($data['tecnico_id']) && $data['tecnico_id'] != ($ant['tecnico_id'] ?? null) && $data['tecnico_id']) {
@@ -277,8 +293,11 @@ switch ($action) {
         break;
 
     case "buscar_equipo":
-        $q = $db->real_escape_string($_GET["q"] ?? "");
-        $result = $db->query("SELECT id, codigo, serie, marca, modelo, procesador, ram, hd_ssd, estado, observacion, doc_compra, fec_venta FROM equipos WHERE codigo='$q' OR serie='$q' LIMIT 5");
+        $q = trim($_GET["q"] ?? "");
+        $stmt = $db->prepare("SELECT id, codigo, serie, marca, modelo, procesador, ram, hd_ssd, estado, observacion, doc_compra, fec_venta FROM equipos WHERE codigo=? OR serie=? LIMIT 5");
+        $stmt->bind_param("ss", $q, $q);
+        $stmt->execute();
+        $result = $stmt->get_result();
         $rows = [];
         while ($row = $result->fetch_assoc()) {
             // Detectar garantia: fec_venta dentro de los ultimos 6 meses
@@ -303,7 +322,7 @@ switch ($action) {
 
     case "buscar_barcode":
         // Para la caja: buscar ticket por numero o codigo de equipo
-        $q = $db->real_escape_string($_GET["q"] ?? "");
+        $q = trim($_GET["q"] ?? "");
         $sql = "SELECT st.*, 
                        CONCAT(p.nombre,' ',IFNULL(p.apellido,'')) AS cliente_nombre,
                        p.telefono AS cliente_tel, p.dni AS cliente_dni,
@@ -311,18 +330,24 @@ switch ($action) {
                 FROM soporte_tecnico st
                 JOIN personas p ON st.cliente_id = p.id
                 LEFT JOIN personas tp ON st.tecnico_id = tp.id
-                WHERE (st.numero_atencion='$q' OR st.equipo_codigo='$q')
+                WHERE (st.numero_atencion=? OR st.equipo_codigo=?)
                   AND st.estado = 'LISTO_PARA_RECOGER'
                 LIMIT 1";
-        $res = $db->query($sql);
+        $stmt = $db->prepare($sql);
+        $stmt->bind_param("ss", $q, $q);
+        $stmt->execute();
+        $res = $stmt->get_result();
         if ($res->num_rows > 0) {
             echo json_encode(["ok" => true, "data" => $res->fetch_assoc()]);
         } else {
             // Buscar en cualquier estado para dar info
             $sql2 = "SELECT st.estado, st.numero_atencion, CONCAT(p.nombre,' ',IFNULL(p.apellido,'')) AS cliente_nombre
                      FROM soporte_tecnico st JOIN personas p ON st.cliente_id = p.id
-                     WHERE st.numero_atencion='$q' OR st.equipo_codigo='$q' LIMIT 1";
-            $res2 = $db->query($sql2);
+                     WHERE st.numero_atencion=? OR st.equipo_codigo=? LIMIT 1";
+            $stmt2 = $db->prepare($sql2);
+            $stmt2->bind_param("ss", $q, $q);
+            $stmt2->execute();
+            $res2 = $stmt2->get_result();
             if ($res2->num_rows > 0) {
                 $row = $res2->fetch_assoc();
                 echo json_encode(["ok" => false, "msg" => "Equipo encontrado pero estado: " . $row['estado'] . " (no esta LISTO_PARA_RECOGER)", "data" => $row]);

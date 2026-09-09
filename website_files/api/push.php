@@ -198,7 +198,10 @@ function sendWebPush($endpoint, $p256dh, $auth, $payloadJson) {
 // ============================================================
 function sendPushToUser($db, $userId, $title, $body, $url = '/index.html') {
     $userId = (int)$userId;
-    $res = $db->query("SELECT id, endpoint, p256dh, auth FROM push_subscriptions WHERE user_id = $userId");
+    $stmt = $db->prepare("SELECT id, endpoint, p256dh, auth FROM push_subscriptions WHERE user_id = ?");
+    $stmt->bind_param("i", $userId);
+    $stmt->execute();
+    $res = $stmt->get_result();
     if (!$res) return;
     
     $payload = json_encode(['title' => $title, 'body' => $body, 'url' => $url]);
@@ -207,7 +210,10 @@ function sendPushToUser($db, $userId, $title, $body, $url = '/index.html') {
         $result = sendWebPush($sub['endpoint'], $sub['p256dh'], $sub['auth'], $payload);
         // Clean up expired subscriptions
         if (!empty($result['expired'])) {
-            $db->query("DELETE FROM push_subscriptions WHERE id = " . (int)$sub['id']);
+            $sub_id = (int)$sub['id'];
+            $stmt_del = $db->prepare("DELETE FROM push_subscriptions WHERE id = ?");
+            $stmt_del->bind_param("i", $sub_id);
+            $stmt_del->execute();
         }
     }
 }
@@ -225,7 +231,10 @@ function sendPushToAdmins($db, $title, $body, $url = '/index.html') {
     while ($sub = $res->fetch_assoc()) {
         $result = sendWebPush($sub['endpoint'], $sub['p256dh'], $sub['auth'], $payload);
         if (!empty($result['expired'])) {
-            $db->query("DELETE FROM push_subscriptions WHERE id = " . (int)$sub['id']);
+            $sub_id = (int)$sub['id'];
+            $stmt_del = $db->prepare("DELETE FROM push_subscriptions WHERE id = ?");
+            $stmt_del->bind_param("i", $sub_id);
+            $stmt_del->execute();
         }
     }
 }
@@ -282,7 +291,9 @@ if (basename($_SERVER['SCRIPT_FILENAME']) === 'push.php') {
             }
             $db = getDB();
             $userId = (int)$_SESSION['user_id'];
-            $db->query("DELETE FROM push_subscriptions WHERE user_id = $userId");
+            $stmt = $db->prepare("DELETE FROM push_subscriptions WHERE user_id = ?");
+            $stmt->bind_param("i", $userId);
+            $stmt->execute();
             echo json_encode(["ok" => true, "msg" => "Suscripciones eliminadas"]);
             $db->close();
             break;

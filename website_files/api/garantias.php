@@ -8,14 +8,19 @@ $action = $_GET["action"] ?? "list";
 switch ($action) {
 
     case "list":
-        $estado = isset($_GET["estado"]) ? $db->real_escape_string($_GET["estado"]) : "";
-        $where = $estado ? "WHERE gp.estado = '$estado'" : "";
-        $sql = "SELECT gp.*, l.titulo as lote_titulo, l.tipo as lote_tipo,
+        $estado = trim($_GET["estado"] ?? "");
+        $baseSql = "SELECT gp.*, l.titulo as lote_titulo, l.tipo as lote_tipo,
                 (SELECT COUNT(*) FROM garantia_items gi WHERE gi.garantia_id = gp.id) as total_items
                 FROM garantias_proveedor gp
-                LEFT JOIN lotes l ON gp.lote_id = l.lote_id
-                $where ORDER BY gp.fecha_creacion DESC";
-        $result = $db->query($sql);
+                LEFT JOIN lotes l ON gp.lote_id = l.lote_id";
+        if ($estado !== "") {
+            $stmt = $db->prepare("$baseSql WHERE gp.estado = ? ORDER BY gp.fecha_creacion DESC");
+            $stmt->bind_param("s", $estado);
+            $stmt->execute();
+            $result = $stmt->get_result();
+        } else {
+            $result = $db->query("$baseSql ORDER BY gp.fecha_creacion DESC");
+        }
         $rows = [];
         while ($row = $result->fetch_assoc()) $rows[] = $row;
         echo json_encode(["ok" => true, "data" => $rows]);
@@ -23,10 +28,15 @@ switch ($action) {
 
     case "ver":
         $id = (int)($_GET["id"] ?? 0);
-        $result = $db->query("SELECT gp.*, l.titulo as lote_titulo FROM garantias_proveedor gp LEFT JOIN lotes l ON gp.lote_id = l.lote_id WHERE gp.id=$id LIMIT 1");
-        $gar = $result->fetch_assoc();
+        $stmt_gar = $db->prepare("SELECT gp.*, l.titulo as lote_titulo FROM garantias_proveedor gp LEFT JOIN lotes l ON gp.lote_id = l.lote_id WHERE gp.id=? LIMIT 1");
+        $stmt_gar->bind_param("i", $id);
+        $stmt_gar->execute();
+        $gar = $stmt_gar->get_result()->fetch_assoc();
         if (!$gar) { echo json_encode(["ok" => false, "msg" => "No encontrado"]); break; }
-        $items = $db->query("SELECT * FROM garantia_items WHERE garantia_id=$id ORDER BY tipo_item, marca");
+        $stmt_items = $db->prepare("SELECT * FROM garantia_items WHERE garantia_id=? ORDER BY tipo_item, marca");
+        $stmt_items->bind_param("i", $id);
+        $stmt_items->execute();
+        $items = $stmt_items->get_result();
         $gar["items"] = [];
         while ($row = $items->fetch_assoc()) $gar["items"][] = $row;
         echo json_encode(["ok" => true, "data" => $gar]);
@@ -35,10 +45,13 @@ switch ($action) {
     // Crear garantia desde lote NACIONAL (con sus items fallados)
     case "crear_desde_lote":
         $data = json_decode(file_get_contents("php://input"), true);
-        $lote_id = $db->real_escape_string($data["lote_id"] ?? "");
+        $lote_id = trim($data["lote_id"] ?? "");
 
         // Verificar que sea lote NACIONAL
-        $lote = $db->query("SELECT * FROM lotes WHERE lote_id='$lote_id' LIMIT 1")->fetch_assoc();
+        $stmt_lote = $db->prepare("SELECT * FROM lotes WHERE lote_id=? LIMIT 1");
+        $stmt_lote->bind_param("s", $lote_id);
+        $stmt_lote->execute();
+        $lote = $stmt_lote->get_result()->fetch_assoc();
         if (!$lote) { echo json_encode(["ok" => false, "msg" => "Lote no encontrado"]); break; }
         if ($lote["tipo"] !== "NACIONAL") { echo json_encode(["ok" => false, "msg" => "Solo lotes NACIONAL pueden generar garantia de proveedor"]); break; }
 
@@ -135,14 +148,16 @@ switch ($action) {
     case "actualizar":
         $data = json_decode(file_get_contents("php://input"), true);
         $id = (int)($data["id"] ?? 0);
-        $estado = $db->real_escape_string($data["estado"] ?? "");
-        $tipo_res = isset($data["tipo_resolucion"]) ? "'" . $db->real_escape_string($data["tipo_resolucion"]) . "'" : "NULL";
-        $notas = $db->real_escape_string($data["notas"] ?? "");
+        $estado = trim($data["estado"] ?? "");
+        $tipo_res = isset($data["tipo_resolucion"]) ? $data["tipo_resolucion"] : null;
+        $notas = trim($data["notas"] ?? "");
         $alerta_dias = isset($data["alerta_dias"]) ? (int)$data["alerta_dias"] : 10;
         
         $fecha_envio = $estado === "ENVIADO" ? ", fecha_envio=NOW()" : "";
         $fecha_res = in_array($estado, ["RESUELTO","RECHAZADO"]) ? ", fecha_resolucion=NOW()" : "";
-        $db->query("UPDATE garantias_proveedor SET estado='$estado', tipo_resolucion=$tipo_res, notas='$notas', alerta_dias=$alerta_dias $fecha_envio $fecha_res WHERE id=$id");
+        $stmt = $db->prepare("UPDATE garantias_proveedor SET estado=?, tipo_resolucion=?, notas=?, alerta_dias=? $fecha_envio $fecha_res WHERE id=?");
+        $stmt->bind_param("sssii", $estado, $tipo_res, $notas, $alerta_dias, $id);
+        $stmt->execute();
         echo json_encode(["ok" => true, "msg" => "Garantía actualizada a $estado"]);
         break;
 

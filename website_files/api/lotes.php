@@ -9,12 +9,20 @@ $action = $_GET["action"] ?? "list";
 switch ($action) {
 
     case "list":
-        $estado = isset($_GET["estado"]) ? $db->real_escape_string($_GET["estado"]) : "";
-        $where = $estado ? "WHERE estado = '$estado'" : "";
-        $result = $db->query("SELECT l.*, CONCAT(COALESCE(p.nombre,''),' ',COALESCE(p.apellido,'')) as admin_nombre,
+        $estado = isset($_GET["estado"]) ? trim($_GET["estado"]) : "";
+        $where = $estado !== "" ? "WHERE estado = ?" : "";
+        $sql = "SELECT l.*, CONCAT(COALESCE(p.nombre,''),' ',COALESCE(p.apellido,'')) as admin_nombre,
             (SELECT COUNT(*) FROM lote_equipos le WHERE le.lote_id = l.lote_id) as total_items,
             (SELECT COUNT(*) FROM lote_equipos le WHERE le.lote_id = l.lote_id AND le.estado_item = 'COMPLETADO') as items_completados
-            FROM lotes l LEFT JOIN personas p ON l.admin_id = p.id $where ORDER BY l.fecha_creacion DESC");
+            FROM lotes l LEFT JOIN personas p ON l.admin_id = p.id $where ORDER BY l.fecha_creacion DESC";
+        if ($estado !== "") {
+            $stmt = $db->prepare($sql);
+            $stmt->bind_param("s", $estado);
+            $stmt->execute();
+            $result = $stmt->get_result();
+        } else {
+            $result = $db->query($sql);
+        }
         $rows = [];
         while ($row = $result->fetch_assoc()) $rows[] = $row;
         echo json_encode(["ok" => true, "data" => $rows]);
@@ -34,11 +42,17 @@ switch ($action) {
         break;
 
     case "ver":
-        $lid = $db->real_escape_string($_GET["id"] ?? "");
-        $result = $db->query("SELECT l.*, CONCAT(COALESCE(p.nombre,''),' ',COALESCE(p.apellido,'')) as admin_nombre FROM lotes l LEFT JOIN personas p ON l.admin_id = p.id WHERE l.lote_id = '$lid' LIMIT 1");
+        $lid = trim($_GET["id"] ?? "");
+        $stmt1 = $db->prepare("SELECT l.*, CONCAT(COALESCE(p.nombre,''),' ',COALESCE(p.apellido,'')) as admin_nombre FROM lotes l LEFT JOIN personas p ON l.admin_id = p.id WHERE l.lote_id = ? LIMIT 1");
+        $stmt1->bind_param("s", $lid);
+        $stmt1->execute();
+        $result = $stmt1->get_result();
         $lote = $result->fetch_assoc();
         if (!$lote) { echo json_encode(["ok" => false, "msg" => "Lote no encontrado"]); break; }
-        $result2 = $db->query("SELECT le.*, e.doc_compra, e.triaje as live_triaje, e.falla as live_falla, CONCAT(COALESCE(t.nombre,''),' ',COALESCE(t.apellido,'')) as tecnico_nombre FROM lote_equipos le LEFT JOIN personas t ON le.tecnico_id = t.id LEFT JOIN equipos e ON le.equipo_codigo = e.codigo WHERE le.lote_id = '$lid' ORDER BY le.fecha_scan DESC");
+        $stmt2 = $db->prepare("SELECT le.*, e.doc_compra, e.triaje as live_triaje, e.falla as live_falla, CONCAT(COALESCE(t.nombre,''),' ',COALESCE(t.apellido,'')) as tecnico_nombre FROM lote_equipos le LEFT JOIN personas t ON le.tecnico_id = t.id LEFT JOIN equipos e ON le.equipo_codigo = e.codigo WHERE le.lote_id = ? ORDER BY le.fecha_scan DESC");
+        $stmt2->bind_param("s", $lid);
+        $stmt2->execute();
+        $result2 = $stmt2->get_result();
         $items = [];
         while ($row = $result2->fetch_assoc()) {
             if (isset($row['live_triaje'])) $row['triaje'] = $row['live_triaje'];
@@ -75,14 +89,22 @@ switch ($action) {
         if ($stmt->execute()) {
             $msg = "Lote $lote_id creado";
             if (!empty($data["autocargar_compra"])) {
-                $doc_compra_auto = $db->real_escape_string($data["autocargar_compra"]);
-                $db->query("
+                $doc_compra_auto = trim($data["autocargar_compra"]);
+                $stmt_auto1 = $db->prepare("
                     INSERT INTO lote_equipos (lote_id, equipo_codigo, equipo_serie, marca, modelo, triaje, falla, estado_item)
-                    SELECT '$lote_id', codigo, serie, marca, modelo, COALESCE(triaje, 'SIN_FALLA'), falla, 'PENDIENTE'
-                    FROM equipos WHERE doc_compra = '$doc_compra_auto'
+                    SELECT ?, codigo, serie, marca, modelo, COALESCE(triaje, 'SIN_FALLA'), falla, 'PENDIENTE'
+                    FROM equipos WHERE doc_compra = ?
                 ");
-                $db->query("UPDATE lotes SET cantidad_real = (SELECT COUNT(*) FROM lote_equipos WHERE lote_id='$lote_id'), estado='LISTO_PISTOLEO' WHERE lote_id='$lote_id'");
-                $db->query("UPDATE equipos SET triaje_inicial = 'SIN_FALLA' WHERE doc_compra = '$doc_compra_auto' AND (triaje_inicial IS NULL OR triaje_inicial = '')");
+                $stmt_auto1->bind_param("ss", $lote_id, $doc_compra_auto);
+                $stmt_auto1->execute();
+
+                $stmt_auto2 = $db->prepare("UPDATE lotes SET cantidad_real = (SELECT COUNT(*) FROM lote_equipos WHERE lote_id=?), estado='LISTO_PISTOLEO' WHERE lote_id=?");
+                $stmt_auto2->bind_param("ss", $lote_id, $lote_id);
+                $stmt_auto2->execute();
+
+                $stmt_auto3 = $db->prepare("UPDATE equipos SET triaje_inicial = 'SIN_FALLA' WHERE doc_compra = ? AND (triaje_inicial IS NULL OR triaje_inicial = '')");
+                $stmt_auto3->bind_param("s", $doc_compra_auto);
+                $stmt_auto3->execute();
                 $msg .= " y auto-cargado desde compra.";
             }
             echo json_encode(["ok" => true, "lote_id" => $lote_id, "msg" => $msg]);
@@ -92,44 +114,60 @@ switch ($action) {
 
     case "avanzar_estado":
         $data = json_decode(file_get_contents("php://input"), true);
-        $lid = $db->real_escape_string($data["lote_id"]);
-        $nuevo = $db->real_escape_string($data["estado"]);
-        $db->query("UPDATE lotes SET estado='$nuevo'" . ($nuevo === 'CERRADO' ? ", fecha_cierre=NOW()" : "") . " WHERE lote_id='$lid'");
+        $lid = trim($data["lote_id"] ?? "");
+        $nuevo = trim($data["estado"] ?? "");
+        $sql_st = "UPDATE lotes SET estado=?" . ($nuevo === 'CERRADO' ? ", fecha_cierre=NOW()" : "") . " WHERE lote_id=?";
+        $stmt_st = $db->prepare($sql_st);
+        $stmt_st->bind_param("ss", $nuevo, $lid);
+        $stmt_st->execute();
         echo json_encode(["ok" => true, "msg" => "Estado actualizado a $nuevo"]);
         break;
 
     case "agregar_equipo":
         $data = json_decode(file_get_contents("php://input"), true);
-        $lid = $data["lote_id"];
-        $cod = $db->real_escape_string($data["equipo_codigo"] ?? "");
+        $lid = trim($data["lote_id"] ?? "");
+        $cod = trim($data["equipo_codigo"] ?? "");
         $ser = $data["equipo_serie"] ?? "";
         $mar = $data["marca"] ?? "";
         $mod = $data["modelo"] ?? "";
-        $falla = $db->real_escape_string($data["falla"] ?? "");
+        $falla = $data["falla"] ?? "";
         $pieza = $data["pieza"] ?? "";
         $pn = $data["pn"] ?? "";
-        $triaje = $db->real_escape_string($data["triaje"] ?? "SIN_FALLA");
-        $tec = !empty($data["tecnico_id"]) ? (int)$data["tecnico_id"] : "NULL";
+        $triaje = trim($data["triaje"] ?? "SIN_FALLA");
+        $tec = !empty($data["tecnico_id"]) ? (int)$data["tecnico_id"] : null;
 
         // Verificar si ya existe (ej. cargado por Lote Completo)
         if ($cod !== "") {
-            $check = $db->query("SELECT id FROM lote_equipos WHERE lote_id='$lid' AND equipo_codigo='$cod' LIMIT 1");
+            $stmt_chk = $db->prepare("SELECT id FROM lote_equipos WHERE lote_id=? AND equipo_codigo=? LIMIT 1");
+            $stmt_chk->bind_param("ss", $lid, $cod);
+            $stmt_chk->execute();
+            $check = $stmt_chk->get_result();
             if ($check->num_rows > 0) {
-                $id = $check->fetch_assoc()["id"];
-                $db->query("UPDATE lote_equipos SET triaje='$triaje', falla='$falla', tecnico_id=$tec WHERE id=$id");
-                $db->query("UPDATE equipos SET triaje='$triaje', triaje_inicial = IF(triaje_inicial IS NULL OR triaje_inicial = '' OR triaje_inicial = 'SIN_FALLA', '$triaje', triaje_inicial), falla='$falla' WHERE codigo='$cod'");
+                $id = (int)$check->fetch_assoc()["id"];
+                $stmt_upd_le = $db->prepare("UPDATE lote_equipos SET triaje=?, falla=?, tecnico_id=? WHERE id=?");
+                $stmt_upd_le->bind_param("ssii", $triaje, $falla, $tec, $id);
+                $stmt_upd_le->execute();
+
+                $stmt_upd_eq = $db->prepare("UPDATE equipos SET triaje=?, triaje_inicial = IF(triaje_inicial IS NULL OR triaje_inicial = '' OR triaje_inicial = 'SIN_FALLA', ?, triaje_inicial), falla=? WHERE codigo=?");
+                $stmt_upd_eq->bind_param("ssss", $triaje, $triaje, $falla, $cod);
+                $stmt_upd_eq->execute();
+
                 echo json_encode(["ok" => true, "id" => $id, "msg" => "Actualizado (ya existia en el lote)"]);
                 break;
             }
         }
 
         $stmt = $db->prepare("INSERT INTO lote_equipos (lote_id, equipo_codigo, equipo_serie, marca, modelo, falla, pieza, pn, triaje, tecnico_id) VALUES (?,?,?,?,?,?,?,?,?,?)");
-        $t_val = $tec === "NULL" ? null : $tec;
-        $stmt->bind_param("sssssssssi", $lid, $cod, $ser, $mar, $mod, $data["falla"], $pieza, $pn, $data["triaje"], $t_val);
+        $stmt->bind_param("sssssssssi", $lid, $cod, $ser, $mar, $mod, $falla, $pieza, $pn, $triaje, $tec);
         if ($stmt->execute()) {
-            $db->query("UPDATE lotes SET cantidad_real = (SELECT COUNT(*) FROM lote_equipos WHERE lote_id='$lid') WHERE lote_id='$lid'");
+            $stmt_cnt = $db->prepare("UPDATE lotes SET cantidad_real = (SELECT COUNT(*) FROM lote_equipos WHERE lote_id=?) WHERE lote_id=?");
+            $stmt_cnt->bind_param("ss", $lid, $lid);
+            $stmt_cnt->execute();
+
             if ($cod !== "") {
-                $db->query("UPDATE equipos SET triaje='$triaje', triaje_inicial = IF(triaje_inicial IS NULL OR triaje_inicial = '' OR triaje_inicial = 'SIN_FALLA', '$triaje', triaje_inicial), falla='$falla' WHERE codigo='$cod'");
+                $stmt_eq_sync = $db->prepare("UPDATE equipos SET triaje=?, triaje_inicial = IF(triaje_inicial IS NULL OR triaje_inicial = '' OR triaje_inicial = 'SIN_FALLA', ?, triaje_inicial), falla=? WHERE codigo=?");
+                $stmt_eq_sync->bind_param("ssss", $triaje, $triaje, $falla, $cod);
+                $stmt_eq_sync->execute();
             }
             echo json_encode(["ok" => true, "id" => $db->insert_id, "msg" => "Equipo agregado"]);
         } else echo json_encode(["ok" => false, "msg" => $db->error]);
@@ -153,10 +191,12 @@ switch ($action) {
 
     case "editar":
         $data = json_decode(file_get_contents("php://input"), true);
-        $lid = $db->real_escape_string($data["lote_id"]);
-        $titulo = $db->real_escape_string($data["titulo"]);
-        $notas = $db->real_escape_string($data["notas"] ?? "");
-        if ($db->query("UPDATE lotes SET titulo='$titulo', notas='$notas' WHERE lote_id='$lid'")) {
+        $lid = trim($data["lote_id"] ?? "");
+        $titulo = trim($data["titulo"] ?? "");
+        $notas = trim($data["notas"] ?? "");
+        $stmt_ed = $db->prepare("UPDATE lotes SET titulo=?, notas=? WHERE lote_id=?");
+        $stmt_ed->bind_param("sss", $titulo, $notas, $lid);
+        if ($stmt_ed->execute()) {
             echo json_encode(["ok" => true, "msg" => "Lote editado"]);
         } else {
             echo json_encode(["ok" => false, "msg" => $db->error]);
@@ -164,64 +204,92 @@ switch ($action) {
         break;
     case "editar_repuestos":
         $data = json_decode(file_get_contents("php://input"), true);
-        $lid = $db->real_escape_string($data["lote_id"]);
-        $orden = $db->real_escape_string($data["repuestos_orden"] ?? "");
-        $costo = $db->real_escape_string($data["repuestos_costo"] ?? "");
-        $estado = $db->real_escape_string($data["repuestos_estado"] ?? "PENDIENTE");
+        $lid = trim($data["lote_id"] ?? "");
+        $orden = trim($data["repuestos_orden"] ?? "");
+        $costo = trim($data["repuestos_costo"] ?? "");
+        $estado = trim($data["repuestos_estado"] ?? "PENDIENTE");
 
-        $db->query("UPDATE lotes SET repuestos_orden='$orden', repuestos_costo='$costo', repuestos_estado='$estado' WHERE lote_id='$lid'");
+        $stmt_rep = $db->prepare("UPDATE lotes SET repuestos_orden=?, repuestos_costo=?, repuestos_estado=? WHERE lote_id=?");
+        $stmt_rep->bind_param("ssss", $orden, $costo, $estado, $lid);
+        $stmt_rep->execute();
         echo json_encode(["ok" => true, "msg" => "Seguimiento de repuestos guardado"]);
         break;
 
     case "editar_item":
         $data = json_decode(file_get_contents("php://input"), true);
-        $le_id = (int)$data["lote_equipo_id"];
-        $falla = $db->real_escape_string($data["falla"] ?? "");
-        $pieza = $db->real_escape_string($data["pieza"] ?? "");
-        $pn = $db->real_escape_string($data["pn"] ?? "");
-        $triaje = $db->real_escape_string($data["triaje"] ?? "");
+        $le_id = (int)($data["lote_equipo_id"] ?? 0);
+        $falla = trim($data["falla"] ?? "");
+        $pieza = trim($data["pieza"] ?? "");
+        $pn = trim($data["pn"] ?? "");
+        $triaje = trim($data["triaje"] ?? "");
 
-        $db->query("UPDATE lote_equipos SET falla='$falla', pieza='$pieza', pn='$pn', triaje='$triaje' WHERE id=$le_id");
+        $stmt_ei = $db->prepare("UPDATE lote_equipos SET falla=?, pieza=?, pn=?, triaje=? WHERE id=?");
+        $stmt_ei->bind_param("ssssi", $falla, $pieza, $pn, $triaje, $le_id);
+        $stmt_ei->execute();
         
         // Sincronizar con equipos
-        $res = $db->query("SELECT equipo_codigo FROM lote_equipos WHERE id=$le_id");
-        if($row = $res->fetch_assoc()) {
+        $stmt_gc = $db->prepare("SELECT equipo_codigo FROM lote_equipos WHERE id=?");
+        $stmt_gc->bind_param("i", $le_id);
+        $stmt_gc->execute();
+        $res = $stmt_gc->get_result();
+        if ($row = $res->fetch_assoc()) {
             $cod = $row['equipo_codigo'];
-            if($cod) $db->query("UPDATE equipos SET triaje='$triaje', falla='$falla' WHERE codigo='$cod'");
+            if ($cod) {
+                $stmt_ue = $db->prepare("UPDATE equipos SET triaje=?, falla=? WHERE codigo=?");
+                $stmt_ue->bind_param("sss", $triaje, $falla, $cod);
+                $stmt_ue->execute();
+            }
         }
         echo json_encode(["ok" => true, "msg" => "Item actualizado"]);
         break;
     case "mover_pendientes":
         $data = json_decode(file_get_contents("php://input"), true);
-        $origen = $db->real_escape_string($data["lote_origen"]);
-        $destino = $db->real_escape_string($data["lote_destino"]);
-        $user_id = $_SESSION['user_id']; // Recuperar ID del usuario que hace el movimiento
+        $origen = trim($data["lote_origen"] ?? "");
+        $destino = trim($data["lote_destino"] ?? "");
+        $user_id = (int)($_SESSION['user_id'] ?? 0);
 
         // Guardar auditoria ANTES de moverlos
-        $db->query("INSERT INTO log_movimientos_lotes (lote_origen, lote_destino, equipo_codigo, usuario_id) 
-                    SELECT '$origen', '$destino', equipo_codigo, $user_id 
+        $stmt_log = $db->prepare("INSERT INTO log_movimientos_lotes (lote_origen, lote_destino, equipo_codigo, usuario_id) 
+                    SELECT ?, ?, equipo_codigo, ? 
                     FROM lote_equipos 
-                    WHERE lote_id='$origen' AND triaje='NECESITA_REPUESTO'");
+                    WHERE lote_id=? AND triaje='NECESITA_REPUESTO'");
+        $stmt_log->bind_param("ssis", $origen, $destino, $user_id, $origen);
+        $stmt_log->execute();
 
         // Mover los que tienen triaje NECESITA_REPUESTO
-        $db->query("UPDATE lote_equipos SET lote_id='$destino' WHERE lote_id='$origen' AND triaje='NECESITA_REPUESTO'");
+        $stmt_mov = $db->prepare("UPDATE lote_equipos SET lote_id=? WHERE lote_id=? AND triaje='NECESITA_REPUESTO'");
+        $stmt_mov->bind_param("ss", $destino, $origen);
+        $stmt_mov->execute();
         
         // Recalcular cantidades
-        $db->query("UPDATE lotes SET cantidad_real = (SELECT COUNT(*) FROM lote_equipos WHERE lote_id='$origen') WHERE lote_id='$origen'");
-        $db->query("UPDATE lotes SET cantidad_real = (SELECT COUNT(*) FROM lote_equipos WHERE lote_id='$destino') WHERE lote_id='$destino'");
+        $stmt_r1 = $db->prepare("UPDATE lotes SET cantidad_real = (SELECT COUNT(*) FROM lote_equipos WHERE lote_id=?) WHERE lote_id=?");
+        $stmt_r1->bind_param("ss", $origen, $origen);
+        $stmt_r1->execute();
+
+        $stmt_r2 = $db->prepare("UPDATE lotes SET cantidad_real = (SELECT COUNT(*) FROM lote_equipos WHERE lote_id=?) WHERE lote_id=?");
+        $stmt_r2->bind_param("ss", $destino, $destino);
+        $stmt_r2->execute();
         
         echo json_encode(["ok" => true, "msg" => "Equipos trasladados con exito"]);
         break;
 
     case "eliminar":
         $data = json_decode(file_get_contents("php://input"), true);
-        $lid = $db->real_escape_string($data["lote_id"]);
+        $lid = trim($data["lote_id"] ?? "");
         // 1. Resetear triaje en equipos
-        $db->query("UPDATE equipos e JOIN lote_equipos le ON e.codigo = le.equipo_codigo SET e.triaje='SIN_FALLA', e.falla=NULL WHERE le.lote_id = '$lid'");
+        $stmt_del1 = $db->prepare("UPDATE equipos e JOIN lote_equipos le ON e.codigo = le.equipo_codigo SET e.triaje='SIN_FALLA', e.falla=NULL WHERE le.lote_id = ?");
+        $stmt_del1->bind_param("s", $lid);
+        $stmt_del1->execute();
+
         // 2. Borrar items
-        $db->query("DELETE FROM lote_equipos WHERE lote_id = '$lid'");
+        $stmt_del2 = $db->prepare("DELETE FROM lote_equipos WHERE lote_id = ?");
+        $stmt_del2->bind_param("s", $lid);
+        $stmt_del2->execute();
+
         // 3. Borrar lote
-        if ($db->query("DELETE FROM lotes WHERE lote_id = '$lid'")) {
+        $stmt_del3 = $db->prepare("DELETE FROM lotes WHERE lote_id = ?");
+        $stmt_del3->bind_param("s", $lid);
+        if ($stmt_del3->execute()) {
             echo json_encode(["ok" => true, "msg" => "Lote eliminado"]);
         } else {
             echo json_encode(["ok" => false, "msg" => $db->error]);

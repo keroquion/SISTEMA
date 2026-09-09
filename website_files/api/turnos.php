@@ -26,10 +26,12 @@ switch ($action) {
                     "Thursday"=>"Jueves","Friday"=>"Viernes","Saturday"=>"Sabado","Sunday"=>"Domingo"];
         $dia_hoy_es = $dias_es[$dia_hoy] ?? $dia_hoy;
 
-        $result = $db->query("SELECT t.*, CONCAT(p.nombre,' ',p.apellido) as tecnico_nombre
+        $stmt = $db->prepare("SELECT t.*, CONCAT(p.nombre,' ',p.apellido) as tecnico_nombre
             FROM turnos t JOIN personas p ON t.tecnico_id = p.id
-            WHERE t.tecnico_id = $tecnico_id AND t.activo = 1 LIMIT 1");
-        $turno = $result->fetch_assoc();
+            WHERE t.tecnico_id = ? AND t.activo = 1 LIMIT 1");
+        $stmt->bind_param("i", $tecnico_id);
+        $stmt->execute();
+        $turno = $stmt->get_result()->fetch_assoc();
 
         if (!$turno) {
             echo json_encode(["ok" => false, "activo" => false, "msg" => "Tecnico no tiene turno configurado"]);
@@ -82,7 +84,10 @@ switch ($action) {
         $data = json_decode(file_get_contents("php://input"), true);
         $tecnico_id = (int)($data["tecnico_id"] ?? 0);
         // Verificar que no tenga ya un turno
-        $check = $db->query("SELECT id FROM turnos WHERE tecnico_id=$tecnico_id LIMIT 1");
+        $stmt_chk = $db->prepare("SELECT id FROM turnos WHERE tecnico_id=? LIMIT 1");
+        $stmt_chk->bind_param("i", $tecnico_id);
+        $stmt_chk->execute();
+        $check = $stmt_chk->get_result();
         if ($check->num_rows > 0) {
             echo json_encode(["ok" => false, "msg" => "Este tecnico ya tiene turno. Use editar."]);
             break;

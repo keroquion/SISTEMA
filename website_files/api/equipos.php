@@ -8,19 +8,51 @@ $action = $_GET["action"] ?? "list";
 switch ($action) {
 
     case "list":
-        $q = isset($_GET["q"]) ? "%" . $db->real_escape_string($_GET["q"]) . "%" : "%";
-        $estado = isset($_GET["estado"]) ? $db->real_escape_string($_GET["estado"]) : "";
-        $marca = isset($_GET["marca"]) ? $db->real_escape_string($_GET["marca"]) : "";
-        $doc = isset($_GET["doc_compra"]) ? $db->real_escape_string($_GET["doc_compra"]) : "";
-        $where = "WHERE (codigo LIKE '$q' OR serie LIKE '$q' OR modelo LIKE '$q' OR marca LIKE '$q')";
-        if ($estado) $where .= " AND estado = '$estado'";
-        if ($marca) $where .= " AND marca = '$marca'";
-        if ($doc) $where .= " AND doc_compra = '$doc'";
+        $raw_q = isset($_GET["q"]) ? trim($_GET["q"]) : "";
+        $q = "%" . $raw_q . "%";
+        $estado = isset($_GET["estado"]) ? trim($_GET["estado"]) : "";
+        $marca = isset($_GET["marca"]) ? trim($_GET["marca"]) : "";
+        $doc = isset($_GET["doc_compra"]) ? trim($_GET["doc_compra"]) : "";
+
+        $where_clauses = ["(codigo LIKE ? OR serie LIKE ? OR modelo LIKE ? OR marca LIKE ?)"];
+        $params = [$q, $q, $q, $q];
+        $types = "ssss";
+
+        if ($estado !== "") {
+            $where_clauses[] = "estado = ?";
+            $params[] = $estado;
+            $types .= "s";
+        }
+        if ($marca !== "") {
+            $where_clauses[] = "marca = ?";
+            $params[] = $marca;
+            $types .= "s";
+        }
+        if ($doc !== "") {
+            $where_clauses[] = "doc_compra = ?";
+            $params[] = $doc;
+            $types .= "s";
+        }
+
+        $where = "WHERE " . implode(" AND ", $where_clauses);
         $limit = (int)($_GET["limit"] ?? 100);
-        $result = $db->query("SELECT id, serie, codigo, tipo_equipo, marca, modelo, procesador, ram, hd_ssd, pulgadas, sucursal, estado, observacion, fec_compra, doc_compra, fec_venta FROM equipos $where ORDER BY codigo LIMIT $limit");
+
+        // Query data
+        $sql = "SELECT id, serie, codigo, tipo_equipo, marca, modelo, procesador, ram, hd_ssd, pulgadas, sucursal, estado, observacion, fec_compra, doc_compra, fec_venta FROM equipos $where ORDER BY codigo LIMIT ?";
+        $stmt = $db->prepare($sql);
+        $stmt->bind_param($types . "i", ...array_merge($params, [$limit]));
+        $stmt->execute();
+        $result = $stmt->get_result();
         $rows = [];
         while ($row = $result->fetch_assoc()) $rows[] = $row;
-        $total = $db->query("SELECT COUNT(*) as c FROM equipos $where")->fetch_assoc()["c"];
+
+        // Query total count
+        $sql_count = "SELECT COUNT(*) as c FROM equipos $where";
+        $stmt_count = $db->prepare($sql_count);
+        $stmt_count->bind_param($types, ...$params);
+        $stmt_count->execute();
+        $total = $stmt_count->get_result()->fetch_assoc()["c"];
+
         echo json_encode(["ok" => true, "data" => $rows, "total" => $total]);
         break;
 
@@ -32,8 +64,11 @@ switch ($action) {
         break;
 
     case "buscar":
-        $q = $db->real_escape_string($_GET["q"] ?? "");
-        $result = $db->query("SELECT id, serie, codigo, marca, modelo, procesador, ram, hd_ssd, estado, observacion, doc_compra FROM equipos WHERE codigo='$q' OR serie='$q' LIMIT 10");
+        $q = trim($_GET["q"] ?? "");
+        $stmt = $db->prepare("SELECT id, serie, codigo, marca, modelo, procesador, ram, hd_ssd, estado, observacion, doc_compra FROM equipos WHERE codigo=? OR serie=? LIMIT 10");
+        $stmt->bind_param("ss", $q, $q);
+        $stmt->execute();
+        $result = $stmt->get_result();
         $rows = [];
         while ($row = $result->fetch_assoc()) $rows[] = $row;
         echo json_encode(["ok" => true, "data" => $rows, "found" => count($rows) > 0]);
@@ -52,9 +87,9 @@ switch ($action) {
 
     case "inventario_rapido":
         $data = json_decode(file_get_contents("php://input"), true);
-        $codigo = $db->real_escape_string($data["codigo"] ?? "");
-        $triaje = $db->real_escape_string($data["triaje"] ?? "SIN_FALLA");
-        $falla = $db->real_escape_string($data["falla"] ?? "");
+        $codigo = trim($data["codigo"] ?? "");
+        $triaje = trim($data["triaje"] ?? "SIN_FALLA");
+        $falla = trim($data["falla"] ?? "");
 
         if (!$codigo) {
             echo json_encode(["ok" => false, "msg" => "Codigo vacio"]);
@@ -62,7 +97,10 @@ switch ($action) {
         }
 
         // Search for equipment
-        $res = $db->query("SELECT * FROM equipos WHERE codigo='$codigo' OR serie='$codigo' LIMIT 1");
+        $stmt_search = $db->prepare("SELECT * FROM equipos WHERE codigo=? OR serie=? LIMIT 1");
+        $stmt_search->bind_param("ss", $codigo, $codigo);
+        $stmt_search->execute();
+        $res = $stmt_search->get_result();
         $equipo = $res->fetch_assoc();
         
         if (!$equipo) {
@@ -82,13 +120,10 @@ switch ($action) {
         break;
 
     case "list_docs":
-        $fec_inicio = isset($_GET["fec_inicio"]) ? $_GET["fec_inicio"] : date('Y-m-01');
-        $fec_fin = isset($_GET["fec_fin"]) ? $_GET["fec_fin"] : date('Y-m-t');
-        
-        $fec_inicio = $db->real_escape_string($fec_inicio);
-        $fec_fin = $db->real_escape_string($fec_fin);
+        $fec_inicio = isset($_GET["fec_inicio"]) ? trim($_GET["fec_inicio"]) : date('Y-m-01');
+        $fec_fin = isset($_GET["fec_fin"]) ? trim($_GET["fec_fin"]) : date('Y-m-t');
 
-        $res = $db->query("SELECT 
+        $sql = "SELECT 
             doc_compra, 
             observacion, 
             COUNT(*) as cantidad, 
@@ -99,9 +134,13 @@ switch ($action) {
             SUM(CASE WHEN (triaje_inicial IS NOT NULL AND triaje_inicial != '' AND triaje_inicial != 'SIN_FALLA') THEN 1 ELSE 0 END) as danados_inicial
             FROM equipos 
             WHERE doc_compra IS NOT NULL AND doc_compra != '' 
-            AND fec_compra >= '$fec_inicio' AND fec_compra <= '$fec_fin' 
+            AND fec_compra >= ? AND fec_compra <= ? 
             GROUP BY doc_compra, observacion 
-            ORDER BY fecha DESC");
+            ORDER BY fecha DESC";
+        $stmt = $db->prepare($sql);
+        $stmt->bind_param("ss", $fec_inicio, $fec_fin);
+        $stmt->execute();
+        $res = $stmt->get_result();
         if (!$res) {
             echo json_encode(["ok" => false, "msg" => "Error BD: " . $db->error]);
             break;
@@ -116,14 +155,27 @@ switch ($action) {
     case "reporte_avanzado":
         $doc = isset($_GET["doc_compra"]) ? trim($_GET["doc_compra"]) : "";
         $where = "";
-        if ($doc) {
-            $docs_array = array_map(function($d) use ($db) { return "'" . $db->real_escape_string(trim($d)) . "'"; }, explode(',', $doc));
-            $docs_list = implode(',', $docs_array);
-            $where = "WHERE doc_compra IN ($docs_list)";
+        $doc_items = [];
+        $types = "";
+        if ($doc !== "") {
+            $doc_items = array_values(array_filter(array_map('trim', explode(',', $doc)), 'strlen'));
+            if (!empty($doc_items)) {
+                $placeholders = implode(',', array_fill(0, count($doc_items), '?'));
+                $where = "WHERE doc_compra IN ($placeholders)";
+                $types = str_repeat('s', count($doc_items));
+            }
         }
         
         // Totales por triaje
-        $res = $db->query("SELECT IF(triaje IS NULL OR triaje = '', 'SIN_FALLA', triaje) as t, COUNT(*) as c FROM equipos $where GROUP BY IF(triaje IS NULL OR triaje = '', 'SIN_FALLA', triaje)");
+        $sql1 = "SELECT IF(triaje IS NULL OR triaje = '', 'SIN_FALLA', triaje) as t, COUNT(*) as c FROM equipos $where GROUP BY IF(triaje IS NULL OR triaje = '', 'SIN_FALLA', triaje)";
+        if (!empty($doc_items)) {
+            $stmt1 = $db->prepare($sql1);
+            $stmt1->bind_param($types, ...$doc_items);
+            $stmt1->execute();
+            $res = $stmt1->get_result();
+        } else {
+            $res = $db->query($sql1);
+        }
         if (!$res) {
             echo json_encode(["ok" => false, "msg" => "Error BD stats: " . $db->error]);
             break;
@@ -136,7 +188,15 @@ switch ($action) {
         }
 
         // Totales por triaje inicial (Historico)
-        $res_hist = $db->query("SELECT IF(triaje_inicial IS NULL OR triaje_inicial = '', 'SIN_FALLA', triaje_inicial) as t, COUNT(*) as c FROM equipos $where GROUP BY IF(triaje_inicial IS NULL OR triaje_inicial = '', 'SIN_FALLA', triaje_inicial)");
+        $sql2 = "SELECT IF(triaje_inicial IS NULL OR triaje_inicial = '', 'SIN_FALLA', triaje_inicial) as t, COUNT(*) as c FROM equipos $where GROUP BY IF(triaje_inicial IS NULL OR triaje_inicial = '', 'SIN_FALLA', triaje_inicial)";
+        if (!empty($doc_items)) {
+            $stmt2 = $db->prepare($sql2);
+            $stmt2->bind_param($types, ...$doc_items);
+            $stmt2->execute();
+            $res_hist = $stmt2->get_result();
+        } else {
+            $res_hist = $db->query($sql2);
+        }
         $stats_hist = ["SIN_FALLA"=>0, "FALLA_MENOR"=>0, "NECESITA_REPUESTO"=>0, "DANO_GRAVE"=>0];
         if ($res_hist) {
             while ($r = $res_hist->fetch_assoc()) {
@@ -146,7 +206,15 @@ switch ($action) {
 
         // Listado detallado
         $limit = (int)($_GET["limit"] ?? 20000);
-        $res_list = $db->query("SELECT observacion, doc_compra, codigo, serie, marca, modelo, estado, fec_venta, IF(triaje IS NULL OR triaje = '', 'SIN_FALLA', triaje) as triaje, IF(triaje_inicial IS NULL OR triaje_inicial = '', 'SIN_FALLA', triaje_inicial) as triaje_inicial, falla FROM equipos $where ORDER BY id DESC LIMIT $limit");
+        $sql3 = "SELECT observacion, doc_compra, codigo, serie, marca, modelo, estado, fec_venta, IF(triaje IS NULL OR triaje = '', 'SIN_FALLA', triaje) as triaje, IF(triaje_inicial IS NULL OR triaje_inicial = '', 'SIN_FALLA', triaje_inicial) as triaje_inicial, falla FROM equipos $where ORDER BY id DESC LIMIT ?";
+        $stmt3 = $db->prepare($sql3);
+        if (!empty($doc_items)) {
+            $stmt3->bind_param($types . "i", ...array_merge($doc_items, [$limit]));
+        } else {
+            $stmt3->bind_param("i", $limit);
+        }
+        $stmt3->execute();
+        $res_list = $stmt3->get_result();
         if (!$res_list) {
             echo json_encode(["ok" => false, "msg" => "Error BD list: " . $db->error]);
             break;

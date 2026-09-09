@@ -24,7 +24,11 @@ if ($es_admin) {
             while ($adm = $admins->fetch_assoc()) {
                 $uid = $adm['id'];
                 // Evitar duplicados exactos el mismo día
-                $chk = $db->query("SELECT id FROM notificaciones WHERE usuario_id=$uid AND link='garantias.html' AND titulo LIKE '%{$gar['numero_garantia']}%' AND DATE(fecha) = CURDATE()");
+                $like_gar = "%" . $gar['numero_garantia'] . "%";
+                $stmt_chk = $db->prepare("SELECT id FROM notificaciones WHERE usuario_id=? AND link='garantias.html' AND titulo LIKE ? AND DATE(fecha) = CURDATE()");
+                $stmt_chk->bind_param("is", $uid, $like_gar);
+                $stmt_chk->execute();
+                $chk = $stmt_chk->get_result();
                 if ($chk->num_rows == 0) {
                     $stmt = $db->prepare("INSERT INTO notificaciones (usuario_id, titulo, mensaje, link) VALUES (?, ?, ?, ?)");
                     $tit = "Garantía Pendiente: " . $gar['numero_garantia'];
@@ -34,14 +38,20 @@ if ($es_admin) {
                 }
             }
             // Actualizar la última fecha de alerta para que vuelva a sonar en X días más
-            $db->query("UPDATE garantias_proveedor SET ultima_alerta_fecha = CURDATE() WHERE id = {$gar['id']}");
+            $gar_id = (int)$gar['id'];
+            $stmt_upd = $db->prepare("UPDATE garantias_proveedor SET ultima_alerta_fecha = CURDATE() WHERE id = ?");
+            $stmt_upd->bind_param("i", $gar_id);
+            $stmt_upd->execute();
         }
     }
 }
 
 switch ($action) {
     case "list":
-        $res = $db->query("SELECT * FROM notificaciones WHERE usuario_id = $usuario_id ORDER BY id DESC LIMIT 50");
+        $stmt = $db->prepare("SELECT * FROM notificaciones WHERE usuario_id = ? ORDER BY id DESC LIMIT 50");
+        $stmt->bind_param("i", $usuario_id);
+        $stmt->execute();
+        $res = $stmt->get_result();
         $notis = [];
         while ($row = $res->fetch_assoc()) $notis[] = $row;
         echo json_encode(["ok" => true, "data" => $notis]);
@@ -50,12 +60,16 @@ switch ($action) {
     case "marcar_leida":
         $data = json_decode(file_get_contents("php://input"), true);
         $id = (int)($data["id"] ?? 0);
-        $db->query("UPDATE notificaciones SET leido = 1 WHERE id = $id AND usuario_id = $usuario_id");
+        $stmt = $db->prepare("UPDATE notificaciones SET leido = 1 WHERE id = ? AND usuario_id = ?");
+        $stmt->bind_param("ii", $id, $usuario_id);
+        $stmt->execute();
         echo json_encode(["ok" => true]);
         break;
 
     case "marcar_todas_leidas":
-        $db->query("UPDATE notificaciones SET leido = 1 WHERE usuario_id = $usuario_id");
+        $stmt = $db->prepare("UPDATE notificaciones SET leido = 1 WHERE usuario_id = ?");
+        $stmt->bind_param("i", $usuario_id);
+        $stmt->execute();
         echo json_encode(["ok" => true]);
         break;
 

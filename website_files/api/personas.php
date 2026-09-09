@@ -26,17 +26,24 @@ switch ($action) {
         break;
 
     case "buscar_dni":
-        $dni = $db->real_escape_string($_GET["dni"] ?? "");
-        $result = $db->query("SELECT id, dni, nombre, apellido, telefono, tipo, especialidad, activo, notas FROM personas WHERE dni = '$dni' LIMIT 1");
+        $dni = trim($_GET["dni"] ?? "");
+        $stmt = $db->prepare("SELECT id, dni, nombre, apellido, telefono, tipo, especialidad, activo, notas FROM personas WHERE dni = ? LIMIT 1");
+        $stmt->bind_param("s", $dni);
+        $stmt->execute();
+        $result = $stmt->get_result();
         $row = $result->fetch_assoc();
         if ($row) echo json_encode(["ok" => true, "data" => $row]);
         else echo json_encode(["ok" => false, "msg" => "DNI no encontrado"]);
         break;
 
     case "buscar":
-        $q = "%" . $db->real_escape_string($_GET["q"] ?? "") . "%";
-        $tipo = $db->real_escape_string($_GET["tipo"] ?? "cliente");
-        $result = $db->query("SELECT id, dni, nombre, apellido, telefono, tipo, especialidad FROM personas WHERE tipo = '$tipo' AND (nombre LIKE '$q' OR apellido LIKE '$q' OR dni LIKE '$q') ORDER BY nombre LIMIT 20");
+        $raw_q = trim($_GET["q"] ?? "");
+        $q = "%" . $raw_q . "%";
+        $tipo = trim($_GET["tipo"] ?? "cliente");
+        $stmt = $db->prepare("SELECT id, dni, nombre, apellido, telefono, tipo, especialidad FROM personas WHERE tipo = ? AND (nombre LIKE ? OR apellido LIKE ? OR dni LIKE ?) ORDER BY nombre LIMIT 20");
+        $stmt->bind_param("ssss", $tipo, $q, $q, $q);
+        $stmt->execute();
+        $result = $stmt->get_result();
         $rows = [];
         while ($row = $result->fetch_assoc()) $rows[] = $row;
         echo json_encode(["ok" => true, "data" => $rows]);

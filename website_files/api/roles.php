@@ -20,20 +20,21 @@ switch ($action) {
 
     case "guardar":
         $data = json_decode(file_get_contents("php://input"), true);
-        $rol = $db->real_escape_string($data['rol'] ?? '');
-        $pagina_defecto = $db->real_escape_string($data['pagina_defecto'] ?? 'index.html');
+        $rol = trim($data['rol'] ?? '');
+        $pagina_defecto = trim($data['pagina_defecto'] ?? 'index.html');
         
         $modulos = $data['modulos_permitidos'] ?? [];
         if (!is_array($modulos)) $modulos = [];
-        $modulos_json = $db->real_escape_string(json_encode($modulos));
+        $modulos_json = json_encode($modulos);
 
         if (!$rol) {
             echo json_encode(["ok" => false, "msg" => "Falta rol"]);
             exit;
         }
 
-        $sql = "UPDATE roles_config SET pagina_defecto = '$pagina_defecto', modulos_permitidos = '$modulos_json' WHERE rol = '$rol'";
-        if ($db->query($sql)) {
+        $stmt = $db->prepare("UPDATE roles_config SET pagina_defecto = ?, modulos_permitidos = ? WHERE rol = ?");
+        $stmt->bind_param("sss", $pagina_defecto, $modulos_json, $rol);
+        if ($stmt->execute()) {
             echo json_encode(["ok" => true, "msg" => "Rol guardado correctamente"]);
         } else {
             echo json_encode(["ok" => false, "msg" => "Error guardando: " . $db->error]);

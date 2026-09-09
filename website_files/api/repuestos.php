@@ -14,8 +14,12 @@ switch ($action) {
         break;
 
     case "buscar":
-        $q = $db->real_escape_string($_GET["q"] ?? "");
-        $result = $db->query("SELECT * FROM repuestos WHERE nombre LIKE '%$q%' OR pn LIKE '%$q%' ORDER BY nombre ASC LIMIT 15");
+        $raw_q = trim($_GET["q"] ?? "");
+        $q = "%" . $raw_q . "%";
+        $stmt = $db->prepare("SELECT * FROM repuestos WHERE nombre LIKE ? OR pn LIKE ? ORDER BY nombre ASC LIMIT 15");
+        $stmt->bind_param("ss", $q, $q);
+        $stmt->execute();
+        $result = $stmt->get_result();
         $rows = [];
         while ($row = $result->fetch_assoc()) $rows[] = $row;
         echo json_encode(["ok" => true, "data" => $rows]);

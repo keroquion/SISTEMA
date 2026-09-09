@@ -24,11 +24,11 @@ $allowed_columns = [
 
 foreach ($rows as $row) {
     // 1. Buscar si ya existe el codigo
-    $codigo = $db->real_escape_string($row['codigo'] ?? $row['Codigo'] ?? $row['CODIGO'] ?? '');
+    $codigo = trim($row['codigo'] ?? $row['Codigo'] ?? $row['CODIGO'] ?? '');
     
     // Si no tiene codigo, intentamos usar la serie
     if (!$codigo) {
-        $codigo = $db->real_escape_string($row['serie'] ?? $row['Serie'] ?? $row['SERIE'] ?? '');
+        $codigo = trim($row['serie'] ?? $row['Serie'] ?? $row['SERIE'] ?? '');
     }
 
     if (!$codigo) {
@@ -38,7 +38,10 @@ foreach ($rows as $row) {
 
     // 2. Verificar duplicidad ignorando espacios y mayusculas
     $codigo_clean = trim(strtolower($codigo));
-    $res = $db->query("SELECT id FROM equipos WHERE LOWER(TRIM(codigo)) = '$codigo_clean'");
+    $stmt_chk = $db->prepare("SELECT id FROM equipos WHERE LOWER(TRIM(codigo)) = ?");
+    $stmt_chk->bind_param("s", $codigo_clean);
+    $stmt_chk->execute();
+    $res = $stmt_chk->get_result();
     if ($res && $res->num_rows > 0) {
         $ignored++; // REGLA DE ORO: Si ya existe, se ignora por completo
         continue; 
@@ -60,10 +63,10 @@ foreach ($rows as $row) {
         if ($found_val !== null) {
             $cols[] = $col;
             // Manejar fechas vacias en Excel
-            if (($col === 'fec_compra' || $col === 'fec_venta') && empty(trim($found_val))) {
-                $vals[] = "NULL";
+            if (($col === 'fec_compra' || $col === 'fec_venta') && empty(trim((string)$found_val))) {
+                $vals[] = null;
             } else {
-                $vals[] = "'" . $db->real_escape_string($found_val) . "'";
+                $vals[] = (string)$found_val;
             }
         }
     }
@@ -71,17 +74,25 @@ foreach ($rows as $row) {
     // Forzamos el codigo si no lo encontro por mapeo exacto
     if (!in_array('codigo', $cols)) {
         $cols[] = 'codigo';
-        $vals[] = "'" . $codigo . "'";
+        $vals[] = (string)$codigo;
     }
 
     if (count($cols) > 0) {
         $cols_str = implode(',', $cols);
-        $vals_str = implode(',', $vals);
-        $sql = "INSERT INTO equipos ($cols_str) VALUES ($vals_str)";
-        if ($db->query($sql)) {
-            $inserted++;
+        $placeholders = implode(',', array_fill(0, count($cols), '?'));
+        $sql = "INSERT INTO equipos ($cols_str) VALUES ($placeholders)";
+        $stmt_ins = $db->prepare($sql);
+        if ($stmt_ins) {
+            $types = str_repeat('s', count($vals));
+            $stmt_ins->bind_param($types, ...$vals);
+            if ($stmt_ins->execute()) {
+                $inserted++;
+            } else {
+                error_log("Error importando fila $codigo: " . $stmt_ins->error);
+                $errors++;
+            }
         } else {
-            error_log("Error importando fila $codigo: " . $db->error);
+            error_log("Error preparando insercion fila $codigo: " . $db->error);
             $errors++;
         }
     } else {
