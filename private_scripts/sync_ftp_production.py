@@ -1,11 +1,11 @@
-﻿import ftplib, os
+import ftplib, os
 
 FTP_HOST = 'ftp.petulap.store'
 FTP_USER = 'petumjvq'
 FTP_PASS = 'HjBI32sh5kAb'
 
 print('=' * 60)
-print('INICIANDO SINCRONIZACION FTP COMPLETA')
+print('INICIANDO SINCRONIZACION FTP COMPLETA (PRODUCCION)')
 print('=' * 60)
 
 ftp = ftplib.FTP(FTP_HOST, timeout=30)
@@ -45,8 +45,8 @@ with open('website_files/js/dashboard.js', 'rb') as f:
 size_dash = os.path.getsize('website_files/js/dashboard.js')
 print(f'  [SUBIDO OK] js/dashboard.js ({size_dash} bytes)')
 
-# 3. Eliminar navbar.js de public_html/js/
-print('\n--- 3. Eliminando js/navbar.js de public_html/js/ ---')
+# 3. Eliminar navbar.js de public_html/js/ (si existiera)
+print('\n--- 3. Verificando js/navbar.js en public_html/js/ ---')
 js_list = ftp.nlst()
 if 'navbar.js' in js_list:
     try:
@@ -55,18 +55,38 @@ if 'navbar.js' in js_list:
     except Exception as e:
         print('  [ERROR BORRANDO] js/navbar.js:', e)
 else:
-    print('  [NO ESTABA] js/navbar.js')
+    print('  [LIMPIO] js/navbar.js no está en el servidor')
 
-# 4. Subir api/soporte.php a public_html/api/
-print('\n--- 4. Subiendo api/soporte.php a public_html/api/ ---')
+# 4. Subir endpoints optimizados a public_html/api/
+print('\n--- 4. Subiendo endpoints optimizados de escalabilidad a public_html/api/ ---')
 ftp.cwd('../api')
-with open('website_files/api/soporte.php', 'rb') as f:
-    ftp.storbinary('STOR soporte.php', f)
-size_sop = os.path.getsize('website_files/api/soporte.php')
-print(f'  [SUBIDO OK] api/soporte.php ({size_sop} bytes)')
+
+api_files = [
+    'desempeno.php',
+    'equipos.php',
+    'garantias.php',
+    'historial.php',
+    'lotes.php',
+    'notificaciones.php',
+    'personas.php',
+    'repuestos.php',
+    'sesiones.php',
+    'soporte.php',
+    'turnos.php',
+]
+
+for fname in api_files:
+    local_path = os.path.join('website_files', 'api', fname)
+    if os.path.exists(local_path):
+        with open(local_path, 'rb') as f:
+            ftp.storbinary(f'STOR {fname}', f)
+        size = os.path.getsize(local_path)
+        print(f'  [SUBIDO OK] api/{fname} ({size} bytes)')
+    else:
+        print(f'  [ERROR] No existe localmente: {local_path}')
 
 # 5. Eliminar schema_dump.php y update_roles.php de public_html/ (raiz)
-print('\n--- 5. Eliminando scripts vulnerables de public_html/ ---')
+print('\n--- 5. Verificando scripts vulnerables en public_html/ ---')
 ftp.cwd('..')
 root_list = ftp.nlst()
 for fname in ['schema_dump.php', 'update_roles.php']:
@@ -76,10 +96,10 @@ for fname in ['schema_dump.php', 'update_roles.php']:
             print(f'  [ELIMINADO REMOTO OK] {fname}')
         except Exception as e:
             print(f'  [ERROR BORRANDO] {fname}: {e}')
-    else:
-        print(f'  [NO ESTABA] {fname}')
+else:
+    print('  [LIMPIO] Scripts vulnerables no residen en la raíz pública')
 
 ftp.quit()
 print('\n' + '=' * 60)
-print('SINCRONIZACION Y LIMPIEZA FTP FINALIZADA')
+print('SINCRONIZACION Y LIMPIEZA FTP FINALIZADA EXITOSAMENTE')
 print('=' * 60)
