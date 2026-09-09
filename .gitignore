@@ -4,3 +4,7 @@ backup.sql
 error_log*
 node_modules/
 .DS_Store
+
+# Credenciales y configuracion de base de datos sensible
+website_files/api/config.php
+api/config.php
