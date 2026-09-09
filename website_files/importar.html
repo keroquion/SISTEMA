@@ -292,6 +292,13 @@ if ("serviceWorker" in navigator) { window.addEventListener("load", () => { navi
                     </div>
                     <div class="status-dot dot-blue"></div>
                 </a>
+                <a href="desempeno_tecnicos.html" class="menu-item">
+                    <div class="menu-item-left">
+                        <i class="ph ph-chart-line-up"></i>
+                        <span>Desempeño Técnicos</span>
+                    </div>
+                    <div class="status-dot dot-blue"></div>
+                </a>
                 <a href="lotes.html" class="menu-item">
                     <div class="menu-item-left">
                         <i class="ph ph-stack"></i>
@@ -361,7 +368,7 @@ if ("serviceWorker" in navigator) { window.addEventListener("load", () => { navi
   <!-- Topbar -->
   <header class="topbar">
     <div class="topbar-left">
-      <button class="btn btn-icon" onclick="window.location.href='index.html'">â¬…ï¸</button>
+      <button class="btn btn-icon" onclick="window.location.href='index.html'"><i class="ph ph-house"></i></button>
       <h1 class="topbar-title">Importador de Equipos</h1>
     </div>
     <div class="topbar-right">
@@ -396,7 +403,7 @@ if ("serviceWorker" in navigator) { window.addEventListener("load", () => { navi
         </div>
 
         <button class="btn btn-primary" id="btn-import" onclick="iniciarImportacion()" style="width:100%">
-          ðŸš€ Confirmar e Importar Seguramente
+          🚀 Confirmar e Importar Seguramente
         </button>
       </div>
       
@@ -494,7 +501,7 @@ Recuerda: Los registros existentes se ignoraran.`)) return;
 
         const btn = document.getElementById('btn-import');
         btn.disabled = true;
-        btn.innerHTML = 'â³ Importando datos...';
+        btn.innerHTML = '<i class="ph ph-hourglass"></i> Importando datos...';
 
         try {
             const res = await fetch('api/importar.php', {
@@ -520,7 +527,7 @@ Recuerda: Los registros existentes se ignoraran.`)) return;
             alert("Error en importacion: " + e.message);
         } finally {
             btn.disabled = false;
-            btn.innerHTML = 'ðŸš€ Confirmar e Importar Seguramente';
+            btn.innerHTML = '🚀 Confirmar e Importar Seguramente';
         }
     }
   </script>
@@ -540,3 +547,5 @@ Recuerda: Los registros existentes se ignoraran.`)) return;
 
 </body>
 </html>
+
+

@@ -289,6 +289,13 @@ if ("serviceWorker" in navigator) { window.addEventListener("load", () => { navi
                     </div>
                     <div class="status-dot dot-blue"></div>
                 </a>
+                <a href="desempeno_tecnicos.html" class="menu-item">
+                    <div class="menu-item-left">
+                        <i class="ph ph-chart-line-up"></i>
+                        <span>Desempeño Técnicos</span>
+                    </div>
+                    <div class="status-dot dot-blue"></div>
+                </a>
                 <a href="lotes.html" class="menu-item">
                     <div class="menu-item-left">
                         <i class="ph ph-stack"></i>
@@ -478,7 +485,7 @@ if ("serviceWorker" in navigator) { window.addEventListener("load", () => { navi
 <div id="modal" style="display:none">
   <div style="display:flex; flex-wrap: wrap; gap: 10px; justify-content:space-between; align-items:center; margin-bottom:15px">
     <strong id="modal-titulo" >Detalle de Atencion</strong>
-    <button onclick="cerrarModal()" style="background:none; border:none; cursor:pointer">âœ•</button>
+    <button onclick="cerrarModal()" style="background:none; border:none; cursor:pointer"><i class="ph ph-house"></i></button>
   </div>
   <div id="modal-content"></div>
 </div>
@@ -528,7 +535,7 @@ async function buscarClienteNombre(q) {
   if (!res.data.length) { ac.style.display='none'; return; }
   ac.style.display='block';
   ac.innerHTML = res.data.map(c => `<div onclick="seleccionarCliente(${JSON.stringify(c).replace(/"/g,'&quot;')})" style="padding:6px; cursor:pointer" onmouseover="this.style.background='#1a2a3e'" onmouseout="this.style.background=''">
-    <b>${c.nombre} ${c.apellido}</b> â€” DNI: ${c.dni} â€” Tel: ${c.telefono}
+    <b>${c.nombre} ${c.apellido}</b> - DNI: ${c.dni} - Tel: ${c.telefono}
   </div>`).join('');
 }
 
@@ -568,7 +575,7 @@ async function buscarEquipo() {
     if (eq.en_garantia) {
       garDiv.style.display = 'block';
       garDiv.innerHTML = `<div style="padding:10px; border-radius:6px; margin-top:6px">
-        <i class="ph ph-shield-check"></i> <b >EQUIPO EN GARANTIA</b> â€” Vendido el ${eq.fec_venta}.<br>
+        <i class="ph ph-shield-check"></i> <b >EQUIPO EN GARANTIA</b> - Vendido el ${eq.fec_venta}.<br>
         Quedan aprox. <b >${eq.meses_garantia_restantes} meses</b> de garantia (6 meses desde venta).<br>
         <span >Si la reparacion es por defecto, puede aplicar garantia gratuita.</span>
       </div>`;
@@ -585,7 +592,7 @@ async function validarTurno(tecnico_id) {
   if (!tecnico_id) { alertDiv.innerHTML = ''; return; }
   const res = await fetch(`api/turnos.php?action=verificar_turno&tecnico_id=${tecnico_id}`).then(r=>r.json());
   if (res.activo) {
-    alertDiv.innerHTML = `<span >ðŸŸ¢ ${res.tecnico_nombre} esta EN TURNO ahora (${res.hora_inicio.substring(0,5)}â€“${res.hora_fin.substring(0,5)})</span>`;
+    alertDiv.innerHTML = `<span ><i class="ph ph-alarm"></i> ${res.tecnico_nombre} esta EN TURNO ahora (${res.hora_inicio.substring(0,5)} - ${res.hora_fin.substring(0,5)})</span>`;
   } else {
     alertDiv.innerHTML = `<span ><i class="ph ph-warning"></i> ${res.msg}</span> <span >(puedes asignar igualmente)</span>`;
   }
@@ -665,7 +672,7 @@ function renderizar(lista) {
     <th>Estado</th><th>Prioridad</th><th>Tecnico</th><th>Ingreso</th><th>Acciones</th>
   </tr></thead><tbody>`;
   lista.forEach(a => {
-    const eq = a.es_externo == 1 ? ('´ ' + (a.equipo_descripcion||a.equipo_serie||'Externo')) : (a.equipo_codigo ? a.equipo_codigo : '-');
+    const eq = a.es_externo == 1 ? ('Â´ ' + (a.equipo_descripcion||a.equipo_serie||'Externo')) : (a.equipo_codigo ? a.equipo_codigo : '-');
     const fecha = a.fecha_ingreso ? a.fecha_ingreso.split(' ')[0] : '';
     html += `<tr>
       <td><b >${a.numero_atencion}</b></td>
@@ -678,7 +685,7 @@ function renderizar(lista) {
       <td>${fecha}</td>
       <td>
         <button class="btn-primary btn-sm" onclick="abrirDetalle(${a.id})"><i class="ph ph-clipboard"></i> Detalle</button>
-        ${localStorage.getItem('tecnico_tipo') === 'admin' ? `<button class="btn-danger btn-sm" onclick="eliminar(${a.id},'${a.numero_atencion}')"></button>` : ''}
+        ${localStorage.getItem('tecnico_tipo') === 'admin' ? `<button class="btn-danger btn-sm" onclick="eliminar(${a.id},'${a.numero_atencion}')"><i class="ph ph-house"></i></button>` : ''}
       </td>
     </tr>`;
   });
@@ -695,9 +702,9 @@ async function abrirDetalle(id) {
     .map(s => `<option value="${s}" ${a.estado===s?'selected':''}>${s.replace(/_/g,' ')}</option>`).join('');
 
   const msgWP = encodeURIComponent(`Hola ${a.cliente_nombre}, te escribimos de Petulap. Tu equipo (${a.equipo_descripcion || a.equipo_codigo}) ya esta listo para recoger. Te esperamos en nuestros horarios de atencion. Gracias!`);
-  const btnWP = a.estado === 'LISTO_PARA_RECOGER' ? `<a href="https://wa.me/51${a.cliente_tel}?text=${msgWP}" target="_blank" ><button style="border:none; padding:8px 18px; border-radius:4px; cursor:pointer">ðŸ’¬ Avisar por WhatsApp</button></a>` : '';
+  const btnWP = a.estado === 'LISTO_PARA_RECOGER' ? `<a href="https://wa.me/51${a.cliente_tel}?text=${msgWP}" target="_blank" ><button style="border:none; padding:8px 18px; border-radius:4px; cursor:pointer">💬 Avisar por WhatsApp</button></a>` : '';
 
-  document.getElementById('modal-titulo').textContent = `${a.numero_atencion} â€” ${a.cliente_nombre}`;
+  document.getElementById('modal-titulo').textContent = `${a.numero_atencion} - ${a.cliente_nombre}`;
   document.getElementById('modal-content').innerHTML = `
     <div id="msg-modal" class="msg"></div>
     <div class="form-row">
@@ -717,7 +724,7 @@ async function abrirDetalle(id) {
     <div style="margin-bottom:8px"><label>Fecha estimada entrega</label><input type="date" id="m-fecha-est" value="${a.fecha_estimada||''}"></div>
     
     <div style="display:flex; gap:10px; margin-top:10px; flex-wrap:wrap">
-      <button class="btn-primary" onclick="actualizarAtencion(${a.id})">ðŸ’¾ Guardar Cambios</button>
+      <button class="btn-primary" onclick="actualizarAtencion(${a.id})">💾 Guardar Cambios</button>
       ${btnWP}
       <button onclick="cerrarModal()" >Cerrar</button>
     </div>
@@ -799,3 +806,4 @@ precargarDesdeURL();
 
 </body>
 </html>
+

@@ -13,8 +13,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     pushScript.src = 'js/push.js';
     pushScript.onload = () => {
         // Wire up notification bell if present
-        const bellBtn = document.querySelector('.notification-btn');
-        if (bellBtn) {
+        const bellBtns = document.querySelectorAll('.notification-btn');
+        bellBtns.forEach(bellBtn => {
             bellBtn.onclick = async () => {
                 const status = petulap_checkPushStatus();
                 if (status === 'granted') {
@@ -26,7 +26,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     else alert('No se pudo activar las notificaciones. Verifica los permisos de tu navegador.');
                 }
             };
-        }
+        });
         // Ensure re-subscription if token changed behind the scenes
         if (petulap_checkPushStatus() === 'granted') {
             petulap_subscribePush().catch(e => console.log('Silent push update failed', e));

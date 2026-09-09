@@ -512,7 +512,7 @@ tr:hover td { background-color: var(--bg-brand-subtle); color: var(--color-brand
 .stat-card .num { font-size: 32px; color: var(--text-primary); font-weight: 700; font-family: var(--font-family); }
 .stat-card .lbl { font-size: 12px; color: var(--text-secondary); margin-top: 5px; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px;}
 
-.modal-overlay, .modal {
+.modal-overlay {
     position: fixed;
     top: 0; left: 0; width: 100%; height: 100%;
     background-color: rgba(15, 23, 42, 0.4);
@@ -525,7 +525,15 @@ tr:hover td { background-color: var(--bg-brand-subtle); color: var(--color-brand
     opacity: 0;
     animation: fadeIn 0.3s forwards;
 }
-.modal-content, .modal-overlay .card {
+.modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) !important;
+    z-index: 1001;
+    display: none;
+}
+.modal-content, .modal-overlay .card, .modal {
     width: 90%;
     max-width: 500px;
     max-height: 90vh;
@@ -537,8 +545,15 @@ tr:hover td { background-color: var(--bg-brand-subtle); color: var(--color-brand
     transform: scale(0.95) translateY(10px);
     animation: popIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
+.modal {
+    animation: popInModal 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+}
 @keyframes fadeIn { to { opacity: 1; } }
 @keyframes popIn { to { transform: scale(1) translateY(0); } }
+@keyframes popInModal { 
+    from { transform: translate(-50%, -50%) scale(0.95) translateY(10px); }
+    to { transform: translate(-50%, -50%) scale(1) translateY(0); } 
+}
 
 
 /* ==========================================================================

@@ -286,6 +286,13 @@
                     </div>
                     <div class="status-dot dot-blue"></div>
                 </a>
+                <a href="desempeno_tecnicos.html" class="menu-item">
+                    <div class="menu-item-left">
+                        <i class="ph ph-chart-line-up"></i>
+                        <span>Desempeño Técnicos</span>
+                    </div>
+                    <div class="status-dot dot-blue"></div>
+                </a>
                 <a href="lotes.html" class="menu-item">
                     <div class="menu-item-left">
                         <i class="ph ph-stack"></i>
@@ -350,14 +357,47 @@
         <!-- DASHBOARD CONTENT -->
         <div class="content">
 
+<style>
+  .scan-box { background: var(--bg-surface); padding: 20px; border-radius: var(--radius-lg); border: 1px solid var(--border-default); margin-bottom: 20px; }
+  .scan-box label { font-weight: 600; color: var(--text-main); display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+  .scan-box input { width: 100%; padding: 12px; border: 2px solid var(--border-default); border-radius: var(--radius-md); font-size: 1.1rem; background: var(--bg-body); color: var(--text-main); }
+  .scan-box input:focus { border-color: var(--color-brand); outline: none; }
+  
+  .card-list { display: grid; gap: 15px; }
+  
+  .ticket-card { background: var(--bg-surface); border-radius: var(--radius-lg); border: 1px solid var(--border-default); padding: 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: var(--shadow-sm); }
+  .ticket-card.highlight { border-color: var(--color-brand); box-shadow: 0 0 0 3px rgba(13,138,188,0.2); }
+  
+  .ticket-info { display: flex; flex-direction: column; gap: 5px; }
+  .ticket-num { font-weight: 800; font-size: 1.2rem; color: var(--color-brand); }
+  .ticket-cliente { font-weight: 600; color: var(--text-main); display: flex; align-items: center; gap: 5px; }
+  .ticket-equipo, .ticket-tecnico { color: var(--text-muted); font-size: 0.9rem; display: flex; align-items: center; gap: 5px; }
+  .ticket-precio { color: var(--color-warning); font-weight: bold; font-size: 0.95rem; display: flex; align-items: center; gap: 5px; }
+  
+  .btn-entregar { background: var(--color-success); color: white; border: none; padding: 10px 20px; border-radius: var(--radius-md); font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 1rem; transition: background 0.2s; white-space: nowrap; }
+  .btn-entregar:hover { background: #059669; }
+  
+  @media (max-width: 600px) {
+    .ticket-card { flex-direction: column; align-items: stretch; gap: 15px; }
+    .btn-entregar { justify-content: center; width: 100%; }
+  }
 
+  /* Modal fixes */
+  #modal { display:none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--bg-surface); padding: 25px; border-radius: var(--radius-lg); z-index: 1000; width: 90%; max-width: 400px; box-shadow: var(--shadow-lg); }
+  #modal-overlay { display:none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); z-index: 999; }
+  #modal h3 { margin-top:0; color: var(--color-success); display: flex; align-items: center; gap: 10px; }
+  #modal label { display:block; margin: 15px 0 5px; font-weight: 600; font-size: 0.9rem; }
+  #modal input, #modal select { width: 100%; padding: 10px; border: 1px solid var(--border-default); border-radius: var(--radius-md); margin-bottom: 15px; background: var(--bg-body); color: var(--text-main); }
+  #modal .btn-primary { width: 100%; margin-bottom: 10px; }
+  #modal .btn-cancel { width: 100%; padding: 10px; background: none; border: 1px solid var(--border-default); border-radius: var(--radius-md); cursor: pointer; color: var(--text-main); }
+</style>
 
-<h2><i class="ph ph-package"></i> Caja â€” Entregas</h2>
+<h2><i class="ph ph-package"></i> Caja - Entregas</h2>
 <p class="sub">Equipos listos para recoger. Escanea el codigo o buscalos en la lista.</p>
 
 <!-- Scanner rapido -->
 <div class="scan-box">
-  <label><i class="ph ph-magnifying-glass"></i> Pistolear codigo de equipo o escribir NÂ° de Ticket</label>
+  <label><i class="ph ph-magnifying-glass"></i> Pistolear código de equipo o escribir N° de Ticket</label>
   <input type="text" id="f-scan" placeholder="Ej: P25555 o ST-2026-001" autofocus
          onkeydown="if(event.key==='Enter') buscarPorCodigo()" autocomplete="off">
 </div>
@@ -379,9 +419,9 @@
     <option value="Efectivo"><i class="ph ph-currency-dollar"></i> Efectivo</option>
     <option value="Yape"><i class="ph ph-device-mobile"></i> Yape</option>
     <option value="Plin"><i class="ph ph-device-mobile"></i> Plin</option>
-    <option value="Transferencia">ðŸ¦ Transferencia</option>
+    <option value="Transferencia">🏦 Transferencia</option>
     <option value="Tarjeta"><i class="ph ph-credit-card"></i> Tarjeta</option>
-    <option value="Sin cobro">ðŸŽ Sin cobro / Garantia</option>
+    <option value="Sin cobro">🎁 Sin cobro / Garantía</option>
   </select>
   <button class="btn-primary" onclick="confirmarEntrega()"><i class="ph ph-check-circle"></i> MARCAR ENTREGADO Y PAGADO</button>
   <button class="btn-cancel" onclick="cerrarModal()">Cancelar</button>
@@ -404,7 +444,7 @@ function renderizar(lista) {
   const el = document.getElementById('lista-listos');
   const ctr = document.getElementById('contador');
   if (!lista.length) {
-    el.innerHTML = '<div class="empty">ðŸŽ‰ No hay equipos pendientes de entrega</div>';
+    el.innerHTML = '<div class="empty">📭 No hay equipos pendientes de entrega</div>';
     ctr.style.display = 'none';
     return;
   }
@@ -414,18 +454,18 @@ function renderizar(lista) {
   el.innerHTML = lista.map(t => {
     const equipo = t.equipo_descripcion || t.equipo_codigo || 'Equipo externo';
     const precio = t.repuesto_precio ? `S/. ${parseFloat(t.repuesto_precio).toFixed(2)}` : '';
-    const repuesto = t.repuesto_nombre ? `© Repuesto: ${t.repuesto_nombre}${t.repuesto_pn?' ('+t.repuesto_pn+')':''}` : '';
-    const tecnico = t.tecnico_nombre ? `ðŸ‘¨â€<i class="ph ph-wrench"></i> ${t.tecnico_nombre.trim()}` : '';
+    const repuesto = t.repuesto_nombre ? `⚙️ Repuesto: ${t.repuesto_nombre}${t.repuesto_pn?' ('+t.repuesto_pn+')':''}` : '';
+    const tecnico = t.tecnico_nombre ? `👨‍🔧 <i class="ph ph-wrench"></i> ${t.tecnico_nombre.trim()}` : '';
     const fecha = t.fecha_ingreso ? t.fecha_ingreso.split(' ')[0] : '';
     return `
     <div class="ticket-card" id="card-${t.id}">
       <div class="ticket-info">
         <div class="ticket-num">${t.numero_atencion}</div>
-        <div class="ticket-cliente">ðŸ‘¤ ${t.cliente_nombre} ${t.cliente_dni?'('+t.cliente_dni+')':''}</div>
+        <div class="ticket-cliente">👤 ${t.cliente_nombre} ${t.cliente_dni?'('+t.cliente_dni+')':''}</div>
         <div class="ticket-equipo"><i class="ph ph-desktop"></i> ${equipo}</div>
         ${repuesto ? `<div class="ticket-equipo">${repuesto}</div>` : ''}
         ${precio ? `<div class="ticket-precio"><i class="ph ph-money"></i> Cobrar: ${precio}</div>` : ''}
-        <div class="ticket-tecnico">${tecnico} ${fecha?'â€¢ Ingreso: '+fecha:''}</div>
+        <div class="ticket-tecnico">${tecnico} ${fecha?'. Ingreso: '+fecha:''}</div>
       </div>
       <button class="btn-entregar" onclick="abrirModal(${t.id})">
         <i class="ph ph-check-circle"></i> Entregar
@@ -470,12 +510,12 @@ function abrirModal(id) {
   ticketActual = t;
 
   const equipo = t.equipo_descripcion || t.equipo_codigo || 'Equipo';
-  const repuesto = t.repuesto_nombre ? `<br>© Repuesto: <b>${t.repuesto_nombre}</b>${t.repuesto_pn?' ('+t.repuesto_pn+')':''}` : '';
+  const repuesto = t.repuesto_nombre ? `<br>? Repuesto: <b>${t.repuesto_nombre}</b>${t.repuesto_pn?' ('+t.repuesto_pn+')':''}` : '';
   const precioSugerido = t.repuesto_precio ? parseFloat(t.repuesto_precio).toFixed(2) : '';
 
   document.getElementById('modal-resumen').innerHTML = `
     <b >${t.numero_atencion}</b><br>
-    ðŸ‘¤ <b>${t.cliente_nombre}</b><br>
+    👤 <b>${t.cliente_nombre}</b><br>
     <i class="ph ph-desktop"></i> ${equipo}${repuesto}
     ${t.diagnostico ? '<br><i class="ph ph-wrench"></i> <i>'+t.diagnostico+'</i>' : ''}
     ${t.solucion ? '<br><i class="ph ph-check-circle"></i> <i>'+t.solucion+'</i>' : ''}

@@ -289,6 +289,13 @@ if ("serviceWorker" in navigator) { window.addEventListener("load", () => { navi
                     </div>
                     <div class="status-dot dot-blue"></div>
                 </a>
+                <a href="desempeno_tecnicos.html" class="menu-item">
+                    <div class="menu-item-left">
+                        <i class="ph ph-chart-line-up"></i>
+                        <span>Desempeño Técnicos</span>
+                    </div>
+                    <div class="status-dot dot-blue"></div>
+                </a>
                 <a href="lotes.html" class="menu-item">
                     <div class="menu-item-left">
                         <i class="ph ph-stack"></i>
@@ -356,7 +363,7 @@ if ("serviceWorker" in navigator) { window.addEventListener("load", () => { navi
 
 
   <div class="header">
-    <h1>ðŸ“– Manual del Sistema Petulap SST</h1>
+    <h1>📖 Manual del Sistema Petulap SST</h1>
     <p style="margin:5px 0 0">Flujo Cero Papel, Gestion de Lotes y Taller Kanban</p>
   </div>
 
@@ -391,12 +398,12 @@ if ("serviceWorker" in navigator) { window.addEventListener("load", () => { navi
           <li><b>Paso 3 (Confirmar):</b> Revisa los datos y presiona "Generar Orden".</li>
         </ul>
         <p><i>Nota: Al crear la orden, se emitira un sonido de alarma en la empresa (PC) y el ticket se auto-asignara al tecnico con menos carga laboral (Algoritmo Round-Robin).</i></p>
-        <a href="recepcion_movil.html" target="_blank" class="link-btn">— Abrir Recepcion Movil</a>
+        <a href="recepcion_movil.html" target="_blank" class="link-btn">â€” Abrir Recepcion Movil</a>
       </div>
 
       <!-- KANBAN Y ESTADOS -->
       <div class="section" id="kanban">
-        <h2>ðŸŽ›ï¸ 2. Panel de Tecnicos (Mis Ordenes)</h2>
+        <h2>ðŸ‘¨â€ðŸ’» 2. Panel de Tecnicos (Mis Ordenes)</h2>
         <p>La vista principal del taller. Un tablero Kanban donde los equipos fluyen de izquierda a derecha.</p>
         
         <h3 id="flujo">Flujo y Estados Oficiales</h3>
@@ -408,24 +415,24 @@ if ("serviceWorker" in navigator) { window.addEventListener("load", () => { navi
           <li><span class="badge bg-listo">LISTO PARA RECOGER</span>: El equipo funciona. Se marca como Terminado.</li>
           <li><span class="badge bg-listo" >ENTREGADO</span>: El cliente se llevo el equipo a casa. Desaparece del panel (se va al historial).</li>
         </ul>
-        <a href="mis_ordenes.html" target="_blank" class="link-btn">— Abrir Panel Tecnico</a>
+        <a href="mis_ordenes.html" target="_blank" class="link-btn">â€” Abrir Panel Tecnico</a>
       </div>
 
       <!-- VISTA ADMIN Y COMPROBANTES -->
       <div class="section" id="admin">
-        <h2>ðŸ‘‘ 3. Funciones del Administrador</h2>
+        <h2>👑 3. Funciones del Administrador</h2>
         <p>El administrador tiene el control total del taller y es responsable de la comunicacion oficial.</p>
         
         <h3>Ingreso y Visibilidad</h3>
         <ul class="tips">
-          <li>En el panel `mis_ordenes.html`, debes seleccionar tu nombre como <b>"ðŸ‘‘ ADMINISTRADOR (Ver TODO)"</b>.</li>
+          <li>En el panel `mis_ordenes.html`, debes seleccionar tu nombre como <b>"👑 ADMINISTRADOR (Ver TODO)"</b>.</li>
           <li>Inmediatamente el sistema ignorara los filtros y te mostrara absolutamente <b>todos los equipos de todos los tecnicos</b> al mismo tiempo.</li>
         </ul>
 
         <h3>Emision de Comprobantes (WhatsApp y Stickers)</h3>
         <ul class="tips">
           <li>Cuando el tecnico registra un equipo nuevo con su celular, este aparecera en tu columna "PENDIENTES".</li>
-          <li>Presiona <b>"ðŸ’¬ Comprobante Inicial (WhatsApp)"</b> para enviarle al cliente un enlace de seguimiento oficial desde el numero de la empresa. Esto reemplaza al papel.</li>
+          <li>Presiona <b>"💬 Comprobante Inicial (WhatsApp)"</b> para enviarle al cliente un enlace de seguimiento oficial desde el numero de la empresa. Esto reemplaza al papel.</li>
           <li>Presiona <b>"<i class="ph ph-printer"></i> Imprimir Sticker (50x25)"</b>. Se abrira una pestana sin dialogos y la impresora termica imprimira un pequeno codigo de barras para pegar en la laptop.</li>
         </ul>
       </div>
@@ -442,7 +449,7 @@ if ("serviceWorker" in navigator) { window.addEventListener("load", () => { navi
           <li><b>Seleccion Global:</b> Puedes marcar el cuadro maestro arriba de la tabla para seleccionar todos los equipos del lote y aplicarles la misma falla (ej: "Sin Falla") o mandarlos directo a diagnostico masivamente.</li>
           <li>El sistema detecta automaticamente si estas escaneando un equipo que ya estaba en la base de datos (cruza informacion para evitar duplicados).</li>
         </ul>
-        <a href="lotes.html" target="_blank" class="link-btn">— Abrir Lotes</a>
+        <a href="lotes.html" target="_blank" class="link-btn">â€” Abrir Lotes</a>
       </div>
 
       <!-- GARANTIAS -->
@@ -454,7 +461,7 @@ if ("serviceWorker" in navigator) { window.addEventListener("load", () => { navi
           <li>Puedes ligar la garantia directamente con el numero de Ticket anterior (Ej: ST-2026-042).</li>
           <li>El sistema calcula los dias transcurridos y te alerta en rojo si la garantia ya expiro o sigue vigente, permitiendo ademas derivar el equipo directo a la marca externa.</li>
         </ul>
-        <a href="garantias.html" target="_blank" class="link-btn">— Abrir Garantias</a>
+        <a href="garantias.html" target="_blank" class="link-btn">â€” Abrir Garantias</a>
       </div>
 
       <!-- SOPORTE Y BUSQUEDA MAESTRA -->
@@ -466,7 +473,7 @@ if ("serviceWorker" in navigator) { window.addEventListener("load", () => { navi
           <li>El sistema buscara en la base de datos a la velocidad de la luz y te traera en una sola pantalla: Quien es el dueno, en que estado esta la reparacion actual, y todo su historial de las veces que trajo ese equipo antes.</li>
           <li>Emitira alertas gigantes rojas/verdes indicando si ese equipo tiene garantia.</li>
         </ul>
-        <a href="soporte.html" target="_blank" class="link-btn">— Abrir Buscador Maestro</a>
+        <a href="soporte.html" target="_blank" class="link-btn">â€” Abrir Buscador Maestro</a>
       </div>
 
       <!-- PORTAL CLIENTE -->
@@ -477,7 +484,7 @@ if ("serviceWorker" in navigator) { window.addEventListener("load", () => { navi
           <li>El cliente no puede ver el sistema, solo ve la pagina `consulta.html`.</li>
           <li>Ingresa su numero de ticket y el sistema le dibuja una linea de tiempo bonita (Recibido -> Reparando -> Listo). Elimina la necesidad de llamadas constantes preguntando "Ya esta mi equipo?".</li>
         </ul>
-        <a href="consulta.html" target="_blank" class="link-btn">— Abrir Portal de Consulta</a>
+        <a href="consulta.html" target="_blank" class="link-btn">â€” Abrir Portal de Consulta</a>
       </div>
 
     </div>

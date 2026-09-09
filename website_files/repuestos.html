@@ -287,6 +287,13 @@ if ("serviceWorker" in navigator) { window.addEventListener("load", () => { navi
                     </div>
                     <div class="status-dot dot-blue"></div>
                 </a>
+                <a href="desempeno_tecnicos.html" class="menu-item">
+                    <div class="menu-item-left">
+                        <i class="ph ph-chart-line-up"></i>
+                        <span>Desempeño Técnicos</span>
+                    </div>
+                    <div class="status-dot dot-blue"></div>
+                </a>
                 <a href="lotes.html" class="menu-item">
                     <div class="menu-item-left">
                         <i class="ph ph-stack"></i>
@@ -393,7 +400,7 @@ if ("serviceWorker" in navigator) { window.addEventListener("load", () => { navi
     
     <div style="display:flex; gap:10px; margin-top:10px">
       <button class="btn-outline" style="flex:1" onclick="document.getElementById('modal').style.display='none'">Cancelar</button>
-      <button class="btn-primary" style="flex:1" onclick="guardar()">ðŸ’¾ Guardar</button>
+      <button class="btn-primary" style="flex:1" onclick="guardar()">💾 Guardar</button>
     </div>
   </div>
 </div>
@@ -434,8 +441,8 @@ async function cargarData(url = 'api/repuestos.php') {
       <td >${r.stock}</td>
       <td>S/ ${r.precio}</td>
       <td class="actions">
-        <button class="btn-outline" style="padding:4px 8px" onclick='editar(${JSON.stringify(r).replace(/'/g, "&apos;")})'>âœï¸</button>
-        <button class="btn-danger" style="padding:4px 8px" onclick="eliminar(${r.id}, '${r.nombre}')"></button>
+        <button class="btn-outline" style="padding:4px 8px" onclick='editar(${JSON.stringify(r).replace(/'/g, "&apos;")})'><i class="ph ph-house"></i></button>
+        <button class="btn-danger" style="padding:4px 8px" onclick="eliminar(${r.id}, '${r.nombre}')"><i class="ph ph-house"></i></button>
       </td>
     </tr>`;
   });
@@ -511,3 +518,4 @@ cargarData();
 
 </body>
 </html>
+

@@ -293,6 +293,13 @@
                     </div>
                     <div class="status-dot dot-blue"></div>
                 </a>
+                <a href="desempeno_tecnicos.html" class="menu-item">
+                    <div class="menu-item-left">
+                        <i class="ph ph-chart-line-up"></i>
+                        <span>Desempeño Técnicos</span>
+                    </div>
+                    <div class="status-dot dot-blue"></div>
+                </a>
                 <a href="lotes.html" class="menu-item">
                     <div class="menu-item-left">
                         <i class="ph ph-stack"></i>
@@ -440,7 +447,7 @@
       
       <!-- Numero de ticket -->
       <div class="ticket-display">
-        <div style="margin-bottom:8px; font-weight: bold; color: var(--text-secondary); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px;">NÂ° DE TICKET</div>
+        <div style="margin-bottom:8px; font-weight: bold; color: var(--text-secondary); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px;">N° DE TICKET</div>
         <div id="exito-numero" style="letter-spacing:3px; font-size: 32px; color: var(--primary); font-weight: 800; font-family: monospace;">ST-????</div>
         <div id="exito-cliente" style="margin-top:15px; font-weight: 500; font-size: 1.1rem;"></div>
       </div>
@@ -573,7 +580,7 @@
                badge.style.cssText = 'background:rgba(16,185,129,0.1);border:1px solid var(--success);color:var(--success);padding:12px;border-radius:8px;margin-top:10px;font-weight:600;font-size:14px;';
                document.getElementById('f-eq-nombre').parentNode.after(badge);
              }
-             badge.textContent = '<i class="ph ph-shield-check"></i> EQUIPO EN GARANTIA â€” ' + eq.meses_garantia_restantes + ' meses restantes desde venta el ' + eq.fec_venta;
+             badge.textContent = '<i class="ph ph-shield-check"></i> EQUIPO EN GARANTIA - ' + eq.meses_garantia_restantes + ' meses restantes desde venta el ' + eq.fec_venta;
            } else {
              const badge = document.getElementById('garantia-badge');
              if (badge) badge.remove();
@@ -592,7 +599,7 @@
     async function crearOrden() {
       const btn = event.target;
       btn.disabled = true;
-      btn.innerHTML = 'â³ Guardando...';
+      btn.innerHTML = '<i class="ph ph-hourglass"></i> Guardando...';
 
       const clienteBody = {
         dni: document.getElementById('f-dni').value.trim(),
@@ -615,7 +622,7 @@
       if (!clienteId) {
         showToast('Error al procesar el cliente');
         btn.disabled = false;
-        btn.innerHTML = 'ðŸ’¾ GENERAR ORDEN';
+        btn.innerHTML = '💾 GENERAR ORDEN';
         return;
       }
 
@@ -647,20 +654,20 @@
         const eqDesc = document.getElementById('f-eq-nombre').value.trim();
         
         document.getElementById('exito-numero').textContent = numero;
-        document.getElementById('exito-cliente').textContent = nombreCliente + ' â€” ' + eqDesc;
+        document.getElementById('exito-cliente').textContent = nombreCliente + ' - ' + eqDesc;
         
         const baseUrl = window.location.origin + window.location.pathname.replace('recepcion_movil.html','');
         const linkSeguimiento = baseUrl + 'consulta.html?ticket=' + encodeURIComponent(numero);
-        const msgWP = `Hola ${nombreCliente}, somos PETULAP <i class="ph ph-wrench"></i>
+        const msgWP = `Hola ${nombreCliente}, somos PETULAP 🔧
 
 Tu equipo (*${eqDesc}*) ha ingresado correctamente.
 
-<i class="ph ph-clipboard"></i> *Ticket:* ${numero}
+📋 *Ticket:* ${numero}
 
 Puedes rastrear tu equipo aqui:
-${linkSeguimiento}
+https://petulap.store/consulta.html?ticket=${encodeURIComponent(numero)}
 
-Gracias por confiar en nosotros! ðŸ™Œ`;
+Gracias por confiar en nosotros! 🙌`;
         document.getElementById('btn-wp-exito').href = `https://wa.me/51${telCliente}?text=${encodeURIComponent(msgWP)}`;
         
         document.getElementById('btn-sticker-exito').dataset.numero = numero;
@@ -672,7 +679,7 @@ Gracias por confiar en nosotros! ðŸ™Œ`;
       } else {
         showToast('Error al crear orden: ' + sRes.msg);
         btn.disabled = false;
-        btn.innerHTML = 'ðŸ’¾ GENERAR ORDEN';
+        btn.innerHTML = '💾 GENERAR ORDEN';
       }
     }
 
@@ -700,3 +707,4 @@ Gracias por confiar en nosotros! ðŸ™Œ`;
 
 </body>
 </html>
+

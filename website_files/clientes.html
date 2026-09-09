@@ -291,6 +291,13 @@ if ("serviceWorker" in navigator) { window.addEventListener("load", () => { navi
                     </div>
                     <div class="status-dot dot-blue"></div>
                 </a>
+                <a href="desempeno_tecnicos.html" class="menu-item">
+                    <div class="menu-item-left">
+                        <i class="ph ph-chart-line-up"></i>
+                        <span>Desempeño Técnicos</span>
+                    </div>
+                    <div class="status-dot dot-blue"></div>
+                </a>
                 <a href="lotes.html" class="menu-item">
                     <div class="menu-item-left">
                         <i class="ph ph-stack"></i>
@@ -357,7 +364,7 @@ if ("serviceWorker" in navigator) { window.addEventListener("load", () => { navi
 
 
   
-  <h2>ðŸ‘¤ Gestion de Clientes</h2>
+  <h2>👤 Gestion de Clientes</h2>
 
   <!-- FORMULARIO NUEVO/EDITAR -->
   <div class="card">
@@ -382,7 +389,7 @@ if ("serviceWorker" in navigator) { window.addEventListener("load", () => { navi
       <div style="margin-bottom:8px"><label>Notas</label><textarea id="f-notas" rows="2"
           placeholder="Observaciones del cliente..."></textarea></div>
       <div style="display:flex; gap:10px">
-        <button class="btn-primary" onclick="guardar()">ðŸ’¾ Guardar</button>
+        <button class="btn-primary" onclick="guardar()">💾 Guardar</button>
         <button onclick="limpiarForm()" >Cancelar</button>
       </div>
     </div>
@@ -426,8 +433,8 @@ if ("serviceWorker" in navigator) { window.addEventListener("load", () => { navi
       <td>${badge}</td>
       <td style="max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap" title="${(c.notas || '').replace(/"/g, "'")}">${c.notas || ''}</td>
       <td>
-        <button class="btn-primary btn-sm" onclick="editar(${c.id})">âœï¸ Editar</button>
-        <button class="btn-danger btn-sm" onclick="eliminar(${c.id},'${c.nombre} ${c.apellido}')"></button>
+        <button class="btn-primary btn-sm" onclick="editar(${c.id})"><i class="ph ph-pencil-simple"></i> Editar</button>
+        <button class="btn-danger btn-sm" onclick="eliminar(${c.id},'${c.nombre} ${c.apellido}')"><i class="ph ph-house"></i></button>
         <a href="soporte.html?cliente_id=${c.id}&cliente_nombre=${encodeURIComponent(c.nombre + ' ' + c.apellido)}" style="padding:4px 10px; border-radius:4px"><i class="ph ph-clipboard"></i> Ver soporte</a>
       </td>
     </tr>`;
@@ -504,7 +511,7 @@ if ("serviceWorker" in navigator) { window.addEventListener("load", () => { navi
       if (res.ok) {
         document.getElementById('f-nombre').value = res.data.nombre;
         document.getElementById('f-apellido').value = res.data.apellido;
-        mostrarMsg('DNI encontrado y datos autocompletados âœ“', 'ok');
+        mostrarMsg('DNI encontrado y datos autocompletados <i class="ph ph-check-circle"></i>', 'ok');
       } else {
         mostrarMsg(res.msg, 'err');
       }
@@ -529,3 +536,4 @@ if ("serviceWorker" in navigator) { window.addEventListener("load", () => { navi
 </body>
 
 </html>
+

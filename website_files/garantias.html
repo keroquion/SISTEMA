@@ -292,6 +292,13 @@
                     </div>
                     <div class="status-dot dot-blue"></div>
                 </a>
+                <a href="desempeno_tecnicos.html" class="menu-item">
+                    <div class="menu-item-left">
+                        <i class="ph ph-chart-line-up"></i>
+                        <span>Desempeño Técnicos</span>
+                    </div>
+                    <div class="status-dot dot-blue"></div>
+                </a>
                 <a href="lotes.html" class="menu-item">
                     <div class="menu-item-left">
                         <i class="ph ph-stack"></i>
@@ -381,7 +388,7 @@
                     <div style="grid-column:1/-1"><label>Notas</label><textarea id="f-notas" rows="2"
                             placeholder="Descripcion del reclamo, equipos o repuestos involucrados..."></textarea></div>
                 </div>
-                <button class="btn-primary" style="margin-top:10px" onclick="crearGarantia()">ðŸ’¾ Crear
+                <button class="btn-primary" style="margin-top:10px" onclick="crearGarantia()">💾 Crear
                     Garantia</button>
             </div>
 
@@ -405,7 +412,7 @@
                 <div
                     style="display:flex; flex-wrap: wrap; gap: 10px; justify-content:space-between; align-items:center; margin-bottom:15px">
                     <strong id="modal-titulo">Detalle Garantia</strong>
-                    <button onclick="cerrarModal()" style="background:none; border:none; cursor:pointer">âœ•</button>
+                    <button onclick="cerrarModal()" style="background:none; border:none; cursor:pointer"><i class="ph ph-house"></i></button>
                 </div>
                 <div id="modal-content"></div>
             </div>
@@ -427,7 +434,7 @@
                 function renderizar(lista) {
                     if (!lista.length) { document.getElementById('tabla-garantias').innerHTML = '<p >Sin garantias registradas</p>'; return; }
                     let html = `<table><thead><tr>
-    <th>NÂ° Garantia</th><th>Lote Origen</th><th>Proveedor</th><th>Estado</th>
+    <th>N° Garantia</th><th>Lote Origen</th><th>Proveedor</th><th>Estado</th>
     <th>Tipo Resolucion</th><th>Equipos</th><th>Repuestos</th><th>Fecha</th><th>Acciones</th>
   </tr></thead><tbody>`;
                     lista.forEach(g => {
@@ -481,7 +488,7 @@
                     });
                     if (g.items.length) itemsHtml += '</tbody></table>';
 
-                    document.getElementById('modal-titulo').textContent = `${g.numero_garantia} â€” ${g.proveedor_nombre || 'Sin proveedor'}`;
+                    document.getElementById('modal-titulo').textContent = `${g.numero_garantia} - ${g.proveedor_nombre || 'Sin proveedor'}`;
                     document.getElementById('modal-content').innerHTML = `
     <div id="msg-modal" class="msg"></div>
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px">
@@ -490,7 +497,7 @@
     </div>
     <div style="margin-bottom:10px"><label>Notas / Observaciones</label><textarea id="m-notas" rows="3">${g.notas || ''}</textarea></div>
     <div style="display:flex; gap:10px; margin-bottom:15px">
-      <button class="btn-primary" onclick="actualizarGarantia(${g.id})">ðŸ’¾ Guardar</button>
+      <button class="btn-primary" onclick="actualizarGarantia(${g.id})">💾 Guardar</button>
       <button onclick="cerrarModal()" >Cerrar</button>
     </div>
     <div style="padding-top:10px">

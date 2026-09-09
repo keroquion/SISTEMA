@@ -289,6 +289,13 @@ if ("serviceWorker" in navigator) { window.addEventListener("load", () => { navi
                     </div>
                     <div class="status-dot dot-blue"></div>
                 </a>
+                <a href="desempeno_tecnicos.html" class="menu-item">
+                    <div class="menu-item-left">
+                        <i class="ph ph-chart-line-up"></i>
+                        <span>Desempeño Técnicos</span>
+                    </div>
+                    <div class="status-dot dot-blue"></div>
+                </a>
                 <a href="lotes.html" class="menu-item">
                     <div class="menu-item-left">
                         <i class="ph ph-stack"></i>
@@ -398,7 +405,7 @@ if ("serviceWorker" in navigator) { window.addEventListener("load", () => { navi
     </div>
     <div style="margin-bottom:8px"><label>Notas</label><textarea id="f-notas" rows="2" placeholder="Observaciones..."></textarea></div>
     <div style="display:flex; gap:10px">
-      <button class="btn-primary" onclick="guardar()">ðŸ’¾ Guardar</button>
+      <button class="btn-primary" onclick="guardar()">💾 Guardar</button>
       <button onclick="limpiarForm()" >Cancelar</button>
     </div>
   </div>
@@ -445,9 +452,9 @@ function renderizar(lista) {
       <td>${c.telefono||''}</td>
       <td>${badge}</td>
       <td>
-        <button class="btn-primary btn-sm" onclick="editar(${c.id})">âœï¸ Editar</button>
+        <button class="btn-primary btn-sm" onclick="editar(${c.id})"><i class="ph ph-pencil-simple"></i> Editar</button>
         <button class="btn-sm" onclick="toggleActivo(${c.id},${c.activo})" >${c.activo?'Desactivar':'Activar'}</button>
-        <button class="btn-danger btn-sm" onclick="eliminar(${c.id},'${c.nombre}')"></button>
+        <button class="btn-danger btn-sm" onclick="eliminar(${c.id},'${c.nombre}')"><i class="ph ph-house"></i></button>
       </td>
     </tr>`;
   });
@@ -532,7 +539,7 @@ async function consultarDNI() {
   if (res.ok) {
     document.getElementById('f-nombre').value = res.data.nombre;
     document.getElementById('f-apellido').value = res.data.apellido;
-    mostrarMsg('Datos autocompletados desde RENIEC âœ“', 'ok');
+    mostrarMsg('Datos autocompletados desde RENIEC <i class="ph ph-check-circle"></i>', 'ok');
   } else {
     mostrarMsg(res.msg, 'err');
   }
@@ -556,3 +563,5 @@ cargar();
 
 </body>
 </html>
+
+

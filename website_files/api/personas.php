@@ -112,17 +112,20 @@ switch ($action) {
             break;
         }
         $url = "https://api.apis.net.pe/v1/dni?numero=" . $dni;
-        $opts = [
-            "http" => [
-                "method" => "GET",
-                "header" => "Accept: application/json\r\n",
-                "timeout" => 5
-            ]
-        ];
-        $context = stream_context_create($opts);
-        $response = @file_get_contents($url, false, $context);
         
-        if ($response === false) {
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 5);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, ["Accept: application/json"]);
+        curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Petulap/1.0");
+        
+        $response = curl_exec($ch);
+        $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+        
+        if ($response === false || $http_code !== 200) {
             echo json_encode(["ok" => false, "msg" => "Error de conexion con el servidor publico de RENIEC/SUNAT"]);
             break;
         }

@@ -136,6 +136,10 @@ if ("serviceWorker" in navigator) { window.addEventListener("load", () => { navi
                     <i class="ph-fill ph-user-list acc-icon-green"></i>
                     Actividades y Clientes
                 </a>
+                <a href="desempeno_tecnicos.html" class="accordion-link">
+                    <i class="ph-fill ph-chart-line-up acc-icon-blue"></i>
+                    Desempeño de Técnicos
+                </a>
             </div>
         </div>
 
@@ -286,6 +290,13 @@ if ("serviceWorker" in navigator) { window.addEventListener("load", () => { navi
                     <div class="menu-item-left">
                         <i class="ph ph-chart-bar"></i>
                         <span>Reportes</span>
+                    </div>
+                    <div class="status-dot dot-blue"></div>
+                </a>
+                <a href="desempeno_tecnicos.html" class="menu-item">
+                    <div class="menu-item-left">
+                        <i class="ph ph-chart-line-up"></i>
+                        <span>Desempeño Técnicos</span>
                     </div>
                     <div class="status-dot dot-blue"></div>
                 </a>
@@ -501,12 +512,12 @@ if ("serviceWorker" in navigator) { window.addEventListener("load", () => { navi
         <h3 style="margin: 0; white-space: nowrap; flex-shrink: 0;">Detalle de Equipos</h3>
         <div style="display:flex; gap:10px; align-items:center; flex-wrap: wrap;">
             <select id="filtro-estado" onchange="filtrarTabla()" class="form-control" style="min-width: 220px; font-weight: 800; background: #eff6ff; border: 2px solid #3b82f6; color: #1e3a8a; box-shadow: 0 2px 5px rgba(59,130,246,0.15); padding: 8px 15px; border-radius: 8px; cursor: pointer; font-size: 13px;">
-                <option value="all">ðŸŽ¯ Filtro: Mostrar Todos</option>
+                <option value="all">🎯 Filtro: Mostrar Todos</option>
                 <option value="operativos"> Operativos (Sin Falla)</option>
                 <option value="soporte">ðŸ› ï¸ En Soporte (Danos)</option>
-                <option value="FALLA_MENOR">â†³ Solo Falla Menor</option>
-                <option value="NECESITA_REPUESTO">â†³ Solo Repuesto</option>
-                <option value="DANO_GRAVE">â†³ Solo Dano Grave</option>
+                <option value="FALLA_MENOR"><i class="ph-fill ph-wrench"></i> Solo Falla Menor</option>
+                <option value="NECESITA_REPUESTO"><i class="ph ph-package"></i> Solo Repuesto</option>
+                <option value="DANO_GRAVE"><i class="ph-fill ph-circle" style="color:red"></i> Solo Dano Grave</option>
             </select>
             <button class="btn-solid-gray" style="background: #0d9488; color: #ffffff; padding: 8px 16px; font-size: 13px; box-shadow: 0 4px 10px rgba(13, 148, 136, 0.3);" onclick="window.print()"><i class="ph-bold ph-printer"></i> Imprimir</button>
         </div>
@@ -810,6 +821,7 @@ window.onload = async () => {
             <i class="ph-bold ph-kanban"></i>
         </button>
 
+        </div>
     </main>
 
     <!-- Scripts -->
@@ -817,3 +829,4 @@ window.onload = async () => {
 
 </body>
 </html>
+

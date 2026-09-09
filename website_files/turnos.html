@@ -289,6 +289,13 @@ if ("serviceWorker" in navigator) { window.addEventListener("load", () => { navi
                     </div>
                     <div class="status-dot dot-blue"></div>
                 </a>
+                <a href="desempeno_tecnicos.html" class="menu-item">
+                    <div class="menu-item-left">
+                        <i class="ph ph-chart-line-up"></i>
+                        <span>Desempeño Técnicos</span>
+                    </div>
+                    <div class="status-dot dot-blue"></div>
+                </a>
                 <a href="lotes.html" class="menu-item">
                     <div class="menu-item-left">
                         <i class="ph ph-stack"></i>
@@ -355,7 +362,7 @@ if ("serviceWorker" in navigator) { window.addEventListener("load", () => { navi
 
 
 
-<h2>ðŸ• Turnos de Tecnicos</h2>
+<h2>Ã°Å¸â€¢Â Turnos de Tecnicos</h2>
 
 <!-- RELOJ EN TIEMPO REAL -->
 <div class="card" style="padding:10px 15px">
@@ -400,7 +407,7 @@ if ("serviceWorker" in navigator) { window.addEventListener("load", () => { navi
       <label><input type="checkbox" id="f-activo" checked> Turno activo</label>
     </div>
     <div style="display:flex; gap:10px">
-      <button class="btn-primary" onclick="guardar()">ðŸ’¾ Guardar Turno</button>
+      <button class="btn-primary" onclick="guardar()">💾 Guardar Turno</button>
       <button onclick="limpiar()" >Cancelar</button>
     </div>
   </div>
@@ -445,12 +452,12 @@ async function cargar() {
   let htmlEst = '<div style="display:flex; flex-wrap:wrap; gap:10px">';
   tecEnTurno.forEach(t => {
     const cls = t.en_turno_ahora ? 'en-turno' : 'fuera-turno';
-    const ic = t.en_turno_ahora ? 'ðŸŸ¢' : '´';
+    const ic = t.en_turno_ahora ? '🟢' : 'Â´';
     htmlEst += `<div style="border-radius:6px; padding:8px 12px; min-width:160px">
       <div >${ic} ${t.tecnico_nombre}</div>
       <div >${t.especialidad||''}</div>
       <div style="margin-top:4px"><span class="${cls}">${t.en_turno_ahora?'EN TURNO':'FUERA DE TURNO'}</span></div>
-      <div style="margin-top:3px">${t.hora_inicio.substring(0,5)}â€“${t.hora_fin.substring(0,5)}</div>
+      <div style="margin-top:3px">${t.hora_inicio.substring(0,5)} - ${t.hora_fin.substring(0,5)}</div>
     </div>`;
   });
   htmlEst += '</div>';
@@ -475,8 +482,8 @@ function renderizar(lista) {
     const enHora = horaActual >= t.hora_inicio && horaActual <= t.hora_fin;
     const enTurno = enDia && enHora;
     const badgeTurno = enTurno
-      ? '<span class="en-turno">ðŸŸ¢ EN TURNO</span>'
-      : `<span class="fuera-turno">´ FUERA</span>`;
+      ? '<span class="en-turno">🟢 EN TURNO</span>'
+      : `<span class="fuera-turno">Â´ FUERA</span>`;
     const badgeActivo = t.activo == 1
       ? '<span >Activo</span>'
       : '<span >Inactivo</span>';
@@ -485,10 +492,10 @@ function renderizar(lista) {
       <td><b>${t.tecnico_nombre}</b><br><small >DNI: ${t.dni}</small></td>
       <td>${t.especialidad||'-'}</td>
       <td>${diasHtml}</td>
-      <td >${t.hora_inicio.substring(0,5)} â€“ ${t.hora_fin.substring(0,5)}</td>
+      <td >${t.hora_inicio.substring(0,5)} - ${t.hora_fin.substring(0,5)}</td>
       <td>${badgeTurno}</td>
       <td>${badgeActivo}</td>
-      <td><button class="btn-primary btn-sm" onclick="editar(${t.id})">âœï¸ Editar</button></td>
+      <td><button class="btn-primary btn-sm" onclick="editar(${t.id})"><i class="ph ph-pencil-simple"></i> Editar</button></td>
     </tr>`;
   });
   html += '</tbody></table>';
@@ -562,3 +569,4 @@ cargar();
 
 </body>
 </html>
+

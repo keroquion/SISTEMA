@@ -1,0 +1,935 @@
+# Leyenda de hablantes
+
+S1 = CESAR AUGUSTO BOHORQUEZ CASANOVA
+S2 = JOSEPH WALTER PINTO GOMEZ
+S3 = LUIS ENRIQUE WONG INUMA
+S4 = GIANCARLOS ALEXIS CUADROS OBREGON
+S5 = SANDRA LETICIA CACERES YUCRA
+S6 = Vilma Taquima Chilo
+S7 = CARLOS ALBERTO SANCHEZ TANTA
+S8 = ZUSETT ADELEYDA LOPEZ RAMOS
+S9 = ABSALON CESPEDES GALIANO
+S10 = INGRID XIOMARA IRRAZABAL CUADROS
+S11 = DAVID MOISES CERRUCHE HUERTA
+S12 = EBERT MARTIN ALVAREZ GAMEROS
+S13 = JALISE AMY ZULEMA POZO RIVERA
+S14 = ALEXANDER JESUS MOTTA CRUZ
+S15 = CYNTIA DELGADO APAZA
+S16 = JHOJAN JHONATAN MEDINA ROJAS
+S17 = EDUARDO ALFONSO VALDEZ LOPEZ
+S18 = LUIS ERIK IPARRAGUIRRE AMAO
+S19 = FRABLI NEYER HUARI TORRES
+S20 = JOSUE SEBASTIAN DA SILVA ARISACA
+S21 = RICARDO PELAYES VILCA
+S22 = SAMIRA SARA CARDENAS CAYETANO
+S23 = JOSE SAUL PERCA DORREGARAY
+S24 = GIAN FRANCO QUISPE HUAMAN
+
+# Transcripción
+
+S1: todo bien, profesor.
+S2: Eso. Miren, por fin ya puedo verlos. Por fin ya puedo verlos. Entonces, qué genial. Y ahora ya puedo verlos, puedo escucharlos. Ya puedo. Vamos en la reunión el espacio más tranquilo. Como siempre hemos visto, antes de empezar la clase, me voy a tomar unos 5 o 10 minutitos para explicarte dos tres cositas. Ya, un enfocado al entregable el día de hoy, lo segundo enfocado a los grupos y lo tercero enfocado a la aula virtual y a los trabajos. ¿Te parece? Si hay alguna consulta adicional, la puedes dejar en el chat para que yo te pueda estar dando el soporte. Ya. Entonces, vamos a empezar primero eh viendo ya el entregable del día de hoy. Eh, pregunta, pregunta, pregunta, amigos. ¿Quiénes de acá tienen la compu o un artefacto electrónico a la mano? ¿Una laptop, una compu, una tablet, un iPod? ¿Un teléfono? Levantan su manito. Sí, levantan su manito. Levantan su manito para contar solamente Sandra. Más no. Ah, ya son dos, tres,
+S1: Teléfono.
+S2: cuatro.
+S1: Yo estoy con el teléfono porque el trabajo.
+S2: Teléfono también sirven. Okay. Excelente. Excelente. La mayoría. Entonces, el resto imagino que está solamente por ahí con el teléfono o que por ahí está en alguna situación del trabajo que no te que te permita solamente escuchar la clase. ¿De acuerdo? Si es así, eh, déjame contarte lo siguiente. A ver, el día de hoy, a ver, a virtual, estoy entrando a virtual. Como se lo dije en algún momento, a mí no me gustan los trabajos para casa. Yo creo que ustedes tienen que estudiar aquí en el tiempo asincrónico, bueno, sincrónico y que termine aquí, ¿no? Nobre aparece la casa para estar con la familia. Bueno, lo que yo creo, ¿no? Y para que pues ustedes también tengan más. Gracias, Sandrita, también voy a bajar tu manito. Sí, ya Franco también. Muchísimas gracias. Sorry, me chicos por la voz. Acaba de tener clases y y a veces tengo que correr porque es muchos pisos ya, así que estoy un poco un poquito agitadito, pero es solo por eso. Ya debería ser este. Y unidad uno, hay un entregable. A ver, la semana 4, creo. Ya listo. Comparto mi pantalla. Me confirman si se puede ver, por favor. Sí, ya. Okay. Para todos. Sí. No se olviden que nosotros tenemos ya en tercera semana, es decir, en esta, eh un producto académico, ¿no? Un producto académico que se entrega hasta el 6 de septiembre. La idea mía es terminarlo el día de hoy, ¿de acuerdo? Eh, si estás en la computadora, sigue los procesos que vamos a hacer. Puedo utilizar un Excel, trata de seguirlos, preguntar si tienes dudas para que puedas acabar tu trabajito el día de hoy y enviarlo hoy mismo a la plataforma, ¿de acuerdo? Eh, para aquellos que por ahí tengan eh un teléfono o están complicados, también pueden hacerlo a través de una hojita, ¿de acuerdo? Es decir, profe, no tengo una máquina, pero tengo un bloc de notas, un cuadernito, tengo ahí mi lapicito. Independientemente del medio de entrega, el aprendizaje es el que ustedes pues es el mismo, ¿no? Que lo entregues a través de una hojita o a través de una compo, ¿de acuerdo? Así que si es tu caso y quieres ya avanzar con tu producto académico y bueno, eh por ello mismo te quieres entregar hoy mismo y no tienes otro recurso más que un cuadernito, puedes utilizarlo y solamente envías una fotito, le tomas una fotito a lo que acabas de avanzar y lo subes aquí al producto académico. Hasta ahí todo claro, ¿verdad? Gracias, Vilma. Qué bonito, qué bonito es ver sus reacciones. No, no me siento solito. Gracias, Ingrid. Okay. Ah, gracias, gracias, gracias, William Eduardo. Muchas gracias. Entonces, vamos a revisar cuál es el producto académico para que te vayas preparando. Aún no lo voy a hacer, eso lo voy a hacer después. Sí, por ahora vamos a enfocarnos netamente en los lineamientos. Ya, ya le vamos a checar. No, vamos a ir por aquí a ver. Ya, este es el producto, ¿no? Si bien es cierto acá dice que es grupal, pero yo te doyfa. Creo que por ahora nos serviría mucho más hacerlo individualmente, ¿de acuerdo? Pero eso no quita. Si tú ya tienes un grupo, repito, ya tienes un grupo y has trabajado con tu equipo, también está bien, ¿no? O sea, también es válido. Es más, voy a dejarles acá unos minutos para que entren a unas salitas y vayan avanzando con su producto, ¿de acuerdo? Pero no olviden que el trabajo lo subimos todos. Yeah. Porque me ha pasado antes estudiantes que entregan el trabajo o o claro entregan el trabajo sin carátula, entonces pues yo como profe solamente tengo el nombre del quien envió, no todo el equipo. ¿De acuerdo? Entonces sí es importante también manejar ello, el eh que cada uno suba su trabajo por si acaso. Sí. Ya el día de hoy solamente vamos a hacer esto. Sí. Eh, ya formulación del problema, lo cual lo vamos a hacer juntitos ahí despacito y calma con calma para que tú puedas terminar esto. Después la representación gráfica. Ya te expliqué. Esto lo vamos a prescindir de este proceso y ya va a haber puntos para aquella persona que me diga por qué también. Después vamos a utilizar esto, el análisis, la interpretación, vamos a llegar ahí y finalmente la presentación del informe, que es lo más sencillo. Créeme que lo vamos a hacer conmigo y yo te voy a enseñar. ¿Alguna pregunta hasta este punto del producto académico? Ch, no te sorprendas. ¿Por qué te sorprendes? ¿Están preocupados? No, ya. Okay. Eso con el primer punto. Ya. Segundo punto, los grupos. He estado checando que muchos ya están ordenándose en equipos y eso está acá. Sí, de hecho voy a ver ahorita mi organización de grupos ya, pero para darles tranquilidad, si aún no tienes equipos, no te preocupes. Sí, no pasa nada. Los grupos recién los vamos a usar la siguiente semana. Pero era importante que ustedes ya estén teniendo sus grupitos, ya incluso acá están su WhatsApp, todo, ¿no? Si hay algún estudiante que por ahora aún no tiene grupo, igual me puede escribir y yo lo voy completando. Todos los estudiantes igual que han logrado completar tienen un puntito extra, ¿de acuerdo? Así que no se preocupen, ahí lo estoy considerando también. ¿Alguien tiene alguna consulta con los puntos? Digo, con los grupos. No lo vamos a utilizar ahora. Por ahora no. Ya, recuerden que el product los grupos nos van a ayudar a nosotros para el producto final, ¿de acuerdo? Para el examen final. Por ahora no es necesario, pero si tú ya tienes tu equipo y quieres ir ya reuniéndote con ellos ahí, genial. Hay manitas levantadas, ¿no? Luis, cuéntame qué tal.
+S3: Profesor, muy buenas noches, compañero. Buenas noches. Solo no sé, me queda una duda, este, profe, o sea, los grupos tengo entendido que vamos a hacer para el examen final, ¿no? Entonces los PA1, PA2, PA3 van a ser individual, ¿correcto? M.
+S2: Muy bien. Eh, este primer PA1, ¿de acuerdo? Si bien es cierto, eh, dice que puede ser grupal. Y si por ejemplo, digo, por ejemplo, para responderte, vamos a ponernos en un caso real. ¿Qué pasaría si este grupo cinco se reúne en equipos, de acuerdo? En su equipo y se reúne en su salita y empieza a avanzar el trabajo. Es válido. Yo no te voy a decir que no lo hagas, lo puedes hacer, ¿de acuerdo? Pero recuerda que para este PA cada uno entrega su trabajo. ¿De acuerdo
+S3: Sí, docente, ya te entendía, o sea, ya te
+S2: lo quieres hacer solito,
+S3: entendí.
+S2: chévere, profe, yo ya quiero avanzar con mi equipo que ya está formado, bacán, hazlo así, pero recuerda que el trabajo lo sube uno.
+S3: Sí. Okay, profe. Sí, este, entiendo. Entonces, podemos hacerlo entre, o sea, con el grupo. Cada uno sube su producto. El trabajo tiene que convivir de los cinco igual,
+S2: Claro.
+S3: no, no hay problema, pero cada uno lo sube.
+S2: Así es, así es.
+S3: Ah,
+S2: Listo,
+S3: ya,
+S2: Luis.
+S3: ya te
+S2: Esto tiene un propósito ya para que todos también comprendan por qué estoy haciendo esto.
+S3: entendí.
+S2: Algunos de tus compañeritos recién se están integrando el día de hoy, ¿de acuerdo? y creen que no los veo, pero sí los veo. Ya. Entonces, esto lo hago para que tengan las mismas oportunidades, obviamente. Eh, igual el día de hoy lo voy a hacer paso por paso, así que si por ahí es tu primera clase y estás en cero, tranqui, que voy a hacerlo paso por paso. ¿De acuerdo?
+S3: Gracias. M.
+S2: Okay. Okay. Todo bien. De acuerdo. Lo tercero que iba a comentarles es que varios de ustedes me decían, "Profe, ¿sabe qué? eh los libros, quiero recursos demás, ¿no? Entonces, si alguno de ustedes ha buscado en YouTube, de esto hay mucho mucha información en YouTube, en videos, ¿no?, de este curso, pero se han podido dar cuenta que los la información que está es muy operativa y muy matemática. Ah, Ricardos me dice algo. Igual si alguien por ahí, chicos, puede apoyarnos responder sus compañeritos, eh, me ayudaría bastante al desarrollo. Ahí si me explicas porfa, Carlos, ¿a qué te refieres el PA1? Ah, eso lo vamos a hacer nosotros en el en el transcurso del día, ¿de acuerdo? Así que si tienes tu compu, chévere, pasas a avanzarlo conmigo para que hoy mismo lo entregues, ¿de acuerdo? Y lo puedes hacer con tu equipo o solito, en pocas palabras, ¿está bien, Carlos? Lo vamos a hacer juntitos. Está bien. Una manito ahí o un emoji. Okay, está bueno. Listo. Ya. A lo que iba, a lo otro que iba, eh, me decían, "No, profe, quiero recursos." Si se han dado cuenta, y ya con eso voy a terminar, si se han dado cuenta, en YouTube hay mucho de esto, pero lado operativo, pero si soy honesto, este lado operativo que existe ha existido hace mucho tiempo. M. Ya desde que yo he sido estudiante de universidad están esos videos, pero ahora la intología ha avanzado tanto que ya no está en cómo resolverlo, sino en el análisis y la interpretación, porque como ya lo hemos visto la clase pasada, el solver resuelve esto en segundos, ni que hablar de la mucho más rápido. Es por eso que yo no me voy a centrar en lo que dicen los videos de YouTube, que es básicamente son cálculos matemáticos para poder llegar respuesta. Te voy a enseñar cómo hacerlo, obviamente, ya, pero no me voy a enfocar en eso porque eso al final lo puede hacer una lo puede hacer una herramienta y tú no eres una herramienta, eres un ser humano. Al profesional que va a interpretar lo que era la IA o lo que le da la herramienta, ¿de acuerdo? Entonces, vamos a enfocarnos más en interpretación y en el análisis. Ya, listo. Entonces, vamos a empezar. Por eso te decía, ¿no?, que acá en el libro eh te he compartido algunos materiales. Déjame checar dónde se encuentran. No sé, ¿alguien pudo ver los libros que he puesto? Levante la manito. Sí. A ver, a ver. Nadie. Ahí está Sandra. Sandra, sí lo hiciste. Gracias. No sé si puedes ayudarme. ¿Dónde? ¿Dónde lo encuentras? Ahí sí me ayudas. No, Sandrita. A ver si alguien tiene este. Sí, Sand. En qué no está.
+S5: Lo encontré, Pero no como tu vida.
+S2: Ah, okay. No se escucha muy bien ya, pero creo que logré entenderte, al menos lo esencial que me dijiste. Ya, según lo que me cuentas están acá. A ver, a ver, a ver, para explicarte también qué es lo que te estoy compartiendo, ¿no? Eh, a ver, unidad presentación puede ser,
+S6: Ah, docente que tal pidió clases,
+S2: ¿no?
+S6: pero este en la NRC eh 39118 no hay material. Imagino que eso a eso se refiere, ¿verdad? Sí,
+S2: Sí,
+S6: porque incluso le mandé un correíto,
+S2: sí, sí, sí,
+S6: pero creo que no lo he leído porque en la 39 118 no
+S2: sí, sí. No, de hecho lo leí, lo leí. Sí.
+S6: hay material.
+S2: De hecho, yo los leo a todos, pero quiero recordar en qué parte, porque sí lo subí. Si bien en todos en videoclases,
+S6: videoclases ahí en tutorial.
+S2: aquí podrá estar,
+S6: Sí,
+S2: vamos a checar accesos,
+S6: sí. En la parte de abajo hay
+S2: materiales. Ah, ya aquí no lo he subido ya.
+S6: materiales
+S2: Ah, mira, ya ahí no lo he subido. Lo he subido en otro lado porque para ustedes creo que está en Pero igual lo puedo mover, no problema.
+S7: lo ha subido en unidad No,
+S2: Ah,
+S7: no.
+S2: lo subí ahí. M.
+S6: a ver. M.
+S2: Ah, miren, ya. A ver, vamos a checar introducción unidad uno. Claro, aquí está la diapositiva. Que la diapositiva sí está, ¿no?
+S7: la diapositiva. Sí. M.
+S2: Ya, ya, ya la encontré. Todos deben tener esto. Ah, en la semana uno van a tener algo que dice material de lectura complementaria porque no me dejaba subir en los otros, así que lo subí aquí. Y acá dice en la parte de abajo libros recomendados por el docente, porque ustedes me decían que no tenían acceso a estos libros. Sí. Entonces aquí yo les voy a estar agregando. Por ahora van dos libros, ¿sí? Pero no les quería saturar tampoco. Mientras vamos avanzando a las clases, les voy a compartir más libros, ¿de acuerdo? Pero por ahora vamos con estos dos. El primer libro ya es el de Mine, ya que es muy bueno en verdad. va a abordar la primera unidad que es programación lineal, lo que estamos haciendo, pero también dos temas que vamos a hacer en la segunda y tercera unidad. Este libro es muy bueno y te cuento por qué. Si a ti te complica mucho el lado matemático, formular, eso que hacemos con la tablita. Aquí no te obviamente la técnica de la tabla porque es un es algo mío lo de la tablita, pero aquí hay ejemplos de cómo construir tus funciones, ¿no? Por ejemplo, si es una función constante, una función positiva, ¿qué significa max min? Acá te explican ejemplo y paso a paso. Miren, con fórmulas muy suavecitas te están explicando, ¿de acuerdo? Para y te da y está todo resuelto por si quieres practicar, interpretar qué significa, ¿no? Cuando te dan un nin y se cambia un max. Son temas más matemáticos, obviamente. Por eso si a ti te o una oportunidad de mejora que tú encuentres dentro de lo que tú sabes son las matemáticas, esto te va a ayudar bastante. Este primer libro, el segundo libro, este que te he puesto acá, está en inglés, pero no te preocupes, por eso está la I. O sea, tú le puedes meter a la I y decir, "traduce, ¿no?" Y ya, bacá. Pero a lo que voy es que este libro te va a ayudar si lo que te está costando no es la parte matemática, sino la parte analítica, la parte interpretativa. ¿De acuerdo? Por eso este libro está enfocado más en tema de gerencia y producción. Sí. Acá también es muy sencillo de poder ver. Acá te va a explicar capítulo por capítulo también la interpretación, ¿no?, que tiene cada uno. Y está en inglés, ¿sí?, Pero como ya te dije, el chay piti lo traduce todo, ¿no? Entonces te va a seguir bastante si tú quieres interpretar y como te eso tiene con casos empresariales. Acá, por ejemplo, tenemos un caso de gestión de cadena, cliente y y gestión de redes, ¿no? Entonces eh nada, te igual cualquier duda que vayas teniendo, ahí está el foro. Yo siempre estoy atento al foro. Pues alguén tiene una pregunta, eh. No, bueno, sí, para que tú también puedas este considerar bien. Dicho eso, siendo las 8:57, ya pasado 30 minutos de gestión. ¿Alguien tiene alguna consulta, pregunta, requisito, solicitud para empezar? ¿Todo bien? Ya para empezar con el modelo del día de hoy, manitos de arriba, algo, reacciones. Entonces dice, "Sí, Gabriel está feliz, ¿no? Gabriel está en fiesta, creo, Gabriel. Ya, chévere. Ahí tienen los libros entonces para que puedan descargarlos y por ahí yo creo que están en todos tus aulas, ¿de acuerdo? Eh, ya, pero si por ahí crees que tal vez, no sé, se me pasó ahí, me lo dices también para subirlo otra vez. Ya vamos a empezar. Ahora sí, ya vamos a empezar, amigos, amigos, amigos. Atención, aquí yo te explicaba. Ya, préstame atención aquí. E yo te explicaba, ¿no?, que nosotros dentro de la investigación operativa damos, tenemos un modelo, lo lanzamos, lo resolvemos, pero no siempre es la respuesta correcta porque ahí no hay trabajo de ingeniería. Déjame darte un ejemplo. ¿Qué chat o qué quieren utilizar, amiguitos? Ahí voy a poner el chat. Alguien chat GPT. La clase pasada, ¿cuál usamos? Y creo, ¿no? Gemini. Y entonces ahora podemos usar chat GPT. Vamos a chat GPT. Va a ser lo mismo. ¿A qué se refiere con eso? Ya pasa prestar atención acá que vamos a hacerlo juntitos. Mira, yo le puedo poner al chat GPT esto. Formula un modelo de programación lineal y mientras voy a pedir puntos. Ah, ya. Considerando dos puntos. Alguien que me diga levantando la mano un elemento del modelo de programación lineal cualquiera. Un punto se ve en el estudiante. ¿Alguien se han olvidado, chicos? Sused.
+S8: variables de decisión.
+S2: Muy bien, señorita Sused. Su apellido es López.
+S8: López Ramos.
+S2: Este López Ramos, ¿no?
+S8: Sí, tiene.
+S2: Ya están farmeando puntos. Eso está bien. Ya lleva cuatro puntos. prácticamente hice una pregunta completa y sin hacerla para el examen. Sí, tienen que sumar sus puntos. Yo les voy a poner esto, ¿no?, en su en su examen directo. Ya, correcto. Variables, ¿no? Las variables de decisión, señorita Suset, eh estaban relacionadas a los recursos o a los productos.
+S8: a los
+S2: Muy bien, señorita.
+S8: productos
+S2: Dígame, por favor, ¿cuántos productos quiere para este ejemplo?
+S8: podría ser cinco. No.
+S2: cinco. Okay, vamos con cinco productos considerando cinco variables. Es decir, si yo soy una empresa de carros, tengo cinco productos, tendré cinco tipos de carros, ¿no? Si yo soy un chifa y tengo cinco variables, ¿cuáles pueden ser esas variables? Mis cinco platos de comida. ¿Sí o no? Claro, profe, si ustedes son una universidad, ¿cuáles pueden ser tus variables? Pueden ser cinco cursos, cinco programas, cinco maestrías, ¿no? Entonces, ya me van entendiendo, ¿no? Las variables son los productos finales que tú ofreces al cliente. ¿De acuerdo? Otra participación más, gracias a Isus. ¿Alguien que me pueda decir alguna otra restricción o elemento del modelo de programación lineal? Creo que ya te dije la respuesta. ¿Alguien? A ver, vamos con usted, jovencito, señorita, vamos a ver. E se me perdió. Absalón, cuéntame.
+S9: Eh, la función
+S2: Función objetivo.
+S9: objetivo.
+S2: Okay. Y cuéntame qué, cómo es la función objetivo.
+S9: Es bueno, es lo que queremos maximizar o minimizar,
+S2: Muy bien. Correcto. Le puedo poner acá, ¿no?, con cinco variables o una función objetivo. ¿Tú qué quieres en este caso? ¿Que minimice o maximice o quieres que la IA?
+S9: que
+S2: Ah, que le pongo entre paréntesis,
+S9: maximice
+S2: Max. Listo. Muchísimas gracias. Tu apellido es primera vez,
+S9: es Galeano.
+S2: ¿no?
+S9: Sí. Primera vez.
+S2: Céspedes. ¿Qué más? Galiano. Listo. Puntazo. Tiene que subir sus puntos. Gracias, amigo. Okay, ya está. Entonces, una función objetivo que tenga max y me falta una, ¿no? Porque son tres elementos. Ya voy variables, voy función objetivo. ¿Quién me falta? Ah,
+S6: restricciones.
+S2: pero yo voy a hacer a Vilma. Vilma, ¿verdad?
+S6: Sí,
+S2: Vilma, ¿cuáles son las restric y las restricciones?
+S6: las restricciones,
+S2: ¿En qué se enfocaba, señorita Vilma?
+S6: eh, el tope, eh, el mayor o igual o bueno, no, el igual o menor, menor o igual. Puede ser, por ejemplo, tres restricciones o puede pasar de tres. Puede ser tres o
+S2: Muy bien.
+S6: menos.
+S2: Correcto. Ahora, si el producto se enfocaba en la variable, en la restricción se va a enfocar el re cur rec
+S6: Recurso.
+S2: recurso. ¿Por qué? Disvariables pueden ser lo que decía, ¿no? Cinco platos de comida, cinco cursos, eh 10 carros, no lo sé, ¿no? Obviamente no. Si son, por ejemplo, dos variables, puede ser un Hyundai y un Toyota, ¿no? Diferentes tipos de modelos de carros, porque los productos son aquellos que yo voy a vender. Chocoja de eh chocoteja de maracuyá, ¿no? Diferentes sabores, ¿no? Entonces, hamburguesa de carne, hamburguesa de pollo. Esas son mis productos que vendo, pues son mis variables, pero las restricciones son los recursos que son necesarios para construir mis variables y cómo son mis recursos, finitos o infinitos. finito, ¿sí o no? Tienen un límite, ¿no? Es por eso que, como dijo la señorita que me está diciendo que yes, eh, las restricciones siempre tienen un límite y como dijo la señorita, por eso tienen menor igual o mayor igual o incluso un igual. ¿Está bien, señorita? Mira, para que su punto valga, ¿cuántas restricciones quiere?
+S6: Tres.
+S2: tres restricciones y tres restricciones. Ya está, tengo mi modelo, tengo mi variable, función y restricción. ¿Qué le voy a poner? ¿Qué debería ponerlo? Enfocado a un escenario de señorita Vilma, ¿cuál es su apellido? Si no me olvido.
+S6: Aquí en el número se en la celda 6.
+S2: Taquima, conté.
+S6: Ya está mi aperida.
+S2: Ah, Taquima, ya está. Dos puntitos. Ya está. tienen que ganar sus puntos.
+S6: Gracias. M.
+S2: Ah, no, a usted, muchísimas gracias. Ya. Y no se olviden, ¿no? Una vez ya le puse esto, le pongo enfocado a un escenario de leo en el chat qué tipo de escenario quieren logística, seguridad, salud, transformación digital, empresarial, emprendimiento. Yo te leo. Ah, a Vamos a ver cuál se repite. Utiliza en el chat. Muéstrame, muéstrame qué quieres enfocado a que ese tipo de escenario. Mantenimiento, producción. mineral, seguridad, logística, recursos humanos, todo se puede aplicar aquí. Voy a checar cuál es el que más está repitiendo. A ver. Ah, logística. A ver, ahí. Mantenimiento, seguridad, transporte, logística, seguridad, producción, tecnología, producción, seguridad, seguridad, salud, mantenimiento, calidad también. Claro, veo que el que más se repite es la señorita Vilma.
+S6: Eh, docente, disculpe, este, justo no sé si pasa con los demás de mis compañeros. Lo que pasa es que en donde estuvo usted proyectando, Isa sale una pantalla donde dice, "Estás presentando mostrar." Ah, ya. Exacto. Si lo pone ahí, este, se ve toda la pantalla porque si sigue ahí como que tapa. No sé si a los demás le pasa lo
+S2: Okay, okay. Lo voy a dejar así,
+S6: mismo.
+S2: ¿de acuerdo? Y voy a entrar por mi teléfono para leer sus chats.
+S6: Eh,
+S2: ¿Está bien?
+S6: puede colocar mostrar de todos modos, docente.
+S2: Sí.
+S6: Sí, para que se pueda para que se pueda ver normal.
+S2: Ah. A ver, vamos a checar. Ah, miren.
+S6: mostrar mi pantalla de todos modos.
+S2: Vamos
+S6: Coloquelo.
+S2: así
+S6: Sí, pero igual se ve este.
+S2: mejor.
+S6: Amplíelo ahí justo donde está hay una X pequeñita al costado. A la derecha.
+S2: Hay una X acá.
+S6: Derecha. Ahí al medio.
+S2: Ah, pero con esto voy a cerrar.
+S6: Al medio. Ajá.
+S2: Ya no los voy a ver. Ya ahí se va a volver a la
+S6: al medio.
+S2: pantalla.
+S6: Ah,
+S2: Sí,
+S6: qué raro.
+S2: pero no se preocupen, no se preocupen. Lo que voy a hacer es hacerlos chiquititos ya, para que tampoco se distraigan mucho con esa pantallita. Aquí les voy a leer a ustedes. Aquí van a estar aquí a mi derecha. Mi derecha van a estar. Y mejor, ¿no? Sí, chicos. Ahí está. Puedo ver sus manitas. Gracias. Ya está correcto. Entonces sí, también se puede tener calidad, mantenimiento, todo en este caso voy a escoger calidad, producción, tecnología, logística, logística, seguridad. Ya, seguridad, creo que se repite. Puede confir la seguridad, un escenario de seguridad y salud en el trabajo. Profe, no me gusta. Bueno, pero puedes utilizar tú mismo tus propios recursos también, ¿no? Tú dale tus propias variables, tu propia este restricciones, ¿no? Y le doy enter. Ah, ya está. Seguimos ganando puntos. Vamos a empezar por eso. Ese más grande. Ya. Primero, ¿qué te dice? Una empresa desea maximizar el nivel de cobertura. Pam, pam, pam. Ya. Y acá, querido amigo, vamos a empezar ya con tu trabajito. ¿Ya les parece si ya empezamos también con su trabajo para que ya ir avanzándolo ya? Ya, manito. Sí, ya listo. Ya vamos por ahí, eh, estás con tu, ya sabes. Ah, si estás con tu cuaderno, bacán, agarra una hojita y escribe. Yo te voy a revisar. Tómale foto y súbelo. Ah, hay que acabarlo hoy, ¿no, profe, yo lo quiero hacer con tiempo. Ya está bien, pero estoy siendo grabada la clase. Ya vamos a empezar por aquí. Primero dice formulación del problema, ¿cierto? Ya. ¿Con qué empieza la formulación? Con definir las ¿Qué cosa? las variables,
+S6: variables.
+S2: ¿sí o no?
+S6: Yes.
+S2: Muy bien. Entonces, como yo ya he hecho este ejemplo, ¿cuántas variables tengo?
+S6: Cinco.
+S2: Tengo cinco variables. Ahora, ustedes saben que a veces su profe para poder evaluarita contexto, ¿no? Le pueden copiar y lo pueden pegar acá. Incluso el escenario, ¿no? ¿De qué trata? Pues no. Y ahí está. Listo. Profe, ¿sabe qué? No lo quiero hacer aquí mismo. Lo quiero hacer en otro documento, pues porque no lo sé. Eh, es más, ¿te parece? Ya me comentarán ustedes, perdónen si estoy un poco hablador hoy, pero ¿les parece si creo un documento en línea para que ustedes tengan acceso a ese trabajo como ejemplo también? Pero no lo borren. Sí, sí. De acuerdo. Vamos a hacer ello. Ya, no lo vayan a borrar. Ah, ya. Sí, ya, o sea, lo puedes borrar, pero yo creo que tus compañeros para si saben quién eres ahí, ¿no? Se van a eh se van a molestar contigo. Ya es producto académico uno, ¿ya? Y le voy a poner 20262, ya para no equivocarme, ya. Ah, investigación operativa, no me voy a confundir con otros cursos. Investigación operativa. Esto te lo voy a compartir aquí. Ah, mejor. Primero voy avanzándolo para que por ahí no nos equivoquemos mucho. Ya. Entonces, vamos a avanzar con esto. Pasos escoger. Vamos con el primero. Formulación del problema y nos piden estos tres. Ya le pongo control C y lo pego acá. Listo, profe, ya está. Lo pongo bien bonito, lo pongo un poquito más grande para que tú también mires. Listo, ya está, profe. Mi formulación del problema obviamente empieza siempre con la descripción del escenario, ¿sí o no? Y acá, ¿dónde encuentro eso? Aquí, ¿ve? Escenario. Una empresa desea maximizar el nivel de cobertura de sus acciones preventivas de seguridad y salud en el trabajo, considerando recursos limitados de capacitación, inspección, pam, pam, pam. Ahí está este contexto control C. Control V. Ya está, profe. Siguiente. Definir las variables de decisión, que son los productos, ¿sí o no? Voy acá. ¿Cuántas variables tengo? Tengo cinco. Ahora, presta atención acá. Importante. Yo sé que tú vas a hacer esto. Voy a agarrar mis variables y lo voy a pegar. Profe, ya está listo mi trabajo. Profe, ya acabé. Yo te sugiero algo. Si vas a hacer eso, está bien, para eso está la guía. No te preocupes, pero lee, ayúdate, pero lee. Recuerda que tu profe ve interpretación. Para mí es más importante de lo que me muestres, 80%, cómo lo interpretas, cómo analizas tú como profesional, que si te sale la nota el ejercicio. Yo valoro más ese análisis. Vamos a verlo ya. tiene cinco variables. El primero, ¿de qué trata? Número de alguien. Bueno, alguien, chicos. Número de Muy bien.
+S7: capacitación
+S2: Número de capacitaciones realizadas. X2, ¿qué significa?
+S6: variable dos.
+S2: Ajá. Número de inspecciones.
+S7: inspecciones
+S2: La tres mantenimiento la
+S11: Número de mantenimientos preventivos.
+S12: mantenimientos preventivos.
+S2: número cuatro. número de Muy bien.
+S12: Trabajadores capacitados.
+S7: trabajadores capacitados.
+S12: trabajador.
+S2: Y finalmente el número cinco,
+S7: Equipo
+S2: número de equipos de DPPs, ¿no?
+S7: ¿Qué me
+S2: Entregados. Muy bien. Entonces, cada uno tiene una importancia, es un producto que va a servir para algo, ¿no? Si mi x1, que es una variable, vale 2, ¿qué significará? ¿Cuántas capacitaciones he tenido, chicos?
+S13: No.
+S2: Si x1 vale 2.
+S6: Dos.
+S10: Dos.
+S2: Y si x3, por ejemplo, tuvo cer, ¿cómo interpretan?
+S14: como uno.
+S11: No tuvo mantenimientos.
+S2: Claro, si x3 es ig a 0, no hay mantenimiento preventivo porque el x3 vale 0, significa que es inexistente, no hay vale cero. Si hubiera sido uno, ah, profe, se realizó un mantenimiento preventivo de equipos. Si hay dos, profe, dos mantenimientos preventivos. Esas son las variables. ¿De acuerdo? Ya, profe, hasta ahí, amigos, se está entendiendo. Miren que estamos avanzándolo así poco a poco. Ya, chévere. Estas son mis variables. Como profesional tú vas a decidir cuáles y qué valor va a tomar cada uno, porque tú vas a hacer tu trabajo. Tu trabajo va a ser armar una propuesta y decir, yo propongo como ingeniero, como marketero, como profesional, como administrador, tener al mes tres capacitaciones, dos inspecciones, cuatro mantenimientos, tan, tan, tan. Tú propones algo porque cuando estás en el trabajo, ¿qué va a pasar? Muchas veces la mayoría propone en función a lo que a lo que crea, ¿no? No, pero al final, ¿qué produce eso? Gastos, no hay ahorro, se te sale de control los tiempos, ¿no? Entonces complicado. En cambio, vamos a aprender a proponer, pero con control, mejorando, manteniendo y optimizando. Listo. Mucha cháchara, profe. Sigamos. siguiente me dice función objetivo. Regresa chalpiti. ¿Dónde está mi función objetivo, amiguitos? Aquí está. ¿Sí o no? ¿Qué pasaría si tú como estudiante me dice, "Ah, profe, es esta fórmula. Control C, control V y le doy este formatito." Profe, ya está. Pregunta para todos. ¿Estará bien o estará mal? ¿Qué creen? ¿O qué le falta? ¿Alguien? No están hablando, chicos. No los escucho. Sí, están hablando. No creo que no lo están hablando. Ah.
+S6: Sí, está bien docente.
+S2: Ah, Vilma. Ah, está parcialmente bien. Falta algo. Mira, si esta es tu función objetivo, yo sé queé significa x1. Sí, sé, no. ¿Qué es x1?
+S6: Variable uno, número de
+S2: Ah, eso sí sé, ¿sí o no?
+S6: capacitaciones.
+S2: Ah, profe, pero ¿qué significa Z?
+S7: Número.
+S2: Eso yo lo sé.
+S6: Ah,
+S12: Sumatoria de variables.
+S6: es no.
+S2: Oh,
+S10: el resultado,
+S2: Yí, ¿qué resultado es? ¿Qué quiero maximizar?
+S6: No.
+S8: También las ganancias.
+S2: Acá te pone,
+S10: las ganancias
+S2: no siempre son las ganancias, ¿no? Porque acá será acá el problema, bueno, acá el informe que nos dice nos pone ganancias, ¿no? Pero no siempre son ganancias. Yo quiero que vayas más allá en el ejemplo que hemos visto, ¿qué quiere maximizar? A,
+S15: el impacto de sistema
+S2: aquí está el Muy bien. Eh,
+S12: Tema de el impacto.
+S2: ¿qué quiere? ¿Qué quiere el impacto en qué?
+S12: maxizar el impacto.
+S2: En seguridad y salud en el trabajo.
+S15: trabajo Oh.
+S10: trabajo. Okay.
+S2: Eso es lo que tú debes poner acá. Maximizar el impacto en la seguridad de salón en el trabajo y después pones tu fórmula. ¿Por qué? Porque tu profe es tóxico. Tu profe te va a decir, "Ah, ¿y qué significa Z? Y si tú me dices ganancias, ¿tendrá sentido?" No, ¿sí o no? No tendrá sentido, ¿sí o no? Ah, profe, entonces siempre es importante para que ustedes sepan qué están haciendo y no se pierdan poner qué significa cada letrita. Acá está bonito, ¿no? Cada variable tiene su interpretación y acá también, ¿no? Establece tu función objetivo. ¿Cuál es mi función objetivo? Maximizar, ¿qué cosa? El impacto. Tal vez para alguno otro sea maximizar ganancias. Tal vez para algún otro sea maximizar la salud. Tal vez para algún otro sea maximizar clientes o maximizar seguros. para que t el lado financiero, por ejemplo, maximizar mi los clientes que obtengo al mes. Se dan cuenta que depende mucho un punto aquel estudiante que me diga y me interprete qué significa este 10. Un puntazo
+S17: o este número de capacitaciones, o sea, digamos 10 capacitaciones que valen el punto número uno. M.
+S2: cerca, pero no. Sigamos intentándolo. Graciason. Está cerquita. A ver, ¿quién más?
+S3: variables.
+S2: ¿Quién más? Johanja,
+S3: Ah,
+S2: Johan.
+S3: la cantidad de variables.
+S2: A Luis dice la cantidad de
+S3: A ver, a ver.
+S2: variables.
+S3: Maximizar X.
+S2: Le contó nuevamente.
+S3: No, no, no es porque
+S2: A ver.
+S9: Eh, bueno, la las veces que bueno, en este caso fueron 10 veces que se realizó el número de capacitaciones. Yes. Yes.
+S2: Te estás acercando cada vez más. Está más cerca. Ahora estás a un 80% cerca. Alexandre. Alexander.
+S16: Docente es el impacto.
+S2: Yo muy bien. Creía que no querías participar ya. Pero bonito. Ah, el impacto de ¿qué? financiero, impacto público de
+S16: No hay impacto en seguridad y salud en el trabajo del X1,
+S2: quién.
+S16: número de capitación.
+S2: Ya, claro, ya no bonito desde el principio. Ah, recuerda que eso no lo vamos a presentar por matemático, sino a gerente. Al gerente le vamos a decir, no, bueno, es el es el impacto del x1. No, no, no. A ver, ¿cómo sería el 10? ¿Qué significa? Es el Ajá.
+S16: El 10 el impacto en
+S2: ¿De quién? ¿En qué? el impacto en
+S6: Seguridad y salud del trabajo.
+S16: trabajo de el número de capacitaciones de las capacitaciones, ¿no? De seguros realizadas.
+S2: Oh, correcto. Muy bien. No te olvides. Por eso te decía, ¿ves? Tú tienes que saber qué significa este 10, este 8, este, este cora ya lo sabes. Es sencillo. Por eso te dije arriba pon qué cosa estás maximizando. Te doy este ejemplo. Mira. Un ejemplito más. Ya voy a poner otro ejemplo aquí. Solo vean lo que está resaltado de amarillo. Ah, ya. Solo esto es un ejemplito de amarillo. ¿Se ve, no? Sí, se ve. Ya voy a hacerlo más grandecito. ¿Qué pasaría si aquí yo quiero maximizar la ganancia? ¿De acuerdo? Quiero maximizar ganancia. Y X1 significa lámparas. X2 significa TBS. X3 significa licuadoras. Licuadoras. Yeah. Ecuadoras. X4 significa. ¿Qué puede significar X4? H, se me fue. Se me fue en inspiración. Aspiradoras. Aspiradoras. Ya. Y la X5 significa oas. Ya está. Ya está. Y acá te voy a poner otros datos, pues no. Te voy a poner cinco, te voy a poner cuatro, te voy a poner nueve, te voy a poner 100, te voy a poner uno, no más te voy a poner dos. Ya está bien. Uno o así nada más. X5. Ya. ¿Qué significaría cinco, chicos?
+S16: La ganancia de las lámparas,
+S2: De bonit. ¿De quién?
+S10: Ne.
+S16: del producto uno que vienen ha ser las lámparas.
+S2: Muy bien. Si vendo una lámpara, ¿cuánto gano?
+S16: Cinco.
+S2: Si vendo dos. Muy bien. ¿Qué significa este cuatro?
+S6: 10uncia
+S16: ganancia del producto X2 que viene a ser el
+S2: ¿De quién?
+S14: la
+S16: TV.
+S2: Muy bien.
+S14: TV
+S2: Y así, ¿qué significa acá?
+S16: ganancia también.
+S2: Bonito, bonito, bonito. No, 100, ¿qué significa de?
+S15: Ganancias de aspirador de las dos
+S6: del aspiradora.
+S14: ganancias
+S2: Muy bien,
+S15: aspiradoras.
+S2: profe. Acá no hay número. ¿Qué es? Cero.
+S14: uno.
+S2: Ah, claro. No me van a poner eso. Ah, si no hay es uno, ¿sí o no? Ya. ¿Qué significa entonces?
+S15: Uno,
+S2: ¿Cuánto gano por vender una ollita?
+S6: Uno.
+S14: Uno.
+S2: Un ¿qué?
+S14: No.
+S2: un sol,
+S15: un sol,
+S2: pues sí,
+S15: un sol.
+S2: claro, un sol. Ya se dan cuenta lo importante entonces que es tener para nosotros la descripción. Tu profe no está loquito, tu profe te ayuda porque ya sabe dónde vas a caer. Y mis estudiantes, la operación impecable, pero ya saben, la operación, el chat GPT lo hizo y si tú te enfocas solo en operar, operar, operar, el chat GPT te va a reemplazar. No, y y yo no quiero que te pase eso. Tú eres un profesional que tiene que saber tomar decisiones, analizar lo que el robotito le va a dar. Sigamos.
+S16: Profe, mis
+S2: Ah, Johan,
+S16: punto.
+S2: cierto. Cuéntame qué puntit tu apellido es.
+S16: Todavía no estoy en la lista. Medina rojo.
+S2: Medina. Medina. ¿Qué más? Medina Rojas.
+S16: A ver.
+S2: Un puntazo. Gracias, amigo. Listo, chiquis. Vamos a continuar entonces. Ya, profe. Función objetivo. Ya está. ¿Cuál es lo otro? Restricciones.
+S6: restricciones
+S2: A ver, profe, ya está acá mi un objetivo. Restricciones. ¿Cuántas restricciones tengo aquí?
+S6: tres.
+S2: Ay, tengo tres, ¿sí o no? Ya, vamos a ir en orden. Ah, entendiendo mi primera, ¿cuál es?
+S12: ¿Cuál es?
+S2: ¿Cuál es? ¿Cuál es?
+S12: ¿Cuál es?
+S14: Presupuesto disponible.
+S12: Presupuesto disponible.
+S11: puesto.
+S2: Muy bien. Presupuesto disponible. ¿Qué va a ser su profe o qué van a hacer ustedes? Pueden acá, presupuesto disponible, profe. Ya está. No, yo te pregunto, ¿no? ¿Por qué existen las restricciones? Sencillo. Tú me podrías hacer, "Ah, profe, mire, mientras mis variables son más altas, mi impacto va a ser más alto. ¿Sí o no? Profeo puedo proponer entonces que haya 100 de cada uno y voy a llegar algún valor seguramente, profe, que hayan 1000 va a aumentar, ¿no? Un millón aumentando, ¿sí o no? Mi impacto de seguridad y salud. Pero yo te pregunto, ¿en la vida real puedes hacer eso?
+S6: No.
+S18: No.
+S2: ¿Qué es lo que te impide tener altos valores de productos? Producir 1000, 100, 2000, 1000, un millón, 2 trillones. ¿Qué es lo que te impide? Las Eso,
+S13: restricciones.
+S2: porque en la vida todo es limitado y es lo que vamos a ver. La primera limitación que tengo, ¿qué cosa es? es el preso presupuesto,
+S6: Presupuesto.
+S12: Presupuesto.
+S6: Ev.
+S2: ¿cierto? Muy bien. Copiamos, pero ya te expliqué por qué. Porque copiamos el presupuesto y ahora copiamos la fórmula. Ah, profe, eso es todo, profe. Sí, eso es todo. Pero entendiendo un punto aquel estudiante que me diga que significa 500.
+S11: profesor, que solo se puede hacer 500 capacitaciones. Yes.
+S2: cerca. Guíate lo que hicimos acá. A ver, Johan, vamos a ir con un chévere que quieres participar, pero también quiero que tu compañerito. Sí. Y bueno, gracias, amigo. La siguiente, la siguiente con todo. Vamos, Johan. Eh, Absalom, cuéntan muy
+S9: Es el presupuesto disponible para las capacitaciones.
+S2: bien. Ese presupuesto y ahí bajan la mano todos, ¿no? Es el presupuesto disponible. Ya, ahora sí va y así van los demás. Tu apellido es Absalón Céspedes.
+S9: Céspaleano,
+S2: Primera vez aquí.
+S9: no es el nu número nuci. Yeah.
+S2: Ya. Más grande. Ya. A ver, profe, otra vez. No te entiendo. Vamos con calma. Igual que hicimos aquí una función objetivo. Si la función objetivo que hablaba de impacto en seguridad y salud, aquí de qué habla la fórmula habla de presupuesto. significa de que o en pocas palabras cuánto te está costando un X1 o las capacitaciones. ¿Cuánto te cuesta una capacitación?
+S1: 500
+S2: Muy bien. Y tener dos y
+S1: sería 1000.
+S7: Ş.
+S1: Ya,
+S2: soles claro. Entonces,
+S1: 1000.
+S2: estos numeritos es el presupuesto disponible o también lo que te está costando cada variable, cada pregunta. ¿De acuerdo? Un punto más aquel estudiante. Ahora sí. Vale todos. Ah, valen todos. Ándale, a ver, analizando, analizando. ¿Cuál? Entre capacitaciones, inspecciones, mantenimiento, trabajadores capacitados con EPP y EPPs entregados. Entre estos cinco, ¿cuál es el que te cuesta más? Levanten la mano.
+S14: El X3.
+S2: Levanten la mano. El punto vale con levant la mano.
+S14: El X3.
+S2: No, con Gracias
+S16: Como mi compañero lo
+S7: Todos se levantamos. Vamos a
+S16: dijo,
+S2: bonito. Ya sabes, estás para un gerente. Ger si es X3. No entiende gerente, se estresa.
+S1: Número de mantimientos preventivos.
+S2: Sí, todos quieren participar. ¿Conciste Johan?
+S1: equipos.
+S16: sí, docente.
+S2: Gracias,
+S16: Gracias.
+S2: César. Gracias Johan. Gracias también ais y a Vilma que yo estoy seguro que tenían ahí respuesto. Claro, ¿no? El más alto, profe, es el que está 800 porque es el que te cuesta más y si te cuesta más obviamente puedes hacer menos de esto, ¿cierto? Ya. ¿Y cuál es tu presupuesto máximo que te han dado? 10,000. No,
+S12: Nad Yeah.
+S2: claro.
+S15: 10,000.
+S2: Pregunta otra vez para un punto. Ah, que me falta, no me falta. Johan, Johan, Johan, Johan, ¿cuál era tu apellido, amigo?
+S16: Medina docente el 10.
+S2: Medina Rojas.
+S16: Eh, sí.
+S2: Ah, ya está ferando sus puntos, ¿no? Muy bien. Ya lo que les decía, ¿no? Vamos a continuar acá. Entonces, amigos, pregunta para otro punto. Ah, valen todos. que se rápidos aquí analizando, analizando de todos estos productos que tengo, ¿cuál es el que a ver del que yo podría ser al menos 100?
+S7: X4.
+S2: A ver, Vilma, vamos contigo. Todos están ahí, ¿no? Sí, dale. Silva, cuál es el que puedo tener como mínimo 100.
+S6: el X4 porque es el
+S2: ¿Por qué?
+S6: mínimo, es el costo mínimo de trabajadores capacitados.
+S2: Sí. Entendamos la pregunta. ¿Está bien la respuesta? Vamos a entender la pregunta. Ya. Como mínimo 100 trabajadores capacitados o como máximo 100 trabajadores capacitados, ¿qué pasaría si hay 101 trabajadores? ¿Podrías capacitar a 101 trabajadores? ¿Sí o no?
+S16: Docente, no te alcanzaré el presupuesto.
+S7: Sí, docente.
+S16: estar superando el límite de los 10,000es,
+S7: Ah.
+S2: Muy bien.
+S6: Se pasa de
+S2: ¿Me siguen? No, claro,
+S6: límite,
+S2: porque si este 101 no podría, ¿no? Claro. Muy bien, muy bien. Ah, están respondiendo. Apedido Vilma.
+S6: Takima.
+S2: Ya todos van a participar. Yo sé que todos están hablando ahí. también lo voy a considerar, es que no. Okay. Siguiente restricción de qué está horas disponibles,
+S7: disponibles.
+S2: ¿no?
+S7: Listo.
+S2: Ya. Muy bien. Lo voy a poner acá. Hora disponibles. Copio mi formatito así bien bonito. Te luces, pues, no te haciendo esto. Ya está. ¿Qué me falta? Mi fórmula, profe. La fórmula está acá. Y repites el proceso que hemos hecho acá. ¿Qué significará ocho? Pregunta para todos. ¿Quieres saber? Carlos. Carlos.
+S7: protección.
+S2: No, bonito. Bonito.
+S7: Claro,
+S2: Protección para un gerente. ¿Cómo le explicas esto? ¿Qué es ocho?
+S7: son las horas disponibles del personal del
+S2: ¿De quién? ¿De quién?
+S7: personal para las capacitaciones realizadas.
+S2: Para. Muy bien. Significa que para si tú quieres una capacitación de seguridad necesitas qué cosa? 8 horas de personal.
+S7: 8 horas.
+S2: Está bien. Gracias, Carlos. Tu apellido es Sánchez.
+S7: Es Sánchez Tanda
+S2: Primera vez también, ¿no?
+S7: no está en Lem 4.
+S2: Ah, estás acá. Cuatro. Muy bien. Bien. participativo. Ya, correcto. Muy bien, ¿no? Entonces, profe, si es un ocho, significa pues que para hacer un X1, es decir, para hacer una capacitación, necesitaré 8 horas de personal de seguridad y como máximo tengo 200. Pregunta análisis para todos. pueden hacer su manito, ¿no? ¿Con cuál de estos como máximo podré hacer como máximo, como máximo podría hacer 200. M.
+S19: e con el e se podría hacer con como máximo instructor o igual este con el X5 que es igual al número de equipo de protección, ¿no?
+S2: Muy bien.
+S19: Para el personal.
+S2: Como máximo, ¿cuánto podrías hacer? 200, ¿no?
+S19: Sí, sí,
+S2: Y si te pide 220,
+S19: ya excedería e con
+S2: ¿en cuánto excede?
+S6: Ah.
+S2: En 20.
+S19: 20 con 20 horas.
+S2: ¿Qué? Muy bien. Hace falta. ¿Y qué haces? Si quieres igual contrato más gente, ¿sí o no? Muy bien. ¿Cuál es tu pedido, amigo?
+S19: Wi docente.
+S2: Primera vez.
+S19: Sí.
+S2: Guairo. Así.
+S19: Wari.
+S2: Ah, wari con h. No,
+S19: Sí, docente Torres.
+S2: ¿qué más? Torres. Ya está. Guay. Okay, muy bien, amigos. Ah, vámonos con la última. Ah, profe, hemos hablado de presupuesto y de horas, pero hay otra restricción. ¿Cuál es esa otra restricción? Límite operativo de actividad, que esto de hecho en logística, esta restricción siempre está en logística. Logística, ¿no? El límite operativo. A ver, ¿qué me ha puesto acá? Acá te explique incluso, no es lo no les decía yo capacidad logística es lo que la empresa puede hacer porque hemos visto, ¿no?, presupuesto, ¿cierto? No podemos tener infinito dinero para hacer esto. Tampoco disponemos de infinito tiempo para poder tener todas las que tengamos, pero el límite operativo en logística básicamente es los recursos y espacio que tú tienes para hacer algo, ¿de acuerdo? Porque para capacitar necesito también un espacio, ¿sí o no? Necesito a un capacitador, necesito materiales, necesito recursos, o sea, ya la capacidad logística engloba todo ello, ¿de acuerdo? Y en este caso, amiguitos, ¿quién me interpreta esto? Un punto aquí el estudiante que interprete ya no uno por uno, no que no un coeficiente por un coeficiente, sino que me interprete la fórmula en general. Está fácil. Ya, pero tómese su tiempo. Así es. El camino más sencillo es el camino correcto, ¿no? A ver, me dice Absalón. A
+S9: Ah, bueno,
+S2: ver,
+S9: sería el límite operativo de todas nuestras variables o actividades debe ser menor o igual a 50.
+S2: ¿ya? ¿Y eso qué significa? Interprétalo un poquito más. Te falta describir la última parte.
+S9: para poder maximizar nuestro impacto.
+S2: ¿Cómo tiene?
+S1: Stop.
+S2: Ya. Okay. Aunque una objetivo, solo restricción. Te ayudo.
+S16: Ah.
+S2: Te ayudo.
+S16: Todos van a ser iguales,
+S9: A ver.
+S16: los
+S2: Ya, ahí está.
+S16: gente.
+S2: Te pregunto,
+S9: Ah,
+S2: ¿el límite operativo logístico para todas las actividades son o no son
+S1: Ah.
+S2: iguales?
+S9: sí, son iguales.
+S16: Sí.
+S2: Son iguales.
+S9: 50.
+S2: 50. Apellido de los dos, por favor. Buen participación.
+S9: Céspedes.
+S2: Absalom Céspedes y mi otro compañero Beina,
+S16: Medina.
+S2: ¿no?
+S16: Sí.
+S2: Beina. Muy bien. Están ahí, están ahí peleando ahí por la punta. Ya parece la Liga Un, ¿no? En algunos casos, queridos amigos, vamos a encontrar esto, ¿no? Tú puedes que todas las variables valgan lo mismo y no está mal, puede ser, puede pasar. Y en este caso, pero te dice que como máximo tú puedes tener 50 o en pocas palabras que tú puedes ponerle todas las cantidades que tú quieras, pero no debes sobrepasar los 50. Okay, hasta acá. ¿Alguna pregunta o consulta? ¿Todo bien? Josué,
+S20: Docente, buenas noches. Eh,
+S2: cuéntame.
+S20: yo no entiendo esa restricción del límite operativo de actividades, o sea, que hace referencia o un ejemplo así más
+S2: Ah, claro que sí.
+S20: práctico.
+S2: Ya. Pregunta, ¿es con respecto a lo que al concepto de límite operativo o es con respecto a la fórmula?
+S20: Creo que el concepto, la fórmula la entiendo más o menos.
+S2: El concepto. Ya, mejor te explico los dos.
+S20: Sí,
+S2: Entonces,
+S20: mejor. M.
+S2: de acuerdo. Ya. El límite operativo, básicamente voy a hacer otra vez uso de mi poderosísimo paint. Ya está mi paint. Ya extrañabas, ¿no?, que tú usas su paint. Ya. ¿Qué es límite operativo? Procámoslo así. Las clases de docentes, ¿de acuerdo? La universidad, por ejemplo, la universidad, por ejemplo, ya tiene 20 ambientes, por ejemplo, ah, tiene 20 ambientes o salones, ¿no? 20 salones. Y cada salón eh se puede usar una vez al día, ¿ya? O sea, obviamente al día puedes utilizar estos 20. Sí. Y tú tienes 50 cursos que dictar. Cada curso se dicta al día también. Pregunta, ¿mi está por debajo o por encima de lo que necesito? M.
+S18: por debajo.
+S2: por debajo,
+S1: Son
+S2: ¿se entiende? Porque yo tengo 50 cursos y solamente tengo 20 ambientes. Está por debajo. Eso es capacidad logística. Pregunta. Aquí yo te he preguntado algo acerca de cursos. C. Este curso eh tiene la cantidad, el doble de estudiantes que el otro. He hecho ese análisis, ¿no? ¿Verdad? No lo he hecho, simplemente te he dicho, si tengo 50 cursos para 20 ambientes. La capacidad logística es básicamente eh aquello que la empresa tiene que tener para que las cosas funcionen y no haya quiebre de stock o no se detenga la producción. En este caso hemos hablado de universidades. En algunos casos también puede pasar esto. Ya vamos a hacer capacidad logística. Puede ser muchas cosas, pero quiero que enfoques el concepto a lo que la empresa necesita para que las cosas funcionen. Otro ejemplo más. capacidad logística puede ser, ¿no? Eh, yo necesito o a ver, 30 unidades de kilos de azúcar, 50 de 50 sacos de kilo de harina, ¿de acuerdo? Pero mi almacén solamente tiene capacidad para 60 aquí, 60 unidades. Pregunta, ¿miadstá por debajo o por encima de lo que necesito? Chicos, nuevamente una vez más.
+S16: ¿Qué
+S2: Una vez más. Mi almacén tiene espacio para 60 unidades.
+S7: Docente, ¿puede silenciar al compañero
+S2: Ah, okay, okay. Sorry, sorry, sorry. Silencio a todos. Ya, ya en teoría lo he silenciado a todos. En teoría. Ya, ahí ya estamos, ¿eh? Ya vamos a continuar. Entonces, la capacidad logística es entonces aquello que la empresa necesita para que las cosas funcionen. Si yo, por ejemplo, necesito almacenar 80 unidades, pero tengo un espacio solo para 60 unidades, ¿cómo es mi capacidad logística? ¿Está por debajo o por encima?
+S18: por debajo.
+S2: Muy bien, eso es capacidad logística. En el caso de este ejemplo que hemos visto acá, no me especificó qué, no me dijo simplemente por capacidad logística la empresa solamente puede tener 50 unidades preventivas en total. No me especifico por qué, pero puede haber sido por muchas cosas. Puedo ser tal vez por el, bueno, tiempo ya no es evaluado. Puedo hacer también por el uso de sus espacios, ¿no? Que solamente puede hacer los 50 50 unidades por el periodo, pues no sé, porque pues solo tiene 50 espacio para estos 50, ¿no? O tal vez solamente ha programado en función a las horas, al espacio libre que tienen sus colaboradores, solamente para 50 unidades. La capacidad logística, en pocas palabras, es como ya te lo había mencionado, lo que la empresa necesita para que las cosas sigan funcionando. Si tu capacidad logística está por debajo de lo que necesitas, hablamos de un substock o un quiebre de stock, pero es otro tema. ¿De acuerdo? No te preocupes porque el límit la capacidad logística eh o también llamado límite operativo eh me dio el chat GPT. No es un concepto que yo te voy a evaluar. es algo que te di GPT y si por ahí tienes más dudas puedes preguntar ya, pero eso depende también de tu modelo. Tal vez lo tengas, como que no lo tengas, tal vez tengas otro otras restricciones. Y acá te decía 50, pues porque en este caso, por ejemplo, todas valen lo mismo. ¿Cuánto es? Uno. ¿Valen lo mismo? En el caso de horas, por ejemplo, valían lo mismo o no. Porque el x1, ¿cuánto te está costando? 8 horas, el x3 10 horitas, el x5 solo una horita, cada una tiene un peso diferente, ¿de acuerdo? Por eso es que se construye la fórmula acá en el límite operativo todas valen exactamente lo mismo que es uno, pero importante solamente tengo espacio para 50. ¿Se entendió ahí, amigo? Mejor. Sí. Bien, José, me alegra igual si es que no queda algo claro, con toda con toda confianza. ¿Alguna otra pregunta, amigos? Si no, manos, likes, likes. Quiero ver likes. Tipa la pantalla, ¿no? Ah, no, tap tapes. Docente. ¿Cuál es la restricción lógica de no negatividad? Dice Josué. Ah, buena pregunta. Yo te pregunto, ¿qué pasaría si el solver lo resuelve y me dice esto para que tú tengas la máxima ganancia? Porque quiero eso, ¿no? Máxima ganancia. Y el Solver te dice, tú tienes que tener -90. Esto es real.
+S18: Oh. Yeah.
+S2: Claro. ¿Cómo podríamos interpretar eso? Ah, - 90 capacitaciones, difícil, ¿no? Negativo, ¿no? Entonces, por eso seguramente lo ha sacado de acá. La restricción, acá hay otra restricción más, creo que está más arriba, ¿no? Aquí está de no negatividad. O seguramente lo hiciste en tu modelo y lo encontraste, ¿no? ¿Cómo tienen que ser todas mis variables mayores iguales? ¿Qué? ¿Qué? ¿Cuánto? Si son no negativas.
+S13: C.
+S2: Claro que Ajá.
+S6: Cero.
+S2: Pero eso no lo pongo yo aquí pues porque se sobreentiende, ¿no? Que todas tienen que ser mayores iguales que además el sobre también lo entiende. ¡Chévere! Así tiene que ver.
+S16: bastante mayores iguales que cero
+S2: Ah, Johan, dime.
+S16: enteros.
+S2: Ah, depende.
+S16: Sì.
+S2: Qué buena pregunta, Johan. Voy con mi solver. Buenas preguntas, chicos. A no sé si es porque les gusta el curso o porque no quieren jalar o por ambos. No lo sé. Ya voy a hacer esa ah. Acá imaginen que estoy hablando yo de empleados, ¿ya? Emple. Empleados. X1 y X2. Por eso les dije que es importante poner las unidades y de qué trata la descripción. Si hablo de empleados y te pongo tres y co, eso no es posible. Te pregunto.
+S9: Es posible.
+S2: Es posible.
+S20: Sí.
+S2: Claro, no te asustes.
+S7: Sí.
+S2: Es posible. ¿Cómo interpretamos? Necesitamos para el X1, ¿cuántos empleados?
+S16: Tres.
+S7: Tres.
+S2: Y para el x2 5.
+S18: Yes.
+S16: C.
+S7: C. M.
+S2: Sencillo. Ahora, claro.
+S6: cinco.
+S2: ¿Y qué hubiera pasado si tuviera dar resolver esto? ¿Es posible?
+S18: No.
+S2: No, pues no es posible.
+S6: medio cuerpo. Ah.
+S2: y un niño. Ah, muy bien. De hecho, Gabriel, lo que acabas de decir es cercanamente a lo que se hace. Ahora te cuento. En el análisis que acá podríamos hacer muchas cosas. Uno, podríamos trabajar solo con enteros o si eres muy perspicaz podrías hacer esto. Ahí lo que yo te digo análisis, lo que no hace el chat GPT. Chat GPT no va a analizar eso. Eso lo haces tú con todos los cursos que has llevado. Tú puedes decir, "No, cinco empleados para el X2. Pero para aquí puede ser tal vez tres empleados y uno partis.
+S16: Medio tiempo.
+S2: Te pregunto,
+S7: tres personas y uno de 1,20. M.
+S2: ¿se entiende? No,
+S16: ¿Te refieres a medio tiempo de trabajo docente Oh.
+S2: claro, porque sería Claro que sería 3 más un 0.5, ¿sí o no? Y este 0.5 5 es la mitad de un trabajador, alguien que sé, tal vez con medio tiempo o mi trabajo, por ejemplo, lo que hacemos es solicitamos a uno, pero que sea junior, uno, por ejemplo, un analista junior,
+S7: Covid. Oh.
+S2: alguien que cobre la mitad, M. Se entiende, amigos. Claro. No,
+S3: Sí,
+S2: pero
+S3: docente se entiende, profe, porque justamente de eso se trata el curso para ir viendo esas
+S2: es
+S3: posibilidades, porque si el cliente te pide también hay que darle solución,
+S2: Luis Enrique, muy buena respuesta y hay que darle solución a las cosas. Ahora, ese es un camino. Tú como profesional más adelante, futuro colega, me vas a decir lo siguiente. Profe, ¿sabes qué? Pero a mí no me gusta trabajar así, profe. Mejor lo redondeo a a tres. Me quedo así. También es válido, profe. No quiero que sea cuatro a cinco. También es válido, pero cuidemos las restricciones que no se pasen. ¿Está bien? Ya, eso respecto a las unidades, pero aquí iba con la pregunta, ¿tú crees que siempre van a ser enteros o habrá casos en los que sí vamos a utilizar decimales?
+S7: Si va a haber momentos que se va a emplear decimales. Sí,
+S2: ¿Qué pasaría si ya no hablo de empleados? Hablo de kilos de, por ejemplo, ¿no? Kilos de alimentos. Y aquí me sale 5.6 8.1. Ahí me sirve decimales o no me sirve.
+S18: Sí.
+S7: No.
+S6: Sí.
+S2: Ah, ¿de qué va a depender? Muy bien. Esa restricción de enteros va a depender también de tu propio modelito. Por eso te he dicho que yo te sugiero que hagas tu propio modelo. Tu profe no te va a dar. Yo no te doy un examen de haz esto y resuélvelo. Yo quiero que tú propongas lo tuyo enfocado a tu trabajo. Utiliza tu guía, todos tus recursos. Yo te voy a estar apoyando, pero tienes que practicar. ¿De acuerdo, amiguito? Hasta ahí. ¿Se entendió? Eh, Josué. Sí,
+S20: Sí, sí, sí.
+S2: chévere. Lo demás también tenemos su manito. ¡Chévere! Gracias. Vamos a continuar. Entonces, hasta ahí. No hay más preguntas. No, todo bien. Sí, pregunten, pregunten porque esto de esto se trata. Ya vamos entonces, profe. Entonces, con esto su formulación del problema ya está, su escenario, variables ya están, función objetivo y mis restricciones ya están, profe. Y yo estoy entendiendo. No ha sido solamente un control C, control V. ¡Chévere! Paso uno completado. ¿Qué sigue? La representación gráfica. Profe, ¿qué es esa representación gráfica y por qué no me has enseñado? Te voy a enseñar, pero antes yo quiero explicarte por qué no te he enseñado esto. Te explico. sencillo. Si yo te dibujo esto, ¿me entiendes? No es un eh es un cuadrante. Esto es x, esto va a ser y. Si yo tengo, por ejemplo, una fórmula, ¿no? Por ejemplo, de las que tengo acá, perdón. que están acá. 50x ta. Ya, profe, son fórmulas lineales. Chévere pregunta. Yo puedo crear su recta, ¿no? Pero a lo que voy es esto, lo importante. ¿Con cuántas variables tengo acá?
+S18: dos x y y.
+S2: ¿Cuáles son?
+S7: X.
+S2: Muy bien. Por ejemplo, ¿no? Si para si x vale 2 y vale 3, va a estar acá su puntito, ¿sí o no? Ah, profe, eso es el método gráfico, no es nada es tabular y encontrar cuál es el punto máximo. Te voy a mostrar un ejemplo, pero ¿por qué no te muestro esto? Porque solamente trabaja con ¿cuántas variables?
+S20: con todos.
+S2: con dos. ¿Qué?
+S12: dos variables.
+S2: Y en la vida y en la vida rú solamente dos variables.
+S18: No.
+S2: A ver si profe. Sí, pero mejor te enseño con hasta Yao. Te dije tengo estudiantes que están trabajando con 10, 12, 15 variables. En la vida utiliza más variables, ¿no, profe, pero explícame. Ya te explico. Este es el método gráfico. Presta atención. Ya. Miren, este es un ejemplo que te he puesto. X1 polos, X2 casacas. ¿Se entiende? ¿Sí?
+S13: Sí.
+S2: ¿Verdad? ¡Chévere! Ya quiero maximizar ganancias. 20. ¿Qué significa entonces?
+S6: Ganancia de los polos,
+S2: Ganancias. Muy bien. Y 35,
+S6: de las casacas. Ganancia de las casacas.
+S2: ganancia de los casacas. Muy bien. El método gráfico es esto, amigos. Lo mismo, ¿no? Tengo solamente dos variables, ¿cierto? Polos y casacas. X1 y X2. Lo único que tienes que hacer es hacer tu recta. Acá está primero mi fórmula, ¿ve? Eh, de mis restricciones, ¿no? Aquí está mi fórmula de mi restricción. 2x + 1 + 3x + 2 menor o igual que 300, ¿cierto? Te voy a explicar rápido. En verdad esto es matemática, pero ya el solver lo hace y en verdad no te imagino haciendo esto si es que vas a estar eh que vas a estar trabajando. Nunca lo hecho, nunca lo he hecho. Nunca he visto que lo hagan. No, pero igual te muestro un poco en qué consiste. Ya. A ver, te cuento. Por ejemplo, acá 2x1 + 3x2 es la una de las restricciones. Sencillo. Tiene que ser menor que 300. Te dice, ¿no? Que 300. Perdóname si lo hago aquí sobre si lo hago encima. Ya, sencillo. Si x1 vale 0, ¿cuánto vale x2? Chicos, ingeniería ingeniero ti hacer esto rápido, ¿no? Si x1 vale 0, 2 * 0 0, ¿sí o no? Me queda 3x2 = 300.
+S6: Bien.
+S2: Muy bien. Este 3 pasa a dividir y x2 vale 100. Sencillito. Por eso si vemos acá cuando x vale, cuando x1 vale 0, acá está mi x1, ¿no? ¿Dónde está cero? Acá, profe. ¿Y cuánto vale y o x2? 100. Acá. Ah, profe, entonces acá hay un punto, profesor. Por eso acá del 0 al 100 hay un puntazo, ¿ves? Y lo mismo, ¿no? Y si x2, profe, vale 0, cambiamos los roles. Si x2 vale 0, ¿cuánto vale x1? 150. ¿Sí o no? Estamos reemplazando nada más. Vino dice, "Sí, profe." Ya. Lo por eso vamos a ver que en esta recta, ¿no? Cuando X1 vale 50, ¿dónde está X1? Aquí está X1 vale 150. Sorry. Bueno, está más allá. Va por acá, ¿no? ¿Cuánto va valer x2? 0. su punto va a estar aquí, pues no, por eso que la recta sigue acá. Entonces, este es el método gráfico, simplemente calcular puntos, dibujas tu recta y una vez que tú tengas tus puntitos, voy a hacer eso un ratito, eh, tú tienes un polígono, ¿no? Está acá es mi polígono. Ahí está mi polígono. ¿Cuántos vértices tiene? Mm,
+S6: Dos.
+S2: vamos, ya.
+S6: Bueno,
+S2: Vamos a ver eso. Voy a borrar todo esto porque se ve feíto, no me gusta cómo se ve. Ya. Entonces, primer paso para el método gráfico es dibujar mis rectas. Son dos restricciones, por eso tengo dos rectas, la primera y la segunda. ¿Ven? Ahí está. Okay. Segundo paso, profe, ¿cuál es? Como me dice maximizar, entonces pinto hacia abajo. Por eso aquí veo una región sombreada. V sencillo. He dibujado mis dos rectas y he pintado hacia abajo porque decía maximizar. Y el tercer y último paso es sencillo. ¿Cuántos vértices tiene, profe? Tienes tres vértices. Un vértice acá, otro vértice acá y otro aquí. Profe, tienes otro acá. Sí, pero eso vale 00 cer. No, no. Y eso es lo que veo acá, pues, ¿no? Por eso acá dice 120 y 0, que es el que está acá abajo, 60 60, que es aquí el medio, y 0 y 100, que es el que está aquí. Y el cer y cero, pues no se considera, ¿no? Porque pues es cer y cero, ¿no? Entonces eh bueno, como te dice x1 y x2, tú tienes que reemplazar esto en tu función objetivo. Tu función objetivo es esta, ¿no? 20x1 + 35x2 es = 3 500. Entonces, con el primer ejemplo, con este vértice uno, simplemente ay, simplemente lo eh lo reemplazas, ¿no? 120 vale x1, 20 * 120 es 2400 más 0, como dice 0 * 35, pues anula, ¿no? Entonces, eh, ¿cuánto sería? 120 * 20. Es lo que veo aquí. Y acá igual, ¿no? 60 reemplazo este x1 le pongo 60, x2 le pongo 60 y la respuesta es 3300. Lo mismo con la que está acá, eh, no, eh, con esta que está aquí, 0 y 100. X1 vale 0, se elimina 35 * 100, 3500 y es lo que viene acá. Y como me dice maximizar, selecciono obviamente el máximo, ¿no? ¿Cuál seleccionarías? El último, ¿sí o no? porque es el mayor. Ah, entonces te dice, ah, con 0 y 100 logras maximizar. Bueno, en resumen, eso es todo lo que es el método gráfico, ya es dibujar y reemplazar, pero es mucha cosa, ¿no? No es lo que yo creo, no sé si coincides conmigo. Y para solamente dos variables es demasiado trabajo para dos variables o no sé.
+S7: Cuando más uno ya como que se dificulta
+S2: Imagínes tenemos tres, cinco variables. Se complica, ¿no? Ya. Y miren, ah, esto es sencillo porque yo puedo meter el problema, ya yo puedo meter este problemita al chat GPT y resolverlo, ¿no? Por ejemplo, aquí le puedo poner resuelve y ya me olvido del método gráfico, me olvido de todo ello. lo va a resolver. Ahí está optimizando, está sacando todos los escenarios posibles. Y es más, el método gráfico a veces falla. A veces falla el método gráfico. ¿Por qué? Porque tienes que ser un trome dibujando funciones. Si ahí no sabes dibujar funciones, te complicas. Tienes que ser un trome sacando eh puntos de intersección entre funciones. Si no sabes ello, te vas a complicar más aún. Por eso que mira acá te sale la función la función óptima, ¿no? Pero ya vamos por ahí. A eso iba. Ahora en la actualidad el Excel lo hace solo, la inteligencia artificial lo hace solo. En mis tiempos yo tenía que hacer mi método gráfico. Yo lo sé. Inge, ¿y cómo lo hacías tú cuando habían cinco variables? Hay formas, ¿no? Lo hacíamos con matrices, aplicábamos este ese método gráfico, hacíamos tres métodos gráficos por cada combinación, un tema matemática, te complicabas y la gente ya no le gustaba el curso. Okay, para hacer un resumen, ya son las 10, me queda una hora con ustedes. Que me entiendan, chicos. Eh, ¿hay alguien acá que le gustaría tal vez o explorar aún más el método gráfico o todos me entendieron cuando les digo que no es muy efectivo? Si hay silencio, me preocupa. O tal vez sí les gustó y quieren que les enseñe el método gráfico.
+S7: Continúe nada más docente con el paso tres.
+S2: Carlos profe,
+S6: Queremos lo fácil docente.
+S2: ya sí. Yo digo que sí, o sea, el método gráfico, en verdad yo les pregunto a ustedes, ¿no? Yo también me olvidó antes graficar funciones. Mucho tema para dos variables, ¿no? Imagínense. Ya. Paso tres, representación gráfica. In. ¿Qué hacemos acá? Nada. Y es más, si alguien te dice, si alguien te dice, "Oye, ¿por qué no usas método gráfico?" ¿Qué responderías? Porque mi modelo tiene más de dos variables. Mi modelo es super pro, tiene 15 variables. Sacas pecho, ¿no? Es algo real. Igual no es malo, ¿no? Si tú tienes dos variables, chévere, ¿no? También está bien. Okay. Continuamos. Resolución a través de Excel, Geogebra y el Wfund Alpha. Acá también falta Lingo y falta el PQM. Pero yo te he dicho, tú vas al trabajo, vas a tener un Geogebra, ¿quiénes tienen en la máquina de su trabajo el Geogebra instalado? Absalon. Ah, no, bueno, el Geogebra está ya en línea, ¿no? ¿Qué me quieres contar, Absalot?
+S9: Ah, no, solo quería decirle que bueno, usamos en para ingeniería, sí, el celular también o línea en todo sitio.
+S2: O por el celular también. Claro, Geogebra,
+S9: Sí.
+S2: pero igual me ayuda solamente para dos variables, ¿cierto? Porque, ¿cómo? ¿Cuántas variables tienes en el geog en el geograpsum?
+S9: Sí. X Y X Y hasta Z creo.
+S2: ¿Cuántas tienes? Ajá.
+S9: No, no estoy
+S2: Pero tiene, si yo te digo,
+S9: seguro.
+S2: por ejemplo, puedes utilizar cinco variables, podrías utilizar en Geogebra con cinco
+S9: Eh, claro. Sí. No, no,
+S2: variables,
+S9: no.
+S7: No, docente. Yeah.
+S9: No.
+S2: ¿no? ¿Sí o no? Claro, te ayuda, Pero también para el método gráfico, para dos variables. Wframp te sirve, pero la licencia cuesta. ¿Cuál es lo que tú tienes sí o sí? Tu poderosísimo Exel.
+S7: Es
+S2: Listo. Ahora sí. Profe, tú me dijiste que no era necesario tener mi Excel. Es cierto, si tú quieres hacerlo más práctico, puedes hacer lo siguiente. Tú hiciste todo esto, ¿no? Nuevamente voy al capítulo 3, resolución mediante herramientas computacionales. Pum, ya está, profe. Entendiendo. Ah, profe, yo lo he hecho con la IA. Chévere. Vamos a utilizar la IA, entonces. Ya, pero entendamos algo, lo que tú quieres es tener la respuesta de las variables, cuántas capacitaciones, cuántas inspecciones, todo esto es lo que tú necesitas, ¿de acuerdo? Esa es la respuesta que tú necesitas para saber cuánto vas a maximizar considerando los recursos. Okay, visto esto, me voy a mi chatt. Amigo, cuéntame el chat GPT, ¿qué te está diciendo? Es su resultado final, ¿no? Le puse resuélvelo. Acá lo resuelto, tan, tan, tan, tan, tan. Y llegó a esta, a esto último. Yo te pregunto, ¿es la respuesta o no es la respuesta? Voy a verlo. ¿Es o no es? Sí, pues sí es. ¿Qué te había dicho? Que necesitas tú la cantidad de por cada variable. ¿Qué te está recomendando el CH GPT? ¿Cuántas capacitaciones tienes que hacer? Chicos, no se duerman. No,
+S16: 12.5
+S2: 12.5, ¿sí o no, profe? Pero 12.5 no puedes dar respuesta, profe, ¿cómo vas a dar eh decimales? ¿Sí o no? Pero sí me están entendiendo, ¿no? Entonces, de inspecciones, ¿cuándo te está recomendando chat GPT de mantenimiento
+S6: cero. No.
+S13: Cer
+S2: preventivo de trabajadores con
+S10: Cero. Yeah.
+S13: 0 37.5
+S2: EPP? Raro, ¿no?
+S13: Cinco.
+S2: DPP entregados,
+S18: Cero.
+S2: cero. Cero.
+S22: Sera.
+S2: PP entregad.
+S7: Ahí están dando decimales, No.
+S2: Exacto. Ahora ya voy. ¿Cuánto es tu impacto preventivo máximo? ¿Cuál es el máximo impacto que puedes obtener?
+S6: 312
+S10: 312.5 S cinc.
+S2: Ah, muy bien.
+S6: puntos.
+S2: Y para eso vamos a ver las restricciones, ¿no? Acá restricciones. Has utilizado todas tus restricciones. Tenías acá presupuesto 10,000, ¿te acuerdas? Sí, ¿verdad?
+S6: Sí.
+S2: ¿Ya has utilizado todo o no has utilizado todo? Muy bien.
+S6: Todas
+S2: En restricción, horas disponibles, ¿utilizaste todo o casi todo,
+S7: Casi todo,
+S18: Casi,
+S2: pero no te pasaste?
+S6: casi.
+S18: casi.
+S2: No, claro, no te pasaste.
+S7: ¿no?
+S2: Estás dentro del rango y en capacidad operativa logística.
+S7: están iguales.
+S6: Exacto.
+S2: Exactito llegaste. Entonces, ¿qué podrías entender? No me pasé de los recursos, así que lo máximo que puedo llegar hasta 312.5. Ahora yo te y es donde yo te digo, eh, vas a si vas a hacerle caso al 100% tu chat GPT, ¿qué cambiarías aquí en las
+S23: No.
+S2: respuestas?
+S6: el 12.5, el punto
+S2: Claro,
+S6: 5
+S2: le pongo auméntale una restricción más. Las variables tienen que ser qué cosa?
+S6: enteros.
+S2: Enteros.
+S7: Ah. Yeah.
+S2: Ya, ya me dicen. Ahí está. No, X1 tienes que hacer en Z dentro de Z. Sí. Ahora sí, con esta restricción que ya tienes que verla así, ¿no? Con esta restricción resuélvelo nuevamente. Ya. Vamos a ver que lo resuelve. Ya está. Ah, me pide el problema original otra vez. Qué pesado.
+S4: que sabe lor. ¿Qué m*****?
+S2: Sí, pesado. Qué pesado. Pero chicos, porfa, su lenguaje ahí, ¿no? Su lenguaje. Ya sé que están ahí. Se han reído, ¿no? Pero lenguaje, chicos, ya sí se han extasiado.
+S7: Está extasiado, muchacho. Yeah.
+S2: Ya voy a copiar todo esto. No modelo me da todo esto y yo le voy a poner todo esto ya. Eh, eh, y creo que ya está. A ver. Ah, me faltó la eh la función objetivo y la restricción. Ya, ya está. Vería. Ya que lo resu, no me piden más cosas.
+S16: No está vinculado,
+S2: Me voy a hacer,
+S16: no está vinculado tu cuenta docente.
+S2: me voy a ser fan de Copilot. Ah, me voy a ser fan de Copilot. Esto que solo me p no me permite hacer más. A ver, vamos a checar. Ah, no, sí lo está haciendo. Lo está haciendo.
+S7: explique para profe Yeah.
+S2: Sí, sí lo está haciendo. Ahora sí son enteros. Ya. Hmm. Ya. Vamos a usar Excel también. Ya. No te no te asustes. Vamos a usar Excel también. Ya. A que haya aplicado nuevamente. Ya, como siempre verificamos. ¿De acuerdo? Utilizó todas las restricciones. Sí, ¿verdad? Acá te dice, se utilizó todo el recurso. ¡Chévere! ¿Qué más? Se utilizó toda la cantidad de horas.
+S7: Pero ahí ha bajado tres puntos.
+S2: ha bajado, ¿no? Obvio, porque si van a ser enteros va a cambiar, ¿cierto? Ese estamos sacrificando esos decimales. Ya veremos qué nos va a pedir ahorita el robotito. ¿Qué me dice? Entonces, a ver, tu ya me dice, ah, de x1, ¿cuánto tengo que tener? Ya no son decimales. Ahora son todos cómo son enteritos.
+S6: enteros.
+S7: Números enteros. Ah.
+S2: Muy bien. ¿Y las restricciones están bien? Sí, ¿verdad? Están dentro del rango todas. Sí. Esta llegó al 100, que era lo máximo. Muy bien. Esta llegó, no superó los 200, ¿no? Muy bien. Y la tercera no superó los 50. Estamos bien. ¿Cierto, chicos? ¿Me siguen? No. Sí. Dice yo. Ya. ¿Cuánto obtuvo? ¿Cuál es lo máx el máximo impacto que va a obtener? 300. 311, ¿sí o no? Ah, profesor, pero anteriormente, ¿cuánto fue el impacto? ¿Cuánto fue?
+S13: 312.5 Okay.
+S2: ¿Bajó o aumentó?
+S7: bajo 1.5 No.
+S23: Oh.
+S18: B
+S2: ¿En cuánto? 1.5. Pero esta vez estamos utilizando números enteros. Ahora tú me puedes decir lo siguiente. ¿Te acuerdas cuando te decía el otro análisis? Esta no te lo va a hacer el chat GPT. Aquí entras tú como profesional. Análisis. Puedes decir, "No, profe, me voy con el entero 311, ya está cerrado, todos con sus enteritos. O tal vez trabajo de profesional, ¿no? Profe, yo me quedo con estos 312, pero voy a manejar. Si me dice 12.5, C puede ser 12 capacitaciones y una media capacitación. ¿Puede ser o no puede ser, chicos?
+S20: No.
+S2: No puede ser.
+S7: No puede ser.
+S2: Yo creo que sí, ¿no?
+S7: Partes a la mitad. Okay.
+S2: Claro, ¿no? Si dice 12.5, Yo puedo decir, "Profe, yo me voy por la opción del decimal, ¿no? Porque esto es 311. Está bajito, profe. Yo decido irme con el 312.5. Okay, pero profe, acá me está dando en decimales y a mí me da miedo el decimal. Que no te dé miedo si es que lo interpretas bien. Tú puedes ir por este camino del decimal, pero tienes que interpretarlo bien. Sería entonces, ¿cuántas capacitaciones tendrías que dar acá con este decimal? ¿Cuántas? 12, ¿no? Cierto, pero te sobraría un 0.5, ¿sí o no? Ese 0.5, ¿qué podría ser?
+S18: la mitad del tiempo de una capacitación.
+S2: Claro, podría ser, ¿no? Una capacitación y un taller, ¿o no? M.
+S18: Sí.
+S2: Se entiende,
+S7: o puede ser 12 capacitaciones este escritas y y lo
+S2: ¿no?
+S7: otro práctico.
+S2: Claro, claro. O una virtual. Está bien, se entiende, ¿no? Aquí es como tú interpretas. Entonces, si tú quieres ir por el camino del decimal, también está bien, pero tienes que interpretarlo eh e de manera correcta. Sí. A ver, trabajadores capacitados. A ver, ¿quién podría interpretar esto? Si se va por el lado de dos decimales.
+S7: 37 trabajadores, varones y una mujer.
+S2: No sé, ahí creo que lado si trabajas el tema. Sí, sí, ya miraba, ya miraba esas reacciones. Ya, sí, sí. Ahí te van a funar. Te van a funar, Carlos. No quiero que los funen, ¿no? Porque las chicas y los chicos tienen las mismas capacidades, ¿no? Pero podría ser tal vez 37
+S7: No, no, no. Estoy hablando de 37 varones y una mujer.
+S2: trabajos. 37, pero ya serían 38, ¿no? Que dice Ríe, ¿no? Tal vez podría ser. A ver, las chicas, defiéndanse, ¿no? ¿Cómo podría ser? Una chica va a decir, "Tén pueden ser 37 chicas y un varón." Podría ser así. o lo más fácil, 37 trabajadores capacitados en EPPs y un trabajador que esté medio capacitado, tal vez que no haya llevado el 100% el taller de capacitación, sino al menos un 20, un 50%. ¿Se entiende, Ingrid?
+S10: Eh, sí, docente, también podría ser e 37 trabajadores capacitados que estuvieron todo el horario de la capacitación, mientras que uno pues no estuvo en todo el horario, tal vez se fue a mitad y así, tal vez.
+S2: un intermitente. Muy bien. Excelente. Ven, amigos. Entonces, esa es la madera en la cual ustedes tienen también dos caminos. tienen el camino pedirle al chat o al Excel que te dé solamente enteros o también que trabajes con decimales, pero interpretándolos de manera correcta. Ya tú decides cuál utilizar. Hasta aquí hay alguna pregunta, amigos, ya para avanzar con el producto académico. Si no, tu manito arriba. Tu manito, no, tu dedito, tu pulgar arriba. Yalice dice, "Todo bien, profe. Sigue avanzando. Las chicas están así. Ah, no sé qué pasó con los chicos. Ya los han funado. Ah, no, Claudio está ahí sacando cara por los chicos. Ya. Okay, vamos a continuar entonces. Yeah. Tú hasta aquí entonces tienes dos caminos. Sí, por ahora puedes utilizar, te dice resolución mediante herramientas computacionales y has utilizado ¿qué herramienta? El chat GPT, ¿no? Entonces para hacer esto tienes que mostrarme primero, yo te sugiero esto, ¿no? El chatpt te va a dar todo esto de manera eh así un poco desordenada. para que te lo dé de manera más eh más ordenada, solamente ponle muéstrame el modelo resuelto en su forma compacta. Y acá le pones, ¿no?, ¿qué es forma compacta? variables, restricciones y función objetivo. Y aquí el robot lo que va a hacer es de manera sencilla y práctica te va a dar todo esto sencillito. Profe, conoc C, cont V, si quieres, profe, le puedes sacar una captura de pantalla. Claro que sí, ¿no? Yo, por ejemplo, voy a hacer esto, puedo sacar una captura de pantalla y pegarlo, ¿no? Claro que sí. O también puedo hacer esto, variables de decisión, ¿no? Eh eh variables. Empiezo con variables de decisión, ¿no? Ya. Igual que estaba acá, ¿no? Mis variables de decisión, profe. Ya, chévere. Pongo mis variables deisión y recuerda, ¿cuántas variables tenías? Cinco, ¿no? X1, X2, X3, X4, X5. Esas son mis cinco variables, profe. Ah, entonces yo te sugiero que de manera ordenadita puedes hacer esto, ¿no? Te sugiero. Ah, yo te sugiero, yo te voy a compartir esto. Yo te sugiero que hagas lo siguiente. Pum, pum, pum. Ya. Variables de decisión. ¿Qué te dice el chat? GPT. A, ¿cuánto tiene que valer X1? Chicos, no se duerman.
+S6: Oh,
+S2: 11.
+S22: 11
+S2: Muy bien. El X2, ¿cuánto tiene que valer? Dos,
+S22: dos
+S2: el x3 cerito, el x4 37,
+S22: 37.
+S2: ¿no? Muy bien.
+S6: y cero.
+S2: Y el x5 te da cerito. Ya está. ¿Cuál es el siguiente elemento? Las restricciones. Vamos a ver las restricciones. Y tú tenías tus restricciones acá, ¿sí o no? eran tres, ¿no? variables, horas y límite. Tú vas a copiar lo mismo. Variables y límite. Vamos a ver ahora en aquí, ¿no? Primer recurso eran las eh variables, ¿no? No era mi presupuesto. Okay. Vamos a ver el presupuesto. Ah, profe, acá me está dando la fórmula. Puedo reemplazarlo? Sí, puede reemplazarlo o también es cierto. No. Eh, muéstrame el cálculo de las restricciones. Eh, ya, ya con la solución. Hablas ahí con tu robotito, ¿no? Ya está. Aquí está la primera, ¿no? Ah, en la primera restricción se ha reemplazado y hemos usado cuánto, 1000 de 1000. Se lo puedes poner acá, profe. Se utilizó 1000 de 1000. ¡Chévere! En la segunda se utilizó cuánto, 172 de 200. Ah, ya está. Y en la tercera se utilizó cuántas, profe? Oy, ¿dónde está? Ah, acá se utilizó 50 de 50. Ya está, profe. Eh, tercera exción cantidad total 50 de 50. Profe, ¿sabe qué? Y si a veces me pierdo y no sé qué hacer, ¿qué hago? sencillo. Tú y acá tienes tus resultados, tus variables. Simplemente entra acá al presupuesto disponible y reemplázalo, ¿no? Por ejemplo, acá en la restricción del límite operativo te dice, ¿no? Sumatoria de x1, 2, 3 y 4 hasta la 5. Es decir, en lugar de x1 le pones 11, en lugar de x2 le pones 2, tan tal tan tal. ¿Cuánto sería? 50, ¿no? Si sumo todo esto, ¿cierto? Sí, ¿verdad? Sí. No. 50. Sí, dice, muy bien. Y es lo que aparecer acá. 50 y 50 es menor igual que 50. Ya le hice. ¿Alguna consulta o todo está bien?
+S13: No, profesor, se marcó. Disculpa.
+S2: No te preocupes. Ya. Entonces, amigos, en las restricciones estamos eh estamos solucionando esto, ¿no? Las variables ya están resueltas, las restricciones también porque me están diciendo si pasé o no sobrepasé, si excedí o no excedí los recursos que tengo. Y según lo que veo acá no he sobrepasado nada. Sigamos, sigamos, sigamos. ¿Cuál me falta? variables, restricciones y la función objetivo, que tú recuerdas que tu función objetivo está acá, ¿cierto? Ah, profe, mi función objetivo está aquí, era maximizar esto. Lo puedes copiar, lo puedes pegar, no te preocupes. Es lo mismo, amigo, es lo mismo. ¿Cierto? Pero aquí ya va a estar tu fórmula. ¿Y cuánto te salió reemplazando también en la fórmula? Acá incluso te sale, ¿no?, el resumen. Lo mira, acá te salía, no lo había visto, lo hubiera copiado si no. Pero bueno, ya te salió ahí. Al final, ¿cuánto te salió todo esto? Vuelvo a formo aquí. El Z te salió 311, ¿sí o no? Entonces, simplemente le pones acá 311 de impacto total generado, que es lo que estás tú eh analizando, ¿no? El impacto en SST, le puedes poner solo 311 Tal y eso es todo. ¿Cuánto estás logrando de impacto? 311 con estas variables y sin sobrepasarte los recursos. Hasta ahí, ¿alguien tiene alguna consulta? ¿Quieren que logen Excel? Lo hago en Excel. Ya. Sí, dice. Ya. Esto para aquellos que están no están en la computadora y están en el chat GPT también lo puede hacer. Para aquellos que tienen el Excel, me siguen. Sí, no voy a demorar mucho, pero necesito que me apoyen. Ya voy a necesitar que me apoyen mucho. En el caso del Excel, simplemente voy a utilizar esto, pero prétenme atención y participemos. Al lado derecho está mi Excel y al lado izquierdo está todo mi modelito. Lo mismo que hemos hecho, amigos. Empezamos con las variables. ¿Cuántas variables tengo? Participemos. Muy bien. X1,
+S13: 5
+S2: ¿qué más? X2, X3.
+S24: H el c.
+S2: Muy bien. Y acá pregunta, ¿Le haré fórmula o dejaré en blanco? ¿Qué creen, chicos? Le agre alguna fórmula o lo dejo en blanco.
+S13: las descripciones.
+S2: Ah, muy bien, profe. ¿Sabes qué? Usted me ha enseñado algo. Creo que se está olvidando, profe. Ya. Lo que te decía era esto, ¿no? También yo te sugiero esto, ¿no? Para que sepas siempre de qué hablas. al costado de tus variables. Siempre ponle las descripciones, por ejemplo, aquí, ¿no? Número de variables, ¿no? Perdón, número de capacitaciones, número de inspecciones. Yo te sugiero que hagas esto. Cuando hagas tu informe en el Excel, yo te voy a enseñar la próxima semana a hacerlo. El Excel ya te lo va a calcular todito, pero si lo dejas solo con letritas, eh, no vas a poder entender tu modelito. Ya. Entonces siempre trata de darle su descripción Aquí a cada variable. Ya, profe, variables. Ya están. ¿Qué te falta? Seguimos con la función objetivo o restricciones. ¿Con cuál quieren ir ustedes? Restricciones. ¿Te parece bien? Y va a ser lo mismo. Sí, es lo mismo. Restricciones. Cuéntame cuál es tu primera restricción, chicos. Primera restricción,
+S14: Presupuesto disponible.
+S2: presupuesto disponible. Recuérdame cuántas celditas eran. Tres celditas. No te olvides. Ya. Para restricciones en el Excel son tres celditas. Sí. Voy a hacer esto más bonito. Le voy a dar formato este. Ya está. Ya está, profe. Ya está. Están mis tres celditas aquí. Listo. ¿Ves? Ya, pero no es la única, ¿no? Pero bueno, voy a cuminar esta primero. Recuérdame en la primera celda, ¿qué va? Va la fórmula. ¿De acuerdo? Díctame. Ahora necesito que me ayudes. ¿Cuál es la fórmula? La que está en presupuesto. ¿Con qué empieza? 500 por la variable x1, ¿no? Entonces le pongo por y cuál es mi variable x1?
+S13: 500.
+S2: Lo que está en amarillito.
+S24: C2.
+S2: C2. Muy bien. Y cierro paréntesis más. Y hago lo mismo, ¿no? ¿Con qué continúo? 400 por variable x2.
+S18: 400
+S2: ¿Y cuál es mi x2?
+S13: C3.
+S18: C3
+S2: Sigo más. Díctame.
+S18: 800 C4
+S2: ¿Qué más? 100 * C4 más 150, ¿no? Porque es la última acá. 150 por el X5. Por X5. Ahí se acabó mi fórmula. Sí, ¿verdad? O hay más.
+S23: Ahí estamos.
+S2: ¿Cómo? ¿Cómo?
+S13: Ahí no.
+S2: Ya no hay ahí. Ahí queda la fórmula. Muy bien. Le doy enter y ya está. Ya, profe, ya está. Sí, amiguito, ya está. ¿Ves? Yo te dije eso es todo. ¡Ups! Eso es todo. Forito, no te asustes. Ya. ¿Qué más me falta? El signo. ¿Qué signo tengo?
+S24: menor igual que 1000 que
+S2: Menor igual. Le pongo menor igual.
+S24: 10.
+S2: Profe, ¿por qué le pone letritas mi estilo? Tú le puedes poner un dibujito, lo que tú quieras, que cuánto el límite, ¿cuánto es el límite?
+S24: Dios mío. M.
+S2: 10000. M. ¿Qué tal? ¿Cuál es la siguiente restricción? Horas. No, hacemos lo mismo. Ya vamos a hacer lo mismo. Fórmula. Lánzate con la fórmula.
+S24: 8
+S13: Ocho.
+S2: Muy bien. Por el X1, ¿no? Más Muy
+S24: Saludos.
+S13: 5* C2 C3 10 *
+S2: bien. Más muy
+S13: C4
+S18: C4
+S2: bien. Más 2 por o el x4.
+S13: C5 1
+S18: C5.
+S2: Muy bien. Más 1, ¿no? O cer0.
+S13: *
+S2: Uno, no,
+S13: X5.
+S2: 1 por el X5. Acabó mi fórmula ahí, ¿sí?, ¿verdad?
+S13: Sí. M.
+S2: Y le pongo menor igual, ¿sí o no? Que cuánto,
+S7: 200
+S2: 200. Siguiente y última límite operativo. ¿Tiene fórmula? Sí, tiene, ¿no? ¿Cuánto es?
+S13: sumar todas las X.
+S2: Muy bien, profe. Súmelo todo. Lo que lo voy a hacer despacito. X1 más ¿Quién? X2, ¿sí o no? Y ese X2 está acá, ¿verdad? Más este X3 + este X4 + este X5. Te dice, "Soma todas las variables, pues, ¿no? Estamos sumando todas las variables del x1 al x5. Ya está, profe, ya hemos sumado. Le doy enter y tiene que ser menor o igual que cuánto, qué muy bien.
+S7: 50
+S2: Variables, restricciones, ¿quién me falta?
+S7: objetivo. M.
+S2: La función objetivo. ¿Y cuál es la fórmula de la función objetivo, amigos? Le voy a poner otro colorcito, un rojito, está bien, con un blanquito. Perú, pues no, la función adjetivo es acá, dice, no, maximizar. Es una fórmula, ¿sí o no? Díctame la fórmula, por favor. ¿Cuánto es?
+S13: Bien.
+S7: 10
+S2: ¿Por cuánto? Por x1,
+S7: C2
+S2: c2. Muy bien. Más 8 *
+S7: 8 12
+S2: x2 más acá está 12 * c4 x3 + 5 * x4 + 4 * x5.
+S7: Sí. M. Yeah.
+S2: Ya está completo. Variables están. Restriciones también. Funciona objetivo de cómo doy cuenta que estamos bien, le doy valores a mis variables, ¿sí o no funciona? Chicos, ¿pun?
+S24: Sí.
+S2: Okay,
+S13: Sí.
+S2: no sé, los perdí, los perdí. Voy a encender otra vez mi mis comentarios para verlos. Ya. E ya no los veo. A ver, ahora, ahora sí ya los vi. Ya está. Okay, chévere. Usualmente ustedes qué harían. Ah, profe, le damos valores, ¿no? Si le damos cinco a cada uno, profe, 20 2 y va a ir aumentando. Por ejemplo, este modelo 20x1 2x2, así ustedes aceptan o no aceptan esta propuesta.
+S24: Está superando, profe, la condicional de la condicional del 10000 en
+S2: Ajá. ¿Qué supera? ¿Qué supera? Y esa tiene un nombre.
+S24: presupuesto disponible.
+S2: Muy bien.
+S14: límites
+S2: Supera el precio.
+S24: Presupuesto disponible.
+S2: ¿Qué más supera? o es todo lo que supera las
+S20: as horas.
+S2: horas también,
+S24: No, también
+S2: ¿no? Ah, entonces seguramente acá me dirás,
+S24: también
+S2: "Ah, profe, ya no es 20. Tal vez si lo bajo a 18 ahí.
+S24: sigue superando.
+S2: Ah, el de arriba.
+S7: A 15.
+S2: Pero claro,
+S7: A 15. Yeah.
+S2: pero imagínese, ¿no? ¿Cuánto nos demoraríamos nosotros en encontrar lo máximo, ¿no?
+S24: No.
+S2: Para eso existe ¿qué herramienta? el solver.
+S20: Rey sol. Yeah.
+S2: Le voy a archivo, voy. Eso está grabado, así que tranqui. Le voy a complementos, me voy a ir, me voy a solver, le doy aceptar. Muy bien. ¿Cómo me doy cuenta que apareció el solver? Porque en datos, en la parte derecha dice solver. Me voy a datos. Aquí en datos me voy a solver y acá aparece esta ventanita. Función objetivo, dice, establecer objetivo. ¿Cuál es la función objetivo? ¿Qué color?
+S24: rojo.
+S2: Ay, selecciono esta celdita. ¿Qué quiero hacer? Max o min.
+S7: Vamos. M.
+S23: Max.
+S2: Muy bien. Ah, se dan cuenta, no lo puse y sean casi nos distraímos. Ven, es importante no poner siempre esto. Ya. Maximizar. ¿Cuáles son las variables?
+S7: C2 a C6.
+S24: X era por
+S2: Claro, las amarillitas, ¿sí o no?
+S24: celdas.
+S2: Claro, ahí es donde robot va a poner ahí en las variables cuál es el dato correcto. Y en las restricciones simplemente puedo seleccionar todo esto menor o igual que todo esto de frente, ¿no? Ya de frente, ¿no?
+S24: Lol.
+S2: Método. ¿Cuál escogíamos? ¿Cuál de los tres? El simplex.
+S23: Simple.
+S2: Siempre con el simplex. Muy bien. Le doy a resolver, ¿no?
+S24: Ha.
+S2: Ahí está. ¿Sí o no? Que es lo mismo que me dio el robotito acá, pero con decimales. Vamos a ir ya. Tan, tan, tan, Tan, tan, tan, tan, tan, tan, tan, tan, tan. Ya. Epa, perdón. Ya, ahora sí es o no es lo mismo,
+S23: Es la mismo.
+S2: queridos amigos. Ah, por ahí creo que ya lo vieron. ¿Dónde está? ¿Dónde estás? Eh, el modelo aquí todavía. ¿Dónde está con mis decimales? Ah, estaba más arriba. Acá está. Ya. Esta era con decimales. Eso no es lo mismo.
+S23: Mis
+S2: Lo mismo,
+S24: Sí,
+S23: Ah.
+S2: ¿no? Sí coincide.
+S24: sí, el Excel lo hace más, lo simplifica más todo.
+S2: Claro, la ventaja es que en el Excel tú puedes jugar con los numeritos, ¿no? Darles valores acá. ¿Qué pasa si le pongo 13, por ejemplo? ¿En cuánto afecta? ¿Sí o no? Ya, esa es la ventaja. En el sh no te da esa opción, no se entiende, ¿verdad? Ya.
+S24: Sí.
+S2: Si tú lograste hacer esto también, chévere, tomas una capturita, le pones una capturita y ¿qué haces? ¿Que te informe? Simplemente le lo capturas y le pegas acá, ¿sí o no? Donde decía este acá abajo, ¿no? Resolución mediante herramientas computacionales. Si tú quieres ya hiciste tu chat GPT, le pones acá, ¿no? No, a través GPT. Ya te salió eso. Chévere. Pero profe, yo no me he quedado ahí. Yo lo he corroborado en el solver. Usando solver, profe. Ya, bacán. Y ya está. ¿Qué tal? Bien, ¿no? Sí, chicos. Espérate. ¿Qué está ocultado aquí? Ah, veo manitos. Okay, chévere.
+S23: Silent
+S2: Y, gracias, José. Finalmente termino con análisis e interpretación. Copio, pego acá análisis e interpretación. ¿Ustedes me entienden que esto es simplemente la estructura? El formato lo van a hacer más bonito, imagino yo, ¿verdad? No, imagígan así. su profe se va a sentir mal, ¿no? Y va a decir, "Pero, ¿qué mis estudiantes me entregan esto así?" No, sí, pues sí, Paul, Paul, yo no es que desconfíe de ustedes, no, pero mis guagüitas de pregrado eh, han entregado casi igual, No, ¿dónde está el corazón? ¿Dónd está la creatividad? Ya, Pilma sea. Explicar qué significa la solución en términos del problema. Sencillo. Yo te cuento y tú repites. Participaciones aquí. Cuéntame. Empezamos con el para. ¿Qué quieres hacer? Max o min.
+S6: Max.
+S2: para maximizar,
+S23: Ma
+S2: ¿qué cosa?
+S10: El impacto en la seguridad y el salud y la salud del trabajo. No.
+S2: El impacto en SST, en cuánto, cuánto vas a aumentar,
+S23: en 312.5
+S18: 5
+S2: no sé,
+S23: cinco.
+S2: no sé. Acá no hay unidades, pu ver unidades, pero si tú estás analizando esto en gramos o en kilos, clientes, soles, ahí le pondrás la unidad. Son unidades. Ya está. Para maximizar el impacto entre 112.5 unidades de se propone vas a tus variables. ¿Qué propones? Eh, ¿por qué aparece una S ahí? ¿Qué ha pasado? ¿Por qué aparece una S? Ah, ahora sí. ¿Ven, chicos? Casi este casi les doy mal este el ejemplo, ¿no? Se coló ahí la S. Imagínense, ¿no? Y estoy segurísimo que tú no hubieras caído. Ya. Bueno, se propone, Ayúdame. ¿Cuántas capacita? ¿Cuántas capacitaciones propones para el X1? Se propone ¿Cuántas?
+S18: 12.5 Cinco.
+S6: 12 C.
+S2: Ya, pero lo que yo te he dicho, ¿no? Se propone 12.5 capacitaciones. Yo te pregunto, o sea, tiene sentido. ¿Qué te va a decir gerencia? Este ingeniero, este profesor, están en otra cosa, ¿no? ¿Cómo que 12.5? Ah, yo que te había sugerido si tú quieres trabajarlo con decimales o llevarlo todo a enteros. Tú lo llevas todo enteros, ahí hay un proceso, ¿no? Y el entero lo pones acá. Si tú quisiste trabajar aún con decimales, aquí es el momento para poder analizarlo. Alguien que quiera participar para un punto, ¿cómo sería este análisis? Ingrid, a ver,
+S23: 12 capacitaciones.
+S2: cuenta. Vamos, vamos cono con la segunda. Ya, ahora vamos con Ingrid. Levantó la manito. A
+S10: Eh, bueno,
+S2: ver,
+S10: sería se propone 12 capacitaciones presenciales y una y una virtual o tal vez podría ser 12 capacitaciones y
+S2: ya está.
+S10: una gratis o mediado.
+S2: Ya, eso depende de ti. Le pongo virtual. Ya está bien, pero Este paréntesis le pongo que esta va a valer 0.5. Así me así me aseguro yo que está el 12.5 ahí. Pues está bien,
+S10: Sí,
+S2: Ingrid.
+S10: me escucha,
+S2: Sí, sí, sí te escuché. Sí,
+S10: ¿verdad?
+S2: te escuché. Por eso ahí le estoy poniendo eso. Está bien. Buen análisis. ¿Cuál es tu apellido?
+S10: Y razón. M.
+S2: Ahí está. Sigamos. Ey, me perdí. ¿Dónde estoy? ¿Dónde estoy? Me perdí. Ah, aquí estoy. Ya se propone, pero solamente propongo esto. 12 capacitaciones. ¿Qué más?
+S7: trabajador y capacitador.
+S2: Muy bien. ¿Y cuántos trabajadores capacitados
+S18: 37.5
+S2: nuevamente? Ahora sí, José, ahí te quieres participar acá. ¿Cómo sería ese 37.5 o alguien más? Ah, Luis,
+S18: y fueron
+S2: a ver, vamos, Luis. ¿Cómo sería 77.5
+S18: capacitados 37 trabajadores y y un trabajador a un
+S2: trabaj
+S18: 50%.
+S2: capacitados y un trabajador?
+S18: al 50%.
+S2: Hay que especificar qué significa de 50%. sería y un trabajador capacitado al 50% mejor, ¿no?
+S18: Sí.
+S2: Un trabajador o capacitado virtualmente, bueno, eso ya te lo dejo a ti. O tal vez un trabajador capacitado al 100%, pero que trabaje la mitad de hora también podría ser, ¿sí o no?
+S18: Sí,
+S2: Eso ya va a depender de usted para que se diviertan.
+S18: también.
+S2: y un trabajador capacitado al 50%. Suena mal, ¿no? Pero por eso decía, mejor un trabajador del 100%, pero que trabaje medio tiempo. Pero ya se los deje a ustedes. Ese significa 0.5. Y eso es todo, amigos. ¿Qué tal? Ya, pero me falta una más. Pres. Ah, no, espérenme, espérenme, espéren. Miren, casi me olvido, chicos. Esto que he hecho yo ha sido evaluando solamente las variables, ¿sí o no? ¿Qué me falta? Evaluar las restricciones. Otro párrafo más,
+S18: To.
+S2: pero este es más sencillo. Con esta propuesta ya lanzamos la propuesta arriba. Sigamos con la línea de pensamiento. Con esta propuesta se utilizará pregunta, ¿se utilizará todo el presupuesto o casi todo?
+S23: Todo
+S6: todo.
+S2: Ya pones no se utilizará todo el presupuesto disponible. Profe, yo lo quiero hacer más bacá. Se utilizará el 100%. Profe, yo lo quierocer más fino. El presupuesto tendrá un uso eficiente al 100% más amarillo, ¿no? De acuerdo. Pero ya me entiendes. Se utilizará todo el presupuesto. Es lo más básico. ¿Qué más? ¿Qué pasó con las horas? ¿Se utilizaron todas las horas?
+S6: No.
+S2: Entonces, puedo poner acá no sobrepasaremos otra
+S23: No.
+S2: palabra las horas disponibles del personal. O también pudiste haber puesto, ¿no? Se superará en un se o tal vez se manejará un 75% del total de horas, ¿no? Mejor, ¿no? Ya depende de ti, yo te lo dejo. ¿Y qué más? Y con el límite operativo, ¿qué pasó,
+S23: Se mantiene
+S2: chicos?
+S23: igual.
+S2: Ya. ¿Y eso qué significa? ¿Se utilizó todo o no se utilizó todo?
+S10: Se utilizó todo.
+S2: Sí.
+S23: O todo.
+S2: Y se utilizará,
+S6: Todo
+S2: ya le pongo, ¿no? El 100% ya para variar un poco. ¿De quién? Del límite o de la capacidad
+S6: espérativo.
+S7: La totalidad,
+S6: No.
+S7: la totalidad.
+S2: operativa. Ahí ustedes se divierten. Capacidad operativa. Punto final. Eso es todo, amigos. ¿Qué tal? Bien, voy con el punto final. Ya, presentar recomendaciones. Y esta es mi parte favorita porque en recomendaciones varía bastante. Eh, cuando hablan de recomendaciones, acá podríamos saber muchas cosas, pero lo voy a dejar para la siguiente clase en función a lo que va la clase de hoy, ¿ya? Porque llevar creo que 3 horas a la semana me complica un poquito, ¿ya? Pero no quiero cerrar el tema sin antes terminar. Hm. Aquí acaba, acaba. Tengo 10 minutos, creo. No.
+S16: Docente,
+S2: Ah,
+S16: una consulta.
+S2: dime, amigo. Ah, no,
+S16: el producto académico.
+S2: ya acabó.
+S16: entregamos el seis.
+S2: Sí.
+S16: Este última parte no la estás concluyendo
+S2: Ah, no, no. Sí, sí, lo tengo que hacer. solamente que pensaba, eh, ¿cómo te lo voy a explicar? Porque la clase ya acabó. No, pero tranqui, te explico y vamos.
+S7: Continúe.
+S2: No, no, yo tengo que explicarte, yo tengo que explicarte. No, se pone triste, Claudio. Mira, yo te explico esto de las variables y recomendaciones para variables, te explico en la siguiente clase, ¿de acuerdo? No te preocupes, pero llega hasta restricciones, es lo más sencillito. Presta atención. ¿Me recomendarías, por ejemplo, ¿qué pasaría si yo te digo, eh, voy a hay que comprar 10 horas más de hay que invertir en horas disponibles de personal? M. Dice sí o dices no.
+S20: Ya no hay presupuesto.
+S2: Seguro.
+S23: Sí.
+S2: ¿Queremos invertir más en horas o dónde invertirías más?
+S6: en horas disponibles.
+S18: Presupuesto.
+S2: Seguros. Porque, ¿qué pasaría si estos 200 lo pongo a 300? ¿Cambi en algo o sería invertir para nada?
+S16: No varí
+S7: Noí nada.
+S16: nada
+S2: Tú como ingeniero profesional más adelante, ¿invertirías en aquellos que están al tope o en aquellos que están con un margen de holgura?
+S16: aquí están al tope.
+S2: Al tope, ¿sí o no? Ponte en el caso, estás trabajando al límite 10,000 de 10,000, ¿sí o no? ¿Qué pasaría si hay un gasto ahí que no tenías en cuenta? Peligroso, ¿no? Trabajar siempre al margen, ¿sí o no? ¿Se entiende? Entonces, lo que tú vas a hacer acá es sencillo, en recomendaciones, sencillito. Por ahora solamente p seleccionas aquellas que están al 100%, en este caso presupuesto y límite operativo. Entonces se sugiere, no se recomienda, no se recomienda manejar una holgura para la para el presupuesto y para el límite operativo. Eso es todo. Eso es todo, amigo. ¿Por qué? porque estás trabajando al límite. Imagínate si en algunos casos hay una emergencia y tienen que cerarse dos espacios para el límite operativo y ya no tienes 50, sino tienes 49, ¿te afecta o no te afecta?
+S7: Sí. Yeah.
+S2: Ajá. Manejar siempre el límite es pegriloso. En recomendaciones, cuando veas esto en tu en tu programa, en tu ejemplo, siempre recomienda manejar holguras o seguridad, porcentaje de seguridad. Se entendió.
+S18: Sí. M.
+S2: Okay. Esto les voy a compartir yo. Ya. Ah, esto les voy a compartir a ustedes en el chat. ¿Hay alguna consulta o pregunta, amiguitos?
+S16: Eh, docente sería todo para entregar, ¿no? Tal como nos ha explicado de esta manera.
+S2: Lo que yo te he puesto es lo mínimo. Si que quieres agregar más cositas, bien por ti.
+S11: Eh, profesor, puede ser también en para mantenimiento. ¿Puedo cambiarle ese?
+S2: Sí,
+S11: No.
+S2: claro. Cambia lo que tú quieras con seis, ocho variables, dos restricciones, tres restricciones. Claro, como dice José, ¿no? Claro. Si son insumar estudio de seguridad.
+S16: No.
+S2: Buena respuesta para logística. Sí. Todo bien,
+S16: No,
+S2: ¿no?
+S16: recomendar entonces utilizar el Excel docente para poder tal vez profundizar, ¿no? O aprender más.
+S2: Sí, el Excel te permite simular porque el CHDP solo resuelve, pero con el Excel tú simulas. Es la diferencia.
+S19: El documento docente nos va a compartir mediante un enlace o lo va a publicar en el en el este en el aula virtual.
+S2: Lo acabo lo acabo de dejar en el chat, pero lo voy a publicar cuando llegue a mi casa, al aula virtual y se los envío al chat de WhatsApp. ¿Les parece?
+S24: Listo, profe.
+S2: Igual si hay alguien que lo pueda compartir ahora acá. Vilma,
+S6: consulta. También dijo que este puede ser el trabajo grupal,
+S2: sí,
+S6: ¿verdad?
+S2: pero todos
+S6: A todos lo subimos.
+S2: los
+S6: Gracias.
+S2: contento
+S11: Profe,
+S2: dime
+S11: profe, el Excel lo va a compartir ahorita o di lo va a compartir llegando a su casa.
+S2: el Excel. Ah, el Excel. ¿Quieres que los comparte el Excel?
+S6: Sí,
+S11: Sí,
+S6: por favor.
+S11: profe.
+S2: Ah, ya. Okay, les voy a compartir este exter que hemos hecho ya, pero llegando a mi casita porque son tres aulas virtuales y me voy a ahí me demoro ahí haciendo las tres.
+S7: Lo veo complicado llegando a su casita.
+S2: Sí, está casi 30,
+S7: Eso una semana ya no pasar el domingo.
+S2: casi 30 minutos o lo puedo dejar por WhatsApp
+S7: Pasar el domingo ya lo sube. No, no creo.
+S2: mejor por WhatsApp lo envío.
+S7: lo mejor por WhatsApp ahorita. Claro, porque se me va mi casita.
+S2: Se quejan mucho se quejan.
+S7: Ya no.
+S2: Ah, voy a este salón se queja, pero está bien, tiene que exigirnos, pues. Okay, listo, amiguitos. ¿Algo más? Todo en orden, ¿no? Listo. Espero que la clase haya servido para la práctica, que es lo que más espero y ya nos estamos viendo.
+S11: Profe,
+S2: Gracias.
+S11: entonces el profe no lo compartió entonces después no lo no lo no lo no lo
+S2: Sí, el chat aún no lo el ex no lo compartí ya,
+S11: Ya,
+S2: pero lo comparto en cuanto en cuanto pueda el ex, pero ya lo hemos hecho paso por paso el ex ya deberían saberlo construir igual se los voy
+S16: No.
+S7: Ya lo subió el WhatsApp docente.
+S2: no el Excel no si tienen el del informe el chat el enlace lo subí al chat si alguien por puede copiar y pegar chévere. En un ratito descargo el programa y lo subo. Ya ve mi teléfono porque el WhatsApp está en mi teléfono, no en esta máquina.
+S16: Docente, sobre el tema de los grupos, creo que habías creado un Excel o me estoy confundiendo de acuerdo.
+S2: Sí,
+S16: Eso lo subiste a la plataforma.
+S2: sí está el link ahí en la plataforma. Igual si no tienes, pídelo ahí por el grupo que creo que lo estaban pasando por ahí también.
+S16: Ah, está viendo gente.
+S2: Okay. Listo, amigos. Cuense un montón. Hay más enojo.
+S24: Buenas noches, docente ya. Me retiro de clas.
+S2: Cuídense todos. Muy buenas noches, hasta luego.
+S7: Se olvid el Excel. M. La reunión finalizó después de 02:12:19 👋 Esta transcripción editable se generó automáticamente y puede contener errores. Los usuarios también pueden cambiar el texto después de que se cree.

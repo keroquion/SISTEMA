@@ -296,6 +296,13 @@ if ("serviceWorker" in navigator) { window.addEventListener("load", () => { navi
                     </div>
                     <div class="status-dot dot-blue"></div>
                 </a>
+                <a href="desempeno_tecnicos.html" class="menu-item">
+                    <div class="menu-item-left">
+                        <i class="ph ph-chart-line-up"></i>
+                        <span>Desempeño Técnicos</span>
+                    </div>
+                    <div class="status-dot dot-blue"></div>
+                </a>
                 <a href="lotes.html" class="menu-item">
                     <div class="menu-item-left">
                         <i class="ph ph-stack"></i>
@@ -698,25 +705,25 @@ function renderCol(colId, tickets) {
     const urg = t.prioridad === 'URGENTE' ? '<span class="urgente">URGENTE</span>' : '';
     const baseUrl = window.location.origin + window.location.pathname.replace('mis_ordenes.html','');
     const linkSeguimiento = baseUrl + 'consulta.html?ticket=' + encodeURIComponent(t.numero_atencion);
-    const msgWP = encodeURIComponent(`Hola ${t.cliente_nombre}, somos PETULAP <i class="ph ph-wrench"></i>
+    const msgWP = encodeURIComponent(`Hola ${t.cliente_nombre}, somos PETULAP 🔧
 
 Tu equipo *${t.equipo_descripcion || t.equipo_codigo}* ya se encuentra LISTO para recoger.
 
-<i class="ph ph-clipboard"></i> *Ticket:* ${t.numero_atencion}
+📋 *Ticket:* ${t.numero_atencion}
 
 Horario de atencion: Lunes a Sabado de 10am a 8pm.
-Te esperamos! ðŸ™Œ`);
+Te esperamos! 🙌`);
 
-    const msgInitWP = encodeURIComponent(`Hola ${t.cliente_nombre}, somos PETULAP <i class="ph ph-wrench"></i>
+    const msgInitWP = encodeURIComponent(`Hola ${t.cliente_nombre}, somos PETULAP 🔧
 
 Tu equipo (*${t.equipo_descripcion || t.equipo_codigo}*) ha ingresado correctamente.
 
-<i class="ph ph-clipboard"></i> *Ticket:* ${t.numero_atencion}
+📋 *Ticket:* ${t.numero_atencion}
 
 Puedes rastrear tu equipo aqui:
 ${linkSeguimiento}
 
-Gracias por confiar en nosotros! ðŸ™Œ`);
+Gracias por confiar en nosotros! 🙌`);
     
     const d1 = new Date(t.fecha_ingreso);
     const d2 = new Date();

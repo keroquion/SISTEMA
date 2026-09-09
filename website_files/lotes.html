@@ -289,6 +289,13 @@ if ("serviceWorker" in navigator) { window.addEventListener("load", () => { navi
                     </div>
                     <div class="status-dot dot-blue"></div>
                 </a>
+                <a href="desempeno_tecnicos.html" class="menu-item">
+                    <div class="menu-item-left">
+                        <i class="ph ph-chart-line-up"></i>
+                        <span>Desempeño Técnicos</span>
+                    </div>
+                    <div class="status-dot dot-blue"></div>
+                </a>
                 <a href="lotes.html" class="menu-item">
                     <div class="menu-item-left">
                         <i class="ph ph-stack"></i>
@@ -376,7 +383,7 @@ if ("serviceWorker" in navigator) { window.addEventListener("load", () => { navi
             <select id="f-tipo" class="form-control" style="padding:10px; font-weight:600; color:#1e293b;">
               <option value="IMPORTACION"> IMPORTACION (China/Extranjero)</option>
               <option value="NACIONAL">„ NACIONAL (Garantia local)</option>
-              <option value="REPUESTOS_LOCAL">ðŸ›’ REPUESTOS LOCAL (Compra local)</option>
+              <option value="REPUESTOS_LOCAL">🛒 REPUESTOS LOCAL (Compra local)</option>
             </select>
           </div>
           <div style="flex:2">
@@ -483,12 +490,12 @@ if ("serviceWorker" in navigator) { window.addEventListener("load", () => { navi
             <div>
                 <label style="font-size: 12px; font-weight: bold;">Estado Repuestos:</label>
                 <select id="f-rep-estado" style="padding: 6px; border-radius: 4px; border: 1px solid #ccc;">
-                    <option value="PENDIENTE">â³ Pendiente</option>
+                    <option value="PENDIENTE"><i class="ph ph-clock"></i> Pendiente</option>
                     <option value="COMPRADO"><i class="ph ph-shopping-cart"></i> Comprado (En camino)</option>
                     <option value="RECIBIDO"><i class="ph ph-check-circle"></i> Recibido</option>
                 </select>
             </div>
-            <button class="btn-primary" onclick="guardarRepuestos()" style="padding: 6px 12px;">ðŸ’¾ Guardar Datos</button>
+            <button class="btn-primary" onclick="guardarRepuestos()" style="padding: 6px 12px;">💾 Guardar Datos</button>
             <button class="btn-success" onclick="exportarPedidoRepuestos()" style="padding: 6px 12px; background: var(--success); border: none; color: white; border-radius: 4px;"><i class="ph ph-file-csv"></i> Descargar Pedido (Excel)</button>
             <button class="btn-secondary" onclick="abrirModalMoverPendientes()" style="padding: 6px 12px;"><i class="ph ph-arrow-clockwise"></i> Mover Pendientes</button>
         </div>
@@ -503,7 +510,7 @@ if ("serviceWorker" in navigator) { window.addEventListener("load", () => { navi
         <div style="display:flex; gap:10px; margin-top:15px; flex-wrap:wrap">
           <button onclick="confirmarAvanceConRepuestos(true)" class="btn-primary"><i class="ph ph-check-circle"></i> Si, llegaron todos</button>
           <button onclick="confirmarAvanceConRepuestos('parcial')" class="btn-secondary" style="background: var(--warning); color: white; border: none;"><i class="ph ph-warning"></i> Parcial (algunos)</button>
-          <button onclick="document.getElementById('modal-repuesto').style.display='none'" class="btn-secondary">âœ– Cancelar</button>
+          <button onclick="document.getElementById('modal-repuesto').style.display='none'" class="btn-secondary"><i class="ph ph-x-circle"></i> Cancelar</button>
         </div>
       </div>
     </div>
@@ -518,7 +525,7 @@ if ("serviceWorker" in navigator) { window.addEventListener("load", () => { navi
         </select>
         <div style="display:flex; gap:10px; flex-wrap:wrap">
           <button onclick="confirmarMoverPendientes()" class="btn-primary"><i class="ph ph-check-circle"></i> Mover Equipos</button>
-          <button onclick="document.getElementById('modal-mover').style.display='none'" class="btn-secondary">âœ– Cancelar</button>
+          <button onclick="document.getElementById('modal-mover').style.display='none'" class="btn-secondary"><i class="ph ph-x-circle"></i> Cancelar</button>
         </div>
       </div>
     </div>
@@ -535,9 +542,9 @@ if ("serviceWorker" in navigator) { window.addEventListener("load", () => { navi
                onkeydown="if(event.key==='Enter'){agregarEquipo()}" autofocus style="flex:2; min-width: 250px; padding: 12px; font-weight: 600; font-size: 15px;">
         <select id="scan-triaje" class="form-control" style="flex:1; min-width: 150px; padding: 12px; font-weight: 600; font-size: 14px;">
           <option value="SIN_FALLA"> Sin Falla</option>
-          <option value="FALLA_MENOR">âš ï¸ Falla Menor</option>
+          <option value="FALLA_MENOR"><i class="ph-fill ph-wrench"></i> Falla Menor</option>
           <option value="NECESITA_REPUESTO"> Necesita Repuesto</option>
-          <option value="DANO_GRAVE">âŒ Dano Grave</option>
+          <option value="DANO_GRAVE"><i class="ph-fill ph-circle" style="color:red"></i> Dano Grave</option>
         </select>
         <button class="btn-primary" onclick="agregarEquipo()" style="padding: 12px 24px; font-size: 15px; border:none; background:#4f46e5;"><i class="ph-bold ph-plus"></i> Agregar</button>
       </div>
@@ -559,7 +566,6 @@ if ("serviceWorker" in navigator) { window.addEventListener("load", () => { navi
     <div id="lista-items" style="padding: 24px;">Cargando items...</div>
   </div>
 </div> <!-- FIN PANEL DETALLE (Estaba mal cerrado arriba) -->
-</div>
 <script src="js/sonidos.js"></script>
 <script src="js/check_auth.js"></script>
 <script>
@@ -683,7 +689,7 @@ async function abrirDetalle(lote_id) {
   document.getElementById('panel-lista').style.display='none';
   document.getElementById('panel-detalle').style.display='block';
   
-  document.getElementById('detalle-titulo').textContent = `${lote_id} â€” ${loteActual.titulo}`;
+  document.getElementById('detalle-titulo').textContent = `${lote_id} - ${loteActual.titulo}`;
   const badge = document.getElementById('detalle-estado-badge');
   badge.textContent = loteActual.estado.replace(/_/g,' ');
   badge.className = 'badge ' + loteActual.estado;
@@ -720,14 +726,14 @@ function renderizarItems() {
 
   let docsHtml = '';
   Object.keys(docCounts).forEach(doc => {
-    docsHtml += `<div style="padding:6px 12px; border-radius:6px">ðŸ“„ Doc: <b >${doc}</b> (${docCounts[doc]})</div>`;
+    docsHtml += `<div style="padding:6px 12px; border-radius:6px">📄 Doc: <b >${doc}</b> (${docCounts[doc]})</div>`;
   });
 
   document.getElementById('resumen-triaje').innerHTML = `
     <div style="padding:6px 12px; border-radius:6px"><i class="ph ph-check-circle"></i> Sin Falla: <b>${triajeCounts.SIN_FALLA}</b></div>
     <div style="padding:6px 12px; border-radius:6px"><i class="ph ph-warning"></i> Falla Menor: <b>${triajeCounts.FALLA_MENOR}</b></div>
     <div style="padding:6px 12px; border-radius:6px"><i class="ph ph-wrench"></i> Necesita Repuesto: <b>${triajeCounts.NECESITA_REPUESTO}</b></div>
-    <div style="padding:6px 12px; border-radius:6px">´ Dano Grave: <b>${triajeCounts.DANO_GRAVE}</b></div>
+    <div style="padding:6px 12px; border-radius:6px"><i class="ph-fill ph-circle" style="color:red"></i> Dano Grave: <b>${triajeCounts.DANO_GRAVE}</b></div>
     <div style="padding:6px 12px; border-radius:6px"><i class="ph ph-package"></i> Total: <b>${itemsLote.length}</b></div>
     <div style="width:100%; height:1px; margin:4px 0"></div>
     ${docsHtml}
@@ -777,7 +783,7 @@ function renderizarItems() {
             </select>
           </td>
           <td>
-            <button class="btn-primary" style="padding:4px 8px; font-size:11px;" onclick="guardarEdicionInline(${item.id})">ðŸ’¾ Guardar</button>
+            <button class="btn-primary" style="padding:4px 8px; font-size:11px;" onclick="guardarEdicionInline(${item.id})">💾 Guardar</button>
           </td>
         </tr>`;
       });
@@ -974,7 +980,7 @@ function actualizarBotonFase() {
     btn.style.opacity = '0.5';
   } else if (idx >= 0 && idx < FLUJO_ESTADOS.length - 1) {
     const siguiente = FLUJO_ESTADOS[idx + 1];
-    btn.textContent = `â–¶ï¸ Pasar a: ${LABELS_ESTADOS[siguiente]}`;
+    btn.textContent = `<i class="ph ph-arrow-right"></i> Pasar a: ${LABELS_ESTADOS[siguiente]}`;
     btn.disabled = false;
     btn.style.opacity = '1';
   } else if (est === 'COMPLETO') {
@@ -982,7 +988,7 @@ function actualizarBotonFase() {
     btn.disabled = false;
     btn.style.opacity = '1';
   } else {
-    btn.textContent = 'â–¶ï¸ Siguiente Fase';
+    btn.textContent = '<i class="ph ph-arrow-right"></i> Siguiente Fase';
   }
 }
 
@@ -1080,7 +1086,7 @@ function editarLote() {
       const fb = document.getElementById('msg-detalle');
       if (res.ok) {
         loteActual.titulo = titulo;
-        document.getElementById('detalle-titulo').textContent = `${loteActual.lote_id} â€” ${titulo}`;
+        document.getElementById('detalle-titulo').textContent = `${loteActual.lote_id} - ${titulo}`;
         fb.textContent = '<i class="ph ph-check-circle"></i> Lote actualizado';
         fb.className = 'msg ok';
       } else {
@@ -1138,3 +1144,5 @@ cargarLotes();
 
 </body>
 </html>
+
+
