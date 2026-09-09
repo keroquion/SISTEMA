@@ -21,15 +21,14 @@ switch ($action) {
         if ($res->num_rows > 0) {
             $user = $res->fetch_assoc();
             
-            if ($user['password_hash'] === null) {
-                if ($pass === '123456') {
-                    $auth_ok = true;
-                } else {
-                    $auth_ok = false;
-                }
-            } else {
-                $auth_ok = password_verify($pass, $user["password_hash"]);
+            if (empty($user['password_hash'])) {
+                echo json_encode([
+                    "ok" => false, 
+                    "msg" => "Usuario sin contraseña configurada. Solicite a un administrador que le asigne una contraseña."
+                ]);
+                exit;
             }
+            $auth_ok = password_verify($pass, $user["password_hash"]);
 
             if ($auth_ok) {
                 $tipo = $user['tipo'];

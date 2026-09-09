@@ -1,5 +1,12 @@
 <?php
+session_start();
+if (!isset($_SESSION['user_id'])) {
+    header('HTTP/1.1 401 Unauthorized');
+    echo json_encode(['ok' => false, 'msg' => 'No autorizado']);
+    exit;
+}
 require_once "config.php";
+check_api_access('admin_only');
 $db = getDB();
 
 $res = $db->query("SELECT codigo, COUNT(*) as c FROM equipos GROUP BY codigo HAVING c > 1");
