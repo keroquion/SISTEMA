@@ -7,6 +7,7 @@ $action = $_GET["action"] ?? "get_activa";
 $usuario_id = $_SESSION['user_id'];
 $usuario_nombre = $_SESSION['user_nombre'];
 $es_admin = ($_SESSION['user_tipo'] === 'admin');
+session_write_close();
 
 switch ($action) {
     case "get_activa":

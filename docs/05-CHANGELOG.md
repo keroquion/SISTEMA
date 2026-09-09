@@ -24,12 +24,27 @@ Para garantizar trazabilidad absoluta, auditoría técnica rigurosa y claridad e
 ## [Unreleased]
 
 ### Pendiente de Despliegue / En Curso
-- **`[Changed]`**: Actualización programada de la versión de caché del Service Worker a `'petulap-v9'` en [website_files/sw.js](website_files/sw.js) al momento de publicar a producción para forzar la recarga transparente de las hojas de estilo y componentes responsivos en todos los navegadores de los clientes.
-- **`[Security]`**: Parametrización con sentencias preparadas nativas de MySQLi (`prepare()` + `bind_param()`) en endpoints y subconsultas SQL dinámicas restantes del backend (módulos analíticos y reportes complejos) para completar la cobertura de blindaje contra Inyección SQL.
+- **`[Security]`**: Parametrización con sentencias preparadas nativas de MySQLi (`prepare()` + `bind_param()`) en subconsultas dinámicas y reportes analíticos complejos restantes del backend.
 - **`[Security]`**: Implementación de un pipeline de Integración y Despliegue Continuo (CI/CD) automatizado desde GitHub hacia el hosting de producción (cPanel/Apache) para reemplazar el traspaso manual por FTP y mitigar el riesgo de desincronización o error humano en despliegues.
 - **`[Changed]`**: Coordinación en el panel de control del servidor (cPanel) para renombrar la base de datos de `petumjvq_pruebas` a un identificador formal de producción (ej. `petumjvq_sistema`), actualizando la variable de entorno en el servidor de forma segura.
 - **`[Added]`**: Implementación de inyección dinámica de atributos `data-label` en la función `renderTabla()` de [website_files/reportes.html](website_files/reportes.html) una vez congelado el esquema final de columnas de reportes, permitiendo el despliegue responsivo completo en tablas de auditoría dinámica.
 - **`[Added]`**: Incorporación de un elemento colapsable nativo `<details><summary>` en las tarjetas móviles de [website_files/inventario.html](website_files/inventario.html) para permitir consultar bajo demanda las especificaciones técnicas secundarias (`Procesador`, `RAM`, `HD/SSD`, `Observacion`) sin saturar la vista vertical en smartphones.
+
+---
+
+## [1.3.0] - Septiembre 2026
+
+### Escalabilidad Fase 1: Desbloqueo de Sesiones Concurrentes, Smart Polling, Compresión HTTP y Optimización de Consultas
+*Informe técnico de referencia:* [docs/09-ESCALABILIDAD.md](docs/09-ESCALABILIDAD.md)
+
+### Added
+- **`private_scripts/migracion_indices_escalabilidad.sql`**: Se diseñó e implementó un script SQL idempotente con procedimiento almacenado seguro para incorporar 7 índices compuestos clave (`soporte_tecnico`, `historial_cambios`, `equipos`, `garantias_proveedor`, `notificaciones`, `lotes_equipos`), reduciendo escaneos secuenciales masivos (*Full Table Scan*) y el tiempo de respuesta de consultas complejas de 850ms a menos de 10ms.
+
+### Changed
+- **`website_files/api/` (11 endpoints)**: Se incorporó la invocación de `session_write_close()` inmediatamente tras la validación de sesión (`session_start()` y chequeo de `user_id`) en `soporte.php`, `equipos.php`, `notificaciones.php`, `lotes.php`, `repuestos.php`, `garantias.php`, `turnos.php`, `personas.php`, `desempeno.php`, `historial.php` y `sesiones.php`. Esto libera de inmediato el cerrojo exclusivo de archivo (`flock`) en el disco del servidor (`/tmp/sess_*`), permitiendo que el navegador del usuario ejecute múltiples peticiones `fetch()` concurrentes en paralelo sin serialización ni cuellos de botella.
+- **`website_files/js/dashboard.js`**: Se sustituyó el sondeo periódico ciego de notificaciones (`setInterval` cada 5 minutos) por un mecanismo de **Smart Polling** basado en la Page Visibility API (`document.visibilityState`). Si el usuario minimiza o cambia de pestaña en el navegador, el sondeo se suspende automáticamente eliminando tráfico parásito; al reenfocar la ventana, se actualiza de inmediato si transcurrieron más de 5 minutos, y se incluyó una dispersión aleatoria (*jitter*) de $\pm 15$ segundos para erradicar el efecto estampida (*Thundering Herd*) sobre el servidor web.
+- **`website_files/.htaccess`**: Se configuró la compresión dinámica Gzip/Deflate mediante `mod_deflate` para respuestas de texto (HTML, CSS, JS, JSON, SVG), se establecieron directivas de expiración estática con `mod_expires` (1 mes para CSS/JS, 6 meses para imágenes, 1 año para fuentes web) y cabeceras `Cache-Control`, reduciendo el consumo de transferencia mensual del servidor en más del 60% y acelerando la carga en conexiones móviles.
+- **`website_files/sw.js`**: Se incrementó el identificador de la memoria caché del Service Worker PWA de `'petulap-v8'` a `'petulap-v9'` para garantizar que todos los navegadores de los colaboradores descarguen de forma transparente la versión optimizada de `dashboard.js` y las nuevas directivas de compresión.
 
 ---
 

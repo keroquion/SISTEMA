@@ -6,6 +6,7 @@ $db = getDB();
 $action = $_GET["action"] ?? "list";
 $usuario_id = $_SESSION['user_id'];
 $es_admin = ($_SESSION['user_tipo'] === 'admin');
+session_write_close();
 
 // SIMULADOR DE CRON PARA ALARMAS DE GARANTIAS (Sólo si es admin)
 if ($es_admin) {

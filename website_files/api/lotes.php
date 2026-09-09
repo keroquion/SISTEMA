@@ -3,6 +3,7 @@ session_start();
 if (!isset($_SESSION['user_id'])) { header('HTTP/1.1 401 Unauthorized'); echo json_encode(['ok'=>false, 'msg'=>'No autorizado']); exit; }
 require_once "config.php";
 check_api_access('lotes.html'); // Seguridad de Backend
+session_write_close();
 $db = getDB();
 $action = $_GET["action"] ?? "list";
 

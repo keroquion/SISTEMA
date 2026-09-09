@@ -8,3 +8,6 @@ node_modules/
 # Credenciales y configuracion de base de datos sensible
 website_files/api/config.php
 api/config.php
+
+*.rar
+*.zip
