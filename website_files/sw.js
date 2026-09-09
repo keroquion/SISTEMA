@@ -1,6 +1,6 @@
-// Service Worker - Petulap PWA v7 (Push Notifications)
+// Service Worker - Petulap PWA v8 (Push Notifications)
 
-var CACHE_NAME = 'petulap-v7';
+var CACHE_NAME = 'petulap-v8';
 var ASSETS = [
     './',
     'index.html',

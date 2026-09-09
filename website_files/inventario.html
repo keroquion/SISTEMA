@@ -25,6 +25,69 @@ if ("serviceWorker" in navigator) { window.addEventListener("load", () => { navi
     <!-- Dashboard Styles -->
     <link rel="stylesheet" href="css/dashboard.css?v=3">
 
+<style>
+/* ===================== INVENTARIO — RESPONSIVE MÓVIL ===================== */
+@media (max-width: 768px) {
+  /* Filtros → columna */
+  .filtros {
+    flex-direction: column !important;
+    gap: 10px !important;
+  }
+  .filtros input,
+  .filtros select,
+  .filtros button { width: 100% !important; }
+
+  /* Contador de resultados */
+  #tabla-inv > div:first-child { font-size: 13px !important; }
+
+  /* Tabla de inventario → tarjetas */
+  #tabla-inv table  { width: 100% !important; }
+  #tabla-inv thead  { display: none !important; }
+  #tabla-inv tr     {
+    display: block !important;
+    margin-bottom: 14px !important;
+    border-radius: 12px !important;
+    border: 1px solid var(--border-default, #e2e8f0) !important;
+    background: var(--bg-card, #fff) !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06) !important;
+    overflow: hidden !important;
+  }
+  #tabla-inv td {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: flex-start !important;
+    padding: 10px 14px !important;
+    border-bottom: 1px solid #f1f5f9 !important;
+    font-size: 13px !important;
+    white-space: normal !important;
+    word-break: break-word !important;
+  }
+  #tabla-inv td:last-child { border-bottom: none !important; }
+  #tabla-inv td::before {
+    content: attr(data-label);
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.4px !important;
+    color: var(--text-secondary, #64748b) !important;
+    margin-right: 10px !important;
+    flex-shrink: 0 !important;
+    min-width: 80px !important;
+  }
+
+  /* Specs ocultos por defecto en móvil — mostrar en details */
+  #tabla-inv td[data-label="Procesador"],
+  #tabla-inv td[data-label="RAM"],
+  #tabla-inv td[data-label="HD/SSD"],
+  #tabla-inv td[data-label="Observacion"] {
+    display: none !important;
+  }
+
+  /* Stats cards → 2 columnas en móvil */
+  .stats { grid-template-columns: 1fr 1fr !important; gap: 10px !important; }
+}
+</style>
+
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="apple-touch-icon" href="icon.jpg">
@@ -419,18 +482,18 @@ function renderizar(lista, total) {
   html += `<table><thead><tr><th>Codigo</th><th>Serie</th><th>Tipo</th><th>Marca</th><th>Modelo</th><th>Procesador</th><th>RAM</th><th>HD/SSD</th><th>Sucursal</th><th>Estado</th><th>DOC.COMPRA</th><th>Observacion</th></tr></thead><tbody>`;
   lista.forEach(e => {
     html += `<tr>
-      <td><b>${e.codigo||'-'}</b></td>
-      <td>${e.serie||'-'}</td>
-      <td>${e.tipo_equipo||''}</td>
-      <td>${e.marca||''}</td>
-      <td>${e.modelo||''}</td>
-      <td>${e.procesador||''}</td>
-      <td>${e.ram||''}</td>
-      <td>${e.hd_ssd||''}</td>
-      <td>${e.sucursal||''}</td>
-      <td class="badge-${e.estado}">${e.estado||''}</td>
-      <td>${e.doc_compra||''}</td>
-      <td style="max-width:150px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap" title="${(e.observacion||'').replace(/"/g,"'")}">${e.observacion||''}</td>
+      <td data-label="Codigo"><b>${e.codigo||'-'}</b></td>
+      <td data-label="Serie">${e.serie||'-'}</td>
+      <td data-label="Tipo">${e.tipo_equipo||''}</td>
+      <td data-label="Marca">${e.marca||''}</td>
+      <td data-label="Modelo">${e.modelo||''}</td>
+      <td data-label="Procesador">${e.procesador||''}</td>
+      <td data-label="RAM">${e.ram||''}</td>
+      <td data-label="HD/SSD">${e.hd_ssd||''}</td>
+      <td data-label="Sucursal">${e.sucursal||''}</td>
+      <td data-label="Estado" class="badge-${e.estado}">${e.estado||''}</td>
+      <td data-label="Doc.Compra">${e.doc_compra||''}</td>
+      <td data-label="Observacion" style="max-width:150px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap" title="${(e.observacion||'').replace(/"/g,"'")}">${e.observacion||''}</td>
     </tr>`;
   });
   html += '</tbody></table>';

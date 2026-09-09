@@ -372,6 +372,73 @@ if ("serviceWorker" in navigator) { window.addEventListener("load", () => { navi
 <style>
   @media (max-width: 768px) {
     .content { padding: 15px 5px !important; }
+
+    /* ===== KANBAN → ACORDEONES EN MÓVIL ===== */
+
+    /* Board: columna vertical, sin overflow horizontal */
+    #kanban-board {
+      flex-direction: column !important;
+      gap: 10px !important;
+      overflow-x: hidden !important;
+      padding-bottom: 80px !important; /* espacio bottom nav */
+    }
+
+    /* Columna: ancho completo, borde redondeado, sin scroll propio */
+    .k-col {
+      min-width: 100% !important;
+      max-width: 100% !important;
+      height: auto !important;
+      max-height: none !important;
+      overflow: visible !important;
+      border-radius: 12px !important;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08) !important;
+    }
+
+    /* Header: cursor pointer, gap, sin border-radius inferior cuando abierto */
+    .k-header {
+      cursor: pointer !important;
+      display: flex !important;
+      justify-content: space-between !important;
+      align-items: center !important;
+      padding: 14px 16px !important;
+      font-size: 14px !important;
+      border-radius: 12px !important;
+      user-select: none !important;
+    }
+    .k-col.expanded .k-header {
+      border-radius: 12px 12px 0 0 !important;
+    }
+
+    /* Ícono de flecha: rotar cuando expandido */
+    .k-header .expand-icon {
+      transition: transform 0.25s ease !important;
+      font-size: 18px !important;
+    }
+    .k-col.expanded .k-header .expand-icon {
+      transform: rotate(45deg) !important;
+    }
+
+    /* Body: colapsado por defecto */
+    .k-body {
+      max-height: 0 !important;
+      overflow: hidden !important;
+      transition: max-height 0.3s ease !important;
+      padding: 0 !important;
+    }
+
+    /* Body: expandido cuando la columna tiene clase .expanded */
+    .k-col.expanded .k-body {
+      max-height: 5000px !important; /* suficiente para muchas tarjetas */
+      overflow-y: auto !important;
+      padding: 8px !important;
+    }
+
+    /* Botones de acción kanban: compactos en móvil */
+    .kanban-action-btns { flex-wrap: wrap !important; gap: 6px !important; }
+    .kanban-action-btns button { flex: 1 1 auto !important; min-width: 100px !important; }
+
+    /* Tabs: ancho completo */
+    .tabs { width: 100% !important; justify-content: center !important; }
   }
 </style>
 
@@ -569,6 +636,16 @@ if ("serviceWorker" in navigator) { window.addEventListener("load", () => { navi
 let miId = localStorage.getItem('tecnico_id');
 let miTipo = localStorage.getItem('tecnico_tipo');
 
+// ===== ACORDEÓN KANBAN: primera columna expandida al cargar en móvil =====
+document.addEventListener('DOMContentLoaded', () => {
+  if (window.innerWidth <= 768) {
+    const primerCol = document.getElementById('kcol-pend');
+    if (primerCol) primerCol.classList.add('expanded');
+  }
+});
+// ===== FIN ACORDEÓN =====
+
+
 if (miTipo === 'admin') {
     miId = 'admin';
     const btnCrear = document.getElementById('btn-crear-tarea');
@@ -674,19 +751,29 @@ function iniciarAutoRefresh() {
 function toggleExpand(colId) {
     const board = document.getElementById('kanban-board');
     const col = document.getElementById(colId);
-    
+    const isMobile = window.innerWidth <= 768;
+
     if (col.classList.contains('expanded')) {
         col.classList.remove('expanded');
-        board.classList.remove('has-expanded');
-        col.querySelector('.expand-icon').classList.replace('ph-arrows-in', 'ph-arrows-out');
+        if (!isMobile) {
+            board.classList.remove('has-expanded');
+            const icon = col.querySelector('.expand-icon');
+            if (icon) icon.classList.replace('ph-arrows-in', 'ph-arrows-out');
+        }
     } else {
         document.querySelectorAll('.k-col').forEach(c => {
             c.classList.remove('expanded');
-            c.querySelector('.expand-icon').classList.replace('ph-arrows-in', 'ph-arrows-out');
+            if (!isMobile) {
+                const icon = c.querySelector('.expand-icon');
+                if (icon) icon.classList.replace('ph-arrows-in', 'ph-arrows-out');
+            }
         });
         col.classList.add('expanded');
-        board.classList.add('has-expanded');
-        col.querySelector('.expand-icon').classList.replace('ph-arrows-out', 'ph-arrows-in');
+        if (!isMobile) {
+            board.classList.add('has-expanded');
+            const icon = col.querySelector('.expand-icon');
+            if (icon) icon.classList.replace('ph-arrows-out', 'ph-arrows-in');
+        }
     }
 }
 

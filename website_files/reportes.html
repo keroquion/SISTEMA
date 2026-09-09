@@ -22,6 +22,65 @@
     <!-- Dashboard Styles -->
     <link rel="stylesheet" href="css/dashboard.css?v=3">
 
+<style>
+/* ===================== REPORTES — RESPONSIVE MÓVIL ===================== */
+@media (max-width: 768px) {
+  /* Filtros de fecha → columna */
+  .fechas-grid {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+
+  /* Header de detalle → columna */
+  #view-detalle > div:first-child {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 10px !important;
+  }
+  #btn-ver-tabla-top { width: 100% !important; justify-content: center !important; }
+
+  /* Barra de acciones panel detalle */
+  #panel-tabla > div > div:first-child { flex-direction: column !important; align-items: flex-start !important; }
+  #filtro-estado { width: 100% !important; min-width: unset !important; }
+
+  /* Tabla de equipos dentro del reporte → tarjetas */
+  #tabla-reporte table  { width: 100% !important; }
+  #tabla-reporte thead  { display: none !important; }
+  #tabla-reporte tr     {
+    display: block !important;
+    margin-bottom: 12px !important;
+    border-radius: 10px !important;
+    border: 1px solid var(--border-default, #e2e8f0) !important;
+    background: var(--bg-card, #fff) !important;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05) !important;
+    overflow: hidden !important;
+  }
+  #tabla-reporte td {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    padding: 10px 14px !important;
+    border-bottom: 1px solid #f1f5f9 !important;
+    font-size: 13px !important;
+    white-space: normal !important;
+  }
+  #tabla-reporte td:last-child { border-bottom: none !important; }
+  #tabla-reporte td::before {
+    content: attr(data-label);
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    color: var(--text-secondary, #64748b) !important;
+    margin-right: 8px !important;
+    flex-shrink: 0 !important;
+  }
+
+  /* Tarjetas de lotes en la lista */
+  .lote-label { padding: 14px !important; }
+  .lote-label > div > div:last-child { display: none !important; } /* ocultar caret en móvil */
+}
+</style>
+
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="apple-touch-icon" href="icon.jpg">

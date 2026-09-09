@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -347,9 +347,10 @@
                 <input type="text" placeholder="Buscar en el sistema...">
             </div>
             <div class="topbar-right">
-                <a href="login.html" class="user-profile">
-                    <img src="https://ui-avatars.com/api/?name=User+Profile&background=0D8ABC&color=fff" alt="User Profile">
-                </a>
+                <button class="notification-btn" aria-label="Notificaciones">
+                    <i class="ph ph-bell"></i>
+                </button>
+                <div class="user-profile" id="lbl-nombre">👨‍ Cargando...</div>
             </div>
         </header>
 
@@ -449,6 +450,7 @@
         .status-otro { background: rgba(100,116,139,0.2); color: var(--text-secondary); }
     </style>
     <script src="js/check_auth.js"></script>
+    <script src="js/dashboard.js?v=3"></script>
     <script>
         const API = 'api/desempeno.php';
 
