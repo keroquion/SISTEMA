@@ -386,8 +386,215 @@ if ("serviceWorker" in navigator) { window.addEventListener("load", () => { navi
 
 
 <style>
+  /* ===== DISEÑO SAAS EJECUTIVO PETULAP: TOKENS Y COMPONENTES EN TIEMPO REAL ===== */
+  @keyframes pulse-green {
+    0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+    70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+  }
+
+  @keyframes pulse-amber {
+    0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7); }
+    70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(245, 158, 11, 0); }
+    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+  }
+
+  .pulse-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+    flex-shrink: 0;
+  }
+
+  .pulse-green {
+    background: #10B981;
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+    animation: pulse-green 1.8s infinite;
+  }
+
+  .pulse-amber {
+    background: #F59E0B;
+    box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7);
+    animation: pulse-amber 1.8s infinite;
+  }
+
+  .pulse-slate {
+    background: #94A3B8;
+  }
+
+  /* Insignias de Estado Vivo (.live-chip) */
+  .live-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 10px;
+    border-radius: 9999px;
+    font-size: 0.73rem;
+    font-weight: 700;
+    line-height: 1.2;
+    white-space: nowrap;
+    letter-spacing: 0.2px;
+    transition: all 0.2s ease;
+  }
+
+  .chip-working {
+    background: rgba(16, 185, 129, 0.12);
+    color: #10B981;
+    border: 1px solid rgba(16, 185, 129, 0.28);
+  }
+
+  .chip-waiting {
+    background: rgba(245, 158, 11, 0.12);
+    color: #F59E0B;
+    border: 1px solid rgba(245, 158, 11, 0.28);
+  }
+
+  .chip-inactive {
+    background: rgba(100, 116, 139, 0.12);
+    color: #64748B;
+    border: 1px solid rgba(100, 116, 139, 0.20);
+  }
+
+  /* Barra Superior de Acciones (.top-action-bar) */
+  .top-action-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+    background: var(--bg-surface);
+    padding: 8px 14px;
+    border-radius: 12px;
+    border: 1px solid var(--border-default);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+  }
+
+  .tabs-header {
+    display: inline-flex;
+    gap: 6px;
+    background: var(--bg-card);
+    padding: 4px;
+    border-radius: 10px;
+    border: 1px solid var(--border-default);
+  }
+
+  .tabs-header .tab-btn {
+    padding: 6px 14px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .tabs-header .tab-btn.active {
+    background: var(--color-brand);
+    color: #ffffff;
+    box-shadow: 0 2px 6px rgba(13, 138, 188, 0.35);
+  }
+
+  .tabs-header .tab-btn.inactive,
+  .tabs-header .tab-btn:not(.active) {
+    background: transparent;
+    color: var(--text-secondary);
+  }
+
+  .tabs-header .tab-btn:not(.active):hover {
+    color: var(--text-primary);
+    background: var(--bg-surface-hover);
+  }
+
+  /* Mini Línea de Tiempo de Taller (.mini-timeline-bar) */
+  .mini-timeline-bar {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 3px;
+    background: var(--bg-surface-hover);
+    padding: 2px;
+    border-radius: 4px;
+    border: 1px solid var(--border-default);
+  }
+
+  .mini-slot {
+    height: 5px;
+    border-radius: 2px;
+    background: rgba(148, 163, 184, 0.18);
+    transition: background-color 0.2s ease;
+  }
+
+  .mini-slot.active-high { background: #10B981; }
+  .mini-slot.active-med { background: #0284c7; }
+  .mini-slot.active-amber { background: #F59E0B; }
+  .mini-slot.active-danger { background: #EF4444; }
+
+  /* Tablero Kanban & Tarjetas */
+  .k-col {
+    background: var(--bg-surface) !important;
+    border: 1px solid var(--border-default) !important;
+    border-radius: 12px !important;
+  }
+
+  .k-header {
+    background: var(--bg-card) !important;
+    color: var(--text-primary) !important;
+    border-bottom: 1px solid var(--border-default) !important;
+    font-weight: 700 !important;
+  }
+
+  .ticket {
+    background: var(--bg-card) !important;
+    border: 1px solid var(--border-default) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04) !important;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease !important;
+    color: var(--text-secondary) !important;
+    position: relative;
+  }
+
+  .ticket:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 20px -4px rgba(0, 0, 0, 0.12) !important;
+    border-color: var(--color-brand) !important;
+  }
+
   @media (max-width: 768px) {
     .content { padding: 15px 5px !important; }
+
+    .top-action-bar {
+      flex-direction: column !important;
+      align-items: stretch !important;
+      gap: 10px !important;
+      padding: 10px !important;
+    }
+
+    .top-action-bar-left {
+      display: flex !important;
+      justify-content: space-between !important;
+      align-items: center !important;
+      width: 100% !important;
+      flex-wrap: wrap !important;
+      gap: 8px !important;
+    }
+
+    .top-action-controls {
+      display: flex !important;
+      flex-wrap: wrap !important;
+      gap: 8px !important;
+      width: 100% !important;
+    }
+
+    .top-action-controls .btn,
+    .top-action-controls a {
+      flex: 1 1 auto !important;
+      min-height: 44px !important;
+      justify-content: center !important;
+    }
 
     /* ===== KANBAN → ACORDEONES EN MÓVIL ===== */
 
@@ -417,6 +624,7 @@ if ("serviceWorker" in navigator) { window.addEventListener("load", () => { navi
       justify-content: space-between !important;
       align-items: center !important;
       padding: 14px 16px !important;
+      min-height: 48px !important;
       font-size: 14px !important;
       border-radius: 12px !important;
       user-select: none !important;
@@ -463,36 +671,77 @@ if ("serviceWorker" in navigator) { window.addEventListener("load", () => { navi
   <!-- KANBAN BOARD -->
   <div id="panel-principal" style="display: flex !important; flex-direction: column !important; flex: 1 !important; min-height: 0 !important;">
     
-    <!-- ACCIONES KANBAN -->
-    <div style="display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:space-between; margin-bottom: 8px; background: white; padding: 6px 12px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.02);">
-      
-      <div class="tabs" style="display: flex; gap: 6px; background: #e2e8f0; padding: 4px; border-radius: 8px; border: 1px solid #cbd5e1;">
-        <button id="tab-clientes" class="tab-btn active" onclick="cambiarTab('clientes')" style="padding: 5px 12px; border-radius: 6px; font-weight: 700; transition: 0.3s; border: none; font-size: 13px;"><i class="ph-fill ph-users"></i> Clientes</button>
-        <button id="tab-internos" class="tab-btn inactive" onclick="cambiarTab('internos')" style="padding: 5px 12px; border-radius: 6px; font-weight: 700; transition: 0.3s; border: none; font-size: 13px;"><i class="ph-fill ph-buildings"></i> Internos</button>
+    <!-- ACCIONES KANBAN: TOP ACTION BAR SAAS -->
+    <div class="top-action-bar">
+      <div class="top-action-bar-left" style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+        <div class="tabs-header">
+          <button id="tab-clientes" type="button" class="tab-btn active" onclick="cambiarTab('clientes')">
+            <i class="ph-fill ph-users"></i> Clientes
+          </button>
+          <button id="tab-internos" type="button" class="tab-btn inactive" onclick="cambiarTab('internos')">
+            <i class="ph-fill ph-buildings"></i> Internos
+          </button>
+        </div>
+        <div id="live-kanban-counter" class="live-chip chip-working" title="Órdenes activas en taller">
+          <span class="pulse-dot pulse-green"></span> <span id="txt-total-active">Cargando órdenes...</span>
+        </div>
       </div>
 
-      <div class="kanban-action-btns" style="display:flex; gap:8px; flex-wrap: wrap;">
-        <button class="btn-primary" style="padding:6px 12px; font-weight: 700; border-radius: 6px; background: #0f172a; border: none; box-shadow: 0 2px 5px rgba(15,23,42,0.2); display: flex; align-items: center; justify-content: center; gap: 4px; font-size: 13px;" onclick="window.location.href='historial_entregados.html'"><i class="ph-bold ph-books"></i> Historial</button>
-        <button class="btn-primary" id="btn-asignar-rep" style="display:none; padding:6px 12px; font-weight: 700; border-radius: 6px; background: linear-gradient(135deg, #f59e0b, #d97706); border: none; box-shadow: 0 2px 5px rgba(217,119,6,0.2); display: flex; align-items: center; justify-content: center; gap: 4px; font-size: 13px;" onclick="abrirModalAsignar()"><i class="ph-bold ph-crosshair"></i> Lote/Interno</button>
-        <button class="btn-primary" id="btn-crear-tarea" style="display:none; padding:6px 12px; font-weight: 700; border-radius: 6px; background: linear-gradient(135deg, #8b5cf6, #6d28d9); border: none; box-shadow: 0 2px 5px rgba(109,40,217,0.2); display: flex; align-items: center; justify-content: center; gap: 4px; font-size: 13px;" onclick="if(typeof abrirModalTareaGlobal === 'function') abrirModalTareaGlobal();"><i class="ph-bold ph-plus"></i> Crear Tarea</button>
+      <div class="top-action-controls" style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+        <button type="button" class="btn btn-secondary" onclick="cargarMisOrdenes()" title="Actualizar tablero" style="display:inline-flex; align-items:center; gap:6px; min-height:38px; padding:0 14px; font-size:12.5px;">
+          <i class="ph ph-arrows-clockwise"></i> <span>Actualizar</span>
+        </button>
+        <a href="historial_entregados.html" class="btn btn-secondary" style="display:inline-flex; align-items:center; gap:6px; min-height:38px; padding:0 14px; font-size:12.5px; text-decoration:none;">
+          <i class="ph-bold ph-books"></i> <span>Historial</span>
+        </a>
+        <button class="btn btn-primary" id="btn-asignar-rep" style="display:none; min-height:38px; padding:0 14px; font-size:12.5px; background: linear-gradient(135deg, #f59e0b, #d97706); border: none; align-items:center; gap:6px;" onclick="abrirModalAsignar()">
+          <i class="ph-bold ph-crosshair"></i> <span>Lote/Interno</span>
+        </button>
+        <button class="btn btn-primary" id="btn-crear-tarea" style="display:none; min-height:38px; padding:0 14px; font-size:12.5px; background: linear-gradient(135deg, #8b5cf6, #6d28d9); border: none; align-items:center; gap:6px;" onclick="if(typeof abrirModalTareaGlobal === 'function') abrirModalTareaGlobal();">
+          <i class="ph-bold ph-plus"></i> <span>Crear Tarea</span>
+        </button>
       </div>
     </div>
     
     <div id="kanban-board">
       <div class="k-col pend" id="kcol-pend">
-        <div class="k-header" onclick="toggleExpand('kcol-pend')" style="cursor: pointer;" title="Clic para expandir/contraer"><div style="display:flex; align-items:center; gap:5px;"><i class="ph ph-clipboard"></i> PENDIENTES (<span id="c-pend">0</span>)</div><i class="ph-bold ph-arrows-out expand-icon"></i></div>
+        <div class="k-header" onclick="toggleExpand('kcol-pend')" style="cursor: pointer;" title="Clic para expandir/contraer">
+          <div style="display:flex; align-items:center; gap:6px;">
+            <span class="pulse-dot pulse-amber"></span>
+            <i class="ph ph-clipboard"></i> PENDIENTES (<span id="c-pend">0</span>)
+          </div>
+          <i class="ph-bold ph-arrows-out expand-icon"></i>
+        </div>
         <div class="k-body" id="col-pend"></div>
       </div>
       <div class="k-col diag" id="kcol-diag">
-        <div class="k-header" onclick="toggleExpand('kcol-diag')" style="cursor: pointer;" title="Clic para expandir/contraer"><div style="display:flex; align-items:center; gap:5px;"><i class="ph ph-magnifying-glass"></i> EN REVISION / REP. (<span id="c-diag">0</span>)</div><i class="ph-bold ph-arrows-out expand-icon"></i></div>
+        <div class="k-header" onclick="toggleExpand('kcol-diag')" style="cursor: pointer;" title="Clic para expandir/contraer">
+          <div style="display:flex; align-items:center; gap:6px;">
+            <span class="pulse-dot pulse-green"></span>
+            <i class="ph ph-magnifying-glass"></i> EN REVISION / REP. (<span id="c-diag">0</span>)
+          </div>
+          <i class="ph-bold ph-arrows-out expand-icon"></i>
+        </div>
         <div class="k-body" id="col-diag"></div>
       </div>
       <div class="k-col rep" id="kcol-rep">
-        <div class="k-header" onclick="toggleExpand('kcol-rep')" style="cursor: pointer;" title="Clic para expandir/contraer"><div style="display:flex; align-items:center; gap:5px;"><i class="ph ph-package"></i> ESPERANDO REPUESTO (<span id="c-rep">0</span>)</div><i class="ph-bold ph-arrows-out expand-icon"></i></div>
+        <div class="k-header" onclick="toggleExpand('kcol-rep')" style="cursor: pointer;" title="Clic para expandir/contraer">
+          <div style="display:flex; align-items:center; gap:6px;">
+            <span class="pulse-dot pulse-amber"></span>
+            <i class="ph ph-package"></i> ESPERANDO REPUESTO (<span id="c-rep">0</span>)
+          </div>
+          <i class="ph-bold ph-arrows-out expand-icon"></i>
+        </div>
         <div class="k-body" id="col-rep"></div>
       </div>
       <div class="k-col listo" id="kcol-listo">
-        <div class="k-header" onclick="toggleExpand('kcol-listo')" style="cursor: pointer;" title="Clic para expandir/contraer"><div style="display:flex; align-items:center; gap:5px;"><i class="ph ph-check-circle"></i> LISTOS / ENTREGADOS (<span id="c-listo">0</span>)</div><i class="ph-bold ph-arrows-out expand-icon"></i></div>
+        <div class="k-header" onclick="toggleExpand('kcol-listo')" style="cursor: pointer;" title="Clic para expandir/contraer">
+          <div style="display:flex; align-items:center; gap:6px;">
+            <span class="pulse-dot pulse-green"></span>
+            <i class="ph ph-check-circle"></i> LISTOS / ENTREGADOS (<span id="c-listo">0</span>)
+          </div>
+          <i class="ph-bold ph-arrows-out expand-icon"></i>
+        </div>
         <div class="k-body" id="col-listo"></div>
       </div>
     </div>
@@ -702,19 +951,29 @@ function cambiarTab(tab) {
   const colRep = document.querySelector('.k-col.rep');
   const headerDiag = document.querySelector('.k-col.diag .k-header');
   const headerListo = document.querySelector('.k-col.listo .k-header');
+  const btnClientes = document.getElementById('tab-clientes');
+  const btnInternos = document.getElementById('tab-internos');
   
   if (tab === 'clientes') {
-    document.getElementById('tab-clientes').className = 'tab-btn active';
-    document.getElementById('tab-internos').className = 'tab-btn inactive';
-    colRep.style.display = 'flex';
-    headerDiag.innerHTML = '<i class="ph ph-magnifying-glass"></i> EN REVISION / REP. (<span id="c-diag">0</span>)';
-    headerListo.innerHTML = '<i class="ph ph-check-circle"></i> LISTOS / ENTREGADOS (<span id="c-listo">0</span>)';
+    if (btnClientes) btnClientes.className = 'tab-btn active';
+    if (btnInternos) btnInternos.className = 'tab-btn inactive';
+    if (colRep) colRep.style.display = 'flex';
+    if (headerDiag) {
+      headerDiag.innerHTML = '<div style="display:flex; align-items:center; gap:6px;"><span class="pulse-dot pulse-green"></span> <i class="ph ph-magnifying-glass"></i> EN REVISION / REP. (<span id="c-diag">0</span>)</div><i class="ph-bold ph-arrows-out expand-icon"></i>';
+    }
+    if (headerListo) {
+      headerListo.innerHTML = '<div style="display:flex; align-items:center; gap:6px;"><span class="pulse-dot pulse-green"></span> <i class="ph ph-check-circle"></i> LISTOS / ENTREGADOS (<span id="c-listo">0</span>)</div><i class="ph-bold ph-arrows-out expand-icon"></i>';
+    }
   } else {
-    document.getElementById('tab-internos').className = 'tab-btn active';
-    document.getElementById('tab-clientes').className = 'tab-btn inactive';
-    colRep.style.display = 'none';
-    headerDiag.innerHTML = '<i class="ph ph-magnifying-glass"></i> EN REVISION (<span id="c-diag">0</span>)';
-    headerListo.innerHTML = '<i class="ph ph-check-circle"></i> TERMINADO (<span id="c-listo">0</span>)';
+    if (btnInternos) btnInternos.className = 'tab-btn active';
+    if (btnClientes) btnClientes.className = 'tab-btn inactive';
+    if (colRep) colRep.style.display = 'none';
+    if (headerDiag) {
+      headerDiag.innerHTML = '<div style="display:flex; align-items:center; gap:6px;"><span class="pulse-dot pulse-green"></span> <i class="ph ph-magnifying-glass"></i> EN REVISION (<span id="c-diag">0</span>)</div><i class="ph-bold ph-arrows-out expand-icon"></i>';
+    }
+    if (headerListo) {
+      headerListo.innerHTML = '<div style="display:flex; align-items:center; gap:6px;"><span class="pulse-dot pulse-green"></span> <i class="ph ph-check-circle"></i> TERMINADO (<span id="c-listo">0</span>)</div><i class="ph-bold ph-arrows-out expand-icon"></i>';
+    }
   }
   cargarMisOrdenes();
 }
@@ -735,6 +994,11 @@ async function cargarMisOrdenes() {
     misTickets = misTickets.filter(t => t.es_externo != 2 && t.cliente_id != 1);
   } else {
     misTickets = misTickets.filter(t => t.es_externo == 2 || t.cliente_id == 1);
+  }
+  
+  const countSpan = document.getElementById('txt-total-active');
+  if (countSpan) {
+    countSpan.textContent = `${misTickets.length} órdenes en taller`;
   }
   
   const pendientesActuales = misTickets.filter(t => t.estado === 'PENDIENTE');
@@ -830,47 +1094,87 @@ Gracias por confiar en nosotros! 🙌`);
     
     const d1 = new Date(t.fecha_ingreso);
     const d2 = new Date();
-    
-    // Difference in hours
-    const ageHours = (d2 - d1) / (1000 * 60 * 60);
-    
-    // Check next calendar day
-    const nextDay = new Date(d1);
-    nextDay.setDate(nextDay.getDate() + 1);
-    const isNextDay = nextDay.getDate() === d2.getDate() && nextDay.getMonth() === d2.getMonth() && nextDay.getFullYear() === d2.getFullYear();
+    const ageHours = Math.max(0, (d2 - d1) / (1000 * 60 * 60));
+    const ageDays = Math.floor(ageHours / 24);
+    const remHours = Math.floor(ageHours % 24);
 
-    let ageColor = '';
-    let ageText = '';
-    let badgeColor = '';
+    let borderAccent = '';
+    let liveChipHtml = '';
+    let slaLabel = '';
+    let slaColor = '';
+    let slot1Class = '';
+    let slot2Class = '';
+    let slot3Class = '';
+    let slot4Class = '';
 
-    if (ageHours >= 72) {
-        ageColor = 'border-left: 4px solid var(--color-danger); background: white;';
-        badgeColor = 'background: var(--bg-danger-subtle); color: var(--color-danger); border: 1px solid #fca5a5;';
-        ageText = '<i class="ph-bold ph-warning-circle"></i> > 72h';
-    } else if (ageHours >= 24) {
-        ageColor = 'border-left: 4px solid var(--color-warning); background: white;';
-        badgeColor = 'background: var(--bg-warning-subtle); color: #b45309; border: 1px solid #fcd34d;';
-        ageText = '<i class="ph-bold ph-hourglass-high"></i> > 24h';
-    } else if (isNextDay) {
-        ageColor = 'border-left: 4px solid var(--color-brand); background: white;';
-        badgeColor = 'background: var(--bg-brand-subtle); color: var(--color-brand); border: 1px solid #93c5fd;';
-        ageText = '<i class="ph-bold ph-clock"></i> Ayer';
+    // Calculate SLA slots (0-24h, 24-48h, 48-72h, >72h)
+    if (ageHours < 24) {
+        slot1Class = 'active-high';
+        slaLabel = '< 24h (Óptimo)';
+        slaColor = '#10B981';
+        borderAccent = 'border-left: 4px solid #10B981;';
+    } else if (ageHours < 48) {
+        slot1Class = 'active-high';
+        slot2Class = 'active-med';
+        slaLabel = '24-48h (En Tiempo)';
+        slaColor = '#0284c7';
+        borderAccent = 'border-left: 4px solid #0284c7;';
+    } else if (ageHours < 72) {
+        slot1Class = 'active-high';
+        slot2Class = 'active-med';
+        slot3Class = 'active-amber';
+        slaLabel = '48-72h (Atención)';
+        slaColor = '#F59E0B';
+        borderAccent = 'border-left: 4px solid #F59E0B;';
     } else {
-        ageColor = 'border-left: 4px solid var(--color-success); background: white;';
-        badgeColor = 'background: var(--bg-success-subtle); color: var(--color-success); border: 1px solid #86efac;';
-        ageText = '<i class="ph-bold ph-check-circle"></i> Hoy';
+        slot1Class = 'active-high';
+        slot2Class = 'active-med';
+        slot3Class = 'active-amber';
+        slot4Class = 'active-danger';
+        slaLabel = `> 72h (Crítico: ${ageDays}d)`;
+        slaColor = '#EF4444';
+        borderAccent = 'border-left: 4px solid #EF4444;';
     }
 
     if (esTarea) {
-        ageColor = 'border-left: 4px solid #b5179e; background: white;';
-        badgeColor = 'background: rgba(181, 23, 158, 0.1); color: #b5179e; border: 1px solid #f9a8d4;';
+        borderAccent = 'border-left: 4px solid #a855f7;';
     }
 
-    html += `<div class="ticket" style="${ageColor} padding: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.04); display: flex; flex-direction: column; height: 100%;">
+    // Determine Live Chip according to state
+    if (esTarea) {
+        liveChipHtml = `<span class="live-chip" style="background: rgba(168, 85, 247, 0.12); color: #a855f7; border: 1px solid rgba(168, 85, 247, 0.28);"><i class="ph-bold ph-wrench"></i> Tarea</span>`;
+    } else if (t.estado === 'ESPERANDO_REPUESTO') {
+        liveChipHtml = `<span class="live-chip chip-waiting"><span class="pulse-dot pulse-amber"></span> En Espera</span>`;
+    } else if (t.estado === 'EN_DIAGNOSTICO' || t.estado === 'EN_REPARACION') {
+        liveChipHtml = `<span class="live-chip chip-working"><span class="pulse-dot pulse-green"></span> En Taller</span>`;
+    } else if (t.estado === 'LISTO_PARA_RECOGER' || t.estado === 'ENTREGADO') {
+        liveChipHtml = `<span class="live-chip chip-working"><i class="ph-bold ph-check-circle"></i> Listo</span>`;
+    } else {
+        // PENDIENTE
+        liveChipHtml = `<span class="live-chip chip-waiting"><span class="pulse-dot pulse-amber"></span> Pendiente</span>`;
+    }
+
+    const tiempoTexto = ageDays > 0 ? `${ageDays}d ${remHours}h` : `${Math.floor(ageHours)}h`;
+
+    const timelineBarHtml = `
+      <div class="card-timeline-container" style="margin: 8px 0 6px 0; background: var(--bg-surface); padding: 6px 8px; border-radius: 8px; border: 1px solid var(--border-default);">
+        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: var(--text-muted); margin-bottom: 4px;">
+          <span style="display:flex; align-items:center; gap:4px;"><i class="ph ph-clock"></i> <span>Taller:</span> <b style="color: var(--text-primary);">${tiempoTexto}</b></span>
+          <span style="font-weight: 700; font-size: 10.5px; color: ${slaColor};">${slaLabel}</span>
+        </div>
+        <div class="mini-timeline-bar" style="grid-template-columns: repeat(4, 1fr); height: 6px; padding: 2px; gap: 3px;">
+          <div class="mini-slot ${slot1Class}" title="0 - 24h"></div>
+          <div class="mini-slot ${slot2Class}" title="24 - 48h"></div>
+          <div class="mini-slot ${slot3Class}" title="48 - 72h"></div>
+          <div class="mini-slot ${slot4Class}" title="> 72h"></div>
+        </div>
+      </div>`;
+
+    html += `<div class="ticket" style="${borderAccent} padding: 12px; display: flex; flex-direction: column; height: 100%;">
       ${urg}
-      <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:6px">
-        <div class="tkt-id" style="font-size: 11px; font-weight: 700; color: #64748b; word-break: break-all; margin-right: 5px;">${t.numero_atencion}</div>
-        ${!esTarea ? `<div style="${badgeColor} padding:2px 6px; border-radius:10px; letter-spacing:0.3px; display:flex; gap:3px; align-items:center; font-size:10px; font-weight:800; white-space:nowrap; flex-shrink:0;">${ageText}</div>` : `<div style="${badgeColor} padding:2px 6px; border-radius:10px; letter-spacing:0.3px; display:flex; gap:3px; align-items:center; font-size:10px; font-weight:800; white-space:nowrap; flex-shrink:0;"><i class="ph-bold ph-wrench"></i> TAREA</div>`}
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; gap:6px;">
+        <div class="tkt-id" style="font-size: 11.5px; font-weight: 700; color: var(--color-brand); word-break: break-all;">${t.numero_atencion}</div>
+        ${liveChipHtml}
       </div>`;
       
       let equipoTitulo = esTarea ? (t.motivo_ingreso||'') : (t.equipo_descripcion||'');
@@ -879,10 +1183,10 @@ Gracias por confiar en nosotros! 🙌`);
       const clienteTexto = esTarea ? (t.tecnico_nombre||'No asignado') : (t.cliente_nombre||'');
 
       html += `
-      <div class="tkt-title" style="font-size: 13.5px; font-weight: 800; color: #0f172a; margin-bottom: 6px; line-height: 1.3; word-break: break-word; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; white-space: pre-line;" title="${equipoTitulo}">${equipoTitulo}</div>
-      <p style="font-size: 11.5px; color: #475569; margin: 4px 0; line-height: 1.4; word-break: break-word; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; white-space: pre-line;" title="${motivoTexto}"><b>${esTarea?'Desc:':'Motivo:'}</b> ${motivoTexto}</p>
-      <p style="font-size: 11.5px; color: #475569; margin: 4px 0; word-break: break-word;" title="${clienteTexto}"><b>${esTarea?'Asignado a:':'Cliente:'}</b> ${clienteTexto}</p>
-      <p style="font-size: 11.5px; color: #475569; margin: 4px 0; display:flex; align-items:flex-start; gap:4px; word-break: break-word;"><i class="ph-bold ph-user" style="color:#94a3b8; flex-shrink:0; margin-top: 2px;"></i> <b>Tecnico:</b> <span>${t.tecnico_nombre||'Sin asignar'}</span></p>`;
+      <div class="tkt-title" style="font-size: 13.5px; font-weight: 700; color: var(--text-primary); margin-bottom: 6px; line-height: 1.35; word-break: break-word; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;" title="${equipoTitulo}">${equipoTitulo}</div>
+      <p style="font-size: 11.5px; color: var(--text-secondary); margin: 4px 0; line-height: 1.4; word-break: break-word; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;" title="${motivoTexto}"><b style="color:var(--text-primary);">${esTarea?'Desc:':'Motivo:'}</b> ${motivoTexto}</p>
+      <p style="font-size: 11.5px; color: var(--text-secondary); margin: 4px 0; word-break: break-word;" title="${clienteTexto}"><b style="color:var(--text-primary);">${esTarea?'Asignado a:':'Cliente:'}</b> ${clienteTexto}</p>
+      <p style="font-size: 11.5px; color: var(--text-secondary); margin: 4px 0; display:flex; align-items:center; gap:5px; word-break: break-word;"><i class="ph-bold ph-user" style="color:var(--text-muted); flex-shrink:0;"></i> <b style="color:var(--text-primary);">Técnico:</b> <span>${t.tecnico_nombre||'Sin asignar'}</span></p>`;
 
       if (t.tecnicos_adicionales && listaTecnicos.length > 0) {
           const ids = t.tecnicos_adicionales.split(',');
@@ -890,48 +1194,51 @@ Gracias por confiar en nosotros! 🙌`);
               const tec = listaTecnicos.find(x => x.id == id);
               return tec ? (tec.nombre + ' ' + (tec.apellido||'')).trim() : 'Tec. ' + id;
           });
-          html += `<div style="font-size: 10.5px; color: #64748b; margin-top: 2px; padding-left: 18px; margin-bottom: 4px;"><i class="ph-bold ph-users" style="margin-right:2px"></i> + ${nombres.join(', ')}</div>`;
+          html += `<div style="font-size: 10.5px; color: var(--text-muted); margin-top: 2px; padding-left: 18px; margin-bottom: 4px;"><i class="ph-bold ph-users" style="margin-right:2px"></i> + ${nombres.join(', ')}</div>`;
       }
+
+      // Timeline SLA bar
+      html += timelineBarHtml;
       
-      html += `<div class="acciones" style="display:flex; gap:6px; margin-top: auto; padding-top: 10px; align-items: stretch; flex-wrap: wrap;">`;
+      html += `<div class="acciones" style="display:flex; gap:6px; margin-top: auto; padding-top: 8px; align-items: center; flex-wrap: wrap;">`;
       
       if (t.estado === 'PENDIENTE') {
         if (esTarea) {
-          html += `<button class="btn-primary" style="flex:1; padding: 6px; font-size:11px;" onclick="abrirModalIniciarInterno(${t.id})"><i class="ph-bold ph-play-circle"></i> Iniciar</button>`;
+          html += `<button class="btn btn-primary" style="flex:1; min-height:34px; padding:0 8px; font-size:11px;" onclick="abrirModalIniciarInterno(${t.id})"><i class="ph-bold ph-play-circle"></i> Iniciar</button>`;
         } else {
-          html += `<button class="btn-primary" style="flex:1; padding: 6px; font-size:11px;" onclick="cambiarEstadoRapido(${t.id}, 'EN_DIAGNOSTICO', this)"><i class="ph-bold ph-play-circle"></i> Iniciar</button>`;
+          html += `<button class="btn btn-primary" style="flex:1; min-height:34px; padding:0 8px; font-size:11px;" onclick="cambiarEstadoRapido(${t.id}, 'EN_DIAGNOSTICO', this)"><i class="ph-bold ph-play-circle"></i> Iniciar</button>`;
         }
       }
       else if (t.estado === 'EN_DIAGNOSTICO' || t.estado === 'EN_REPARACION') {
-        if (!esTarea) html += `<button class="btn-secondary" style="flex:1; padding: 6px; font-size:11px;" onclick="abrirModal(${t.id}, 'repuesto')"><i class="ph-bold ph-package"></i> Repuesto</button>`;
-        html += `<button class="btn-primary" style="flex:1; padding: 6px; font-size:11px;" onclick="abrirModal(${t.id}, 'listo')"><i class="ph-bold ph-check-circle"></i> Terminar</button>`;
+        if (!esTarea) html += `<button class="btn btn-secondary" style="flex:1; min-height:34px; padding:0 8px; font-size:11px;" onclick="abrirModal(${t.id}, 'repuesto')"><i class="ph-bold ph-package"></i> Repuesto</button>`;
+        html += `<button class="btn btn-primary" style="flex:1; min-height:34px; padding:0 8px; font-size:11px;" onclick="abrirModal(${t.id}, 'listo')"><i class="ph-bold ph-check-circle"></i> Terminar</button>`;
       }
       else if (t.estado === 'ESPERANDO_REPUESTO') {
-        html += `<button class="btn-primary" style="flex:1; padding: 6px; font-size:11px;" onclick="cambiarEstadoRapido(${t.id}, 'EN_REPARACION', this)"><i class="ph-bold ph-wrench"></i> Continuar</button>`;
+        html += `<button class="btn btn-primary" style="flex:1; min-height:34px; padding:0 8px; font-size:11px;" onclick="cambiarEstadoRapido(${t.id}, 'EN_REPARACION', this)"><i class="ph-bold ph-wrench"></i> Continuar</button>`;
       }
       else if (t.estado === 'LISTO_PARA_RECOGER') {
         if (miId === 'admin' && !esTarea) {
-          html += `<button class="btn-primary" style="flex:1; padding: 6px; font-size:11px; background:#10b981; border:none;" onclick="abrirModalWhatsApp(${t.id}, '${t.cliente_tel}', \`${msgWP}\`)"><i class="ph-bold ph-whatsapp-logo"></i> Entregar</button>`;
+          html += `<button class="btn btn-primary" style="flex:1; min-height:34px; padding:0 8px; font-size:11px; background:#10b981; border:none;" onclick="abrirModalWhatsApp(${t.id}, '${t.cliente_tel}', \`${msgWP}\`)"><i class="ph-bold ph-whatsapp-logo"></i> Entregar</button>`;
         } else {
-          html += `<button class="btn-secondary" style="flex:1; padding: 6px; font-size:11px;" onclick="cambiarEstadoRapido(${t.id}, 'ENTREGADO', this)"><i class="ph-bold ph-handshake"></i> ${esTarea?'Archivar':'Entregado'}</button>`;
+          html += `<button class="btn btn-secondary" style="flex:1; min-height:34px; padding:0 8px; font-size:11px;" onclick="cambiarEstadoRapido(${t.id}, 'ENTREGADO', this)"><i class="ph-bold ph-handshake"></i> ${esTarea?'Archivar':'Entregado'}</button>`;
         }
       }
 
       if (miId === 'admin') {
-          html += `<button class="btn-secondary" style="padding:4px; width:28px; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:14px; margin-left: auto;" onclick="const el = document.getElementById('more-actions-${t.id}'); el.style.display = el.style.display==='none'?'flex':'none';"><i class="ph-bold ph-dots-three"></i></button>`;
+          html += `<button class="btn btn-secondary" style="width:34px; height:34px; min-height:34px; padding:0; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:16px; margin-left: auto;" onclick="const el = document.getElementById('more-actions-${t.id}'); el.style.display = el.style.display==='none'?'flex':'none';" title="Más opciones"><i class="ph-bold ph-dots-three"></i></button>`;
       }
 
     html += `</div>`; 
 
     if (miId === 'admin') {
-      html += `<div id="more-actions-${t.id}" style="display:none; margin-top:10px; padding-top:10px; border-top:1px solid var(--border-default); flex-direction:column; gap:6px;">`;
-      html += `<button class="btn-secondary" style="width:100%; padding:6px; font-size:11px;" onclick="abrirModalAdmin(${t.id})"><i class="ph-fill ph-crown"></i> Administrar Ticket</button>`;
+      html += `<div id="more-actions-${t.id}" style="display:none; margin-top:8px; padding-top:8px; border-top:1px solid var(--border-default); flex-direction:column; gap:6px;">`;
+      html += `<button class="btn btn-secondary" style="width:100%; min-height:34px; padding:0 8px; font-size:11px; justify-content:center;" onclick="abrirModalAdmin(${t.id})"><i class="ph-fill ph-crown"></i> Administrar Ticket</button>`;
       
       if (!esTarea) {
         html += `<a href="https://wa.me/51${t.cliente_tel}?text=${msgInitWP}" target="_blank" style="text-decoration:none">
-                   <button class="btn-secondary" style="width:100%; padding:6px; font-size:11px;"><i class="ph-bold ph-whatsapp-logo"></i> Recibo Inicial (WP)</button>
+                   <button class="btn btn-secondary" style="width:100%; min-height:34px; padding:0 8px; font-size:11px; justify-content:center;"><i class="ph-bold ph-whatsapp-logo"></i> Recibo Inicial (WP)</button>
                  </a>`;
-        html += `<button class="btn-secondary" style="width:100%; padding:6px; font-size:11px;" onclick="window.open('imprimir_sticker.html?numero=${t.numero_atencion}&cliente=${encodeURIComponent(t.cliente_nombre)}', '_blank', 'width=300,height=200')"><i class="ph-bold ph-printer"></i> Imprimir Sticker</button>`;
+        html += `<button class="btn btn-secondary" style="width:100%; min-height:34px; padding:0 8px; font-size:11px; justify-content:center;" onclick="window.open('imprimir_sticker.html?numero=${t.numero_atencion}&cliente=${encodeURIComponent(t.cliente_nombre)}', '_blank', 'width=300,height=200')"><i class="ph-bold ph-printer"></i> Imprimir Sticker</button>`;
       }
       html += `</div>`;
     }

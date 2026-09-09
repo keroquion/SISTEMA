@@ -1,6 +1,6 @@
-// Service Worker - Petulap PWA v13 (Monitoreo en Vivo y Heatmap Semanal GitHub)
+// Service Worker - Petulap PWA v14 (Diseño SaaS Ejecutivo Kanban y Componentes en Tiempo Real)
  
-var CACHE_NAME = 'petulap-v13';
+var CACHE_NAME = 'petulap-v14';
 var ASSETS = [
     './',
     'index.html',

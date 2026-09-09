@@ -32,6 +32,26 @@ Para garantizar trazabilidad absoluta, auditoría técnica rigurosa y claridad e
 
 ---
 
+## [1.4.5] - Septiembre 2026
+
+### Modernización Visual y Elevación UI/UX del Tablero Kanban (SaaS Ejecutivo)
+*Módulos impactados:* `website_files/mis_ordenes.html`, `website_files/sw.js`.
+
+### Changed
+- **`website_files/mis_ordenes.html`**:
+  - Se rediseñó la cabecera del tablero implementando el componente `.top-action-bar` unificado con navegación segmentada `.tabs-header` (`#tab-clientes` e `#tab-internos`), botón de actualización inmediata y enlace a historial de entregados con estilos normalizados `.btn.btn-secondary`.
+  - Se integró el badge en tiempo real `#live-kanban-counter` utilizando `.live-chip.chip-working` y micro-animación `.pulse-dot.pulse-green`, mostrando el total de órdenes activas en taller de manera dinámica (`cargarMisOrdenes()`).
+  - Se añadieron puntos de pulso vivos (`.pulse-dot.pulse-amber` y `.pulse-dot.pulse-green`) en las cabeceras de todas las columnas (`PENDIENTES`, `EN REVISION`, `ESPERANDO REPUESTO`, `LISTOS / ENTREGADOS`), preservando la capacidad de colapso en acordeón móvil.
+  - Se sustituyeron las insignias estáticas por `.live-chip` con estados semánticos (`.chip-working`, `.chip-waiting`) y punto de pulso vivo en cada orden de trabajo.
+  - Se implementó la mini-barra de tiempo transcurrido (`.mini-timeline-bar` / `.card-timeline-container`) con 4 segmentos de nivel SLA (`<24h Óptimo`, `24-48h En Tiempo`, `48-72h Atención`, `>72h Crítico`), permitiendo a técnicos y administradores auditar el tiempo en taller de cada laptop sin abrir menús.
+  - Se eliminaron por completo fondos blancos fijos (`background: white;`) y colores de texto crudos (`#0f172a`, `#475569`), migrando todos los estilos de las tarjetas a variables semánticas (`var(--bg-surface)`, `var(--bg-card)`, `var(--border-default)`, `var(--text-primary)`, `var(--text-secondary)`, `var(--text-muted)`) para una experiencia impecable en Modo Oscuro.
+  - Se respetaron al 100% todos los identificadores protegidos del DOM (`#mobile-menu-toggle`, `#mobile-sidebar`, `#lbl-nombre`, `#lbl-tecnico`, `.fab-chat`, `.notification-btn`, `#tab-clientes`, `#tab-internos`).
+  - *¿Por qué?* Adaptar el flujo de trabajo diario de los técnicos de taller al nuevo estándar de diseño SaaS Ejecutivo (`docs/12-SISTEMA-DE-DISENO-UI-UX.md`), mejorando la escaneabilidad visual en menos de 3 segundos y erradicando fallos de contraste en modo oscuro.
+- **`website_files/sw.js`**:
+  - Se incrementó la versión del Service Worker de `'petulap-v13'` a `'petulap-v14'` para forzar la actualización instantánea de caché en dispositivos móviles y navegadores de escritorio.
+
+---
+
 ## [1.4.4] - Septiembre 2026
 
 ### Formalización y Documentación del Sistema de Diseño UI/UX Ejecutivo
