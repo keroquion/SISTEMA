@@ -82,6 +82,30 @@ async function clearCache(e) {
     window.location.reload(true);
 }
 
+/* --- MODO OSCURO (Toggle y sincronizacion de iconos) --- */
+function toggleTheme() {
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    if (isDark) {
+        document.documentElement.removeAttribute('data-theme');
+        localStorage.setItem('petulap-theme', 'light');
+    } else {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        localStorage.setItem('petulap-theme', 'dark');
+    }
+    document.querySelectorAll('.theme-toggle-btn i').forEach(icon => {
+        icon.className = isDark ? 'ph ph-moon' : 'ph ph-sun';
+    });
+}
+window.toggleTheme = toggleTheme;
+
+document.addEventListener('DOMContentLoaded', () => {
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    document.querySelectorAll('.theme-toggle-btn i').forEach(icon => {
+        icon.className = isDark ? 'ph ph-sun' : 'ph ph-moon';
+    });
+});
+
+
 // ====== FAB CHAT LOGIC (DRAGGABLE & GLOBAL TASK CREATION) ======
 document.addEventListener('DOMContentLoaded', () => {
     const fabBtn = document.querySelector('.fab-chat');
@@ -278,8 +302,31 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Auto load on start
     cargarNotificaciones();
-    // Poll every 5 minutes
-    setInterval(cargarNotificaciones, 5 * 60 * 1000);
+
+    // Smart Polling de Alta Escalabilidad (Page Visibility API + Jitter anti-estampida)
+    let lastNotifCheck = Date.now();
+    const BASE_POLL_INTERVAL = 5 * 60 * 1000; // 5 minutos
+
+    function planificarSiguienteSondeo() {
+        const jitter = (Math.random() - 0.5) * 30 * 1000; // ±15 segundos de dispersión
+        const delay = Math.max(60000, BASE_POLL_INTERVAL + jitter);
+        setTimeout(() => {
+            if (document.visibilityState === 'visible') {
+                cargarNotificaciones();
+                lastNotifCheck = Date.now();
+            }
+            planificarSiguienteSondeo();
+        }, delay);
+    }
+    planificarSiguienteSondeo();
+
+    // Actualizar inmediatamente al reactivar la pestaña si venció el intervalo
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible' && (Date.now() - lastNotifCheck) >= BASE_POLL_INTERVAL) {
+            cargarNotificaciones();
+            lastNotifCheck = Date.now();
+        }
+    });
 });
 
 window.cargarNotificaciones = async function() {
