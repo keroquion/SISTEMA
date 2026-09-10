@@ -1,6 +1,6 @@
-// Service Worker - Petulap PWA v18 (Visibilización TAR/INT, Actividades Instantáneas y Filtros Segmentados)
+// Service Worker - Petulap PWA v19 (Plataforma Ejecutiva de Control y Trazabilidad de Repuestos)
  
-var CACHE_NAME = 'petulap-v18';
+var CACHE_NAME = 'petulap-v19';
 var ASSETS = [
     './',
     'index.html',

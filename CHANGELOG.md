@@ -1,3 +1,5 @@
+
+
 # Changelog - Petulap SST
 
 Todas las modificaciones notables, remediaciones de seguridad, optimizaciones de interfaz y actualizaciones arquitectónicas de este proyecto se documentan en esta bitácora oficial.

@@ -1,43 +1,369 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>Pedidos de Repuestos - Petulap SST</title>
-<link rel="stylesheet" href="css/tokens.css?v=1">
-<link rel="stylesheet" href="css/styles.css?v=3">
-<link rel="stylesheet" href="css/dashboard.css?v=3">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<script src="https://unpkg.com/@phosphor-icons/web"></script>
-<script>
-  (function(){
-    if(localStorage.getItem('petulap-theme') === 'dark') {
-      document.documentElement.setAttribute('data-theme', 'dark');
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <title>Pedidos y Envíos de Repuestos - Petulap SST</title>
+    
+    <!-- PWA Meta Tags -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#F8FAFC">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Petulap SST">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="css/tokens.css?v=1">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="css/styles.css?v=3">
+    <link rel="stylesheet" href="css/dashboard.css?v=3">
+    
+    <!-- Script Anti-Flicker Obligatorio -->
+    <script>
+      (function(){
+        if(localStorage.getItem('petulap-theme') === 'dark') {
+          document.documentElement.setAttribute('data-theme', 'dark');
+        }
+      })();
+    </script>
+
+    <!-- Service Worker -->
+    <script>
+    if ("serviceWorker" in navigator) { 
+        window.addEventListener("load", () => { 
+            navigator.serviceWorker.register("sw.js").then(r => console.log("SW ok")).catch(e => console.log("SW fail", e)); 
+        }); 
     }
-  })();
-</script>
-<script>
-if ("serviceWorker" in navigator) { window.addEventListener("load", () => { navigator.serviceWorker.register("sw.js").then(r => console.log("SW ok")).catch(e => console.log("SW fail", e)); }); }
-</script>
-<style>
-  .badge-pagado { background: var(--bg-success-subtle); color: var(--success); padding: 4px 8px; border-radius: 12px; font-size: 11px; font-weight: 700; border: 1px solid #86efac; }
-  .badge-pendiente { background: var(--bg-warning-subtle); color: #b45309; padding: 4px 8px; border-radius: 12px; font-size: 11px; font-weight: 700; border: 1px solid #fcd34d; }
-  .rep-card { background: var(--bg-card); border-radius: 12px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid var(--border); display: flex; flex-direction: column; gap: 10px; }
-  .rep-header { display: flex; justify-content: space-between; align-items: flex-start; }
-  .rep-info { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 13px; }
-  .rep-actions { display: flex; gap: 8px; margin-top: 10px; border-top: 1px solid var(--border); padding-top: 10px; }
-</style>
+    </script>
+
+    <style>
+        /* Animaciones Pulse para Estados en Tiempo Real */
+        @keyframes pulse-green {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+        @keyframes pulse-blue {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(2, 132, 199, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(2, 132, 199, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(2, 132, 199, 0); }
+        }
+        @keyframes pulse-amber {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(245, 158, 11, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+        }
+        @keyframes pulse-red {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+
+        .pulse-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+            flex-shrink: 0;
+        }
+        .pulse-green { background-color: #10B981; animation: pulse-green 1.8s infinite; }
+        .pulse-blue  { background-color: #0284c7; animation: pulse-blue 1.8s infinite; }
+        .pulse-amber { background-color: #F59E0B; animation: pulse-amber 1.8s infinite; }
+        .pulse-red   { background-color: #EF4444; animation: pulse-red 1.8s infinite; }
+        .pulse-slate { background-color: #64748B; }
+
+        /* Fila de Tarjetas KPI Ejecutivas */
+        .kpis-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+            gap: 14px;
+            margin-bottom: 22px;
+        }
+        .kpi-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-default);
+            border-radius: var(--radius-lg);
+            padding: 16px 18px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+            transition: transform 0.15s, border-color 0.15s;
+        }
+        .kpi-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--color-brand);
+        }
+        .kpi-icon-wrap {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.35rem;
+            flex-shrink: 0;
+        }
+
+        /* Barra de Filtros Segmentados */
+        .historial-filter-bar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .filter-chip {
+            background: var(--bg-surface-hover);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-default);
+            padding: 7px 15px;
+            border-radius: 24px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            transition: all 0.15s ease-in-out;
+            user-select: none;
+        }
+        .filter-chip:hover {
+            background: var(--bg-surface);
+            color: var(--text-primary);
+            border-color: var(--color-brand);
+        }
+        .filter-chip.active {
+            background: var(--color-brand);
+            color: #ffffff;
+            border-color: var(--color-brand);
+            box-shadow: 0 2px 8px rgba(13, 138, 188, 0.35);
+        }
+        .filter-chip .chip-count {
+            font-size: 0.75rem;
+            background: rgba(0,0,0,0.12);
+            padding: 1px 7px;
+            border-radius: 12px;
+        }
+        .filter-chip.active .chip-count {
+            background: rgba(255,255,255,0.25);
+            color: #ffffff;
+        }
+
+        /* Grilla de Tarjetas de Trazabilidad */
+        .tracking-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+            gap: 16px;
+        }
+
+        /* Tarjeta de Trazabilidad Ejecutiva */
+        .tracking-rep-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-default);
+            border-radius: var(--radius-lg);
+            padding: 18px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
+        }
+        .tracking-rep-card:hover {
+            border-color: var(--color-brand);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+        }
+
+        /* Insignias Semánticas de Tipo */
+        .badge-tipo {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        .badge-tipo.tipo-cliente {
+            background: rgba(2, 132, 199, 0.12);
+            color: #0284c7;
+            border: 1px solid rgba(2, 132, 199, 0.35);
+        }
+        .badge-tipo.tipo-garantia {
+            background: rgba(245, 158, 11, 0.12);
+            color: #d97706;
+            border: 1px solid rgba(245, 158, 11, 0.35);
+        }
+        .badge-tipo.tipo-lote {
+            background: rgba(6, 182, 212, 0.12);
+            color: #0891b2;
+            border: 1px solid rgba(6, 182, 212, 0.35);
+        }
+
+        /* Insignias Semáforo SLA */
+        .badge-sla {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 20px;
+        }
+        .sla-green {
+            background: rgba(16, 185, 129, 0.12);
+            color: #10B981;
+            border: 1px solid rgba(16, 185, 129, 0.35);
+        }
+        .sla-amber {
+            background: rgba(245, 158, 11, 0.12);
+            color: #d97706;
+            border: 1px solid rgba(245, 158, 11, 0.35);
+        }
+        .sla-red {
+            background: rgba(239, 68, 68, 0.14);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.4);
+            animation: pulse-red 2s infinite;
+        }
+        .sla-slate {
+            background: rgba(100, 116, 139, 0.12);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-default);
+        }
+        .sla-emerald {
+            background: rgba(16, 185, 129, 0.18);
+            color: #059669;
+            border: 1px solid #10B981;
+        }
+
+        /* Stepper de 4 Fases */
+        .stepper-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+            margin: 6px 0 10px 0;
+            padding: 0 4px;
+        }
+        .stepper-progress-bar {
+            position: absolute;
+            top: 13px;
+            left: 20px;
+            right: 20px;
+            height: 3px;
+            background: var(--border-default);
+            z-index: 1;
+        }
+        .stepper-progress-fill {
+            height: 100%;
+            background: var(--color-brand);
+            transition: width 0.3s ease;
+        }
+        .step-item {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            background: var(--bg-surface);
+            padding: 0 4px;
+        }
+        .step-node {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: var(--bg-surface-hover);
+            border: 2px solid var(--border-default);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+            transition: all 0.2s ease;
+        }
+        .step-item.completed .step-node {
+            background: var(--color-brand);
+            border-color: var(--color-brand);
+            color: #ffffff;
+        }
+        .step-item.current .step-node {
+            background: #0284c7;
+            border-color: #0284c7;
+            color: #ffffff;
+            box-shadow: 0 0 0 4px rgba(2, 132, 199, 0.22);
+        }
+        .step-label {
+            font-size: 0.68rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            white-space: nowrap;
+        }
+        .step-item.completed .step-label,
+        .step-item.current .step-label {
+            color: var(--text-primary);
+        }
+
+        /* Botón de copiar tracking */
+        .btn-copy-tracking {
+            background: var(--bg-surface-hover);
+            border: 1px solid var(--border-default);
+            color: var(--text-primary);
+            padding: 3px 8px;
+            border-radius: 5px;
+            font-size: 0.78rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.15s;
+        }
+        .btn-copy-tracking:hover {
+            border-color: var(--color-brand);
+            color: var(--color-brand);
+        }
+
+        @media (max-width: 480px) {
+            .tracking-grid {
+                grid-template-columns: 1fr;
+            }
+            .kpis-row {
+                grid-template-columns: 1fr;
+            }
+            .step-label {
+                font-size: 0.62rem;
+            }
+        }
+    </style>
 </head>
 <body class="dashboard-body">
 
     <!-- MOBILE HEADER -->
     <header class="mobile-header">
-        <button class="menu-toggle" id="mobile-menu-toggle"><i class="ph ph-list"></i></button>
-        <div class="logo-container"><div class="logo-icon">P</div><span>PETULAP S.A.C.</span></div>
-        <button class="theme-toggle-btn" aria-label="Cambiar tema" onclick="toggleTheme()" style="background: none; border: none; font-size: 20px; cursor: pointer; color: var(--text-secondary); margin-right: 15px; display: flex; align-items: center;"><i class="ph ph-moon"></i></button>
-        <button class="notification-btn"><i class="ph ph-bell"></i></button>
+        <button class="menu-toggle" id="mobile-menu-toggle">
+            <i class="ph ph-list"></i>
+        </button>
+        <div class="logo-container">
+            <div class="logo-icon">P</div>
+            <span>PETULAP S.A.C.</span>
+        </div>
+        <button class="theme-toggle-btn" aria-label="Cambiar tema" onclick="toggleTheme()" style="background: none; border: none; font-size: 20px; cursor: pointer; color: var(--text-secondary); margin-right: 15px; display: flex; align-items: center;">
+            <i class="ph ph-moon"></i>
+        </button>
+        <button class="notification-btn">
+            <i class="ph ph-bell"></i>
+        </button>
     </header>
 
     <!-- MOBILE SIDEBAR (ACCORDION) -->
@@ -71,7 +397,7 @@ if ("serviceWorker" in navigator) { window.addEventListener("load", () => { navi
                     <i class="ph-fill ph-shield-check acc-icon-blue"></i>
                     Garantias
                 </a>
-                <a href="pedidos_repuestos.html" class="accordion-link">
+                <a href="pedidos_repuestos.html" class="accordion-link active">
                     <i class="ph-fill ph-wrench acc-icon-blue"></i>
                     Pedidos de Repuestos
                 </a>
@@ -165,6 +491,7 @@ if ("serviceWorker" in navigator) { window.addEventListener("load", () => { navi
                 </a>
             </div>
         </div>
+
         <div class="accordion-item danger-border">
             <div class="accordion-header">
                 <div style="display: flex; align-items: center; gap: 10px; color: var(--danger);">
@@ -235,181 +562,643 @@ if ("serviceWorker" in navigator) { window.addEventListener("load", () => { navi
         </div>
     </aside>
 
+    <!-- MAIN CONTENT -->
     <main class="main-wrapper">
         <header class="topbar">
-            <div class="search-bar"><i class="ph ph-magnifying-glass"></i><input type="text" placeholder="Buscar en el sistema..."></div>
+            <div class="search-bar">
+                <i class="ph ph-magnifying-glass"></i>
+                <input type="text" id="busqueda-global" placeholder="Buscar por pieza, ticket, modelo o tracking..." oninput="filtrarPorTexto(this.value)">
+            </div>
             <div class="topbar-right">
-                <button class="notification-btn"><i class="ph ph-bell"></i></button>
+                <button class="notification-btn" aria-label="Notificaciones">
+                    <i class="ph ph-bell"></i>
+                </button>
                 <div class="user-profile" id="lbl-nombre">👨‍ Cargando...</div>
+                <span id="lbl-tecnico" style="display:none;"></span>
             </div>
         </header>
 
         <div class="content">
-            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom: 20px;">
-              <h2><i class="ph-fill ph-truck" style="color: var(--primary);"></i> Gestión de Pedidos de Repuestos</h2>
-              <button class="btn-secondary" onclick="cargarPedidos()"><i class="ph ph-arrows-clockwise"></i> Actualizar</button>
+            <!-- Barra de Título y Acciones Superiores -->
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:15px; margin-bottom: 22px;">
+                <div>
+                    <h2><i class="ph-bold ph-truck" style="color: var(--color-brand)"></i> Control de Compras & Trazabilidad de Repuestos</h2>
+                    <p style="color: var(--text-secondary); margin-top: 5px;">Seguimiento en tiempo real de couriers, SLA de envíos y piezas para clientes y lotes.</p>
+                </div>
+                <div style="display:flex; gap: 10px; flex-wrap:wrap;">
+                    <a href="repuestos.html" class="btn btn-secondary"><i class="ph-bold ph-nut"></i> Catálogo de Repuestos</a>
+                    <button class="btn btn-primary" onclick="cargarTracking()"><i class="ph-bold ph-arrows-clockwise"></i> Actualizar</button>
+                </div>
             </div>
 
-            <div id="contenedor-pedidos">
-                <div style="text-align: center; padding: 40px;"><i class="ph ph-spinner ph-spin" style="font-size: 32px;"></i></div>
+            <!-- Fila de 5 Tarjetas KPI Ejecutivas -->
+            <div class="kpis-row">
+                <div class="kpi-card">
+                    <div class="kpi-icon-wrap" style="background: rgba(16,185,129,0.12); color: #10B981;">
+                        <i class="ph-bold ph-package"></i>
+                    </div>
+                    <div>
+                        <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; color:var(--text-secondary); display:flex; align-items:center; gap:6px;">
+                            <span class="pulse-dot pulse-green"></span> Pedidos Activos
+                        </div>
+                        <div id="kpi-total-activos" style="font-size:1.45rem; font-weight:700; color:var(--text-primary); margin-top:2px;">0</div>
+                    </div>
+                </div>
+
+                <div class="kpi-card">
+                    <div class="kpi-icon-wrap" style="background: rgba(2,132,199,0.12); color: #0284c7;">
+                        <i class="ph-bold ph-truck"></i>
+                    </div>
+                    <div>
+                        <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; color:var(--text-secondary); display:flex; align-items:center; gap:6px;">
+                            <span class="pulse-dot pulse-blue"></span> En Courier / Tránsito
+                        </div>
+                        <div id="kpi-en-transito" style="font-size:1.45rem; font-weight:700; color:#0284c7; margin-top:2px;">0</div>
+                    </div>
+                </div>
+
+                <div class="kpi-card">
+                    <div class="kpi-icon-wrap" style="background: rgba(245,158,11,0.12); color: #F59E0B;">
+                        <i class="ph-bold ph-shield-check"></i>
+                    </div>
+                    <div>
+                        <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; color:var(--text-secondary); display:flex; align-items:center; gap:6px;">
+                            <span class="pulse-dot pulse-amber"></span> Garantías (S/ 0)
+                        </div>
+                        <div id="kpi-garantias" style="font-size:1.45rem; font-weight:700; color:#F59E0B; margin-top:2px;">0</div>
+                    </div>
+                </div>
+
+                <div class="kpi-card">
+                    <div class="kpi-icon-wrap" style="background: rgba(239,68,68,0.12); color: #EF4444;">
+                        <i class="ph-bold ph-warning-circle"></i>
+                    </div>
+                    <div>
+                        <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; color:var(--text-secondary); display:flex; align-items:center; gap:6px;">
+                            <span class="pulse-dot pulse-red"></span> Retrasados (SLA)
+                        </div>
+                        <div id="kpi-retrasados" style="font-size:1.45rem; font-weight:700; color:#EF4444; margin-top:2px;">0</div>
+                    </div>
+                </div>
+
+                <div class="kpi-card">
+                    <div class="kpi-icon-wrap" style="background: rgba(100,116,139,0.12); color: #64748B;">
+                        <i class="ph-bold ph-stack"></i>
+                    </div>
+                    <div>
+                        <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; color:var(--text-secondary); display:flex; align-items:center; gap:6px;">
+                            <span class="pulse-dot pulse-slate"></span> Lotes Internos
+                        </div>
+                        <div id="kpi-lotes-internos" style="font-size:1.45rem; font-weight:700; color:var(--text-primary); margin-top:2px;">0</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Barra de Filtros Segmentados Rápidos -->
+            <div class="historial-filter-bar">
+                <span style="font-size:0.85rem; font-weight:600; color:var(--text-secondary); display:inline-flex; align-items:center; gap:5px;">
+                    <i class="ph-bold ph-funnel"></i> Filtrar Demanda:
+                </span>
+                <button class="filter-chip active" id="filter-todos" onclick="setFiltro('TODOS')">
+                    Todos (<span class="chip-count" id="count-todos">0</span>)
+                </button>
+                <button class="filter-chip" id="filter-clientes" onclick="setFiltro('CLIENTES')">
+                    <i class="ph-bold ph-user"></i> Clientes Facturables (<span class="chip-count" id="count-clientes">0</span>)
+                </button>
+                <button class="filter-chip" id="filter-garantias" onclick="setFiltro('GARANTIAS')">
+                    <i class="ph-bold ph-shield-check"></i> Garantías Cliente S/ 0 (<span class="chip-count" id="count-garantias">0</span>)
+                </button>
+                <button class="filter-chip" id="filter-lotes" onclick="setFiltro('LOTES')">
+                    <i class="ph-bold ph-stack"></i> Lotes Internos LOT (<span class="chip-count" id="count-lotes">0</span>)
+                </button>
+                <button class="filter-chip" id="filter-retrasados" onclick="setFiltro('RETRASADOS')">
+                    <i class="ph-bold ph-warning-circle" style="color:#ef4444"></i> Retrasados (<span class="chip-count" id="count-retrasados">0</span>)
+                </button>
+            </div>
+
+            <!-- Contenedor Principal de Tarjetas de Trazabilidad -->
+            <div id="contenedor-tracking" class="tracking-grid">
+                <div style="text-align: center; padding: 60px; grid-column: 1 / -1; color: var(--text-muted);">
+                    <i class="ph ph-spinner ph-spin" style="font-size: 2.4rem;"></i>
+                    <p style="margin-top: 12px; font-weight: 500;">Cargando pedidos y couriers en tránsito...</p>
+                </div>
             </div>
         </div>
     </main>
+ 
+    <!-- Floating Action Button -->
+    <button class="fab-chat" onclick="if(typeof abrirModalTareaGlobal === 'function') abrirModalTareaGlobal();" title="Crear Tarea Interna">
+        <i class="ph-bold ph-plus"></i>
+    </button>
+ 
+    <!-- MODAL ACTUALIZAR TRACKING & FECHAS -->
+    <div class="modal-overlay" id="modal-tracking" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:9999; align-items:center; justify-content:center; backdrop-filter:blur(3px);">
+        <div class="card" style="width:92%; max-width:540px; background:var(--bg-surface); border:1px solid var(--border-default); border-radius:var(--radius-lg); padding:24px; box-shadow:0 10px 30px rgba(0,0,0,0.25); max-height:90vh; overflow-y:auto;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; border-bottom:1px solid var(--border-default); padding-bottom:12px;">
+                <h3 style="margin:0; font-size:1.15rem; color:var(--text-primary); display:flex; align-items:center; gap:8px;">
+                    <i class="ph-bold ph-truck" style="color:var(--color-brand)"></i> Control de Tracking y Envío
+                </h3>
+                <button onclick="cerrarModalTracking()" style="background:none; border:none; font-size:1.3rem; color:var(--text-secondary); cursor:pointer;">
+                    <i class="ph ph-x"></i>
+                </button>
+            </div>
 
-    <!-- MODAL EDITAR PEDIDO -->
-    <div class="modal-overlay" id="modal-editar" style="display:none;">
-      <div class="card" style="width:90%; max-width:400px">
-        <h2><i class="ph ph-pencil-simple"></i> Editar Pedido</h2>
-        <input type="hidden" id="e-id">
-        
-        <div class="form-group">
-          <label class="form-label">Estado de Pago</label>
-          <select id="e-pagado" class="form-control">
-            <option value="0">Pendiente de Pago</option>
-            <option value="1">Pagado</option>
-          </select>
-        </div>
-        
-        <div class="form-group">
-          <label class="form-label">Comprobante (Boleta/Factura)</label>
-          <input type="text" id="e-comprobante" class="form-control" placeholder="Ej: B001-000123">
-        </div>
+            <input type="hidden" id="modal-pedido-id">
+            <input type="hidden" id="modal-ticket-id">
 
-        <div class="form-group">
-          <label class="form-label">Fecha Llegada Aproximada</label>
-          <input type="date" id="e-llegada" class="form-control">
+            <div style="background:var(--bg-surface-hover); padding:10px 14px; border-radius:var(--radius-sm); border:1px solid var(--border-default); margin-bottom:16px;">
+                <div style="font-size:0.78rem; text-transform:uppercase; color:var(--text-secondary); font-weight:600;">Referencia:</div>
+                <div id="modal-lbl-ref" style="font-weight:700; font-size:0.95rem; color:var(--text-primary); margin-top:2px;">ST-XXXXXX</div>
+                <div id="modal-lbl-pieza" style="font-size:0.85rem; color:var(--text-secondary); margin-top:2px;">Pantalla 15.6 FHD</div>
+            </div>
+
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px; margin-bottom:14px;">
+                <div>
+                    <label class="form-label" style="font-size:0.82rem; font-weight:600; color:var(--text-secondary); display:block; margin-bottom:5px;">
+                        Proveedor / Tienda
+                    </label>
+                    <input type="text" id="m-proveedor" class="form-control" placeholder="Ej: AliExpress, Deltron, Wilson" style="width:100%; background:var(--bg-surface); color:var(--text-primary);">
+                </div>
+                <div>
+                    <label class="form-label" style="font-size:0.82rem; font-weight:600; color:var(--text-secondary); display:block; margin-bottom:5px;">
+                        Courier / Transporte
+                    </label>
+                    <input type="text" id="m-courier" class="form-control" placeholder="Ej: Shalom, Olva, DHL" style="width:100%; background:var(--bg-surface); color:var(--text-primary);">
+                </div>
+            </div>
+
+            <div style="margin-bottom:14px;">
+                <label class="form-label" style="font-size:0.82rem; font-weight:600; color:var(--text-secondary); display:block; margin-bottom:5px;">
+                    Código de Guía / Número de Tracking
+                </label>
+                <input type="text" id="m-tracking" class="form-control" placeholder="Ej: SHA-987456123 o 1Z9999999999999" style="width:100%; background:var(--bg-surface); color:var(--text-primary); font-family:monospace; font-weight:600;">
+            </div>
+
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px; margin-bottom:14px;">
+                <div>
+                    <label class="form-label" style="font-size:0.82rem; font-weight:600; color:var(--text-secondary); display:block; margin-bottom:5px;">
+                        Fecha de Compra
+                    </label>
+                    <input type="date" id="m-fecha-compra" class="form-control" style="width:100%; background:var(--bg-surface); color:var(--text-primary);">
+                </div>
+                <div>
+                    <label class="form-label" style="font-size:0.82rem; font-weight:600; color:var(--text-secondary); display:block; margin-bottom:5px;">
+                        Llegada Estimada
+                    </label>
+                    <input type="date" id="m-fecha-llegada" class="form-control" style="width:100%; background:var(--bg-surface); color:var(--text-primary);">
+                </div>
+            </div>
+
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px; margin-bottom:14px;">
+                <div>
+                    <label class="form-label" style="font-size:0.82rem; font-weight:600; color:var(--text-secondary); display:block; margin-bottom:5px;">
+                        Costo Compra (S/)
+                    </label>
+                    <input type="number" step="0.01" id="m-costo" class="form-control" placeholder="0.00" style="width:100%; background:var(--bg-surface); color:var(--text-primary);">
+                </div>
+                <div>
+                    <label class="form-label" style="font-size:0.82rem; font-weight:600; color:var(--text-secondary); display:block; margin-bottom:5px;">
+                        Precio Cobrado Cliente (S/)
+                    </label>
+                    <input type="number" step="0.01" id="m-precio" class="form-control" placeholder="0.00" style="width:100%; background:var(--bg-surface); color:var(--text-primary);">
+                </div>
+            </div>
+
+            <div style="margin-bottom:14px; background:var(--bg-surface-hover); padding:10px 14px; border-radius:var(--radius-sm); border:1px solid var(--border-default);">
+                <label style="display:flex; align-items:center; gap:8px; cursor:pointer; user-select:none; font-size:0.88rem; font-weight:600; color:var(--text-primary);">
+                    <input type="checkbox" id="m-garantia" onchange="toggleGarantiaModal(this.checked)" style="width:17px; height:17px; cursor:pointer;">
+                    <span>🛡️ Garantía de Taller (Costo asumido por Petulap - Cobro S/ 0 al cliente)</span>
+                </label>
+            </div>
+
+            <div style="margin-bottom:14px;">
+                <label class="form-label" style="font-size:0.82rem; font-weight:600; color:var(--text-secondary); display:block; margin-bottom:5px;">
+                    Fase de Envío / Estado
+                </label>
+                <select id="m-estado-envio" class="form-control" style="width:100%; background:var(--bg-surface); color:var(--text-primary); font-weight:600;">
+                    <option value="SOLICITADO">1. Solicitado / En Cotización</option>
+                    <option value="EN_TRANSITO">2. En Tránsito / Despachado por Courier</option>
+                    <option value="RECIBIDO_EN_TALLER">3. Recibido en Taller</option>
+                    <option value="INSTALADO">4. Instalado en Laptop</option>
+                </select>
+            </div>
+
+            <div style="margin-bottom:20px;">
+                <label class="form-label" style="font-size:0.82rem; font-weight:600; color:var(--text-secondary); display:block; margin-bottom:5px;">
+                    Notas u Observaciones del Envío
+                </label>
+                <textarea id="m-notas" class="form-control" rows="2" placeholder="Detalles de embalaje, teléfono de transportista o especificaciones..." style="width:100%; background:var(--bg-surface); color:var(--text-primary);"></textarea>
+            </div>
+
+            <div style="display:flex; justify-content:flex-end; gap:10px;">
+                <button class="btn btn-secondary" onclick="cerrarModalTracking()">Cancelar</button>
+                <button class="btn btn-primary" id="btn-guardar-tracking" onclick="guardarTracking()">
+                    <i class="ph-bold ph-floppy-disk"></i> Guardar Tracking
+                </button>
+            </div>
         </div>
-        
-        <div style="display:flex; gap:10px">
-          <button class="btn btn-outline" onclick="document.getElementById('modal-editar').style.display='none'">Cancelar</button>
-          <button class="btn btn-primary" onclick="guardarPedido()">Guardar Cambios</button>
-        </div>
-      </div>
     </div>
 
+    <!-- Scripts de Lógica y Control -->
     <script src="js/check_auth.js"></script>
-    <script src="js/dashboard.js?v=3"></script>
+    <script src="js/dashboard.js?v=4"></script>
     <script>
-        async function cargarPedidos() {
-            const container = document.getElementById('contenedor-pedidos');
-            container.innerHTML = '<div style="text-align: center; padding: 40px;"><i class="ph ph-spinner ph-spin" style="font-size: 32px;"></i></div>';
-            
+        const API_REPUESTOS = 'api/repuestos.php';
+        let gPedidos = [];
+        let gFiltroActual = 'TODOS';
+        let gTextoBusqueda = '';
+
+        // Cargar datos principales desde el backend
+        async function cargarTracking() {
+            const container = document.getElementById('contenedor-tracking');
+            container.innerHTML = `
+                <div style="text-align: center; padding: 60px; grid-column: 1 / -1; color: var(--text-muted);">
+                    <i class="ph ph-spinner ph-spin" style="font-size: 2.4rem;"></i>
+                    <p style="margin-top: 12px; font-weight: 500;">Actualizando información de envíos y piezas...</p>
+                </div>
+            `;
+
             try {
-                const res = await fetch('api/soporte.php?action=repuestos_pendientes').then(r=>r.json());
-                if (!res.ok) {
-                    container.innerHTML = `<div style="color:red">Error: ${res.msg}</div>`;
-                    return;
+                const res = await fetch(`${API_REPUESTOS}?action=tracking_pedidos`).then(r => r.json());
+                if (res.ok) {
+                    gPedidos = res.data || [];
+                    actualizarKpis(res.kpis || {});
+                    actualizarContadoresFiltro();
+                    renderizarPedidos();
+                } else {
+                    container.innerHTML = `<div style="grid-column:1/-1; color:var(--color-danger); padding:30px; text-align:center;">Error: ${res.msg || 'No se pudo cargar'}</div>`;
                 }
-
-                if (res.data.length === 0) {
-                    container.innerHTML = '<div style="text-align:center; padding: 40px; color: var(--text-secondary);"><i class="ph ph-check-circle" style="font-size:48px; opacity:0.5; margin-bottom:10px; display:block;"></i>No hay repuestos pendientes de llegada.</div>';
-                    return;
-                }
-
-                let html = '';
-                res.data.forEach(p => {
-                    const pagadoHtml = p.repuesto_pagado == 1 
-                        ? `<span class="badge-pagado"><i class="ph-bold ph-check"></i> Pagado</span>` 
-                        : `<span class="badge-pendiente"><i class="ph-bold ph-clock"></i> Pendiente Pago</span>`;
-                    
-                    const comprobanteStr = p.repuesto_comprobante ? `<b>Doc:</b> ${p.repuesto_comprobante}` : `<span style="color:#94a3b8">Sin comprobante</span>`;
-                    const llegadaStr = p.repuesto_fecha_llegada_aprox ? `<b>Llega:</b> ${p.repuesto_fecha_llegada_aprox}` : `<span style="color:#94a3b8">Fecha sin definir</span>`;
-
-                    html += `
-                    <div class="rep-card">
-                        <div class="rep-header">
-                            <div>
-                                <div style="font-weight: 800; color: var(--text-main); font-size: 15px;">${p.repuesto_nombre}</div>
-                                <div style="font-size: 12px; color: var(--text-secondary); margin-top: 4px;"><b>Ticket:</b> ${p.numero_atencion} | <b>Cliente:</b> ${p.cliente_nombre}</div>
-                            </div>
-                            <div style="text-align: right;">
-                                ${pagadoHtml}
-                                <div style="font-weight: 800; color: var(--text-main); margin-top: 5px;">S/ ${p.repuesto_precio || '0.00'}</div>
-                            </div>
-                        </div>
-                        
-                        <div class="rep-info">
-                            <div><i class="ph-fill ph-receipt" style="color:var(--text-secondary)"></i> ${comprobanteStr}</div>
-                            <div><i class="ph-fill ph-calendar-blank" style="color:var(--text-secondary)"></i> ${llegadaStr}</div>
-                            <div style="grid-column: 1 / -1;"><i class="ph-fill ph-laptop" style="color:var(--text-secondary)"></i> <b>Equipo:</b> ${p.equipo_descripcion}</div>
-                        </div>
-
-                        <div class="rep-actions">
-                            <button class="btn-secondary" style="flex:1; padding: 8px; font-size: 12px;" onclick='abrirEditar(${JSON.stringify(p).replace(/'/g, "&apos;")})'>
-                                <i class="ph-bold ph-pencil-simple"></i> Editar Pago/Fecha
-                            </button>
-                            <button class="btn-primary" style="flex:1; padding: 8px; font-size: 12px; background: #10b981; border:none;" onclick="marcarLlegada(${p.id})">
-                                <i class="ph-bold ph-check-circle"></i> Marcar Recibido
-                            </button>
-                        </div>
-                    </div>
-                    `;
-                });
-                container.innerHTML = html;
-            } catch(e) {
-                container.innerHTML = `<div style="color:red">Error de conexión.</div>`;
+            } catch (e) {
+                container.innerHTML = `<div style="grid-column:1/-1; color:var(--color-danger); padding:30px; text-align:center;">Error de conexión con el servidor.</div>`;
             }
         }
 
-        function abrirEditar(p) {
-            document.getElementById('e-id').value = p.id;
-            document.getElementById('e-pagado').value = p.repuesto_pagado == 1 ? "1" : "0";
-            document.getElementById('e-comprobante').value = p.repuesto_comprobante || '';
-            document.getElementById('e-llegada').value = p.repuesto_fecha_llegada_aprox || '';
-            document.getElementById('modal-editar').style.display = 'flex';
+        // Actualizar métricas KPI de cabecera
+        function actualizarKpis(kpis) {
+            document.getElementById('kpi-total-activos').textContent = kpis.total_activos || 0;
+            document.getElementById('kpi-en-transito').textContent = kpis.en_transito || 0;
+            document.getElementById('kpi-garantias').textContent = kpis.garantias || 0;
+            document.getElementById('kpi-retrasados').textContent = kpis.retrasados || 0;
+            document.getElementById('kpi-lotes-internos').textContent = kpis.lotes_internos || 0;
         }
 
-        async function guardarPedido() {
-            const id = document.getElementById('e-id').value;
-            const body = {
-                id: id,
-                repuesto_pagado: document.getElementById('e-pagado').value,
-                repuesto_comprobante: document.getElementById('e-comprobante').value,
-                repuesto_fecha_llegada_aprox: document.getElementById('e-llegada').value || null
-            };
+        // Calcular contadores para los botones segmentados
+        function actualizarContadoresFiltro() {
+            let cTodos = 0;
+            let cClientes = 0;
+            let cGarantias = 0;
+            let cLotes = 0;
+            let cRetrasados = 0;
 
-            const btn = document.querySelector('#modal-editar .btn-primary');
+            gPedidos.forEach(p => {
+                cTodos++;
+                if (p.origen_tipo === 'LOTE') {
+                    cLotes++;
+                } else if (p.es_garantia == 1 || p.origen_tipo === 'GARANTIA') {
+                    cGarantias++;
+                } else {
+                    cClientes++;
+                }
+
+                if (p.sla_status === 'RETRASADO' && (p.estado_envio === 'SOLICITADO' || p.estado_envio === 'EN_TRANSITO')) {
+                    cRetrasados++;
+                }
+            });
+
+            document.getElementById('count-todos').textContent = cTodos;
+            document.getElementById('count-clientes').textContent = cClientes;
+            document.getElementById('count-garantias').textContent = cGarantias;
+            document.getElementById('count-lotes').textContent = cLotes;
+            document.getElementById('count-retrasados').textContent = cRetrasados;
+        }
+
+        // Cambiar filtro segmentado
+        function setFiltro(filtro) {
+            gFiltroActual = filtro;
+            ['todos', 'clientes', 'garantias', 'lotes', 'retrasados'].forEach(id => {
+                const btn = document.getElementById(`filter-${id}`);
+                if (btn) btn.classList.toggle('active', id.toUpperCase() === filtro);
+            });
+            renderizarPedidos();
+        }
+
+        // Búsqueda en tiempo real
+        function filtrarPorTexto(txt) {
+            gTextoBusqueda = txt.trim().toLowerCase();
+            renderizarPedidos();
+        }
+
+        // Renderizar tarjetas ejecutivas de trazabilidad
+        function renderizarPedidos() {
+            const container = document.getElementById('contenedor-tracking');
+
+            let filtrados = gPedidos.filter(p => {
+                // Filtro segmentado
+                if (gFiltroActual === 'CLIENTES') {
+                    if (p.origen_tipo === 'LOTE' || p.es_garantia == 1 || p.origen_tipo === 'GARANTIA') return false;
+                } else if (gFiltroActual === 'GARANTIAS') {
+                    if (!(p.es_garantia == 1 || p.origen_tipo === 'GARANTIA')) return false;
+                } else if (gFiltroActual === 'LOTES') {
+                    if (p.origen_tipo !== 'LOTE') return false;
+                } else if (gFiltroActual === 'RETRASADOS') {
+                    if (!(p.sla_status === 'RETRASADO' && (p.estado_envio === 'SOLICITADO' || p.estado_envio === 'EN_TRANSITO'))) return false;
+                }
+
+                // Filtro por texto
+                if (gTextoBusqueda) {
+                    const str = `${p.numero_referencia} ${p.repuesto_nombre} ${p.repuesto_pn || ''} ${p.equipo_descripcion || ''} ${p.cliente_nombre || ''} ${p.courier || ''} ${p.tracking_number || ''} ${p.proveedor_nombre || ''}`.toLowerCase();
+                    if (!str.includes(gTextoBusqueda)) return false;
+                }
+
+                return true;
+            });
+
+            if (filtrados.length === 0) {
+                container.innerHTML = `
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 60px; color: var(--text-muted);">
+                        <i class="ph ph-package" style="font-size: 3rem; opacity: 0.4;"></i>
+                        <p style="margin-top: 12px; font-size: 1rem;">No se encontraron pedidos con los filtros seleccionados.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '';
+            filtrados.forEach(p => {
+                // Insignia de tipo
+                let tipoBadge = '';
+                if (p.origen_tipo === 'LOTE') {
+                    tipoBadge = `<span class="badge-tipo tipo-lote"><i class="ph-bold ph-stack"></i> Lote Interno</span>`;
+                } else if (p.es_garantia == 1 || p.origen_tipo === 'GARANTIA') {
+                    tipoBadge = `<span class="badge-tipo tipo-garantia"><i class="ph-bold ph-shield-check"></i> Garantía S/ 0</span>`;
+                } else {
+                    tipoBadge = `<span class="badge-tipo tipo-cliente"><i class="ph-bold ph-user"></i> Cliente</span>`;
+                }
+
+                // Insignia de SLA
+                let slaBadge = `<span class="badge-sla sla-${p.sla_color || 'slate'}">${p.sla_label || 'Sin fecha'}</span>`;
+
+                // Cálculo de fase del Stepper (1: Solicitado, 2: En Tránsito, 3: Recibido en Taller, 4: Instalado)
+                let faseNum = 1;
+                const est = p.estado_envio || 'SOLICITADO';
+                if (est === 'EN_TRANSITO') faseNum = 2;
+                else if (est === 'RECIBIDO_EN_TALLER') faseNum = 3;
+                else if (est === 'INSTALADO') faseNum = 4;
+
+                const fillPercent = ((faseNum - 1) / 3) * 100;
+
+                const step1Class = (faseNum > 1) ? 'completed' : ((faseNum === 1) ? 'current' : '');
+                const step2Class = (faseNum > 2) ? 'completed' : ((faseNum === 2) ? 'current' : '');
+                const step3Class = (faseNum > 3) ? 'completed' : ((faseNum === 3) ? 'current' : '');
+                const step4Class = (faseNum === 4) ? 'completed current' : '';
+
+                // Courier y Tracking
+                let trackingHtml = '<span style="color:var(--text-muted);">Sin guía aún</span>';
+                if (p.tracking_number) {
+                    trackingHtml = `
+                        <span style="font-family:monospace; font-weight:700; color:var(--text-primary); font-size:0.85rem;">${p.tracking_number}</span>
+                        <button class="btn-copy-tracking" onclick="copiarAlPortapapeles('${p.tracking_number}', this)" title="Copiar código">
+                            <i class="ph-bold ph-copy"></i> Copiar
+                        </button>
+                    `;
+                }
+
+                // Bloque Financiero
+                let finHtml = '';
+                if (p.es_garantia == 1 || p.origen_tipo === 'GARANTIA') {
+                    finHtml = `
+                        <div style="background:rgba(245,158,11,0.1); border:1px dashed rgba(245,158,11,0.4); border-radius:6px; padding:6px 10px; font-size:0.8rem; color:#d97706; display:flex; justify-content:space-between; align-items:center;">
+                            <span>Costo Taller: <strong>S/ ${parseFloat(p.costo_compra || 0).toFixed(2)}</strong></span>
+                            <span style="font-weight:700;">🛡️ Cubierto por Garantía</span>
+                        </div>
+                    `;
+                } else {
+                    const ganancia = (parseFloat(p.precio_cliente || 0) - parseFloat(p.costo_compra || 0));
+                    finHtml = `
+                        <div style="display:flex; justify-content:space-between; font-size:0.82rem; background:var(--bg-surface-hover); padding:7px 10px; border-radius:6px; border:1px solid var(--border-default);">
+                            <div>Costo: <strong>S/ ${parseFloat(p.costo_compra || 0).toFixed(2)}</strong></div>
+                            <div>Precio Cliente: <strong style="color:var(--color-brand);">S/ ${parseFloat(p.precio_cliente || 0).toFixed(2)}</strong></div>
+                        </div>
+                    `;
+                }
+
+                // Botón Marcar Recibido (visible si aún no está en taller)
+                let btnRecibirHtml = '';
+                if (faseNum < 3) {
+                    btnRecibirHtml = `
+                        <button class="btn btn-secondary" style="font-size:0.8rem; padding:6px 12px; background:rgba(16,185,129,0.12); color:#059669; border-color:rgba(16,185,129,0.3);" onclick="marcarRecibido(${p.id}, '${p.numero_referencia}')">
+                            <i class="ph-bold ph-check-circle"></i> Recibido
+                        </button>
+                    `;
+                }
+
+                html += `
+                    <div class="tracking-rep-card">
+                        <!-- Cabecera de la Tarjeta -->
+                        <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">
+                            <div>
+                                <div style="display:flex; align-items:center; gap:7px; flex-wrap:wrap;">
+                                    <span style="font-weight:800; font-size:1.05rem; color:var(--color-brand);">${p.numero_referencia}</span>
+                                    ${tipoBadge}
+                                </div>
+                                <div style="font-size:0.82rem; color:var(--text-secondary); margin-top:3px;">
+                                    <i class="ph ph-user"></i> ${p.cliente_nombre || 'Cliente General'} ${p.cliente_telefono ? `• ${p.cliente_telefono}` : ''}
+                                </div>
+                            </div>
+                            <div>
+                                ${slaBadge}
+                            </div>
+                        </div>
+
+                        <!-- Mini-Stepper de 4 Fases -->
+                        <div class="stepper-container">
+                            <div class="stepper-progress-bar">
+                                <div class="stepper-progress-fill" style="width: ${fillPercent}%;"></div>
+                            </div>
+                            <div class="step-item ${step1Class}">
+                                <div class="step-node"><i class="ph-bold ph-receipt"></i></div>
+                                <span class="step-label">1. Solicitado</span>
+                            </div>
+                            <div class="step-item ${step2Class}">
+                                <div class="step-node"><i class="ph-bold ph-truck"></i></div>
+                                <span class="step-label">2. Tránsito</span>
+                            </div>
+                            <div class="step-item ${step3Class}">
+                                <div class="step-node"><i class="ph-bold ph-package"></i></div>
+                                <span class="step-label">3. En Taller</span>
+                            </div>
+                            <div class="step-item ${step4Class}">
+                                <div class="step-node"><i class="ph-bold ph-wrench"></i></div>
+                                <span class="step-label">4. Instalado</span>
+                            </div>
+                        </div>
+
+                        <!-- Información de la Pieza y Equipo -->
+                        <div style="background:var(--bg-surface-hover); padding:10px 14px; border-radius:var(--radius-sm); border:1px solid var(--border-default);">
+                            <div style="font-weight:700; font-size:0.95rem; color:var(--text-primary); display:flex; align-items:center; gap:6px;">
+                                <i class="ph-bold ph-nut" style="color:var(--color-brand)"></i>
+                                <span>${p.repuesto_nombre}</span>
+                            </div>
+                            ${p.repuesto_pn ? `<div style="font-size:0.75rem; color:var(--text-secondary); margin-top:2px;"><strong>PN:</strong> <span style="font-family:monospace;">${p.repuesto_pn}</span></div>` : ''}
+                            <div style="font-size:0.82rem; color:var(--text-secondary); margin-top:4px;">
+                                <i class="ph ph-laptop"></i> <strong>Equipo:</strong> ${p.equipo_descripcion || 'Laptop Laptop'}
+                            </div>
+                        </div>
+
+                        <!-- Proveedor y Seguimiento Courier -->
+                        <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.82rem; flex-wrap:wrap; gap:8px;">
+                            <div>
+                                <span style="color:var(--text-secondary);">Courier:</span>
+                                <strong>${p.courier || (p.proveedor_nombre ? p.proveedor_nombre : 'Pendiente')}</strong>
+                            </div>
+                            <div style="display:flex; align-items:center; gap:6px;">
+                                ${trackingHtml}
+                            </div>
+                        </div>
+
+                        <!-- Bloque Financiero -->
+                        ${finHtml}
+
+                        ${p.notas_envio ? `<div style="font-size:0.78rem; color:var(--text-muted); font-style:italic;"><i class="ph ph-note"></i> ${p.notas_envio}</div>` : ''}
+
+                        <!-- Botones de Acción -->
+                        <div style="display:flex; justify-content:flex-end; gap:8px; border-top:1px solid var(--border-default); padding-top:10px; margin-top:4px;">
+                            <button class="btn btn-secondary" style="font-size:0.8rem; padding:6px 12px;" onclick='abrirModalTracking(${JSON.stringify(p).replace(/'/g, "&apos;")})'>
+                                <i class="ph-bold ph-pencil-simple"></i> Editar Tracking
+                            </button>
+                            ${btnRecibirHtml}
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        // Abrir modal con datos cargados
+        function abrirModalTracking(p) {
+            document.getElementById('modal-pedido-id').value = p.id;
+            document.getElementById('modal-ticket-id').value = p.ticket_id || '';
+            document.getElementById('modal-lbl-ref').textContent = p.numero_referencia;
+            document.getElementById('modal-lbl-pieza').textContent = `${p.repuesto_nombre} ${p.repuesto_pn ? `(PN: ${p.repuesto_pn})` : ''}`;
+            
+            document.getElementById('m-proveedor').value = p.proveedor_nombre || '';
+            document.getElementById('m-courier').value = p.courier || '';
+            document.getElementById('m-tracking').value = p.tracking_number || '';
+            document.getElementById('m-fecha-compra').value = p.fecha_compra || '';
+            document.getElementById('m-fecha-llegada').value = p.fecha_estimada_llegada || '';
+            document.getElementById('m-costo').value = p.costo_compra ? parseFloat(p.costo_compra) : '';
+            document.getElementById('m-precio').value = p.precio_cliente ? parseFloat(p.precio_cliente) : '';
+            
+            const esGar = (p.es_garantia == 1 || p.origen_tipo === 'GARANTIA');
+            const chkGar = document.getElementById('m-garantia');
+            chkGar.checked = esGar;
+            toggleGarantiaModal(esGar);
+
+            document.getElementById('m-estado-envio').value = p.estado_envio || 'SOLICITADO';
+            document.getElementById('m-notas').value = p.notas_envio || '';
+
+            document.getElementById('modal-tracking').style.display = 'flex';
+        }
+
+        function toggleGarantiaModal(checked) {
+            const inputPrecio = document.getElementById('m-precio');
+            if (checked) {
+                inputPrecio.value = '0.00';
+                inputPrecio.disabled = true;
+                inputPrecio.style.opacity = '0.6';
+            } else {
+                inputPrecio.disabled = false;
+                inputPrecio.style.opacity = '1';
+            }
+        }
+
+        function cerrarModalTracking() {
+            document.getElementById('modal-tracking').style.display = 'none';
+        }
+
+        // Guardar tracking vía API
+        async function guardarTracking() {
+            const id = document.getElementById('modal-pedido-id').value;
+            if (!id) return;
+
+            const btn = document.getElementById('btn-guardar-tracking');
             const originalHtml = btn.innerHTML;
-            btn.innerHTML = 'Guardando...';
+            btn.innerHTML = '<i class="ph ph-spinner ph-spin"></i> Guardando...';
             btn.disabled = true;
 
+            const payload = {
+                id: parseInt(id),
+                proveedor_nombre: document.getElementById('m-proveedor').value.trim(),
+                courier: document.getElementById('m-courier').value.trim(),
+                tracking_number: document.getElementById('m-tracking').value.trim(),
+                fecha_compra: document.getElementById('m-fecha-compra').value || null,
+                fecha_estimada_llegada: document.getElementById('m-fecha-llegada').value || null,
+                costo_compra: parseFloat(document.getElementById('m-costo').value) || 0.00,
+                precio_cliente: parseFloat(document.getElementById('m-precio').value) || 0.00,
+                es_garantia: document.getElementById('m-garantia').checked ? 1 : 0,
+                estado_envio: document.getElementById('m-estado-envio').value,
+                notas_envio: document.getElementById('m-notas').value.trim()
+            };
+
             try {
-                const res = await fetch('api/soporte.php?action=actualizar', { method: 'POST', body: JSON.stringify(body) }).then(r=>r.json());
+                const res = await fetch(`${API_REPUESTOS}?action=guardar_tracking`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                }).then(r => r.json());
+
                 if (res.ok) {
-                    document.getElementById('modal-editar').style.display = 'none';
-                    cargarPedidos();
+                    cerrarModalTracking();
+                    cargarTracking();
                 } else {
-                    alert("Error: " + res.msg);
+                    alert('Error: ' + (res.msg || 'No se pudo guardar'));
                 }
-            } catch(e) {
-                alert("Error de conexión");
+            } catch (e) {
+                alert('Error de conexión con el servidor al guardar tracking.');
             } finally {
                 btn.innerHTML = originalHtml;
                 btn.disabled = false;
             }
         }
 
-        async function marcarLlegada(id) {
-            if(!confirm("¿Confirmas que el repuesto ha llegado? El ticket pasará a EN REPARACIÓN y se notificará al técnico.")) return;
-            
-            const body = {
-                id: id,
-                estado: 'EN_REPARACION'
-            };
+        // Marcar recibido directamente con un clic
+        async function marcarRecibido(id, ref) {
+            if (!confirm(`¿Confirmas que el repuesto para la orden ${ref} ha llegado físicamente al taller?`)) {
+                return;
+            }
 
             try {
-                const res = await fetch('api/soporte.php?action=actualizar', { method: 'POST', body: JSON.stringify(body) }).then(r=>r.json());
+                const res = await fetch(`${API_REPUESTOS}?action=marcar_recibido`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id: id })
+                }).then(r => r.json());
+
                 if (res.ok) {
-                    cargarPedidos();
+                    cargarTracking();
                 } else {
-                    alert("Error: " + res.msg);
+                    alert('Error: ' + (res.msg || 'No se pudo marcar recepción'));
                 }
-            } catch(e) {
-                alert("Error de conexión");
+            } catch (e) {
+                alert('Error de conexión al marcar recepción.');
             }
         }
 
-        document.addEventListener('DOMContentLoaded', cargarPedidos);
+        // Utilidad: Copiar código al portapapeles con feedback
+        function copiarAlPortapapeles(texto, btn) {
+            navigator.clipboard.writeText(texto).then(() => {
+                const orig = btn.innerHTML;
+                btn.innerHTML = '<i class="ph-bold ph-check" style="color:#10B981"></i> ¡Copiado!';
+                setTimeout(() => { btn.innerHTML = orig; }, 2000);
+            }).catch(() => {
+                alert('Código: ' + texto);
+            });
+        }
+
+        window.onload = () => {
+            cargarTracking();
+        };
     </script>
 </body>
 </html>
