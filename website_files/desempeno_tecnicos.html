@@ -560,6 +560,31 @@
             border: 1px solid var(--border-default);
         }
 
+        /* Insignia de rol de intervención (Titular / Colaborador) */
+        .role-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            line-height: 1.2;
+            vertical-align: middle;
+        }
+        .chip-titular {
+            background: rgba(13, 138, 188, 0.12);
+            color: var(--color-brand, #0D8ABC);
+            border: 1px solid rgba(13, 138, 188, 0.35);
+        }
+        .chip-colaborador {
+            background: rgba(139, 92, 246, 0.12);
+            color: #8B5CF6;
+            border: 1px solid rgba(139, 92, 246, 0.35);
+        }
+
         /* Mini-timeline del día */
         .mini-timeline-container {
             display: flex;
@@ -952,10 +977,13 @@
                 // Chip de estado
                 let estadoChip = '';
                 if (tec.estado_en_vivo === 'TRABAJANDO' && tec.ticket_actual) {
+                    const colabBadge = tec.ticket_actual.es_colaboracion 
+                        ? `<span class="role-chip chip-colaborador" style="font-size:0.68rem; padding:1px 6px; margin-left:6px;"><i class="ph-bold ph-handshake"></i> Colaborando</span>` 
+                        : '';
                     estadoChip = `
-                        <div class="live-chip chip-working" title="Trabajando activamente">
+                        <div class="live-chip chip-working" title="${tec.ticket_actual.es_colaboracion ? 'Intervención en orden de compañero' : 'Trabajando activamente como titular'}">
                             <span class="pulse-dot"></span>
-                            <span><strong>${tec.ticket_actual.numero}</strong>: ${tec.ticket_actual.equipo || 'Laptop en proceso'}</span>
+                            <span><strong>${tec.ticket_actual.numero}</strong>: ${tec.ticket_actual.equipo || 'Laptop en proceso'}${colabBadge}</span>
                         </div>
                     `;
                 } else if (tec.estado_en_vivo === 'ESPERANDO') {
@@ -1146,7 +1174,11 @@
                     else if (mins >= 1) levelClass = 'level-1';
 
                     const horaFinStr = String(h + 1).padStart(2, '0') + ':00';
-                    const ticketInfo = slot.ticket ? `${slot.ticket} (${slot.equipo || 'Diagnóstico'})` : 'Sin asignación';
+                    let ticketInfo = 'Sin asignación';
+                    if (slot.ticket) {
+                        const rolTxt = slot.es_colaboracion ? ' [Colaboración]' : ' [Titular]';
+                        ticketInfo = `${slot.ticket} (${slot.equipo || 'Diagnóstico'})${rolTxt}`;
+                    }
                     const tooltipMsg = `${dia.dia_nombre} ${String(h).padStart(2, '0')}:00 - ${horaFinStr} | ${mins} min | Ticket: ${ticketInfo}`;
 
                     html += `
@@ -1200,8 +1232,13 @@
                         <td style="white-space:nowrap; font-weight:700; color:var(--text-primary);">${duracion}</td>
                         <td style="white-space:nowrap;">${tiempoAsignado}</td>
                         <td>
-                            <span style="color:var(--color-brand); font-weight:bold;">${act.ticket}</span>
-                            <span style="color:var(--text-secondary); margin-left:6px;">${act.equipo || 'Equipo Laptop'}</span>
+                            <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                                <span style="color:var(--color-brand); font-weight:bold;">${act.ticket}</span>
+                                ${act.es_colaboracion 
+                                    ? '<span class="role-chip chip-colaborador" title="Intervención / Cambio de estado realizado en orden de otro compañero"><i class="ph-bold ph-handshake"></i> Colaborador</span>' 
+                                    : '<span class="role-chip chip-titular" title="Técnico titular asignado a la orden"><i class="ph-bold ph-user-check"></i> Titular</span>'}
+                            </div>
+                            <div style="color:var(--text-secondary); font-size:0.85rem; margin-top:3px;">${act.equipo || 'Equipo Laptop'}</div>
                         </td>
                         <td><span class="status-badge ${badgeClass}">${estadoTexto}</span></td>
                     </tr>

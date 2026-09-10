@@ -1,4 +1,4 @@
-// Service Worker - Petulap PWA v17 (Responsive Reportes data-label y Detalles Técnicos en Inventario)
+// Service Worker - Petulap PWA v17 (Auditoría Colaborativa Multi-Técnico, Reportes data-label y Detalles en Inventario)
  
 var CACHE_NAME = 'petulap-v17';
 var ASSETS = [

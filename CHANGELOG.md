@@ -32,17 +32,28 @@ Para garantizar trazabilidad absoluta, auditoría técnica rigurosa y claridad e
 
 ## [1.4.8] - Septiembre 2026
 
-### Remediación Responsive Completa: Data-Labels en Reportes y Detalles Técnicos Colapsables en Inventario
-*Módulos impactados:* `website_files/reportes.html`, `website_files/inventario.html`, `website_files/sw.js`.
+### Auditoría Colaborativa Multi-Técnico, Data-Labels en Reportes y Detalles Técnicos en Inventario
+*Módulos impactados:* `website_files/api/desempeno.php`, `website_files/desempeno_tecnicos.html`, `website_files/reportes.html`, `website_files/inventario.html`, `website_files/sw.js`.
 
-### Added
+> **Causa Raíz ("El Por Qué"):** Anteriormente, la pantalla de Desempeño Técnico y el endpoint `api/desempeno.php` atribuían las actividades y horas trabajadas exclusivamente al técnico titular asignado a la orden (`st.tecnico_id`). En el flujo real del taller, múltiples técnicos colaboran, diagnostican o reparan órdenes asignadas a otros compañeros. Al ignorar la autoría registrada en `historial_cambios`, las horas reales de colaboradores (ej. Renzo interviniendo en tickets de otros técnicos) quedaban invisibilizadas o subestimadas. Se implementó un modelo unificado multi-técnico y colaborativo que audita fielmente cada transición de estado realizada por cada usuario sin duplicar horas.
+
+### Added & Fixed
+- **`website_files/api/desempeno.php`**:
+  - **Fuente Intervención (`historial_cambios`)**: Cada cambio de estado (`campo_cambiado = 'estado'`) se atribuye al técnico que lo ejecutó mediante matching flexible (nombre, apellido, nombre completo normalizado con remoción de tildes y diacríticos contra la tabla `personas`).
+  - **Fuente Titular (`soporte_tecnico`)**: Respaldo para órdenes asignadas en cola que aún no registran transiciones posteriores en el historial, garantizando cobertura de tickets en diagnóstico o en espera.
+  - **Control de Duplicidad**: Clave única de actividad (`ticket + fecha_inicio`) para evitar doble contabilización si el técnico es tanto titular de la orden como ejecutor de las transiciones.
+  - **Metadatos Colaborativos**: Inyección de campos `es_colaboracion` (booleano) y `rol_intervencion` (`'Colaborador'` / `'Titular'`) en cada actividad y en las celdas del heatmap semanal.
+  - **Blindaje SQL**: Consultas parametrizadas con sentencias preparadas nativas (`prepare()` + `bind_param()`) y validación estricta de listas blancas de rangos.
+- **`website_files/desempeno_tecnicos.html`**:
+  - **Insignias de Rol (.role-chip)**: En la tabla cronológica de 6 columnas, incorporación de insignias semánticas discretas en la columna "Ticket y Equipo / Tarea" (`Titular` en azul marca y `Colaborador` en púrpura con iconos Phosphor `ph-user-check` y `ph-handshake`).
+  - **Heatmap Semanal Enriquecido**: Tooltips contextuales interactivos indicando explícitamente `[Colaboración]` o `[Titular]` junto al ticket y equipo.
+  - **Monitoreo en Vivo Adaptativo**: Reconocimiento de estados en proceso colaborativos en el chip en vivo de la tarjeta ejecutiva (`Colaborando`).
 - **`website_files/reportes.html`**:
-  - Inyección de atributos `data-label` (`Proveedor (Obs)`, `Doc. Compra`, `Código`, `Serie`, `Marca/Modelo`, `Falla Registrada`, `Triaje Inicial`, `Triaje Actual`) en cada una de las celdas generadas por `cargarReporte()`. Con esto se consumen al 100% las reglas CSS previamente definidas, mostrando tarjetas apiladas completas y legibles en dispositivos móviles sin desbordamiento horizontal.
+  - Inyección de atributos `data-label` (`Proveedor (Obs)`, `Doc. Compra`, `Código`, `Serie`, `Marca/Modelo`, `Falla Registrada`, `Triaje Inicial`, `Triaje Actual`) en las celdas generadas por `cargarReporte()`, completando la vista de tarjetas móviles apiladas sin desbordamiento horizontal.
 - **`website_files/inventario.html`**:
-  - Incorporación de componente colapsable nativo `<details><summary>` mediante la celda `.mobile-specs-cell` y su grilla de especificaciones `.inv-specs-grid`.
-  - Mantenimiento estricto del aislamiento en escritorio: `.mobile-specs-cell` permanece en `display: none` en monitores (>768px) para no alterar la estructura tabular de 12 columnas. En smartphones (<=768px), permite consultar bajo demanda `Procesador`, `RAM`, `HD/SSD` y `Observación` sin saturar la vista inicial de tarjetas.
+  - Incorporación de componente colapsable nativo `<details><summary>` mediante la celda `.mobile-specs-cell` y su grilla de especificaciones `.inv-specs-grid` (oculta en escritorio `display: none` y expandible al toque en smartphones).
 - **`website_files/sw.js`**:
-  - Incremento de versión de caché PWA a `'petulap-v17'` para forzar la actualización transparente de estilos y scripts en clientes en producción.
+  - Versión de caché PWA `'petulap-v17'` para actualización transparente en producción.
 
 ---
 
