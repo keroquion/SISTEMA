@@ -122,6 +122,44 @@ if ($action === "resumen") {
         return null;
     };
 
+    // Helper: Extraer técnicos asignados (titular y adicionales) con roles
+    $obtenerTecnicosDeFila = function($tecnico_id, $tecnicos_adicionales) {
+        $asignados = []; // [$tid => 'Titular'|'Colaborador'|'Equipo']
+        $titular = !empty($tecnico_id) ? (int)$tecnico_id : null;
+        
+        $adicionales = [];
+        if (!empty($tecnicos_adicionales)) {
+            $raw = trim($tecnicos_adicionales);
+            if (strpos($raw, '[') === 0) {
+                $dec = json_decode($raw, true);
+                if (is_array($dec)) {
+                    foreach ($dec as $v) if (is_numeric($v)) $adicionales[] = (int)$v;
+                }
+            } else {
+                $parts = explode(',', $raw);
+                foreach ($parts as $p) {
+                    $clean = trim($p);
+                    if (is_numeric($clean)) $adicionales[] = (int)$clean;
+                }
+            }
+        }
+        
+        if ($titular) {
+            $asignados[$titular] = 'Titular';
+            foreach ($adicionales as $aid) {
+                if ($aid !== $titular) {
+                    $asignados[$aid] = 'Colaborador';
+                }
+            }
+        } else {
+            // Sin titular pero con adicionales: todos forman parte del Equipo
+            foreach ($adicionales as $aid) {
+                $asignados[$aid] = 'Equipo';
+            }
+        }
+        return $asignados;
+    };
+
     // Helper: Normalización de actividades (Clientes ST, Soporte Interno ST-INT y Tareas de Taller TAR)
     $normalizarTicketInfo = function($num, $st_equipo, $motivo, $diag, $clienteRaw) {
         $numUpper = strtoupper(trim($num ?? ''));
@@ -148,10 +186,11 @@ if ($action === "resumen") {
     // 2. Fuente Intervención: Extraer historial de cambios de estado relevantes
     $sqlHist = "
         SELECT h.registro_id, h.fecha_cambio, h.valor_nuevo, h.valor_anterior, h.usuario_nombre,
-               st.tecnico_id as titular_tecnico_id, st.numero_atencion,
+               st.tecnico_id as titular_tecnico_id, st.tecnicos_adicionales, st.numero_atencion,
                st.motivo_ingreso, st.diagnostico, st.equipo_descripcion as st_equipo,
                CONCAT(c.nombre, ' ', COALESCE(c.apellido, '')) as cliente_nombre_raw,
                st.estado as estado_actual,
+               st.fecha_ingreso, st.fecha_entrega,
                st.tiempo_estimado
         FROM historial_cambios h
         INNER JOIN soporte_tecnico st ON h.registro_id = st.id
@@ -175,12 +214,18 @@ if ($action === "resumen") {
         while ($row = $resHist->fetch_assoc()) {
             $usuarioNombre = $row['usuario_nombre'] ?? '';
             $titularId = !empty($row['titular_tecnico_id']) ? (int)$row['titular_tecnico_id'] : null;
+            $tecsAsignados = $obtenerTecnicosDeFila($titularId, $row['tecnicos_adicionales'] ?? '');
 
             // Atribuir al técnico que realizó la transición en historial_cambios
             $ejecutorId = $resolverTecnicoIdPorUsuario($usuarioNombre);
-            if ($ejecutorId === null && $titularId && isset($tecnicos[$titularId])) {
-                // Si el cambio fue por 'Sistema' o usuario no reconocido, se asigna al titular
-                $ejecutorId = $titularId;
+            if ($ejecutorId === null) {
+                if ($titularId && isset($tecnicos[$titularId])) {
+                    $ejecutorId = $titularId;
+                } elseif (!empty($tecsAsignados)) {
+                    // Si no hay titular, asignar al primer técnico adicional
+                    $firstAid = array_key_first($tecsAsignados);
+                    if (isset($tecnicos[$firstAid])) $ejecutorId = $firstAid;
+                }
             }
 
             if (!$ejecutorId || !isset($tecnicos[$ejecutorId])) {
@@ -188,7 +233,8 @@ if ($action === "resumen") {
             }
 
             $tk_id = (int)$row['registro_id'];
-            $esColab = ($titularId && $ejecutorId !== $titularId);
+            $rolIntervencion = $tecsAsignados[$ejecutorId] ?? ($titularId && $ejecutorId === $titularId ? 'Titular' : 'Colaborador');
+            $esColab = ($rolIntervencion !== 'Titular');
 
             $infoNorm = $normalizarTicketInfo(
                 $row['numero_atencion'],
@@ -207,6 +253,9 @@ if ($action === "resumen") {
                     'titular_id' => $titularId,
                     'estado_actual' => $row['estado_actual'],
                     'tiempo_estimado' => $row['tiempo_estimado'] ?? null,
+                    'fecha_ingreso' => $row['fecha_ingreso'] ?? null,
+                    'fecha_entrega' => $row['fecha_entrega'] ?? null,
+                    'rol_intervencion' => $rolIntervencion,
                     'eventos' => []
                 ];
             }
@@ -214,7 +263,8 @@ if ($action === "resumen") {
             $eventosPorTecnicoTicket[$ejecutorId][$tk_id]['eventos'][] = [
                 'fecha' => $row['fecha_cambio'],
                 'estado' => $row['valor_nuevo'],
-                'es_colaboracion' => $esColab
+                'es_colaboracion' => $esColab,
+                'rol_intervencion' => $rolIntervencion
             ];
         }
     }
@@ -224,11 +274,13 @@ if ($action === "resumen") {
         foreach ($ticketsDeTecnico as $tk_id => $tk) {
             $inicio = null;
             $esColabAct = false;
+            $rolAct = $tk['rol_intervencion'] ?? 'Titular';
 
             foreach ($tk['eventos'] as $ev) {
                 $est = $ev['estado'];
                 $fech = $ev['fecha'];
                 $esColab = $ev['es_colaboracion'];
+                if (!empty($ev['rol_intervencion'])) $rolAct = $ev['rol_intervencion'];
 
                 if (in_array($est, ['EN_DIAGNOSTICO', 'EN_REPARACION'])) {
                     if ($inicio === null) {
@@ -238,37 +290,54 @@ if ($action === "resumen") {
                 } else {
                     if ($inicio !== null) {
                         $dur = strtotime($fech) - strtotime($inicio);
-                        if ($dur >= 0) {
-                            $esInstant = ($dur < 60);
-                            $durSeg = max(0, $dur);
-                            $claveAct = $tk['numero'] . '_' . date('Y-m-d_H', strtotime($inicio));
-                            if (!isset($actividadesUnicas[$tid][$claveAct])) {
-                                $actividadesUnicas[$tid][$claveAct] = true;
-                                $tecnicos[$tid]['actividades'][] = [
-                                    'ticket' => $tk['numero'],
-                                    'equipo' => $tk['equipo'],
-                                    'cliente' => $tk['cliente'],
-                                    'tipo_origen' => $tk['tipo_origen'],
-                                    'inicio' => $inicio,
-                                    'fin' => $fech,
-                                    'estado_fin' => $est,
-                                    'duracion_seg' => $durSeg,
-                                    'minutos_reales' => (int)round($durSeg / 60),
-                                    'es_instantaneo' => $esInstant,
-                                    'tiempo_estimado' => $tk['tiempo_estimado'],
-                                    'es_colaboracion' => $esColabAct,
-                                    'rol_intervencion' => $esColabAct ? 'Colaborador' : 'Titular'
-                                ];
-                                $tecnicos[$tid]['horas_trabajadas'] += $durSeg;
-                                $ticketsConActividad[$tid][$tk_id] = true;
-                            }
+                        if ($dur < 60 || $dur <= 0) {
+                            $esInstant = true;
+                            $durSeg = 0;
+                            $minutosReales = 0;
+                        } else {
+                            $esInstant = false;
+                            $durSeg = min($dur, 86400);
+                            $minutosReales = (int)round($durSeg / 60);
+                        }
+                        $claveAct = $tk['numero'] . '_' . date('Y-m-d_H', strtotime($inicio));
+                        if (!isset($actividadesUnicas[$tid][$claveAct])) {
+                            $actividadesUnicas[$tid][$claveAct] = true;
+                            $tecnicos[$tid]['actividades'][] = [
+                                'ticket' => $tk['numero'],
+                                'equipo' => $tk['equipo'],
+                                'cliente' => $tk['cliente'],
+                                'tipo_origen' => $tk['tipo_origen'],
+                                'inicio' => $inicio,
+                                'fin' => $fech,
+                                'estado_fin' => $est,
+                                'duracion_seg' => $durSeg,
+                                'minutos_reales' => $minutosReales,
+                                'es_instantaneo' => $esInstant,
+                                'tiempo_estimado' => $tk['tiempo_estimado'],
+                                'es_colaboracion' => $esColabAct,
+                                'rol_intervencion' => $rolAct
+                            ];
+                            $tecnicos[$tid]['horas_trabajadas'] += $durSeg;
+                            $ticketsConActividad[$tid][$tk_id] = true;
                         }
                         $inicio = null;
                     } else {
                         // Cierre directo o pase a repuesto por este técnico
                         if (in_array($est, ['LISTO_PARA_RECOGER', 'ENTREGADO', 'ESPERANDO_REPUESTO', 'COMPLETADO', 'ENTREGADA'])) {
-                            $dur = ($est === 'ESPERANDO_REPUESTO') ? 2700 : 3600; // 45m o 60m estándar
-                            $inicioEst = date('Y-m-d H:i:s', strtotime($fech) - $dur);
+                            $fechFin = $fech;
+                            $fechIni = !empty($tk['fecha_ingreso']) ? $tk['fecha_ingreso'] : $fech;
+                            $durDiff = strtotime($fechFin) - strtotime($fechIni);
+                            if ($durDiff < 60 || $durDiff <= 0) {
+                                $esInstant = true;
+                                $dur = 0;
+                                $minutosReales = 0;
+                                $inicioEst = $fechIni;
+                            } else {
+                                $esInstant = false;
+                                $dur = min($durDiff, 86400);
+                                $minutosReales = (int)round($dur / 60);
+                                $inicioEst = $fechIni;
+                            }
                             $claveAct = $tk['numero'] . '_' . date('Y-m-d_H', strtotime($inicioEst));
                             if (!isset($actividadesUnicas[$tid][$claveAct])) {
                                 $actividadesUnicas[$tid][$claveAct] = true;
@@ -278,14 +347,14 @@ if ($action === "resumen") {
                                     'cliente' => $tk['cliente'],
                                     'tipo_origen' => $tk['tipo_origen'],
                                     'inicio' => $inicioEst,
-                                    'fin' => $fech,
+                                    'fin' => $fechFin,
                                     'estado_fin' => ($est === 'ESPERANDO_REPUESTO') ? 'ESPERANDO_REPUESTO' : 'COMPLETADO',
                                     'duracion_seg' => $dur,
-                                    'minutos_reales' => (int)round($dur / 60),
-                                    'es_instantaneo' => false,
+                                    'minutos_reales' => $minutosReales,
+                                    'es_instantaneo' => $esInstant,
                                     'tiempo_estimado' => $tk['tiempo_estimado'],
                                     'es_colaboracion' => $esColab,
-                                    'rol_intervencion' => $esColab ? 'Colaborador' : 'Titular'
+                                    'rol_intervencion' => $rolAct
                                 ];
                                 $tecnicos[$tid]['horas_trabajadas'] += $dur;
                                 $ticketsConActividad[$tid][$tk_id] = true;
@@ -298,45 +367,50 @@ if ($action === "resumen") {
             // Si el trabajo sigue en progreso abierto
             if ($inicio !== null) {
                 $dur = time() - strtotime($inicio);
-                if ($dur >= 0) {
-                    $esInstant = ($dur < 60);
+                if ($dur < 60 || $dur <= 0) {
+                    $esInstant = true;
+                    $durSeg = 0;
+                    $minutosReales = 0;
+                } else {
+                    $esInstant = false;
                     $durSeg = max(0, $dur);
-                    $claveAct = $tk['numero'] . '_' . date('Y-m-d_H', strtotime($inicio));
-                    if (!isset($actividadesUnicas[$tid][$claveAct])) {
-                        $actividadesUnicas[$tid][$claveAct] = true;
-                        $tecnicos[$tid]['actividades'][] = [
-                            'ticket' => $tk['numero'],
-                            'equipo' => $tk['equipo'],
-                            'cliente' => $tk['cliente'],
-                            'tipo_origen' => $tk['tipo_origen'],
-                            'inicio' => $inicio,
-                            'fin' => null,
-                            'estado_fin' => 'EN_PROCESO',
-                            'duracion_seg' => $durSeg,
-                            'minutos_reales' => (int)round($durSeg / 60),
-                            'es_instantaneo' => $esInstant,
-                            'tiempo_estimado' => $tk['tiempo_estimado'],
-                            'es_colaboracion' => $esColabAct,
-                            'rol_intervencion' => $esColabAct ? 'Colaborador' : 'Titular'
-                        ];
-                        $tecnicos[$tid]['horas_trabajadas'] += $durSeg;
-                        $ticketsConActividad[$tid][$tk_id] = true;
-                    }
+                    $minutosReales = (int)round($durSeg / 60);
+                }
+                $claveAct = $tk['numero'] . '_' . date('Y-m-d_H', strtotime($inicio));
+                if (!isset($actividadesUnicas[$tid][$claveAct])) {
+                    $actividadesUnicas[$tid][$claveAct] = true;
+                    $tecnicos[$tid]['actividades'][] = [
+                        'ticket' => $tk['numero'],
+                        'equipo' => $tk['equipo'],
+                        'cliente' => $tk['cliente'],
+                        'tipo_origen' => $tk['tipo_origen'],
+                        'inicio' => $inicio,
+                        'fin' => null,
+                        'estado_fin' => 'EN_PROCESO',
+                        'duracion_seg' => $durSeg,
+                        'minutos_reales' => $minutosReales,
+                        'es_instantaneo' => $esInstant,
+                        'tiempo_estimado' => $tk['tiempo_estimado'],
+                        'es_colaboracion' => $esColabAct,
+                        'rol_intervencion' => $rolAct
+                    ];
+                    $tecnicos[$tid]['horas_trabajadas'] += $durSeg;
+                    $ticketsConActividad[$tid][$tk_id] = true;
                 }
             }
         }
     }
 
-    // 4. Fuente Titular: Respaldo para órdenes asignadas en soporte_tecnico sin transiciones suficientes en historial
+    // 4. Fuente Titular y Colaboradores: Respaldo para órdenes asignadas en soporte_tecnico
     $sqlFallback = "
         SELECT st.id, st.numero_atencion,
                st.motivo_ingreso, st.diagnostico, st.equipo_descripcion as st_equipo,
                CONCAT(c.nombre, ' ', COALESCE(c.apellido, '')) as cliente_nombre_raw,
-               st.estado, st.tecnico_id, st.fecha_ingreso, st.fecha_entrega, st.tiempo_estimado,
+               st.estado, st.tecnico_id, st.tecnicos_adicionales, st.fecha_ingreso, st.fecha_entrega, st.tiempo_estimado,
                COALESCE(st.fecha_entrega, st.fecha_ingreso) as fecha_referencia
         FROM soporte_tecnico st
         LEFT JOIN personas c ON st.cliente_id = c.id
-        WHERE st.tecnico_id IS NOT NULL
+        WHERE (st.tecnico_id IS NOT NULL OR (st.tecnicos_adicionales IS NOT NULL AND st.tecnicos_adicionales != ''))
         AND ($whereFechaSt OR st.estado IN ('EN_DIAGNOSTICO', 'EN_REPARACION', 'ESPERANDO_REPUESTO', 'PENDIENTE'))
         ORDER BY fecha_referencia ASC
     ";
@@ -351,12 +425,9 @@ if ($action === "resumen") {
 
     if ($resFallback) {
         while ($row = $resFallback->fetch_assoc()) {
-            $tid = (int)$row['tecnico_id'];
-            if (!isset($tecnicos[$tid])) continue;
+            $tecsAsignados = $obtenerTecnicosDeFila($row['tecnico_id'], $row['tecnicos_adicionales'] ?? '');
+            if (empty($tecsAsignados)) continue;
             $tk_id = (int)$row['id'];
-
-            // Si el técnico titular ya registró actividad para este ticket, no duplicar
-            if (isset($ticketsConActividad[$tid][$tk_id])) continue;
 
             $est = $row['estado'];
             $num = $row['numero_atencion'];
@@ -374,13 +445,25 @@ if ($action === "resumen") {
             $entrega = $row['fecha_entrega'];
             $tiempoEst = $row['tiempo_estimado'] ?? null;
 
-            if (in_array($est, ['EN_DIAGNOSTICO', 'EN_REPARACION'])) {
-                $ingresoYmd = date('Y-m-d', strtotime($ingreso));
-                $inicio = ($ingresoYmd < $hoyYmd) ? date('Y-m-d 08:00:00') : $ingreso;
-                $dur = time() - strtotime($inicio);
-                if ($dur >= 0) {
-                    $esInstant = ($dur < 60);
-                    $durSeg = max(0, $dur);
+            foreach ($tecsAsignados as $tid => $rolIntervencion) {
+                if (!isset($tecnicos[$tid])) continue;
+                if (isset($ticketsConActividad[$tid][$tk_id])) continue;
+
+                $esColab = ($rolIntervencion !== 'Titular');
+
+                if (in_array($est, ['EN_DIAGNOSTICO', 'EN_REPARACION'])) {
+                    $ingresoYmd = date('Y-m-d', strtotime($ingreso));
+                    $inicio = ($ingresoYmd < $hoyYmd) ? date('Y-m-d 08:00:00') : $ingreso;
+                    $dur = time() - strtotime($inicio);
+                    if ($dur < 60 || $dur <= 0) {
+                        $esInstant = true;
+                        $durSeg = 0;
+                        $minutosReales = 0;
+                    } else {
+                        $esInstant = false;
+                        $durSeg = max(0, $dur);
+                        $minutosReales = (int)round($durSeg / 60);
+                    }
                     $claveAct = $num . '_' . date('Y-m-d_H', strtotime($inicio));
                     if (!isset($actividadesUnicas[$tid][$claveAct])) {
                         $actividadesUnicas[$tid][$claveAct] = true;
@@ -393,73 +476,76 @@ if ($action === "resumen") {
                             'fin' => null,
                             'estado_fin' => 'EN_PROCESO',
                             'duracion_seg' => $durSeg,
-                            'minutos_reales' => (int)round($durSeg / 60),
+                            'minutos_reales' => $minutosReales,
                             'es_instantaneo' => $esInstant,
                             'tiempo_estimado' => $tiempoEst,
-                            'es_colaboracion' => false,
-                            'rol_intervencion' => 'Titular'
+                            'es_colaboracion' => $esColab,
+                            'rol_intervencion' => $rolIntervencion
                         ];
                         $tecnicos[$tid]['horas_trabajadas'] += $durSeg;
                         $ticketsConActividad[$tid][$tk_id] = true;
                     }
-                }
-            } elseif ($est === 'ESPERANDO_REPUESTO') {
-                $ingresoYmd = date('Y-m-d', strtotime($ingreso));
-                $inicio = ($ingresoYmd < $hoyYmd) ? date('Y-m-d 08:00:00') : $ingreso;
-                $dur = 2700; // 45 min de triaje previo
-                $fin = date('Y-m-d H:i:s', strtotime($inicio) + $dur);
-                $claveAct = $num . '_' . date('Y-m-d_H', strtotime($inicio));
-                if (!isset($actividadesUnicas[$tid][$claveAct])) {
-                    $actividadesUnicas[$tid][$claveAct] = true;
-                    $tecnicos[$tid]['actividades'][] = [
-                        'ticket' => $num,
-                        'equipo' => $eq,
-                        'cliente' => $cli,
-                        'tipo_origen' => $tipoOrigen,
-                        'inicio' => $inicio,
-                        'fin' => $fin,
-                        'estado_fin' => 'ESPERANDO_REPUESTO',
-                        'duracion_seg' => $dur,
-                        'minutos_reales' => (int)round($dur / 60),
-                        'es_instantaneo' => false,
-                        'tiempo_estimado' => $tiempoEst,
-                        'es_colaboracion' => false,
-                        'rol_intervencion' => 'Titular'
-                    ];
-                    $tecnicos[$tid]['horas_trabajadas'] += $dur;
-                    $ticketsConActividad[$tid][$tk_id] = true;
-                }
-            } elseif (in_array($est, ['LISTO_PARA_RECOGER', 'ENTREGADO', 'COMPLETADO', 'ENTREGADA'])) {
-                $fin = !empty($entrega) ? $entrega : $ingreso;
-                $diffFechas = (!empty($entrega) && !empty($ingreso)) ? (strtotime($entrega) - strtotime($ingreso)) : 5400;
-                $esInstant = ($diffFechas >= 0 && $diffFechas < 60);
-                if ($esInstant) {
-                    $dur = max(0, $diffFechas);
-                    $inicio = $ingreso;
-                } else {
-                    $dur = ($diffFechas > 0 && $diffFechas < 86400) ? $diffFechas : 5400;
-                    $inicio = date('Y-m-d H:i:s', strtotime($fin) - $dur);
-                }
-                $claveAct = $num . '_' . date('Y-m-d_H', strtotime($inicio));
-                if (!isset($actividadesUnicas[$tid][$claveAct])) {
-                    $actividadesUnicas[$tid][$claveAct] = true;
-                    $tecnicos[$tid]['actividades'][] = [
-                        'ticket' => $num,
-                        'equipo' => $eq,
-                        'cliente' => $cli,
-                        'tipo_origen' => $tipoOrigen,
-                        'inicio' => $inicio,
-                        'fin' => $fin,
-                        'estado_fin' => 'COMPLETADO',
-                        'duracion_seg' => $dur,
-                        'minutos_reales' => (int)round($dur / 60),
-                        'es_instantaneo' => $esInstant,
-                        'tiempo_estimado' => $tiempoEst,
-                        'es_colaboracion' => false,
-                        'rol_intervencion' => 'Titular'
-                    ];
-                    $tecnicos[$tid]['horas_trabajadas'] += $dur;
-                    $ticketsConActividad[$tid][$tk_id] = true;
+                } elseif ($est === 'ESPERANDO_REPUESTO') {
+                    $ingresoYmd = date('Y-m-d', strtotime($ingreso));
+                    $inicio = ($ingresoYmd < $hoyYmd) ? date('Y-m-d 08:00:00') : $ingreso;
+                    $dur = 2700; // 45 min de triaje previo
+                    $fin = date('Y-m-d H:i:s', strtotime($inicio) + $dur);
+                    $claveAct = $num . '_' . date('Y-m-d_H', strtotime($inicio));
+                    if (!isset($actividadesUnicas[$tid][$claveAct])) {
+                        $actividadesUnicas[$tid][$claveAct] = true;
+                        $tecnicos[$tid]['actividades'][] = [
+                            'ticket' => $num,
+                            'equipo' => $eq,
+                            'cliente' => $cli,
+                            'tipo_origen' => $tipoOrigen,
+                            'inicio' => $inicio,
+                            'fin' => $fin,
+                            'estado_fin' => 'ESPERANDO_REPUESTO',
+                            'duracion_seg' => $dur,
+                            'minutos_reales' => (int)round($dur / 60),
+                            'es_instantaneo' => false,
+                            'tiempo_estimado' => $tiempoEst,
+                            'es_colaboracion' => $esColab,
+                            'rol_intervencion' => $rolIntervencion
+                        ];
+                        $tecnicos[$tid]['horas_trabajadas'] += $dur;
+                        $ticketsConActividad[$tid][$tk_id] = true;
+                    }
+                } elseif (in_array($est, ['LISTO_PARA_RECOGER', 'ENTREGADO', 'COMPLETADO', 'ENTREGADA'])) {
+                    $fin = (!empty($entrega) && strtotime($entrega) <= time()) ? $entrega : $ingreso;
+                    $diffFechas = strtotime($fin) - strtotime($ingreso);
+                    if ($diffFechas < 60 || $diffFechas <= 0) {
+                        $dur = 0;
+                        $minutosReales = 0;
+                        $esInstant = true;
+                        $inicio = $ingreso;
+                    } else {
+                        $dur = min($diffFechas, 86400);
+                        $minutosReales = (int)round($dur / 60);
+                        $esInstant = false;
+                        $inicio = $ingreso;
+                    }
+                    $claveAct = $num . '_' . date('Y-m-d_H', strtotime($inicio));
+                    if (!isset($actividadesUnicas[$tid][$claveAct])) {
+                        $actividadesUnicas[$tid][$claveAct] = true;
+                        $tecnicos[$tid]['actividades'][] = [
+                            'ticket' => $num,
+                            'equipo' => $eq,
+                            'cliente' => $cli,
+                            'tipo_origen' => $tipoOrigen,
+                            'inicio' => $inicio,
+                            'fin' => $fin,
+                            'estado_fin' => 'COMPLETADO',
+                            'duracion_seg' => $dur,
+                            'minutos_reales' => $minutosReales,
+                            'es_instantaneo' => $esInstant,
+                            'tiempo_estimado' => $tiempoEst,
+                            'es_colaboracion' => $esColab,
+                            'rol_intervencion' => $rolIntervencion
+                        ];
+                        $tecnicos[$tid]['horas_trabajadas'] += $dur;
+                        $ticketsConActividad[$tid][$tk_id] = true;
+                    }
                 }
             }
         }
@@ -480,7 +566,7 @@ if ($action === "resumen") {
                         'tipo_origen' => $act['tipo_origen'] ?? 'CLIENTE',
                         'inicio' => $act['inicio'],
                         'es_colaboracion' => !empty($act['es_colaboracion']),
-                        'rol_intervencion' => !empty($act['es_colaboracion']) ? 'Colaborador' : 'Titular'
+                        'rol_intervencion' => $act['rol_intervencion'] ?? (!empty($act['es_colaboracion']) ? 'Colaborador' : 'Titular')
                     ];
                     break;
                 }
@@ -493,12 +579,12 @@ if ($action === "resumen") {
         SELECT st.id, st.numero_atencion,
                st.motivo_ingreso, st.diagnostico, st.equipo_descripcion as st_equipo,
                CONCAT(c.nombre, ' ', COALESCE(c.apellido, '')) as cliente_nombre_raw,
-               st.estado, st.tecnico_id,
+               st.estado, st.tecnico_id, st.tecnicos_adicionales,
                COALESCE(st.fecha_entrega, st.fecha_ingreso) as fecha_referencia,
                st.fecha_ingreso
         FROM soporte_tecnico st
         LEFT JOIN personas c ON st.cliente_id = c.id
-        WHERE st.tecnico_id IS NOT NULL
+        WHERE (st.tecnico_id IS NOT NULL OR (st.tecnicos_adicionales IS NOT NULL AND st.tecnicos_adicionales != ''))
         AND (st.estado IN ('EN_DIAGNOSTICO', 'EN_REPARACION', 'ESPERANDO_REPUESTO', 'PENDIENTE') OR DATE(COALESCE(st.fecha_entrega, st.fecha_ingreso)) = CURDATE())
         ORDER BY 
             FIELD(st.estado, 'EN_DIAGNOSTICO', 'EN_REPARACION', 'ESPERANDO_REPUESTO', 'PENDIENTE', 'LISTO_PARA_RECOGER', 'ENTREGADO'),
@@ -507,9 +593,8 @@ if ($action === "resumen") {
     $resLive = $db->query($sqlLive);
     if ($resLive) {
         while ($row = $resLive->fetch_assoc()) {
-            $tid = (int)$row['tecnico_id'];
-            if (!isset($tecnicos[$tid])) continue;
-            if ($tecnicos[$tid]['estado_en_vivo'] === 'TRABAJANDO') continue; // Ya detectado por actividad
+            $tecs = $obtenerTecnicosDeFila($row['tecnico_id'], $row['tecnicos_adicionales'] ?? '');
+            if (empty($tecs)) continue;
 
             $infoNorm = $normalizarTicketInfo(
                 $row['numero_atencion'],
@@ -520,40 +605,48 @@ if ($action === "resumen") {
             );
 
             $est = $row['estado'];
-            if (in_array($est, ['EN_DIAGNOSTICO', 'EN_REPARACION'])) {
-                $tecnicos[$tid]['estado_en_vivo'] = 'TRABAJANDO';
-                $tecnicos[$tid]['ticket_actual'] = [
-                    'numero' => $row['numero_atencion'],
-                    'equipo' => $infoNorm['equipo_descripcion'],
-                    'cliente' => $infoNorm['cliente_nombre'],
-                    'tipo_origen' => $infoNorm['tipo_origen'],
-                    'inicio' => $row['fecha_referencia'],
-                    'es_colaboracion' => false,
-                    'rol_intervencion' => 'Titular'
-                ];
-            } elseif ($est === 'ESPERANDO_REPUESTO' && $tecnicos[$tid]['estado_en_vivo'] === 'INACTIVO') {
-                $tecnicos[$tid]['estado_en_vivo'] = 'ESPERANDO';
-                $tecnicos[$tid]['ticket_actual'] = [
-                    'numero' => $row['numero_atencion'],
-                    'equipo' => $infoNorm['equipo_descripcion'],
-                    'cliente' => $infoNorm['cliente_nombre'],
-                    'tipo_origen' => $infoNorm['tipo_origen'],
-                    'inicio' => $row['fecha_referencia'],
-                    'es_colaboracion' => false,
-                    'rol_intervencion' => 'Titular'
-                ];
-            } elseif ($est === 'PENDIENTE' && $tecnicos[$tid]['estado_en_vivo'] === 'INACTIVO') {
-                $tecnicos[$tid]['estado_en_vivo'] = 'EN_ESPERA';
-                $tecnicos[$tid]['ticket_actual'] = [
-                    'numero' => $row['numero_atencion'],
-                    'equipo' => $infoNorm['equipo_descripcion'],
-                    'cliente' => $infoNorm['cliente_nombre'],
-                    'tipo_origen' => $infoNorm['tipo_origen'],
-                    'inicio' => $row['fecha_referencia'],
-                    'es_pendiente' => true,
-                    'es_colaboracion' => false,
-                    'rol_intervencion' => 'Titular'
-                ];
+
+            foreach ($tecs as $tid => $rolIntervencion) {
+                if (!isset($tecnicos[$tid])) continue;
+                if ($tecnicos[$tid]['estado_en_vivo'] === 'TRABAJANDO') continue; // Ya detectado por actividad
+
+                $esColab = ($rolIntervencion !== 'Titular');
+
+                if (in_array($est, ['EN_DIAGNOSTICO', 'EN_REPARACION'])) {
+                    $tecnicos[$tid]['estado_en_vivo'] = 'TRABAJANDO';
+                    $tecnicos[$tid]['ticket_actual'] = [
+                        'numero' => $row['numero_atencion'],
+                        'equipo' => $infoNorm['equipo_descripcion'],
+                        'cliente' => $infoNorm['cliente_nombre'],
+                        'tipo_origen' => $infoNorm['tipo_origen'],
+                        'inicio' => $row['fecha_referencia'],
+                        'es_colaboracion' => $esColab,
+                        'rol_intervencion' => $rolIntervencion
+                    ];
+                } elseif ($est === 'ESPERANDO_REPUESTO' && $tecnicos[$tid]['estado_en_vivo'] === 'INACTIVO') {
+                    $tecnicos[$tid]['estado_en_vivo'] = 'ESPERANDO';
+                    $tecnicos[$tid]['ticket_actual'] = [
+                        'numero' => $row['numero_atencion'],
+                        'equipo' => $infoNorm['equipo_descripcion'],
+                        'cliente' => $infoNorm['cliente_nombre'],
+                        'tipo_origen' => $infoNorm['tipo_origen'],
+                        'inicio' => $row['fecha_referencia'],
+                        'es_colaboracion' => $esColab,
+                        'rol_intervencion' => $rolIntervencion
+                    ];
+                } elseif ($est === 'PENDIENTE' && $tecnicos[$tid]['estado_en_vivo'] === 'INACTIVO') {
+                    $tecnicos[$tid]['estado_en_vivo'] = 'EN_ESPERA';
+                    $tecnicos[$tid]['ticket_actual'] = [
+                        'numero' => $row['numero_atencion'],
+                        'equipo' => $infoNorm['equipo_descripcion'],
+                        'cliente' => $infoNorm['cliente_nombre'],
+                        'tipo_origen' => $infoNorm['tipo_origen'],
+                        'inicio' => $row['fecha_referencia'],
+                        'es_pendiente' => true,
+                        'es_colaboracion' => $esColab,
+                        'rol_intervencion' => $rolIntervencion
+                    ];
+                }
             }
         }
     }

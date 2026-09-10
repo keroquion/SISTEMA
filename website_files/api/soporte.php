@@ -283,13 +283,16 @@ switch ($action) {
         }
         // Fechas automaticas por cambio de estado
         if (isset($data["estado"])) {
-            if ($data["estado"] === "ENTREGADO") {
+            $nuevoEstado = trim($data["estado"]);
+            if (in_array($nuevoEstado, ["ENTREGADO", "LISTO_PARA_RECOGER", "COMPLETADO", "LISTO_PARA_ENTREGA"])) {
                 $fields[] = "fecha_entrega=NOW()";
-                // Registrar quien cobro
-                $cobrado_por = (int)($_SESSION['user_id'] ?? 0);
-                if ($cobrado_por) { $fields[] = "cobrado_por=$cobrado_por"; }
+                if ($nuevoEstado === "ENTREGADO") {
+                    // Registrar quien cobro
+                    $cobrado_por = (int)($_SESSION['user_id'] ?? 0);
+                    if ($cobrado_por) { $fields[] = "cobrado_por=$cobrado_por"; }
+                }
             }
-            if ($data["estado"] === "ESPERANDO_REPUESTO" && $ant["estado"] !== "ESPERANDO_REPUESTO") {
+            if ($nuevoEstado === "ESPERANDO_REPUESTO" && ($ant["estado"] ?? '') !== "ESPERANDO_REPUESTO") {
                 $fields[] = "fecha_pedido_repuesto=NOW()";
             }
         }

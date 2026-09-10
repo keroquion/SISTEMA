@@ -28,6 +28,26 @@ Para garantizar trazabilidad absoluta, auditoría técnica rigurosa y claridad e
 - **`[Security]`**: Implementación de un pipeline de Integración y Despliegue Continuo (CI/CD) automatizado desde GitHub hacia el hosting de producción (cPanel/Apache) para reemplazar el traspaso manual por FTP y mitigar el riesgo de desincronización o error humano en despliegues.
 - **`[Changed]`**: Coordinación en el panel de control del servidor (cPanel) para renombrar la base de datos de `petumjvq_pruebas` a un identificador formal de producción (ej. `petumjvq_sistema`), actualizando la variable de entorno en el servidor de forma segura.
 
+## [1.5.2] - Septiembre 2026
+
+### Auditoría y Rendimiento Técnico Multi-Asignación y Erradicación de Tiempos Sintéticos Proyectados
+*Módulos impactados:* `website_files/api/desempeno.php`, `website_files/api/soporte.php`, `website_files/mis_ordenes.html`, `website_files/sw.js`.
+
+> **Causa Raíz ("El Por Qué"):** Se identificaron dos discrepancias en la auditoría de tiempos y rendimientos técnicos:
+> 1. Al completar tickets casi instantáneos (creación y cierre en <1 minuto, e.g. `TAR-2026-037`), el sistema proyectaba fechas de entrega futuras si `fecha_entrega` no se sobrescribía, o aplicaba tiempos por defecto de 5400s (1h 30m) cuando el intervalo de tiempo era nulo o inconsistente, inflando artificialmente el tiempo de trabajo del técnico. Se erradicó todo tiempo artificial y se fijó `st.fecha_entrega = NOW()` forzoso en `api/soporte.php` al transicionar a estados terminados, marcando duraciones <60s como `Instantáneo (<1m)`.
+> 2. En tickets y tareas compartidas asignadas a múltiples técnicos (`st.tecnicos_adicionales`, e.g. `TAR-2026-038`), la API de desempeño solo filtraba por `st.tecnico_id IS NOT NULL`, excluyendo las tareas asignadas en equipo si el técnico titular era nulo, y privando a los colaboradores de reflejar su estado en vivo (`TRABAJANDO`). Asimismo, el tablero Kanban en `mis_ordenes.html` mostraba erróneamente "Técnico: Sin asignar" seguido del listado de nombres, lo cual fue unificado bajo el rótulo distintivo "Equipo: [Nombres]".
+
+### Fixed & Changed
+- **`website_files/api/soporte.php`**:
+  - **Fijación Real de Entrega (`fecha_entrega = NOW()`)**: En la acción `actualizar`, al cambiar a estados finales (`ENTREGADO`, `LISTO_PARA_RECOGER`, `COMPLETADO`, `LISTO_PARA_ENTREGA`), se sobrescribe automáticamente `fecha_entrega = NOW()`, erradicando cualquier fecha proyectada en el futuro y garantizando marcas de tiempo exactas.
+- **`website_files/api/desempeno.php`**:
+  - **Soporte Completo de Colaboradores (`tecnicos_adicionales`)**: Implementación del helper `$obtenerTecnicosDeFila` para atribuir tickets, eventos de historial y estado en vivo tanto al técnico titular (`Titular`) como a los técnicos secundarios (`Colaborador` o `Equipo` si titular es nulo), permitiendo que colaboradores visualicen tareas activas (e.g. `TAR-2026-038`) en estado `TRABAJANDO`.
+  - **Erradicación de Tiempos Sintéticos**: Eliminación de fallbacks arbitrarios de 3600s/5400s. Toda tarea completada en menos de 60 segundos se cataloga con `minutos_reales = 0` y `es_instantaneo = true` (`Instantáneo (<1m)`), reflejando con fidelidad la productividad en taller.
+- **`website_files/mis_ordenes.html`**:
+  - **Rótulo de Equipo en Tarjetas Kanban**: Ajuste en la renderización de tarjetas Kanban para mostrar `<i class="ph-bold ph-users"></i> Equipo: [Nombres]` cuando un ticket no tiene técnico titular pero cuenta con técnicos adicionales asignados.
+- **`website_files/sw.js`**:
+  - **Incremento de Caché PWA a `petulap-v22`**: Renovación de caché para garantizar la propagación instantánea de los cambios a todos los clientes y dispositivos móviles de los técnicos.
+
 ## [1.5.1] - Septiembre 2026
 
 ### Plataforma Ejecutiva de Historial de Tickets Entregados y Finalizados Multiorigen

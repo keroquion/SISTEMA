@@ -1,6 +1,6 @@
-// Service Worker - Petulap PWA v21 (Historial Ejecutivo de Tickets Entregados y Finalizados Multiorigen)
+// Service Worker - Petulap PWA v22 (Auditoria de Rendimiento Multi-Asignacion y Erradicacion de Tiempos Sinteticos)
  
-var CACHE_NAME = 'petulap-v21';
+var CACHE_NAME = 'petulap-v22';
 var ASSETS = [
     './',
     'index.html',

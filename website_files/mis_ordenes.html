@@ -1200,7 +1200,7 @@ Gracias por confiar en nosotros! 🙌`);
       <div class="tkt-title" style="font-size: 13.5px; font-weight: 700; color: var(--text-primary); margin-bottom: 6px; line-height: 1.35; word-break: break-word; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;" title="${equipoTitulo}">${equipoTitulo}</div>
       <p style="font-size: 11.5px; color: var(--text-secondary); margin: 4px 0; line-height: 1.4; word-break: break-word; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;" title="${motivoTexto}"><b style="color:var(--text-primary);">${esTarea?'Desc:':'Motivo:'}</b> ${motivoTexto}</p>
       <p style="font-size: 11.5px; color: var(--text-secondary); margin: 4px 0; word-break: break-word;" title="${clienteTexto}"><b style="color:var(--text-primary);">${esTarea?'Asignado a:':'Cliente:'}</b> ${clienteTexto}</p>
-      <p style="font-size: 11.5px; color: var(--text-secondary); margin: 4px 0; display:flex; align-items:center; gap:5px; word-break: break-word;"><i class="ph-bold ph-user" style="color:var(--text-muted); flex-shrink:0;"></i> <b style="color:var(--text-primary);">Técnico:</b> <span>${t.tecnico_nombre||'Sin asignar'}</span></p>`;
+`;
 
       if (t.tecnicos_adicionales && listaTecnicos.length > 0) {
           const ids = t.tecnicos_adicionales.split(',');
@@ -1208,7 +1208,14 @@ Gracias por confiar en nosotros! 🙌`);
               const tec = listaTecnicos.find(x => x.id == id);
               return tec ? (tec.nombre + ' ' + (tec.apellido||'')).trim() : 'Tec. ' + id;
           });
-          html += `<div style="font-size: 10.5px; color: var(--text-muted); margin-top: 2px; padding-left: 18px; margin-bottom: 4px;"><i class="ph-bold ph-users" style="margin-right:2px"></i> + ${nombres.join(', ')}</div>`;
+          if (!t.tecnico_id || !t.tecnico_nombre || t.tecnico_nombre === 'Sin asignar') {
+              html += `<p style="font-size: 11.5px; color: var(--text-secondary); margin: 4px 0; display:flex; align-items:center; gap:5px; word-break: break-word;"><i class="ph-bold ph-users" style="color:var(--text-muted); flex-shrink:0;"></i> <b style="color:var(--text-primary);">Equipo:</b> <span>${nombres.join(', ')}</span></p>`;
+          } else {
+              html += `<p style="font-size: 11.5px; color: var(--text-secondary); margin: 4px 0; display:flex; align-items:center; gap:5px; word-break: break-word;"><i class="ph-bold ph-user" style="color:var(--text-muted); flex-shrink:0;"></i> <b style="color:var(--text-primary);">Técnico:</b> <span>${t.tecnico_nombre}</span></p>`;
+              html += `<div style="font-size: 10.5px; color: var(--text-muted); margin-top: 2px; padding-left: 18px; margin-bottom: 4px;"><i class="ph-bold ph-users" style="margin-right:2px"></i> + ${nombres.join(', ')}</div>`;
+          }
+      } else {
+          html += `<p style="font-size: 11.5px; color: var(--text-secondary); margin: 4px 0; display:flex; align-items:center; gap:5px; word-break: break-word;"><i class="ph-bold ph-user" style="color:var(--text-muted); flex-shrink:0;"></i> <b style="color:var(--text-primary);">Técnico:</b> <span>${t.tecnico_nombre||'Sin asignar'}</span></p>`;
       }
 
       // Timeline SLA bar
