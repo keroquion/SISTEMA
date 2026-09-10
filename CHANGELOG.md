@@ -30,6 +30,25 @@ Para garantizar trazabilidad absoluta, auditoría técnica rigurosa y claridad e
 - **`[Security]`**: Implementación de un pipeline de Integración y Despliegue Continuo (CI/CD) automatizado desde GitHub hacia el hosting de producción (cPanel/Apache) para reemplazar el traspaso manual por FTP y mitigar el riesgo de desincronización o error humano en despliegues.
 - **`[Changed]`**: Coordinación en el panel de control del servidor (cPanel) para renombrar la base de datos de `petumjvq_pruebas` a un identificador formal de producción (ej. `petumjvq_sistema`), actualizando la variable de entorno en el servidor de forma segura.
 
+## [1.5.3] - Septiembre 2026
+
+### Identidad Oficial de Marca, Favicon y Rediseño Integral del Portal Público de Seguimiento
+*Módulos impactados:* `website_files/consulta.html`, `website_files/css/dashboard.css`, `website_files/*.html` (22 pantallas internas), `website_files/sw.js`.
+
+> **Causa Raíz ("El Por Qué"):** La plataforma no contaba con el logotipo oficial de Petulap S.A.C. ni favicon en ninguna de sus pantallas, empleando marcadores genéricos de texto (`<div class="logo-icon">P</div><span>PETULAP S.A.C.</span>`). Esta carencia de identidad visual generaba desconfianza e incertidumbre en clientes externos que accedían al portal de seguimiento desde enlaces de WhatsApp. Asimismo, la pantalla pública `consulta.html` presentaba un diseño rudimentario, carecía de un stepper de 5 pasos alineado al ciclo real de taller (`PENDIENTE`, `EN_DIAGNOSTICO`, `EN_REPARACION`/`ESPERANDO_REPUESTO`, `LISTO_PARA_RECOGER`, `ENTREGADO`), no brindaba información de confianza (sedes en Yanahuara y Cayma, horarios de atención, garantía y medios de pago) ni enlaces directos de llamada a la acción (CTA) a WhatsApp para coordinar recojo. Adicionalmente, contenía artefactos residuales de código interno (`.fab-chat`, `dashboard.js`, `</main>`) no aptos para una pantalla pública.
+
+### Added
+- **Identidad Oficial de Marca y Favicon Global**: Incorporación de los activos oficiales `img/logo-petulap.png` y `img/favicon-petulap.png`, implementando favicon y apple-touch-icon en todas las pantallas del sistema interno y portal público.
+- **Sección Informativa del Taller en `consulta.html`**: Despliegue de 4 tarjetas institucionales detallando horarios de atención (Yanahuara y Cayma), direcciones físicas de ambas sedes, condiciones de garantía (6 meses en laptops + 3 años de soporte técnico), medios de pago (efectivo, transferencias, tarjetas, boleta y factura) y canales oficiales de contacto.
+- **Botón Flotante y CTA WhatsApp en `consulta.html`**: Incorporación de botón flotante `.fab-whatsapp` accesible y de banner condicional para equipos en estado `LISTO_PARA_RECOGER` con enlace directo preconfigurado a WhatsApp (+51 983 396 137).
+- **Precaché PWA v23**: Registro de `img/logo-petulap.png`, `img/favicon-petulap.png` y `consulta.html` dentro de `ASSETS` en el Service Worker.
+
+### Changed
+- **`website_files/consulta.html`**: Rediseño integral del portal público de clientes con estética premium SaaS, badges de confianza en el hero, formulario de búsqueda con inputs asistidos para Ticket y DNI, stepper animado de 5 pasos con pulsos CSS y tarjetas de información técnica de taller.
+- **`website_files/css/dashboard.css`**: Incorporación de reglas semánticas para `.sidebar-logo` con filtro adaptativo para modo claro y oscuro (`filter: brightness(0) invert(1)` en dark mode y sin filtro en light mode), asegurando compatibilidad en sidebar colapsado (ancho 80px).
+- **Pantallas Internas (`website_files/*.html`)**: Reemplazo en lote del logo tipográfico por la imagen oficial `.sidebar-logo` tanto en el header móvil como en la barra lateral en los 20 módulos operativos del sistema (`soporte.html`, `mis_ordenes.html`, `desempeno_tecnicos.html`, etc.).
+- **`website_files/sw.js`**: Incremento de caché PWA a `petulap-v23` para renovación inmediata de activos en dispositivos móviles y de escritorio.
+
 ## [1.5.2] - Septiembre 2026
 
 ### Auditoría y Rendimiento Técnico Multi-Asignación y Erradicación de Tiempos Sintéticos Proyectados

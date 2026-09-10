@@ -1,14 +1,17 @@
-// Service Worker - Petulap PWA v22 (Auditoria de Rendimiento Multi-Asignacion y Erradicacion de Tiempos Sinteticos)
+// Service Worker - Petulap PWA v23 (Logo oficial, favicon y rediseño portal consulta.html)
  
-var CACHE_NAME = 'petulap-v22';
+var CACHE_NAME = 'petulap-v23';
 var ASSETS = [
     './',
     'index.html',
     'login.html',
+    'consulta.html',
     'css/tokens.css',
     'css/styles.css',
     'css/dashboard.css',
     'css/missing.css',
+    'img/logo-petulap.png',
+    'img/favicon-petulap.png',
     'icon-192.png',
     'icon-512.png',
     'manifest.json'

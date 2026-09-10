@@ -1,5 +1,7 @@
 import ftplib, os
 
+BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+
 FTP_HOST = 'ftp.petulap.store'
 FTP_USER = 'petumjvq'
 FTP_PASS = 'HjBI32sh5kAb'
@@ -36,10 +38,11 @@ html_files = [
     'tecnicos.html',
     'turnos.html',
     'login.html',
+    'consulta.html',
     'sw.js',
     '.htaccess'
 ]
-root_uploads = [(os.path.join('website_files', f), f) for f in html_files]
+root_uploads = [(os.path.join(BASE_DIR, 'website_files', f), f) for f in html_files]
 
 ftp.cwd('public_html')
 print('\n--- 1. Subiendo archivos principales a public_html/ ---')
@@ -55,19 +58,38 @@ for local_file, remote_file in root_uploads:
 # 2. Subir dashboard.js a public_html/js/ y dashboard.css a public_html/css/
 print('\n--- 2. Subiendo js/dashboard.js y css/dashboard.css ---')
 ftp.cwd('js')
-with open('website_files/js/dashboard.js', 'rb') as f:
+with open(os.path.join(BASE_DIR, 'website_files', 'js', 'dashboard.js'), 'rb') as f:
     ftp.storbinary('STOR dashboard.js', f)
-size_dash = os.path.getsize('website_files/js/dashboard.js')
+size_dash = os.path.getsize(os.path.join(BASE_DIR, 'website_files', 'js', 'dashboard.js'))
 print(f'  [SUBIDO OK] js/dashboard.js ({size_dash} bytes)')
 
 ftp.cwd('../css')
 for css_file in ['styles.css', 'tokens.css', 'dashboard.css', 'missing.css']:
-    local_css = os.path.join('website_files', 'css', css_file)
+    local_css = os.path.join(BASE_DIR, 'website_files', 'css', css_file)
     if os.path.exists(local_css):
         with open(local_css, 'rb') as f:
             ftp.storbinary(f'STOR {css_file}', f)
         print(f'  [SUBIDO OK] css/{css_file} ({os.path.getsize(local_css)} bytes)')
 ftp.cwd('../js')
+# 2b. Subir imagenes oficiales a public_html/img/
+print('\n--- 2b. Subiendo imagenes a public_html/img/ ---')
+try:
+    ftp.cwd('..')
+    dirs = ftp.nlst()
+    if 'img' not in dirs:
+        ftp.mkd('img')
+        print('  [CREADO REMOTO OK] public_html/img/')
+    ftp.cwd('img')
+    for img_file in ['logo-petulap.png', 'favicon-petulap.png']:
+        local_img = os.path.join(BASE_DIR, 'website_files', 'img', img_file)
+        if os.path.exists(local_img):
+            with open(local_img, 'rb') as f:
+                ftp.storbinary(f'STOR {img_file}', f)
+            print(f'  [SUBIDO OK] img/{img_file} ({os.path.getsize(local_img)} bytes)')
+    ftp.cwd('..')
+except Exception as e:
+    print('  [ERROR SUBIENDO IMG]:', e)
+
 
 # 3. Eliminar navbar.js de public_html/js/ (si existiera)
 print('\n--- 3. Verificando js/navbar.js en public_html/js/ ---')
@@ -83,7 +105,7 @@ else:
 
 # 4. Subir endpoints optimizados a public_html/api/
 print('\n--- 4. Subiendo endpoints optimizados de escalabilidad a public_html/api/ ---')
-ftp.cwd('../api')
+ftp.cwd('/public_html/api')
 
 api_files = [
     'auth.php',
@@ -105,7 +127,7 @@ api_files = [
 ]
 
 for fname in api_files:
-    local_path = os.path.join('website_files', 'api', fname)
+    local_path = os.path.join(BASE_DIR, 'website_files', 'api', fname)
     if os.path.exists(local_path):
         with open(local_path, 'rb') as f:
             ftp.storbinary(f'STOR {fname}', f)
@@ -116,7 +138,7 @@ for fname in api_files:
 
 # 5. Eliminar schema_dump.php y update_roles.php de public_html/ (raiz)
 print('\n--- 5. Verificando scripts vulnerables en public_html/ ---')
-ftp.cwd('..')
+ftp.cwd('/public_html')
 root_list = ftp.nlst()
 for fname in ['schema_dump.php', 'update_roles.php']:
     if fname in root_list:

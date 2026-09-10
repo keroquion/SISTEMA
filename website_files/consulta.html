@@ -1,34 +1,21 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Seguimiento de Servicio - Petulap</title>
-<link rel="stylesheet" href="css/tokens.css?v=1">
-    <link rel="stylesheet" href="css/styles.css?v=3">
-
-
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#F8FAFC">
-<script>
-if ("serviceWorker" in navigator) { window.addEventListener("load", () => { navigator.serviceWorker.register("sw.js").then(r => console.log("SW ok")).catch(e => console.log("SW fail", e)); }); }
-</script>
-
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <title>Seguimiento de Servicio — PetuLap</title>
     
-    <!-- Icons -->
-    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <!-- Favicon Oficial -->
+    <link rel="icon" type="image/png" href="img/favicon-petulap.png">
+    <link rel="apple-touch-icon" href="img/favicon-petulap.png">
     
-    <!-- Dashboard Styles -->
-    <link rel="stylesheet" href="css/dashboard.css?v=3">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#2563EB">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="PetuLap">
 
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<link rel="apple-touch-icon" href="icon.jpg">
-
+    <!-- Script Anti-Flicker de Tema -->
     <script>
       (function(){
         if(localStorage.getItem('petulap-theme') === 'dark') {
@@ -36,327 +23,1239 @@ if ("serviceWorker" in navigator) { window.addEventListener("load", () => { navi
         }
       })();
     </script>
+
+    <!-- Google Fonts Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <!-- Jerarquia de Estilos Estricta -->
+    <link rel="stylesheet" href="css/tokens.css?v=1">
+    <link rel="stylesheet" href="css/styles.css?v=3">
+    <link rel="stylesheet" href="css/dashboard.css?v=3">
+
+    <script>
+    if ("serviceWorker" in navigator) { 
+      window.addEventListener("load", () => { 
+        navigator.serviceWorker.register("sw.js").then(r => console.log("SW ok")).catch(e => console.log("SW fail", e)); 
+      }); 
+    }
+    </script>
+
     <style>
-      /* CSS para Portal Publico y Stepper */
+      /* ==========================================================================
+         Portal Publico de Seguimiento de Clientes - PetuLap SST (v1.5.3)
+         ========================================================================== */
+      :root {
+        --portal-max-w: 780px;
+      }
+
       body {
-        background-color: var(--bg-page, #F4F7FE);
-        font-family: 'Inter', sans-serif;
+        background-color: var(--bg-page, #F3F6F9);
+        color: var(--text-primary, #1E293B);
+        font-family: 'Inter', system-ui, -apple-system, sans-serif;
         margin: 0;
         padding: 0;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        line-height: 1.5;
+        -webkit-font-smoothing: antialiased;
       }
-      .card {
-        background: #fff;
-        border-radius: 12px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-        padding: 30px;
-        margin-bottom: 20px;
+
+      /* Header Fijo con Logo Oficial */
+      .portal-header {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        background: var(--bg-surface-glass, rgba(255, 255, 255, 0.92));
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border-bottom: 1px solid var(--border-default, rgba(15, 23, 42, 0.1));
+        padding: 12px 20px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
       }
-      .form-control {
-        width: 100%;
-        padding: 12px 15px;
-        border: 1px solid #E2E8F0;
+
+      .portal-header-content {
+        max-width: var(--portal-max-w);
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .portal-logo-link {
+        display: flex;
+        align-items: center;
+        text-decoration: none;
+        gap: 12px;
+      }
+
+      .portal-logo {
+        height: 38px;
+        width: auto;
+        object-fit: contain;
+      }
+
+      [data-theme="dark"] .portal-logo {
+        filter: brightness(0) invert(1);
+      }
+
+      .portal-header-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.78rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.6px;
+        padding: 5px 12px;
+        border-radius: 9999px;
+        background: var(--bg-brand-subtle, #EFF6FF);
+        color: var(--color-brand, #2563EB);
+        border: 1px solid rgba(37, 99, 235, 0.2);
+      }
+
+      [data-theme="dark"] .portal-header-tag {
+        background: rgba(37, 99, 235, 0.15);
+        color: #93C5FD;
+      }
+
+      .portal-theme-btn {
+        background: none;
+        border: none;
+        font-size: 20px;
+        cursor: pointer;
+        color: var(--text-secondary, #64748B);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
         border-radius: 8px;
-        margin-bottom: 15px;
-        font-size: 1rem;
+        transition: background 0.2s, color 0.2s;
+      }
+
+      .portal-theme-btn:hover {
+        background: var(--bg-surface-hover, #F8FAFC);
+        color: var(--color-brand, #2563EB);
+      }
+
+      /* Contenedor Principal */
+      .portal-main {
+        flex: 1;
+        width: 100%;
+        max-width: var(--portal-max-w);
+        margin: 0 auto;
+        padding: 24px 18px 50px;
         box-sizing: border-box;
       }
-      .form-control:focus {
-        outline: none;
-        border-color: var(--color-brand, #3b82f6);
-        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+
+      /* Hero Section */
+      .portal-hero {
+        text-align: center;
+        margin-bottom: 26px;
       }
-      .btn-primary {
-        background: var(--color-brand, #3b82f6);
-        color: white;
-        border: none;
-        padding: 12px 20px;
-        border-radius: 8px;
-        cursor: pointer;
+
+      .hero-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.8rem;
         font-weight: 600;
+        color: var(--color-brand, #2563EB);
+        background: var(--bg-brand-subtle, #EFF6FF);
+        padding: 4px 12px;
+        border-radius: 20px;
+        margin-bottom: 12px;
+      }
+
+      .portal-hero h1 {
+        font-size: 1.85rem;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+        margin: 0 0 10px 0;
+        color: var(--text-primary, #0F172A);
+      }
+
+      .hero-subtitle {
+        color: var(--text-secondary, #64748B);
+        font-size: 0.98rem;
+        margin: 0 auto 18px;
+        max-width: 520px;
+      }
+
+      .trust-badges {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        margin-bottom: 8px;
+      }
+
+      .trust-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        background: var(--bg-surface, #FFFFFF);
+        color: var(--text-secondary, #475569);
+        padding: 6px 12px;
+        border-radius: 8px;
+        border: 1px solid var(--border-default, rgba(15, 23, 42, 0.08));
+        box-shadow: var(--shadow-sm, 0 1px 3px rgba(0,0,0,0.03));
+      }
+
+      .trust-badge i {
+        color: var(--color-success, #10B981);
+        font-size: 1rem;
+      }
+
+      /* Tarjeta de Formulario y Resultado */
+      .portal-card {
+        background: var(--bg-surface, #FFFFFF);
+        border: 1px solid var(--border-default, rgba(15, 23, 42, 0.12));
+        border-radius: 16px;
+        box-shadow: var(--shadow-card, 0 10px 30px rgba(0, 0, 0, 0.06));
+        padding: 28px 24px;
+        margin-bottom: 28px;
+        transition: box-shadow 0.2s ease;
+      }
+
+      .portal-form-group {
+        margin-bottom: 18px;
+        text-align: left;
+      }
+
+      .portal-label {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.88rem;
+        font-weight: 600;
+        color: var(--text-primary, #1E293B);
+        margin-bottom: 8px;
+      }
+
+      .portal-input-wrapper {
+        position: relative;
+        display: flex;
+        align-items: center;
+      }
+
+      .portal-input-wrapper i {
+        position: absolute;
+        left: 14px;
+        font-size: 1.15rem;
+        color: var(--text-muted, #94A3B8);
+        pointer-events: none;
+      }
+
+      .portal-input {
+        width: 100%;
+        padding: 13px 14px 13px 44px;
+        font-size: 0.96rem;
+        font-family: inherit;
+        background: var(--bg-page, #F8FAFC);
+        color: var(--text-primary, #1E293B);
+        border: 1.5px solid var(--border-default, #E2E8F0);
+        border-radius: 10px;
+        box-sizing: border-box;
+        transition: all 0.2s ease;
+      }
+
+      .portal-input:focus {
+        outline: none;
+        background: var(--bg-surface, #FFFFFF);
+        border-color: var(--color-brand, #2563EB);
+        box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+      }
+
+      .portal-btn-submit {
+        background: var(--color-brand-gradient, linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%));
+        color: #FFFFFF;
+        border: none;
+        padding: 14px 24px;
+        border-radius: 10px;
+        cursor: pointer;
+        font-weight: 700;
+        font-size: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        width: 100%;
+        box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
+        transition: all 0.2s ease;
+        margin-top: 10px;
+      }
+
+      .portal-btn-submit:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 6px 18px rgba(37, 99, 235, 0.45);
+      }
+
+      .portal-btn-submit:active {
+        transform: translateY(0);
+      }
+
+      .portal-error-box {
+        display: none;
+        background: var(--bg-danger-subtle, #FFE4E6);
+        color: var(--text-danger, #BE123C);
+        border: 1px solid rgba(244, 63, 94, 0.3);
+        border-radius: 10px;
+        padding: 12px 16px;
+        margin-top: 16px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .form-helper-note {
+        text-align: center;
+        margin-top: 18px;
+        font-size: 0.85rem;
+        color: var(--text-secondary, #64748B);
+      }
+
+      .form-helper-note a {
+        color: var(--color-brand, #2563EB);
+        text-decoration: none;
+        font-weight: 600;
+      }
+
+      .form-helper-note a:hover {
+        text-decoration: underline;
+      }
+
+      /* Stepper de 5 Pasos Premium */
+      .stepper-5 {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        position: relative;
+        margin: 30px 0 35px;
+        padding: 0 10px;
+      }
+
+      .stepper-5::before {
+        content: '';
+        position: absolute;
+        top: 20px;
+        left: 36px;
+        right: 36px;
+        height: 3px;
+        background: var(--border-default, #E2E8F0);
+        z-index: 1;
+      }
+
+      .step-item {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        flex: 1;
+      }
+
+      .step-icon-wrap {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        background: var(--bg-surface, #FFFFFF);
+        border: 2px solid var(--border-default, #CBD5E1);
+        color: var(--text-muted, #94A3B8);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.15rem;
+        margin-bottom: 8px;
+        transition: all 0.3s ease;
+      }
+
+      .step-label {
+        font-size: 0.78rem;
+        font-weight: 600;
+        color: var(--text-secondary, #64748B);
+        max-width: 85px;
+        line-height: 1.25;
+      }
+
+      /* Estado completado: Verde */
+      .step-item.completed .step-icon-wrap {
+        background: var(--color-success, #10B981);
+        border-color: var(--color-success, #10B981);
+        color: #FFFFFF;
+        box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+      }
+
+      .step-item.completed .step-label {
+        color: var(--text-success, #047857);
+      }
+
+      /* Estado activo: Azul con pulso */
+      .step-item.active .step-icon-wrap {
+        background: var(--color-brand, #2563EB);
+        border-color: var(--color-brand, #2563EB);
+        color: #FFFFFF;
+        box-shadow: 0 0 0 5px rgba(37, 99, 235, 0.25);
+        animation: pulse-ring 2s infinite;
+      }
+
+      .step-item.active .step-label {
+        color: var(--color-brand, #2563EB);
+        font-weight: 700;
+      }
+
+      @keyframes pulse-ring {
+        0% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.4); }
+        70% { box-shadow: 0 0 0 8px rgba(37, 99, 235, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0); }
+      }
+
+      /* Tarjeta de Resultado */
+      .result-header {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        border-bottom: 1px solid var(--border-default, #E2E8F0);
+        padding-bottom: 16px;
+        margin-bottom: 22px;
+      }
+
+      .result-ticket-title {
+        font-size: 1.35rem;
+        font-weight: 800;
+        color: var(--color-brand, #2563EB);
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .status-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 14px;
+        border-radius: 9999px;
+        font-size: 0.85rem;
+        font-weight: 700;
+        letter-spacing: 0.3px;
+        text-transform: uppercase;
+      }
+
+      .pill-yellow { background: var(--bg-warning-subtle, #FEF3C7); color: var(--text-warning, #B45309); border: 1px solid rgba(245, 158, 11, 0.25); }
+      .pill-blue   { background: var(--bg-brand-subtle, #EFF6FF);   color: var(--color-brand, #1D4ED8); border: 1px solid rgba(37, 99, 235, 0.25); }
+      .pill-orange { background: #FFEDD5;                           color: #C2410C;                     border: 1px solid rgba(249, 115, 22, 0.25); }
+      .pill-green  { background: var(--bg-success-subtle, #D1FAE5); color: var(--text-success, #047857); border: 1px solid rgba(16, 185, 129, 0.25); }
+      .pill-red    { background: var(--bg-danger-subtle, #FFE4E6);  color: var(--text-danger, #BE123C);  border: 1px solid rgba(244, 63, 94, 0.25); }
+
+      /* Grilla de Datos */
+      .details-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 14px;
+        margin-bottom: 20px;
+      }
+
+      .detail-item {
+        background: var(--bg-page, #F8FAFC);
+        border: 1px solid var(--border-default, #E2E8F0);
+        border-radius: 10px;
+        padding: 12px 14px;
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+      }
+
+      .detail-icon {
+        font-size: 1.3rem;
+        color: var(--color-brand, #2563EB);
+        background: var(--bg-surface, #FFFFFF);
+        padding: 8px;
+        border-radius: 8px;
+        box-shadow: var(--shadow-sm, 0 1px 3px rgba(0,0,0,0.05));
+      }
+
+      .detail-content {
+        flex: 1;
+      }
+
+      .detail-label {
+        font-size: 0.76rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+        color: var(--text-secondary, #64748B);
+        margin-bottom: 2px;
+      }
+
+      .detail-value {
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: var(--text-primary, #1E293B);
+        word-break: break-word;
+      }
+
+      /* Bloque Tecnico */
+      .tech-notes-card {
+        background: var(--bg-surface-hover, #F8FAFC);
+        border: 1.5px dashed var(--color-brand, #3B82F6);
+        border-radius: 12px;
+        padding: 16px 18px;
+        margin-bottom: 18px;
+      }
+
+      .tech-notes-title {
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: var(--color-brand, #2563EB);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .tech-notes-item {
+        font-size: 0.92rem;
+        margin-bottom: 8px;
+        line-height: 1.45;
+      }
+
+      .badge-garantia {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: var(--bg-success-subtle, #D1FAE5);
+        color: var(--text-success, #047857);
+        font-size: 0.85rem;
+        font-weight: 700;
+        padding: 6px 12px;
+        border-radius: 8px;
+        border: 1px solid rgba(16, 185, 129, 0.3);
+        margin-bottom: 14px;
+      }
+
+      /* Banner y CTA Listo para Recoger */
+      .pickup-alert-box {
+        background: linear-gradient(135deg, rgba(16, 185, 129, 0.12) 0%, rgba(5, 150, 105, 0.08) 100%);
+        border: 1.5px solid var(--color-success, #10B981);
+        border-radius: 12px;
+        padding: 20px;
+        text-align: center;
+        margin-top: 20px;
+      }
+
+      .pickup-alert-title {
+        font-size: 1.25rem;
+        font-weight: 800;
+        color: #065F46;
+        margin: 0 0 6px 0;
         display: flex;
         align-items: center;
         justify-content: center;
         gap: 8px;
-        width: 100%;
+      }
+
+      .pickup-alert-desc {
+        color: #047857;
+        font-size: 0.92rem;
+        margin: 0 0 16px 0;
+      }
+
+      .btn-whatsapp-cta {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        background: #25D366;
+        color: #FFFFFF;
+        text-decoration: none;
+        font-weight: 700;
         font-size: 1rem;
-        transition: background 0.2s;
+        padding: 12px 24px;
+        border-radius: 10px;
+        box-shadow: 0 4px 14px rgba(37, 211, 102, 0.35);
+        transition: all 0.2s ease;
       }
-      .btn-primary:hover {
-        background: #2563eb;
+
+      .btn-whatsapp-cta:hover {
+        background: #20BA5A;
+        transform: translateY(-1px);
+        box-shadow: 0 6px 18px rgba(37, 211, 102, 0.45);
       }
-      .error {
-        color: #ef4444;
+
+      .btn-back {
+        background: none;
+        border: 1px solid var(--border-default, #CBD5E1);
+        color: var(--text-secondary, #64748B);
+        border-radius: 8px;
+        padding: 8px 16px;
+        font-size: 0.88rem;
+        font-weight: 600;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        margin-bottom: 18px;
+        transition: all 0.2s ease;
+      }
+
+      .btn-back:hover {
+        background: var(--bg-surface-hover, #F8FAFC);
+        color: var(--text-primary, #1E293B);
+      }
+
+      /* Seccion Informativa del Taller */
+      .workshop-section {
         margin-top: 10px;
-        font-size: 0.9rem;
-        display: none;
       }
-      /* Stepper Styles */
-      .stepper {
-        display: flex;
-        justify-content: space-between;
-        margin: 40px 0;
-        position: relative;
-      }
-      .stepper::before {
-        content: '';
-        position: absolute;
-        top: 16px;
-        left: 0;
-        right: 0;
-        height: 2px;
-        background: #E2E8F0;
-        z-index: 1;
-      }
-      .stepper .step {
-        position: relative;
-        z-index: 2;
+
+      .workshop-section-title {
+        font-size: 1.15rem;
+        font-weight: 700;
+        color: var(--text-primary, #1E293B);
+        margin: 0 0 16px 0;
         text-align: center;
-        flex: 1;
-      }
-      .stepper .circle {
-        width: 34px;
-        height: 34px;
-        background: #fff;
-        border: 2px solid #E2E8F0;
-        border-radius: 50%;
-        color: #64748B;
         display: flex;
         align-items: center;
         justify-content: center;
-        margin: 0 auto 8px auto;
-        font-weight: bold;
-        font-size: 0.9rem;
-        transition: all 0.3s ease;
+        gap: 8px;
       }
-      .stepper .step.active .circle {
-        background: var(--color-brand, #3b82f6);
-        border-color: var(--color-brand, #3b82f6);
-        color: #fff;
-        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+
+      .workshop-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
       }
-      .stepper .step.completed .circle {
-        background: var(--color-success, #10b981);
-        border-color: var(--color-success, #10b981);
-        color: #fff;
+
+      .info-card {
+        background: var(--bg-surface, #FFFFFF);
+        border: 1px solid var(--border-default, rgba(15, 23, 42, 0.1));
+        border-radius: 14px;
+        padding: 18px;
+        box-shadow: var(--shadow-sm, 0 2px 6px rgba(0,0,0,0.03));
       }
-      .stepper .step-label {
-        font-size: 0.8rem;
-        color: #64748B;
+
+      .info-card-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 700;
+        font-size: 0.95rem;
+        color: var(--text-primary, #1E293B);
+        margin-bottom: 12px;
       }
-      .stepper .step.active .step-label {
-        color: #1e293b;
+
+      .info-card-header i {
+        font-size: 1.25rem;
+        color: var(--color-brand, #2563EB);
+        background: var(--bg-brand-subtle, #EFF6FF);
+        padding: 6px;
+        border-radius: 8px;
+      }
+
+      .info-card-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        font-size: 0.88rem;
+        color: var(--text-secondary, #475569);
+      }
+
+      .info-card-list li {
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+        margin-bottom: 8px;
+        line-height: 1.35;
+      }
+
+      .info-card-list li:last-child {
+        margin-bottom: 0;
+      }
+
+      .info-card-list li i {
+        color: var(--color-brand, #2563EB);
+        margin-top: 2px;
+        font-size: 0.95rem;
+        flex-shrink: 0;
+      }
+
+      .info-card-list a {
+        color: var(--color-brand, #2563EB);
+        text-decoration: none;
         font-weight: 600;
       }
-      .info-box {
-        background: #F8FAFC;
-        padding: 15px;
-        border-radius: 8px;
-        border: 1px solid #E2E8F0;
+
+      .info-card-list a:hover {
+        text-decoration: underline;
+      }
+
+      /* Boton Flotante WhatsApp */
+      .fab-whatsapp {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        z-index: 9999;
+        width: 58px;
+        height: 58px;
+        border-radius: 50%;
+        background-color: #25D366;
+        color: #FFFFFF;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 32px;
+        box-shadow: 0 4px 16px rgba(37, 211, 102, 0.4);
+        text-decoration: none;
+        transition: transform 0.25s ease, box-shadow 0.25s ease;
+      }
+
+      .fab-whatsapp:hover {
+        transform: scale(1.08);
+        box-shadow: 0 6px 22px rgba(37, 211, 102, 0.55);
+      }
+
+      /* Footer */
+      .portal-footer {
+        background: var(--bg-surface, #FFFFFF);
+        border-top: 1px solid var(--border-default, rgba(15, 23, 42, 0.1));
+        padding: 30px 20px;
+        text-align: center;
+        font-size: 0.86rem;
+        color: var(--text-muted, #94A3B8);
+        margin-top: auto;
+      }
+
+      .footer-logo {
+        height: 28px;
+        width: auto;
+        filter: grayscale(1);
+        opacity: 0.65;
+        margin-bottom: 12px;
+        object-fit: contain;
+      }
+
+      .portal-footer p {
+        margin: 6px 0;
+      }
+
+      .portal-footer a {
+        color: var(--text-secondary, #64748B);
+        text-decoration: none;
+        font-weight: 600;
+        transition: color 0.2s;
+      }
+
+      .portal-footer a:hover {
+        color: var(--color-brand, #2563EB);
+      }
+
+      /* Responsivo Mobile (<640px) */
+      @media (max-width: 640px) {
+        .portal-hero h1 { font-size: 1.5rem; }
+        .hero-subtitle { font-size: 0.9rem; }
+        .details-grid { grid-template-columns: 1fr; }
+        .workshop-grid { grid-template-columns: 1fr; }
+        
+        .stepper-5 {
+          padding: 0;
+          margin: 20px 0 25px;
+        }
+
+        .stepper-5::before {
+          left: 20px;
+          right: 20px;
+          top: 18px;
+        }
+
+        .step-icon-wrap {
+          width: 34px;
+          height: 34px;
+          font-size: 0.95rem;
+        }
+
+        .step-label {
+          font-size: 0.68rem;
+          max-width: 62px;
+        }
+
+        .portal-card {
+          padding: 20px 16px;
+        }
+
+        .fab-whatsapp {
+          bottom: 20px;
+          right: 20px;
+          width: 52px;
+          height: 52px;
+          font-size: 28px;
+        }
       }
     </style>
 </head>
 <body>
 
-<header style="background: var(--bg-surface); padding: 20px; text-align: center; border-bottom: 1px solid var(--border-default); margin-bottom: 30px;">
-  <h1 style="margin:0; color: var(--color-brand); font-size: 1.5rem; display: flex; align-items: center; justify-content: center; gap: 10px;">
-    <i class="ph-bold ph-wrench"></i> PETULAP
-  </h1>
-  <p style="margin: 5px 0 0 0; color: var(--text-secondary); font-size: 0.9rem;">Centro de Soporte Técnico Especializado</p>
-</header>
-
-<div class="container" style="max-width: 600px; margin: 0 auto; padding: 0 20px;">
-  <div class="card" id="search-box">
-    <h2 style="margin-top:0">Rastrea tu Servicio</h2>
-    <p style="margin-bottom:20px">Ingresa tus datos para conocer el estado actual de tu equipo en nuestro taller.</p>
-    
-    <input type="text" id="f-ticket" class="form-control" placeholder="N° de Ticket (Ej: ST-2026-001)" autofocus>
-    <input type="text" id="f-dni" class="form-control" placeholder="DNI del titular" onkeydown="if(event.key==='Enter') consultar()">
-    
-    <button onclick="consultar()" id="btn-consultar" class="btn-primary"><i class="ph ph-magnifying-glass"></i> Consultar Estado</button>
-    
-    <div id="msg-error" class="error"></div>
-  </div>
-
-  <div class="progress-container card" id="result-box" style="display:none">
-    <button onclick="volver()" style="width:auto; padding:8px 15px; margin-bottom:20px; background: none; border: 1px solid #ccc; border-radius: 6px; cursor: pointer;"><i class="ph ph-arrow-left"></i> Nueva Consulta</button>
-    
-    <h3 style="margin-top:0">Ticket: <span id="lbl-ticket" ></span></h3>
-    <p style="margin:0 0 5px 0"><b>Equipo:</b> <span id="lbl-equipo"></span></p>
-    <p style="margin:0 0 20px 0"><b>Cliente:</b> <span id="lbl-cliente"></span></p>
-
-    <!-- STEPPER -->
-    <div class="stepper">
-      <div class="step" id="step-1">
-        <div class="circle">1</div>
-        <span class="step-label">Recibido</span>
-      </div>
-      <div class="step" id="step-2">
-        <div class="circle">2</div>
-        <span class="step-label">Revision</span>
-      </div>
-      <div class="step" id="step-3">
-        <div class="circle">3</div>
-        <span class="step-label">Reparacion</span>
-      </div>
-      <div class="step" id="step-4">
-        <div class="circle">4</div>
-        <span class="step-label">Listo</span>
-      </div>
-    </div>
-
-    <!-- DETAILS -->
-    <div class="info-box">
-      <div><strong>Estado Actual:</strong> <span id="lbl-estado-txt" ></span></div>
-      <div style="margin-top:8px"><strong>Fecha de Ingreso:</strong> <span id="lbl-ingreso"></span></div>
-      <div style="margin-top:8px"><strong>Motivo:</strong> <span id="lbl-motivo"></span></div>
-      <div id="lbl-garantia"></div>
-      
-      <div id="box-tech-notes" style="margin-top:15px; padding-top:15px; display:none">
-        <div id="lbl-diagnostico" style="margin-bottom:10px"></div>
-        <div id="lbl-solucion"></div>
-      </div>
-    </div>
-    
-    <div id="box-recoger" style="margin-top:20px; padding:15px; border-radius:6px; text-align:center; display:none">
-      <h3 style="margin:0 0 10px 0">🎉 Tu equipo esta listo!</h3>
-      <p style="margin:0">Puedes pasar a recogerlo dentro de nuestros horarios de atencion.</p>
-    </div>
-    </div>
-</div>
-
-<footer style="text-align: center; margin-top: 40px; padding: 20px; color: var(--text-muted); font-size: 0.9rem;">
-  Dudas o consultas: <a href="https://wa.me/51936183039" target="_blank" style="color: var(--color-brand); text-decoration: none;">Escribenos al WhatsApp</a><br>
-  © 2026 Petulap. Todos los derechos reservados.
-</footer>
-
-<script src="js/sonidos.js"></script>
-<script>
-async function consultar() {
-  const tkt = document.getElementById('f-ticket').value.trim();
-  const dni = document.getElementById('f-dni').value.trim();
-  const err = document.getElementById('msg-error');
-  
-  if (!tkt) {
-    err.textContent = "Por favor, ingresa el numero de ticket.";
-    err.style.display = 'block';
-    return;
-  }
-  
-  document.getElementById('btn-consultar').textContent = 'Consultando...';
-  
-  // Si no hay DNI, lo intentamos sin validar
-  const url = dni 
-    ? `api/consulta.php?action=estado&ticket=${encodeURIComponent(tkt)}&dni=${encodeURIComponent(dni)}`
-    : `api/consulta.php?action=estado&ticket=${encodeURIComponent(tkt)}`;
-  const res = await fetch(url).then(r=>r.json());
-  
-  document.getElementById('btn-consultar').innerHTML = '<i class="ph ph-magnifying-glass"></i> Consultar Estado';
-  
-  if (!res.ok) {
-    err.textContent = res.msg;
-    err.style.display = 'block';
-  } else {
-    err.style.display = 'none';
-    mostrarResultados(res.data);
-  }
-}
-
-// Pre-rellenar desde URL al cargar
-window.addEventListener('DOMContentLoaded', () => {
-  const params = new URLSearchParams(window.location.search);
-  if (params.get('ticket')) {
-    document.getElementById('f-ticket').value = params.get('ticket');
-  }
-  if (params.get('dni')) {
-    document.getElementById('f-dni').value = params.get('dni');
-  }
-  // Si viene ticket en la URL, consultar automaticamente
-  if (params.get('ticket')) {
-    consultar();
-  }
-});
-
-function mostrarResultados(data) {
-  document.getElementById('search-box').style.display = 'none';
-  document.getElementById('result-box').style.display = 'block';
-  
-  document.getElementById('lbl-ticket').textContent = data.numero_atencion;
-  document.getElementById('lbl-equipo').textContent = data.equipo_descripcion;
-  document.getElementById('lbl-cliente').textContent = data.cliente_nombre;
-  document.getElementById('lbl-ingreso').textContent = data.fecha_ingreso;
-  document.getElementById('lbl-motivo').textContent = data.motivo_ingreso;
-  
-  const st = data.estado;
-  document.getElementById('lbl-estado-txt').textContent = st.replace(/_/g, ' ');
-  
-  // Limpiar stepper
-  for(let i=1; i<=4; i++) {
-    document.getElementById(`step-${i}`).className = 'step';
-  }
-  
-  // Logica de stepper
-  let activeStep = 1;
-  if (st === 'EN_DIAGNOSTICO') activeStep = 2;
-  else if (st === 'ESPERANDO_REPUESTO' || st === 'EN_REPARACION') activeStep = 3;
-  else if (st === 'LISTO_PARA_RECOGER' || st === 'ENTREGADO') activeStep = 4;
-  else if (st === 'CANCELADO') activeStep = 0; // Cancelado rompe el stepper
-  
-  for(let i=1; i<=activeStep; i++) {
-    let stepEl = document.getElementById(`step-${i}`);
-    if (i < activeStep) {
-      stepEl.classList.add('completed');
-    } else if (i === activeStep) {
-      stepEl.classList.add('active');
-    }
-  }
-
-  // Notas tecnicas
-  const boxNotes = document.getElementById('box-tech-notes');
-  let hasNotes = false;
-  if (data.diagnostico) {
-    document.getElementById('lbl-diagnostico').innerHTML = `<strong>Diagnostico:</strong> ${data.diagnostico}`;
-    hasNotes = true;
-  } else document.getElementById('lbl-diagnostico').innerHTML = '';
-  
-  if (data.solucion) {
-    document.getElementById('lbl-solucion').innerHTML = `<strong>Solucion / Notas:</strong> ${data.solucion}`;
-    hasNotes = true;
-  } else document.getElementById('lbl-solucion').innerHTML = '';
-  
-  boxNotes.style.display = hasNotes ? 'block' : 'none';
-  
-  // Garantia
-  const garBox = document.getElementById('lbl-garantia');
-  if (data.en_garantia == "1") {
-    garBox.innerHTML = '<span class="badge-garantia"><i class="ph ph-shield-check"></i> Atencion por Garantia</span>';
-  } else garBox.innerHTML = '';
-  
-  // Mensaje final
-  const recBox = document.getElementById('box-recoger');
-  recBox.style.display = (st === 'LISTO_PARA_RECOGER') ? 'block' : 'none';
-}
-
-function volver() {
-  document.getElementById('search-box').style.display = 'block';
-  document.getElementById('result-box').style.display = 'none';
-  document.getElementById('f-ticket').value = '';
-  document.getElementById('f-dni').value = '';
-  document.getElementById('msg-error').style.display = 'none';
-}
-</script>
-
-
+    <!-- Header Fijo con Logo Oficial -->
+    <header class="portal-header">
+        <div class="portal-header-content">
+            <a href="consulta.html" class="portal-logo-link" title="PetuLap - Inicio">
+                <img src="img/logo-petulap.png" alt="PetuLap" class="portal-logo">
+            </a>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <span class="portal-header-tag"><i class="ph-bold ph-shield-check"></i> Portal de Clientes</span>
+                <button class="portal-theme-btn" aria-label="Cambiar tema" onclick="toggleTheme()">
+                    <i class="ph ph-moon"></i>
+                </button>
+            </div>
         </div>
-        
-        <!-- FAB Button -->
-        <button class="fab-chat" onclick="if(typeof abrirModalTareaGlobal === 'function') abrirModalTareaGlobal();" title="Crear Tarea Interna">
-            <i class="ph-bold ph-kanban"></i>
-        </button>
+    </header>
+
+    <!-- Contenido Principal -->
+    <main class="portal-main">
+
+        <!-- Hero Section -->
+        <section class="portal-hero">
+            <div class="hero-badge"><i class="ph-bold ph-seal-check"></i> Servicio Técnico Especializado</div>
+            <h1>Seguimiento de tu Servicio Técnico</h1>
+            <p class="hero-subtitle">Ingresa tu número de ticket para conocer en tiempo real la evolución y diagnóstico de tu equipo en taller.</p>
+            
+            <div class="trust-badges">
+                <span class="trust-badge"><i class="ph-bold ph-shield-check"></i> 6 meses de garantía</span>
+                <span class="trust-badge"><i class="ph-bold ph-wrench"></i> 3 años de soporte técnico</span>
+                <span class="trust-badge"><i class="ph-bold ph-seal-check"></i> Empresa formal con boleta/factura</span>
+            </div>
+        </section>
+
+        <!-- Formulario de Consulta -->
+        <div class="portal-card" id="search-box">
+            <div class="portal-form-group">
+                <label class="portal-label" for="f-ticket"><i class="ph-bold ph-ticket"></i> Número de Ticket u Orden</label>
+                <div class="portal-input-wrapper">
+                    <i class="ph ph-ticket"></i>
+                    <input type="text" id="f-ticket" class="portal-input" placeholder="Ej: ST-20260901-001 o TAR-2026-010" autocomplete="off" autofocus>
+                </div>
+            </div>
+
+            <div class="portal-form-group">
+                <label class="portal-label" for="f-dni"><i class="ph-bold ph-identification-card"></i> DNI del Titular</label>
+                <div class="portal-input-wrapper">
+                    <i class="ph ph-identification-card"></i>
+                    <input type="text" id="f-dni" class="portal-input" placeholder="DNI del titular registrado" autocomplete="off" onkeydown="if(event.key==='Enter') consultar()">
+                </div>
+            </div>
+
+            <button onclick="consultar()" id="btn-consultar" class="portal-btn-submit">
+                <i class="ph-bold ph-magnifying-glass"></i> Consultar Estado
+            </button>
+
+            <div id="msg-error" class="portal-error-box">
+                <i class="ph-bold ph-warning-circle" style="font-size: 1.25rem;"></i>
+                <span id="msg-error-text"></span>
+            </div>
+
+            <div class="form-helper-note">
+                ¿No tienes a mano tu ticket? <a href="https://wa.me/51983396137?text=Hola%20Petulap,%20no%20tengo%20mi%20número%20de%20ticket%20para%20consultar%20el%20estado%20de%20mi%20reparación" target="_blank"><i class="ph-bold ph-whatsapp-logo"></i> Escríbenos al WhatsApp</a> y te lo facilitamos de inmediato.
+            </div>
+        </div>
+
+        <!-- Tarjeta de Resultados -->
+        <div class="portal-card" id="result-box" style="display: none;">
+            <button onclick="volver()" class="btn-back">
+                <i class="ph ph-arrow-left"></i> Nueva Consulta
+            </button>
+
+            <div class="result-header">
+                <h2 class="result-ticket-title">
+                    <i class="ph-bold ph-ticket"></i> Ticket <span id="lbl-ticket"></span>
+                </h2>
+                <span id="lbl-estado-badge" class="status-pill pill-blue">
+                    <i class="ph-bold ph-clock"></i> <span id="lbl-estado-txt"></span>
+                </span>
+            </div>
+
+            <!-- Stepper Oficial de 5 Pasos -->
+            <div class="stepper-5" id="stepper-component">
+                <div class="step-item" id="step-1">
+                    <div class="step-icon-wrap"><i class="ph-bold ph-download-simple"></i></div>
+                    <span class="step-label">1. Recibido</span>
+                </div>
+                <div class="step-item" id="step-2">
+                    <div class="step-icon-wrap"><i class="ph-bold ph-magnifying-glass"></i></div>
+                    <span class="step-label">2. Diagnóstico</span>
+                </div>
+                <div class="step-item" id="step-3">
+                    <div class="step-icon-wrap"><i class="ph-bold ph-wrench"></i></div>
+                    <span class="step-label">3. Reparación</span>
+                </div>
+                <div class="step-item" id="step-4">
+                    <div class="step-icon-wrap"><i class="ph-bold ph-check-circle"></i></div>
+                    <span class="step-label">4. Listo</span>
+                </div>
+                <div class="step-item" id="step-5">
+                    <div class="step-icon-wrap"><i class="ph-bold ph-package"></i></div>
+                    <span class="step-label">5. Entregado</span>
+                </div>
+            </div>
+
+            <!-- Grilla de Informacion del Servicio -->
+            <div class="details-grid">
+                <div class="detail-item">
+                    <i class="ph-bold ph-laptop detail-icon"></i>
+                    <div class="detail-content">
+                        <div class="detail-label">Equipo</div>
+                        <div class="detail-value" id="lbl-equipo">--</div>
+                    </div>
+                </div>
+                <div class="detail-item">
+                    <i class="ph-bold ph-user detail-icon"></i>
+                    <div class="detail-content">
+                        <div class="detail-label">Cliente</div>
+                        <div class="detail-value" id="lbl-cliente">--</div>
+                    </div>
+                </div>
+                <div class="detail-item">
+                    <i class="ph-bold ph-calendar detail-icon"></i>
+                    <div class="detail-content">
+                        <div class="detail-label">Fecha de Ingreso</div>
+                        <div class="detail-value" id="lbl-ingreso">--</div>
+                    </div>
+                </div>
+                <div class="detail-item">
+                    <i class="ph-bold ph-note detail-icon"></i>
+                    <div class="detail-content">
+                        <div class="detail-label">Motivo Reportado</div>
+                        <div class="detail-value" id="lbl-motivo">--</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Badge de Garantia Oficial -->
+            <div id="lbl-garantia"></div>
+
+            <!-- Bloque Tecnico (Diagnostico y Solucion) -->
+            <div id="box-tech-notes" class="tech-notes-card" style="display: none;">
+                <div class="tech-notes-title">
+                    <i class="ph-bold ph-clipboard-text"></i> Informe de Taller
+                </div>
+                <div id="lbl-diagnostico" class="tech-notes-item"></div>
+                <div id="lbl-solucion" class="tech-notes-item"></div>
+            </div>
+
+            <!-- CTA Exclusivo: Equipo Listo para Recoger -->
+            <div id="box-recoger" class="pickup-alert-box" style="display: none;">
+                <h3 class="pickup-alert-title">
+                    <i class="ph-bold ph-check-circle"></i> ¡Tu equipo está listo para entrega!
+                </h3>
+                <p class="pickup-alert-desc">
+                    El servicio técnico ha concluido satisfactoriamente. Puedes acercarte a nuestra oficina dentro del horario de atención con tu documento de identidad o ticket.
+                </p>
+                <a href="https://wa.me/51983396137?text=Hola%20Petulap,%20vi%20en%20el%20portal%20que%20mi%20equipo%20está%20listo%20para%20recoger" target="_blank" class="btn-whatsapp-cta">
+                    <i class="ph-bold ph-whatsapp-logo"></i> ¡Mi equipo está listo! Escribir al taller
+                </a>
+            </div>
+        </div>
+
+        <!-- Seccion Informativa del Taller (Siempre Visible) -->
+        <section class="workshop-section">
+            <h2 class="workshop-section-title">
+                <i class="ph-bold ph-buildings"></i> Información Oficial de Petulap S.A.C.
+            </h2>
+
+            <div class="workshop-grid">
+                <!-- Tarjeta 1: Horarios -->
+                <div class="info-card">
+                    <div class="info-card-header">
+                        <i class="ph-bold ph-clock"></i> Horarios de Atención
+                    </div>
+                    <ul class="info-card-list">
+                        <li><i class="ph-bold ph-calendar-blank"></i> <strong>Lunes a Viernes:</strong> 10:30 am – 7:30 pm</li>
+                        <li><i class="ph-bold ph-calendar-blank"></i> <strong>Sábados:</strong> 10:30 am – 6:00 pm</li>
+                        <li><i class="ph-bold ph-x-circle"></i> Domingos y feriados: Cerrado</li>
+                    </ul>
+                </div>
+
+                <!-- Tarjeta 2: Oficinas -->
+                <div class="info-card">
+                    <div class="info-card-header">
+                        <i class="ph-bold ph-map-pin"></i> Nuestras Oficinas en Arequipa
+                    </div>
+                    <ul class="info-card-list">
+                        <li><i class="ph-bold ph-navigation-arrow"></i> <strong>Sede Yanahuara:</strong> Av. Ejército 314, 2do piso</li>
+                        <li><i class="ph-bold ph-navigation-arrow"></i> <strong>Sede Cayma:</strong> León XIII Mza A-4, 1er piso</li>
+                        <li><i class="ph-bold ph-globe"></i> Arequipa, Perú</li>
+                    </ul>
+                </div>
+
+                <!-- Tarjeta 3: Garantia y Pagos -->
+                <div class="info-card">
+                    <div class="info-card-header">
+                        <i class="ph-bold ph-shield-check"></i> Garantía y Medios de Pago
+                    </div>
+                    <ul class="info-card-list">
+                        <li><i class="ph-bold ph-seal-check"></i> <strong>Garantía:</strong> 6 meses en laptops + 3 años de soporte</li>
+                        <li><i class="ph-bold ph-credit-card"></i> Efectivo, Yape, Plin, BCP, BBVA, Interbank y tarjetas</li>
+                        <li><i class="ph-bold ph-receipt"></i> Emitimos Boleta y Factura electrónica</li>
+                    </ul>
+                </div>
+
+                <!-- Tarjeta 4: Contacto y Redes -->
+                <div class="info-card">
+                    <div class="info-card-header">
+                        <i class="ph-bold ph-chat-circle-dots"></i> Contacto y Redes
+                    </div>
+                    <ul class="info-card-list">
+                        <li><i class="ph-bold ph-whatsapp-logo"></i> <a href="https://wa.me/51983396137" target="_blank">+51 983 396 137 (WhatsApp Taller)</a></li>
+                        <li><i class="ph-bold ph-instagram-logo"></i> <a href="https://instagram.com/petulap_computadoras" target="_blank">@petulap_computadoras</a></li>
+                        <li><i class="ph-bold ph-facebook-logo"></i> <a href="https://facebook.com/PetulapComputadoras" target="_blank">PetulapComputadoras</a></li>
+                    </ul>
+                </div>
+            </div>
+        </section>
 
     </main>
 
-    <!-- Scripts -->
-    <script src="js/dashboard.js?v=3"></script>
+    <!-- Boton Flotante de WhatsApp -->
+    <a href="https://wa.me/51983396137" target="_blank" class="fab-whatsapp" aria-label="Escribir al WhatsApp de Petulap" title="Escribir al WhatsApp de Soporte Petulap">
+        <i class="ph-bold ph-whatsapp-logo"></i>
+    </a>
 
+    <!-- Footer Oficial de Marca -->
+    <footer class="portal-footer">
+        <img src="img/logo-petulap.png" alt="PetuLap" class="footer-logo">
+        <p>
+            Dudas o consultas: <a href="https://wa.me/51983396137" target="_blank"><i class="ph-bold ph-whatsapp-logo"></i> +51 983 396 137</a> | 
+            <a href="https://instagram.com/petulap_computadoras" target="_blank"><i class="ph-bold ph-instagram-logo"></i> @petulap_computadoras</a> |
+            <a href="https://facebook.com/PetulapComputadoras" target="_blank"><i class="ph-bold ph-facebook-logo"></i> PetulapComputadoras</a>
+        </p>
+        <p>© 2026 Petulap S.A.C. | Arequipa, Perú — Laptops Importadas & Soporte Técnico Especializado</p>
+    </footer>
+
+    <script src="js/sonidos.js"></script>
+    <script>
+    // Conmutador de tema claro/oscuro
+    function toggleTheme() {
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        if (isDark) {
+            document.documentElement.removeAttribute('data-theme');
+            localStorage.setItem('petulap-theme', 'light');
+        } else {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            localStorage.setItem('petulap-theme', 'dark');
+        }
+        updateThemeIcon();
+    }
+
+    function updateThemeIcon() {
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        const icon = document.querySelector('.portal-theme-btn i');
+        if (icon) {
+            icon.className = isDark ? 'ph ph-sun' : 'ph ph-moon';
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        updateThemeIcon();
+
+        // Soporte de pre-rellenado y consulta automatica via URL
+        const params = new URLSearchParams(window.location.search);
+        const tktParam = params.get('ticket');
+        const dniParam = params.get('dni');
+        
+        if (tktParam) {
+            document.getElementById('f-ticket').value = tktParam;
+        }
+        if (dniParam) {
+            document.getElementById('f-dni').value = dniParam;
+        }
+        if (tktParam && dniParam) {
+            consultar();
+        }
+    });
+
+    async function consultar() {
+        const tkt = document.getElementById('f-ticket').value.trim();
+        const dni = document.getElementById('f-dni').value.trim();
+        const errBox = document.getElementById('msg-error');
+        const errTxt = document.getElementById('msg-error-text');
+        const btn = document.getElementById('btn-consultar');
+
+        if (!tkt) {
+            errTxt.textContent = 'Por favor, ingresa el número de ticket u orden.';
+            errBox.style.display = 'flex';
+            document.getElementById('f-ticket').focus();
+            return;
+        }
+
+        if (!dni) {
+            errTxt.textContent = 'Por favor, ingresa el DNI del titular registrado para validar la consulta.';
+            errBox.style.display = 'flex';
+            document.getElementById('f-dni').focus();
+            return;
+        }
+
+        errBox.style.display = 'none';
+        btn.disabled = true;
+        btn.innerHTML = '<i class="ph-bold ph-spinner" style="animation: spin 1s linear infinite;"></i> Consultando...';
+
+        try {
+            const url = `api/consulta.php?action=estado&ticket=${encodeURIComponent(tkt)}&dni=${encodeURIComponent(dni)}`;
+            const res = await fetch(url).then(r => r.json());
+
+            btn.disabled = false;
+            btn.innerHTML = '<i class="ph-bold ph-magnifying-glass"></i> Consultar Estado';
+
+            if (!res.ok) {
+                errTxt.textContent = res.msg || 'No se encontró ninguna orden con los datos ingresados.';
+                errBox.style.display = 'flex';
+                if (typeof reproducirSonido === 'function') reproducirSonido('error');
+            } else {
+                errBox.style.display = 'none';
+                mostrarResultados(res.data);
+                if (typeof reproducirSonido === 'function') reproducirSonido('exito');
+            }
+        } catch (e) {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="ph-bold ph-magnifying-glass"></i> Consultar Estado';
+            errTxt.textContent = 'Ocurrió un error de conexión al consultar el servidor. Inténtalo de nuevo.';
+            errBox.style.display = 'flex';
+        }
+    }
+
+    function mostrarResultados(data) {
+        document.getElementById('search-box').style.display = 'none';
+        document.getElementById('result-box').style.display = 'block';
+
+        document.getElementById('lbl-ticket').textContent = data.numero_atencion || '--';
+        document.getElementById('lbl-equipo').textContent = data.equipo_descripcion || 'No especificado';
+        document.getElementById('lbl-cliente').textContent = data.cliente_nombre || 'Cliente Petulap';
+        document.getElementById('lbl-ingreso').textContent = data.fecha_ingreso || '--';
+        document.getElementById('lbl-motivo').textContent = data.motivo_ingreso || 'Sin motivo reportado';
+
+        const st = (data.estado || '').toUpperCase();
+        const badge = document.getElementById('lbl-estado-badge');
+        const badgeTxt = document.getElementById('lbl-estado-txt');
+
+        // Configurar rotulo y color semantico del badge
+        badge.className = 'status-pill';
+        let statusLabel = st.replace(/_/g, ' ');
+        let statusClass = 'pill-blue';
+
+        if (st === 'PENDIENTE') {
+            statusClass = 'pill-yellow';
+            statusLabel = 'Recibido (Pendiente)';
+        } else if (st === 'EN_DIAGNOSTICO') {
+            statusClass = 'pill-blue';
+            statusLabel = 'En Diagnóstico';
+        } else if (st === 'EN_REPARACION' || st === 'ESPERANDO_REPUESTO') {
+            statusClass = 'pill-orange';
+            statusLabel = st === 'ESPERANDO_REPUESTO' ? 'Esperando Repuesto' : 'En Reparación';
+        } else if (st === 'LISTO_PARA_RECOGER' || st === 'COMPLETADO' || st === 'LISTO_PARA_ENTREGA') {
+            statusClass = 'pill-green';
+            statusLabel = 'Listo para Recoger';
+        } else if (st === 'ENTREGADO') {
+            statusClass = 'pill-green';
+            statusLabel = 'Entregado al Cliente';
+        } else if (st === 'CANCELADO') {
+            statusClass = 'pill-red';
+            statusLabel = 'Servicio Cancelado';
+        }
+
+        badge.classList.add(statusClass);
+        badgeTxt.textContent = statusLabel;
+
+        // Logica de Mapeo del Stepper Oficial de 5 Pasos
+        // 1: PENDIENTE
+        // 2: EN_DIAGNOSTICO
+        // 3: EN_REPARACION / ESPERANDO_REPUESTO
+        // 4: LISTO_PARA_RECOGER / COMPLETADO / LISTO_PARA_ENTREGA
+        // 5: ENTREGADO
+        for (let i = 1; i <= 5; i++) {
+            const stepEl = document.getElementById(`step-${i}`);
+            if (stepEl) stepEl.className = 'step-item';
+        }
+
+        let activeStep = 1;
+        if (st === 'EN_DIAGNOSTICO') activeStep = 2;
+        else if (st === 'EN_REPARACION' || st === 'ESPERANDO_REPUESTO') activeStep = 3;
+        else if (st === 'LISTO_PARA_RECOGER' || st === 'COMPLETADO' || st === 'LISTO_PARA_ENTREGA') activeStep = 4;
+        else if (st === 'ENTREGADO') activeStep = 5;
+        else if (st === 'CANCELADO') activeStep = 0;
+
+        for (let i = 1; i <= activeStep; i++) {
+            const stepEl = document.getElementById(`step-${i}`);
+            if (stepEl) {
+                if (i < activeStep) {
+                    stepEl.classList.add('completed');
+                } else if (i === activeStep) {
+                    stepEl.classList.add('active');
+                }
+            }
+        }
+
+        // Si esta entregado, todos los pasos quedan completados
+        if (st === 'ENTREGADO') {
+            const step5 = document.getElementById('step-5');
+            if (step5) {
+                step5.classList.remove('active');
+                step5.classList.add('completed');
+            }
+        }
+
+        // Bloque de Notas Tecnicas
+        const boxNotes = document.getElementById('box-tech-notes');
+        let hasNotes = false;
+        if (data.diagnostico && data.diagnostico.trim() !== '') {
+            document.getElementById('lbl-diagnostico').innerHTML = `<strong>Diagnóstico Técnico:</strong> ${data.diagnostico}`;
+            hasNotes = true;
+        } else {
+            document.getElementById('lbl-diagnostico').innerHTML = '';
+        }
+
+        if (data.solucion && data.solucion.trim() !== '') {
+            document.getElementById('lbl-solucion').innerHTML = `<strong>Solución / Notas de Taller:</strong> ${data.solucion}`;
+            hasNotes = true;
+        } else {
+            document.getElementById('lbl-solucion').innerHTML = '';
+        }
+        boxNotes.style.display = hasNotes ? 'block' : 'none';
+
+        // Badge de Garantia PetuLap
+        const garBox = document.getElementById('lbl-garantia');
+        if (data.en_garantia == '1' || data.en_garantia == 1) {
+            garBox.innerHTML = '<div class="badge-garantia"><i class="ph-bold ph-shield-check"></i> Atención Cubierta por Garantía Oficial PetuLap</div>';
+        } else {
+            garBox.innerHTML = '';
+        }
+
+        // Banner CTA para recoger equipo
+        const isReady = (st === 'LISTO_PARA_RECOGER' || st === 'COMPLETADO' || st === 'LISTO_PARA_ENTREGA');
+        document.getElementById('box-recoger').style.display = isReady ? 'block' : 'none';
+
+        // Scroll suave hacia los resultados
+        document.getElementById('result-box').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function volver() {
+        document.getElementById('search-box').style.display = 'block';
+        document.getElementById('result-box').style.display = 'none';
+        document.getElementById('msg-error').style.display = 'none';
+        document.getElementById('search-box').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+    </script>
 </body>
 </html>
