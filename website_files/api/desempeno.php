@@ -734,8 +734,14 @@ if ($action === "resumen") {
     // Resumen Global
     $resumen = [
         "total_tecnicos" => count($data),
+        "total" => count($data),
         "tecnicos_trabajando" => 0,
+        "tecnicos_ocupados" => 0,
+        "ocupados" => 0,
+        "ocupados_ahora" => 0,
+        "en_proceso" => 0,
         "tecnicos_esperando" => 0,
+        "esperando" => 0,
         "tecnicos_inactivos" => 0,
         "total_horas" => 0,
         "total_horas_hoy" => 0
@@ -745,8 +751,13 @@ if ($action === "resumen") {
         $resumen['total_horas_hoy'] += $t['horas_hoy'];
         if ($t['estado_en_vivo'] === 'TRABAJANDO') {
             $resumen['tecnicos_trabajando']++;
+            $resumen['tecnicos_ocupados']++;
+            $resumen['ocupados']++;
+            $resumen['ocupados_ahora']++;
+            $resumen['en_proceso']++;
         } elseif ($t['estado_en_vivo'] === 'ESPERANDO' || $t['estado_en_vivo'] === 'EN_ESPERA' || $t['estado_en_vivo'] === 'ASIGNADO') {
             $resumen['tecnicos_esperando']++;
+            $resumen['esperando']++;
         } else {
             $resumen['tecnicos_inactivos']++;
         }

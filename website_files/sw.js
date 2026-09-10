@@ -1,6 +1,6 @@
-// Service Worker - Petulap PWA v19 (Plataforma Ejecutiva de Control y Trazabilidad de Repuestos)
+// Service Worker - Petulap PWA v20 (Restauración de Heatmap Semanal y Fix KPI Ocupados)
  
-var CACHE_NAME = 'petulap-v19';
+var CACHE_NAME = 'petulap-v20';
 var ASSETS = [
     './',
     'index.html',

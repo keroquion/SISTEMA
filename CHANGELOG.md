@@ -30,6 +30,24 @@ Para garantizar trazabilidad absoluta, auditoría técnica rigurosa y claridad e
 - **`[Security]`**: Implementación de un pipeline de Integración y Despliegue Continuo (CI/CD) automatizado desde GitHub hacia el hosting de producción (cPanel/Apache) para reemplazar el traspaso manual por FTP y mitigar el riesgo de desincronización o error humano en despliegues.
 - **`[Changed]`**: Coordinación en el panel de control del servidor (cPanel) para renombrar la base de datos de `petumjvq_pruebas` a un identificador formal de producción (ej. `petumjvq_sistema`), actualizando la variable de entorno en el servidor de forma segura.
 
+## [1.4.10] - Septiembre 2026
+
+### Restauración del Visualizador Semanal (Heatmap de Zonas Calientes) y Corrección de KPI "Ocupados Ahora"
+*Módulos impactados:* `website_files/desempeno_tecnicos.html`, `website_files/api/desempeno.php`, `website_files/sw.js`.
+
+> **Causa Raíz ("El Por Qué"):** Al visualizar a un técnico en el listado de desempeño, la vista desplegable individual no renderizaba el Heatmap Semanal interactivo (.heatmap-grid) debido a una omisión en el contenedor del drawer inline, mostrando únicamente la tabla cronológica de actividades. Adicionalmente, la tarjeta KPI superior de "Ocupados Ahora" mostraba el valor textual `undefined` debido a una discrepancia en el nombre de la propiedad entre backend y frontend (`tecnicos_ocupados` vs `tecnicos_trabajando` / `ocupados`). Se reintegró la matriz semanal completa de 11 slots (08:00 a 18:00) con selector de semanas (#semana-info), indicador de HOY, 4 niveles de calor verde, nivel violeta (.level-instant) para actividades puntuales (<1 min), tooltip flotante con efecto glassmorphism (#heatmap-tooltip), y se implementó un fallback robusto en el KPI (`kpi.ocupados ?? kpi.en_proceso ?? kpi.ocupados_ahora ?? kpi.tecnicos_trabajando ?? 0`).
+
+### Fixed & Added
+- **`website_files/desempeno_tecnicos.html`**:
+  - **Restauración del Heatmap Semanal**: Integración del contenedor gráfico (`.heatmap-container` / `.heatmap-grid`) y barra de semanas (`.week-nav-bar`) tanto en el drawer desplegable individual de cada técnico en el listado (`toggleTechInline`) como en la pestaña de horario individual (`vista-individual`).
+  - **Tooltip Inteligente Glassmorphism (#heatmap-tooltip)**: Reincorporación del tooltip flotante con efecto de desenfoque de fondo y borde semántico para desplegar detalles de ticket, minutos trabajados y distinciones para actividades instantáneas.
+  - **Resolución de "Ocupados Ahora"**: Unificación del binding del KPI con fallback seguro `(kpi.ocupados ?? kpi.en_proceso ?? kpi.ocupados_ahora ?? kpi.tecnicos_trabajando ?? 0)` erradicando el valor `undefined`.
+  - **Preservación de Filtros y 6 Columnas**: Mantenimiento estricto de la barra de filtros segmentados `[Todos]`, `[Clientes ST]`, `[Tareas e Internos]` y la tabla cronológica de 6 columnas inmediatamente debajo del heatmap.
+- **`website_files/api/desempeno.php`**:
+  - **Normalización de KPIs en Resumen**: Inclusión de alias unificados `ocupados`, `ocupados_ahora`, `en_proceso` y `tecnicos_ocupados` en el objeto `$resumen` para garantizar consistencia total con cualquier consumidor frontend.
+- **`website_files/sw.js`**:
+  - Incremento de versión de caché a `'petulap-v20'`.
+
 ---
 
 ## [1.4.9] - Septiembre 2026

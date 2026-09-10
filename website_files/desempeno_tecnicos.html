@@ -438,7 +438,8 @@
                         </button>
                         <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; justify-content:center;">
                             <i class="ph-bold ph-calendar-blank" style="color:var(--color-brand); font-size:1.2rem;"></i>
-                            <span id="semana-rango-texto" style="font-weight:700; font-size:0.95rem; color:var(--text-primary);">Cargando semana...</span>
+                            <span id="semana-info" class="semana-info-lbl" style="font-weight:700; font-size:0.95rem; color:var(--text-primary);">Cargando semana...</span>
+                            <span id="semana-rango-texto" style="display:none;"></span>
                             <button id="btn-esta-semana" class="btn btn-secondary" style="display:none; padding:2px 10px; font-size:0.75rem; min-height:26px; border-radius:20px; font-weight:600;" onclick="irEstaSemana()">
                                 <i class="ph-bold ph-arrow-counter-clockwise"></i> Esta Semana
                             </button>
@@ -526,7 +527,8 @@
         </div>
     </main>
 
-    <!-- TOOLTIP FLOTANTE CONTEXTUAL -->
+    <!-- TOOLTIP FLOTANTE CONTEXTUAL (GLASSMORPHISM) -->
+    <div id="heatmap-tooltip" class="heatmap-tooltip" style="display:none;"></div>
     <div id="floating-tooltip" class="floating-tooltip" style="display:none;"></div>
 
     <style>
@@ -824,21 +826,33 @@
             font-weight: 700;
         }
 
-        /* Tooltip flotante estilizado */
-        .floating-tooltip {
+        /* Tooltip flotante estilizado con Glassmorphism */
+        #heatmap-tooltip, .heatmap-tooltip, #floating-tooltip, .floating-tooltip {
             position: fixed;
-            background: #0f172a;
-            color: #ffffff;
-            padding: 8px 12px;
-            border-radius: 6px;
-            font-size: 0.8rem;
+            background: rgba(15, 23, 42, 0.90);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            color: #f8fafc;
+            padding: 9px 14px;
+            border-radius: var(--radius-md, 8px);
+            font-size: 0.82rem;
             font-weight: 500;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.45), 0 8px 10px -6px rgba(0,0,0,0.35);
             pointer-events: none;
-            z-index: 9999;
+            z-index: 99999;
             max-width: 320px;
-            line-height: 1.4;
-            border: 1px solid rgba(255,255,255,0.1);
+            line-height: 1.45;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            transition: opacity 0.15s ease;
+        }
+        [data-theme="light"] #heatmap-tooltip,
+        [data-theme="light"] .heatmap-tooltip,
+        [data-theme="light"] #floating-tooltip,
+        [data-theme="light"] .floating-tooltip {
+            background: rgba(255, 255, 255, 0.94);
+            color: #0f172a;
+            border: 1px solid rgba(0, 0, 0, 0.12);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15);
         }
 
         /* Tabla de historial */
@@ -1021,8 +1035,13 @@
                     gSemanaInfo = res.semana_info || null;
 
                     if (gSemanaInfo) {
-                        const lblSemana = document.getElementById('semana-rango-texto');
+                        const lblSemana = document.getElementById('semana-info');
                         if (lblSemana) lblSemana.textContent = gSemanaInfo.rango_texto;
+                        const lblSemanaLegacy = document.getElementById('semana-rango-texto');
+                        if (lblSemanaLegacy) lblSemanaLegacy.textContent = gSemanaInfo.rango_texto;
+                        document.querySelectorAll('.semana-info-lbl').forEach(el => {
+                            el.textContent = gSemanaInfo.rango_texto;
+                        });
                     }
 
                     renderResumen(gResumen);
@@ -1043,31 +1062,34 @@
             }
         }
 
-        // Renderizar tarjetas de métricas en vivo
+        // Renderizar tarjetas de métricas en vivo con cálculo seguro contra undefined
         function renderResumen(resumen) {
-            const horasTotalesHoy = formatDurationSeconds(resumen.total_horas_hoy || 0);
-            const horasPeriodo = formatDurationSeconds(resumen.total_horas || 0);
+            const kpi = resumen || {};
+            const totalTec = kpi.total_tecnicos ?? kpi.total ?? (gData ? gData.length : 0);
+            const ocupadosAhora = kpi.ocupados ?? kpi.en_proceso ?? kpi.ocupados_ahora ?? kpi.tecnicos_trabajando ?? kpi.tecnicos_ocupados ?? 0;
+            const esperandoRep = kpi.tecnicos_esperando ?? kpi.esperando ?? 0;
+            const horasTotalesHoy = formatDurationSeconds(kpi.total_horas_hoy || 0);
 
             const html = `
                 <div class="stat-card" style="flex:1; min-width: 170px; background: var(--bg-surface); padding: 16px 20px; border-radius: var(--radius-lg); border: 1px solid var(--border-default); display: flex; align-items: center; gap: 14px;">
                     <div style="background: rgba(13,138,188,0.12); color: var(--color-brand); width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem;"><i class="ph-bold ph-users"></i></div>
                     <div>
                         <div style="color: var(--text-secondary); font-size: 0.8rem; font-weight: 600; text-transform: uppercase;">Total Técnicos</div>
-                        <div style="font-size: 1.4rem; font-weight: 700; color: var(--text-primary);">${resumen.total_tecnicos || 0}</div>
+                        <div style="font-size: 1.4rem; font-weight: 700; color: var(--text-primary);">${totalTec}</div>
                     </div>
                 </div>
                 <div class="stat-card" style="flex:1; min-width: 170px; background: var(--bg-surface); padding: 16px 20px; border-radius: var(--radius-lg); border: 1px solid var(--border-default); display: flex; align-items: center; gap: 14px;">
                     <div style="background: rgba(16,185,129,0.12); color: #10B981; width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem;"><i class="ph-bold ph-wrench"></i></div>
                     <div>
-                        <div style="color: var(--text-secondary); font-size: 0.8rem; font-weight: 600; text-transform: uppercase;">Trabajando Ahora</div>
-                        <div style="font-size: 1.4rem; font-weight: 700; color: #10B981;">${resumen.tecnicos_trabajando || 0}</div>
+                        <div style="color: var(--text-secondary); font-size: 0.8rem; font-weight: 600; text-transform: uppercase;">Ocupados Ahora</div>
+                        <div style="font-size: 1.4rem; font-weight: 700; color: #10B981;">${ocupadosAhora}</div>
                     </div>
                 </div>
                 <div class="stat-card" style="flex:1; min-width: 170px; background: var(--bg-surface); padding: 16px 20px; border-radius: var(--radius-lg); border: 1px solid var(--border-default); display: flex; align-items: center; gap: 14px;">
                     <div style="background: rgba(245,158,11,0.12); color: #F59E0B; width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem;"><i class="ph-bold ph-hourglass-medium"></i></div>
                     <div>
                         <div style="color: var(--text-secondary); font-size: 0.8rem; font-weight: 600; text-transform: uppercase;">Esperando Repuesto</div>
-                        <div style="font-size: 1.4rem; font-weight: 700; color: #F59E0B;">${resumen.tecnicos_esperando || 0}</div>
+                        <div style="font-size: 1.4rem; font-weight: 700; color: #F59E0B;">${esperandoRep}</div>
                     </div>
                 </div>
                 <div class="stat-card" style="flex:1; min-width: 170px; background: var(--bg-surface); padding: 16px 20px; border-radius: var(--radius-lg); border: 1px solid var(--border-default); display: flex; align-items: center; gap: 14px;">
@@ -1081,7 +1103,169 @@
             document.getElementById('resumen-global').innerHTML = html;
         }
 
-        // Renderizar Vista 1: Monitoreo en Vivo (Tarjetas ejecutivas)
+        // Estado de tarjetas desplegadas inline en la Vista 1
+        let gOpenTechs = new Set();
+
+        function toggleTechInline(tecId) {
+            const id = parseInt(tecId);
+            const drawer = document.getElementById(`tech-details-${id}`);
+            const btnIcon = document.getElementById(`tech-icon-${id}`);
+            const btnText = document.getElementById(`tech-btn-text-${id}`);
+            if (!drawer) return;
+
+            const tec = gData.find(t => t.id == id);
+            if (!tec) return;
+
+            if (drawer.style.display === 'none' || !drawer.style.display) {
+                drawer.style.display = 'block';
+                gOpenTechs.add(id);
+                if (btnIcon) {
+                    btnIcon.className = 'ph-bold ph-caret-up';
+                }
+                if (btnText) {
+                    btnText.textContent = 'Ocultar Horario';
+                }
+                renderTechInline(tec);
+            } else {
+                drawer.style.display = 'none';
+                gOpenTechs.delete(id);
+                if (btnIcon) {
+                    btnIcon.className = 'ph-bold ph-caret-down';
+                }
+                if (btnText) {
+                    btnText.textContent = 'Ver Horario y Heatmap';
+                }
+            }
+        }
+
+        function filtrarHistorialInline(tecId, tipo) {
+            const id = parseInt(tecId);
+            const tec = gData.find(t => t.id == id);
+            if (!tec) return;
+            tec._filtroActual = tipo;
+            renderTechInline(tec);
+        }
+
+        // Renderizado del contenido del técnico desplegado (Heatmap semanal + Filtros + Tabla 6 cols)
+        function renderTechInline(tec) {
+            const container = document.getElementById(`tech-details-${tec.id}`);
+            if (!container) return;
+
+            const filtro = tec._filtroActual || 'TODOS';
+            const actividades = tec.actividades || [];
+
+            let cTodos = 0;
+            let cClientes = 0;
+            let cTareas = 0;
+            actividades.forEach(a => {
+                cTodos++;
+                const tipo = a.tipo_origen || (String(a.ticket || '').startsWith('TAR-') ? 'TAREA' : (String(a.ticket || '').startsWith('ST-INT-') ? 'INTERNO' : 'CLIENTE'));
+                if (tipo === 'CLIENTE') cClientes++;
+                else cTareas++;
+            });
+
+            const weekNavBarHtml = `
+                <div class="week-nav-bar" style="display:flex; justify-content:space-between; align-items:center; background:var(--bg-surface-hover); padding:10px 16px; border-radius:var(--radius-md); border:1px solid var(--border-default); margin-bottom:18px; flex-wrap:wrap; gap:10px;">
+                    <button class="btn btn-secondary" style="font-size:0.85rem; padding:0 14px; min-height:36px;" onclick="navegarSemana(-1)">
+                        <i class="ph-bold ph-caret-left"></i> Semana Anterior
+                    </button>
+                    <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; justify-content:center;">
+                        <i class="ph-bold ph-calendar-blank" style="color:var(--color-brand); font-size:1.2rem;"></i>
+                        <span class="semana-info-lbl" style="font-weight:700; font-size:0.95rem; color:var(--text-primary);">${gSemanaInfo ? gSemanaInfo.rango_texto : 'Cargando semana...'}</span>
+                        ${gSemanaOffset !== 0 ? `<button class="btn btn-secondary" style="padding:2px 10px; font-size:0.75rem; min-height:26px; border-radius:20px; font-weight:600;" onclick="irEstaSemana()"><i class="ph-bold ph-arrow-counter-clockwise"></i> Esta Semana</button>` : ''}
+                    </div>
+                    <button class="btn btn-secondary" style="font-size:0.85rem; padding:0 14px; min-height:36px;" onclick="navegarSemana(1)">
+                        Semana Siguiente <i class="ph-bold ph-caret-right"></i>
+                    </button>
+                </div>
+            `;
+
+            const heatmapHtml = `
+                <div style="margin-bottom: 22px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 12px; flex-wrap:wrap; gap:10px;">
+                        <h4 style="margin:0; font-size: 1.05rem; display:flex; align-items:center; gap:8px; color: var(--text-primary);">
+                            <i class="ph-bold ph-grid-four" style="color:var(--color-brand)"></i> Matriz de Actividad Semanal (Lunes a Sábado • 08:00 a 18:00)
+                        </h4>
+                        <span style="font-size:0.85rem; color:var(--text-secondary); background: var(--bg-surface-hover); padding: 4px 10px; border-radius: var(--radius-sm); border: 1px solid var(--border-default);">
+                            <i class="ph ph-info"></i> Pasa el cursor sobre un cuadro para ver ticket y laptop
+                        </span>
+                    </div>
+
+                    <div class="heatmap-container" style="overflow-x: auto; -webkit-overflow-scrolling: touch; padding: 6px 0;">
+                        <div style="min-width: 620px;">
+                            ${generarHtmlHeatmap(tec.heatmap_semanal)}
+                        </div>
+                    </div>
+
+                    <!-- Leyenda estilo GitHub -->
+                    <div class="heatmap-legend" style="display:flex; justify-content:flex-end; align-items:center; gap:8px; margin-top:12px; font-size:0.85rem; color:var(--text-secondary); flex-wrap:wrap;">
+                        <span>Menos actividad</span>
+                        <span class="heatmap-sample level-0" title="0 minutos"></span>
+                        <span class="heatmap-sample level-1" title="1 a 25 minutos"></span>
+                        <span class="heatmap-sample level-2" title="26 a 45 minutos"></span>
+                        <span class="heatmap-sample level-3" title="46 a 60 minutos"></span>
+                        <span>Más actividad</span>
+                        <span style="margin: 0 4px; color:var(--border-default);">|</span>
+                        <span class="heatmap-sample level-instant" title="Cierre directo o actividad puntual (<1 min)"></span>
+                        <span style="display:inline-flex; align-items:center; gap:4px;"><i class="ph-bold ph-lightning" style="color:#a855f7;"></i> Puntual (&lt;1m)</span>
+                    </div>
+                </div>
+            `;
+
+            const filterBarHtml = `
+                <div class="historial-filter-bar" style="margin-bottom: 14px; margin-top: 10px;">
+                    <span style="font-size:0.85rem; font-weight:600; color:var(--text-secondary); display:inline-flex; align-items:center; gap:5px;">
+                        <i class="ph-bold ph-funnel"></i> Filtrar Actividades:
+                    </span>
+                    <button class="filter-chip ${filtro === 'TODOS' ? 'active' : ''}" onclick="filtrarHistorialInline(${tec.id}, 'TODOS')">
+                        Todos (${cTodos})
+                    </button>
+                    <button class="filter-chip ${filtro === 'CLIENTE' ? 'active' : ''}" onclick="filtrarHistorialInline(${tec.id}, 'CLIENTE')">
+                        <i class="ph-bold ph-laptop"></i> Clientes ST (${cClientes})
+                    </button>
+                    <button class="filter-chip ${filtro === 'TAREAS_INTERNOS' ? 'active' : ''}" onclick="filtrarHistorialInline(${tec.id}, 'TAREAS_INTERNOS')">
+                        <i class="ph-bold ph-wrench"></i> Tareas e Internos (TAR/INT) (${cTareas})
+                    </button>
+                </div>
+            `;
+
+            const tableRows = generarFilasTabla(actividades, filtro);
+            const tableHtml = `
+                <div style="overflow-x:auto;">
+                    <table class="timesheet-table">
+                        <thead>
+                            <tr>
+                                <th style="width:110px;">Inicio</th>
+                                <th style="width:110px;">Fin</th>
+                                <th style="width:130px;">Tiempo Real</th>
+                                <th style="width:110px;">Tiempo Asignado</th>
+                                <th style="min-width:220px;">Ticket y Equipo / Tarea</th>
+                                <th style="width:110px;">Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${tableRows}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+
+            container.innerHTML = `
+                <div style="background:var(--bg-surface); padding:16px; border-radius:var(--radius-md); border:1px solid var(--border-default);">
+                    ${weekNavBarHtml}
+                    ${heatmapHtml}
+                    <div style="border-top:1px solid var(--border-default); padding-top:16px;">
+                        <h4 style="margin:0 0 10px 0; font-size:1.05rem; display:flex; align-items:center; gap:8px; color:var(--text-primary);">
+                            <i class="ph-bold ph-clock-counter-clockwise" style="color:var(--color-brand)"></i> Historial Cronológico de Tickets / Tareas
+                        </h4>
+                        ${filterBarHtml}
+                        ${tableHtml}
+                    </div>
+                </div>
+            `;
+        }
+
+        // Renderizar Vista 1: Monitoreo en Vivo con Soporte de Despliegue Inline
         function renderVistaLive(data) {
             const container = document.getElementById('live-tech-list');
             if (!data || data.length === 0) {
@@ -1150,62 +1334,81 @@
                 }
 
                 const rolLabel = tec.tipo === 'admin' ? 'Administrador / Supervisor' : 'Técnico Especialista';
+                const isOpen = gOpenTechs.has(tec.id);
 
                 html += `
-                    <div class="live-tech-card">
-                        <!-- Info Personal -->
-                        <div class="tech-info-left">
-                            <div class="tech-avatar-live">${iniciales}</div>
-                            <div>
-                                <div style="font-weight: 700; font-size: 1.05rem; color: var(--text-primary);">${tec.nombre} ${tec.apellido || ''}</div>
-                                <div style="color: var(--text-secondary); font-size: 0.85rem; margin-top: 3px;">
-                                    <i class="ph ph-identification-card"></i> ${rolLabel}
+                    <div class="live-tech-card" style="display:flex; flex-direction:column; align-items:stretch; padding:18px 20px;">
+                        <!-- Fila Resumen Superior (Clic para expandir) -->
+                        <div style="display:flex; align-items:center; justify-content:space-between; gap:20px; flex-wrap:wrap; cursor:pointer;" onclick="toggleTechInline(${tec.id})">
+                            <!-- Info Personal -->
+                            <div class="tech-info-left">
+                                <div class="tech-avatar-live">${iniciales}</div>
+                                <div>
+                                    <div style="font-weight: 700; font-size: 1.05rem; color: var(--text-primary);">${tec.nombre} ${tec.apellido || ''}</div>
+                                    <div style="color: var(--text-secondary); font-size: 0.85rem; margin-top: 3px;">
+                                        <i class="ph ph-identification-card"></i> ${rolLabel}
+                                    </div>
                                 </div>
+                            </div>
+
+                            <!-- Semáforo / Estado en Vivo -->
+                            <div style="flex: 2 1 280px;">
+                                <div style="font-size: 0.75rem; font-weight: 600; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 5px;">
+                                    Estado Actual:
+                                </div>
+                                ${estadoChip}
+                            </div>
+
+                            <!-- Horas Hoy y Mini-Timeline -->
+                            <div style="display:flex; align-items:center; gap: 16px; flex-wrap: wrap;">
+                                <div>
+                                    <div style="font-size: 0.75rem; font-weight: 600; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 4px;">
+                                        Horas Hoy:
+                                    </div>
+                                    <div style="font-weight: 700; font-size: 1rem; color: var(--text-primary); display:flex; align-items:center; gap:5px;">
+                                        <i class="ph-bold ph-clock" style="color:var(--color-brand);"></i> ${horasHoyStr}
+                                    </div>
+                                </div>
+
+                                <div class="mini-timeline-container">
+                                    <div style="display:flex; justify-content:space-between; font-size:0.68rem; color:var(--text-secondary);">
+                                        <span>08h</span>
+                                        <span>Hoy</span>
+                                        <span>18h</span>
+                                    </div>
+                                    <div class="mini-timeline-bar">
+                                        ${miniSlotsHtml}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Botones de Acción -->
+                            <div style="display:flex; align-items:center; gap:8px;">
+                                <button class="btn btn-secondary" style="font-size: 0.85rem; padding: 0 14px;" onclick="event.stopPropagation(); toggleTechInline(${tec.id})">
+                                    <i id="tech-icon-${tec.id}" class="ph-bold ${isOpen ? 'ph-caret-up' : 'ph-caret-down'}"></i>
+                                    <span id="tech-btn-text-${tec.id}">${isOpen ? 'Ocultar Horario' : 'Ver Horario y Heatmap'}</span>
+                                </button>
+                                <button class="btn btn-secondary" style="font-size: 0.85rem; padding: 0 12px;" title="Ver en Pestaña Individual" onclick="event.stopPropagation(); verHorarioTecnico(${tec.id})">
+                                    <i class="ph-bold ph-arrow-square-out"></i>
+                                </button>
                             </div>
                         </div>
 
-                        <!-- Semáforo / Estado en Vivo -->
-                        <div style="flex: 2 1 280px;">
-                            <div style="font-size: 0.75rem; font-weight: 600; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 5px;">
-                                Estado Actual:
-                            </div>
-                            ${estadoChip}
-                        </div>
-
-                        <!-- Horas Hoy y Mini-Timeline -->
-                        <div style="display:flex; align-items:center; gap: 16px; flex-wrap: wrap;">
-                            <div>
-                                <div style="font-size: 0.75rem; font-weight: 600; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 4px;">
-                                    Horas Hoy:
-                                </div>
-                                <div style="font-weight: 700; font-size: 1rem; color: var(--text-primary); display:flex; align-items:center; gap:5px;">
-                                    <i class="ph-bold ph-clock" style="color:var(--color-brand);"></i> ${horasHoyStr}
-                                </div>
-                            </div>
-
-                            <div class="mini-timeline-container">
-                                <div style="display:flex; justify-content:space-between; font-size:0.68rem; color:var(--text-secondary);">
-                                    <span>08h</span>
-                                    <span>Hoy</span>
-                                    <span>18h</span>
-                                </div>
-                                <div class="mini-timeline-bar">
-                                    ${miniSlotsHtml}
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Botón Acción Directa -->
-                        <div>
-                            <button class="btn btn-secondary" style="font-size: 0.85rem; padding: 0 16px;" onclick="verHorarioTecnico(${tec.id})">
-                                <i class="ph-bold ph-calendar"></i> Ver Horario Semanal
-                            </button>
+                        <!-- Contenedor Desplegable Inline: Heatmap Semanal y Tabla Cronológica -->
+                        <div id="tech-details-${tec.id}" style="display: ${isOpen ? 'block' : 'none'}; border-top: 1px solid var(--border-default); margin-top: 16px; padding-top: 16px;" onclick="event.stopPropagation()">
                         </div>
                     </div>
                 `;
             });
 
             container.innerHTML = html;
+
+            // Re-renderizar drawers abiertos
+            data.forEach(tec => {
+                if (gOpenTechs.has(tec.id)) {
+                    renderTechInline(tec);
+                }
+            });
         }
 
         // Llenar el selector desplegable de la Vista 2
@@ -1220,11 +1423,11 @@
 
         // Transición directa desde la Vista 1 hacia el detalle del técnico en la Vista 2
         function verHorarioTecnico(tecId) {
-            gTecnicoSeleccionadoId = tecId;
+            gTecnicoSeleccionadoId = parseInt(tecId);
             const select = document.getElementById('select-tecnico-detalle');
-            if (select) select.value = tecId;
+            if (select) select.value = gTecnicoSeleccionadoId;
             cambiarVista('individual');
-            mostrarDetalleTecnico(tecId);
+            mostrarDetalleTecnico(gTecnicoSeleccionadoId);
         }
 
         // Mostrar el Heatmap y actividades del técnico seleccionado en la Vista 2
@@ -1281,20 +1484,16 @@
             if (btnTar) btnTar.classList.toggle('active', gFiltroHistorial === 'TAREAS_INTERNOS');
         }
 
-        // Generar la matriz gráfica semanal (Lunes a Sábado x 8am a 6pm)
-        function renderHeatmapMatriz(heatmap) {
-            const wrapper = document.getElementById('heatmap-matrix-wrapper');
+        // Construir la matriz gráfica semanal reutilizable (.heatmap-grid)
+        function generarHtmlHeatmap(heatmap) {
             if (!heatmap || heatmap.length === 0) {
-                wrapper.innerHTML = '<div style="color:var(--text-muted); padding:20px;">Sin datos semanales disponibles.</div>';
-                return;
+                return '<div style="color:var(--text-muted); padding:20px; text-align:center;">Sin datos semanales disponibles.</div>';
             }
 
-            // Horas fijas de 8 a 18
             const horasHeaders = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18];
-
             let html = '<div class="heatmap-grid">';
 
-            // 1. Fila de Cabecera (Horas)
+            // 1. Cabecera de Horas
             html += '<div class="heatmap-col-header" style="text-align:left;">Día / Hora</div>';
             horasHeaders.forEach(h => {
                 html += `<div class="heatmap-col-header">${String(h).padStart(2, '0')}:00</div>`;
@@ -1332,15 +1531,15 @@
 
                     let tooltipMsg = '';
                     if (esInstantSlot) {
-                        tooltipMsg = `${dia.dia_nombre} ${String(h).padStart(2, '0')}:00 - ${horaFinStr} | ⚡ Actividad puntual registrada (<1 min) | Ticket: ${ticketInfo}`;
+                        tooltipMsg = `<strong>${dia.dia_nombre} ${String(h).padStart(2, '0')}:00 - ${horaFinStr}</strong><br><span style="color:#c084fc;">⚡ Actividad puntual registrada (&lt;1 min)</span><br>Ticket: ${ticketInfo}`;
                     } else {
-                        tooltipMsg = `${dia.dia_nombre} ${String(h).padStart(2, '0')}:00 - ${horaFinStr} | ${mins} min | Ticket: ${ticketInfo}`;
+                        tooltipMsg = `<strong>${dia.dia_nombre} ${String(h).padStart(2, '0')}:00 - ${horaFinStr}</strong><br>Minutos trabajados: <strong>${mins} min</strong><br>Ticket: ${ticketInfo}`;
                     }
 
                     html += `
                         <div class="heatmap-cell ${levelClass}" 
                              data-tooltip="${tooltipMsg.replace(/"/g, '&quot;')}"
-                             title="${tooltipMsg.replace(/"/g, '&quot;')}"
+                             title="${tooltipMsg.replace(/<[^>]*>?/gm, '')}"
                              onmouseenter="mostrarTooltip(event, this)"
                              onmouseleave="ocultarTooltip()">
                         </div>
@@ -1349,48 +1548,32 @@
             });
 
             html += '</div>';
-            wrapper.innerHTML = html;
+            return html;
         }
 
-        // Renderizar tabla de historial cronológico con filtros dinámicos e insignias semánticas
-        function renderTablaActividades(actividades) {
-            const tbody = document.getElementById('tbody-historial-individual');
-            if (!actividades) actividades = [];
+        // Generar la matriz gráfica semanal en Vista 2
+        function renderHeatmapMatriz(heatmap) {
+            const wrapper = document.getElementById('heatmap-matrix-wrapper');
+            if (!wrapper) return;
+            wrapper.innerHTML = generarHtmlHeatmap(heatmap);
+        }
 
-            // 1. Contadores dinámicos para los chips de filtrado
-            let cTodos = 0;
-            let cClientes = 0;
-            let cTareasInternos = 0;
+        // Generador de filas HTML para la tabla cronológica de 6 columnas
+        function generarFilasTabla(actividades, filtro) {
+            if (!actividades || actividades.length === 0) {
+                return '<tr><td colspan="6" style="text-align:center; color:var(--text-muted); padding:24px;">Sin actividades registradas en el periodo seleccionado.</td></tr>';
+            }
 
-            actividades.forEach(a => {
-                cTodos++;
-                const tipo = a.tipo_origen || (String(a.ticket || '').startsWith('TAR-') ? 'TAREA' : (String(a.ticket || '').startsWith('ST-INT-') ? 'INTERNO' : 'CLIENTE'));
-                if (tipo === 'CLIENTE') {
-                    cClientes++;
-                } else {
-                    cTareasInternos++;
-                }
-            });
-
-            const elTodos = document.getElementById('count-filter-todos');
-            const elCli = document.getElementById('count-filter-cliente');
-            const elTar = document.getElementById('count-filter-tareas');
-            if (elTodos) elTodos.textContent = cTodos;
-            if (elCli) elCli.textContent = cClientes;
-            if (elTar) elTar.textContent = cTareasInternos;
-
-            // 2. Filtrar actividades según la pestaña activa
             const actividadesFiltradas = actividades.filter(a => {
-                if (gFiltroHistorial === 'TODOS') return true;
+                if (!filtro || filtro === 'TODOS') return true;
                 const tipo = a.tipo_origen || (String(a.ticket || '').startsWith('TAR-') ? 'TAREA' : (String(a.ticket || '').startsWith('ST-INT-') ? 'INTERNO' : 'CLIENTE'));
-                if (gFiltroHistorial === 'CLIENTE') return tipo === 'CLIENTE';
-                if (gFiltroHistorial === 'TAREAS_INTERNOS') return (tipo === 'TAREA' || tipo === 'INTERNO');
+                if (filtro === 'CLIENTE') return tipo === 'CLIENTE';
+                if (filtro === 'TAREAS_INTERNOS') return (tipo === 'TAREA' || tipo === 'INTERNO');
                 return true;
             });
 
             if (actividadesFiltradas.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:var(--text-muted); padding:24px;">No se encontraron actividades registradas para este filtro en el periodo seleccionado.</td></tr>';
-                return;
+                return '<tr><td colspan="6" style="text-align:center; color:var(--text-muted); padding:24px;">No se encontraron actividades para este filtro en el periodo seleccionado.</td></tr>';
             }
 
             let rows = '';
@@ -1483,27 +1666,56 @@
                 `;
             });
 
-            tbody.innerHTML = rows;
+            return rows;
         }
 
-        // Control de Tooltip Flotante
+        // Renderizar tabla de historial cronológico en Vista 2
+        function renderTablaActividades(actividades) {
+            const tbody = document.getElementById('tbody-historial-individual');
+            if (!actividades) actividades = [];
+
+            let cTodos = 0;
+            let cClientes = 0;
+            let cTareasInternos = 0;
+
+            actividades.forEach(a => {
+                cTodos++;
+                const tipo = a.tipo_origen || (String(a.ticket || '').startsWith('TAR-') ? 'TAREA' : (String(a.ticket || '').startsWith('ST-INT-') ? 'INTERNO' : 'CLIENTE'));
+                if (tipo === 'CLIENTE') {
+                    cClientes++;
+                } else {
+                    cTareasInternos++;
+                }
+            });
+
+            const elTodos = document.getElementById('count-filter-todos');
+            const elCli = document.getElementById('count-filter-cliente');
+            const elTar = document.getElementById('count-filter-tareas');
+            if (elTodos) elTodos.textContent = cTodos;
+            if (elCli) elCli.textContent = cClientes;
+            if (elTar) elTar.textContent = cTareasInternos;
+
+            tbody.innerHTML = generarFilasTabla(actividades, gFiltroHistorial);
+        }
+
+        // Control de Tooltip Flotante Inteligente con Glassmorphism
         function mostrarTooltip(e, el) {
-            const tip = document.getElementById('floating-tooltip');
-            const msg = el.getAttribute('data-tooltip');
+            const tip = document.getElementById('heatmap-tooltip') || document.getElementById('floating-tooltip');
+            const msg = el.getAttribute('data-tooltip') || el.getAttribute('title');
             if (!tip || !msg) return;
 
-            tip.textContent = msg;
+            tip.innerHTML = msg;
             tip.style.display = 'block';
 
             const rect = el.getBoundingClientRect();
             let left = rect.left + (rect.width / 2) - (tip.offsetWidth / 2);
             let top = rect.top - tip.offsetHeight - 8;
 
-            if (left < 10) left = 10;
-            if (left + tip.offsetWidth > window.innerWidth - 10) {
-                left = window.innerWidth - tip.offsetWidth - 10;
+            if (left < 12) left = 12;
+            if (left + tip.offsetWidth > window.innerWidth - 12) {
+                left = window.innerWidth - tip.offsetWidth - 12;
             }
-            if (top < 10) {
+            if (top < 12) {
                 top = rect.bottom + 8;
             }
 
@@ -1512,7 +1724,7 @@
         }
 
         function ocultarTooltip() {
-            const tip = document.getElementById('floating-tooltip');
+            const tip = document.getElementById('heatmap-tooltip') || document.getElementById('floating-tooltip');
             if (tip) tip.style.display = 'none';
         }
 
