@@ -1,6 +1,6 @@
-// Service Worker - Petulap PWA v27 (Garantias KPI, Login premium, Fix blur overlays v1.5.7)
+// Service Worker - Petulap PWA v28 (Login WhatsApp detector, 3 anos soporte, footer v1.5.7c)
  
-var CACHE_NAME = 'petulap-v27';
+var CACHE_NAME = 'petulap-v28';
 var ASSETS = [
     './',
     'index.html',

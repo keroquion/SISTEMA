@@ -36,9 +36,9 @@ Para garantizar trazabilidad absoluta, auditoría técnica rigurosa y claridad e
 ### Changed
 - `garantias.html`: Sección de contenido rediseñada con fila de KPI (6 tarjetas: Total, Preparando, Enviado, En Proceso, Resuelto, Rechazado). Carga asíncrona vía `api/garantias.php?action=resumen`.
 - `garantias.html`: Filtro `<select>` reemplazado por chips interactivos con función `filtrarEstado()`. Renderizado de lista mejorado con tarjetas tipo `gar-card` + badges de estado con colores semánticos.
-- `login.html`: Rediseño premium con panel izquierdo de branding institucional (logo oficial, sedes Lima/Arequipa, garantía 90 días), panel derecho con formulario refinado, password toggle, ícono de ojo, gradiente azul corporativo, footer con versión y RUC.
+- `login.html`: Rediseño corporativo de alto impacto con sedes oficiales de Arequipa (Yanahuara y Cayma) según `petulap-info-y-recomendaciones.md`. Enlaces inteligentes de WhatsApp (+51 983 396 137 y 942 770 228) que reconocen dispositivo para abrir app nativa en móviles o WhatsApp Web en PC. Soporte técnico por 3 años para equipos adquiridos en Petulap y footer reubicado al panel izquierdo.
 - `api/garantias.php`: Nuevo action `resumen` — retorna conteos agrupados por estado para alimentar los KPI cards.
-- `sw.js`: Cache bumpeado de `petulap-v26` a `petulap-v27`.
+- `sw.js`: Cache bumpeado a `petulap-v28` para invalidación instantánea de caché.
 
 ## [1.5.6] - Septiembre 2026
 
