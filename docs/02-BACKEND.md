@@ -227,6 +227,18 @@ Controla la campanita de alertas visuales en la esquina superior de la pantalla.
 
 ---
 
+### 1.17. Auditoría y Rendimiento Técnico: `api/desempeno.php`
+Calcula métricas de productividad, estado en vivo y auditoría histórica de tiempos de reparación para técnicos individuales y equipos colaborativos.
+
+| Acción (`action`) | Método | ¿Qué hace en una frase simple? |
+| :--- | :---: | :--- |
+| `resumen` | **GET** | Devuelve el consolidado de KPIs globales (eficiencia, tickets cerrados, tiempos promedio y ranking de técnicos). |
+| `detalle_tecnico` | **GET** | Desglosa la actividad de un técnico específico (`tecnico_id`), tiempos reales por ticket y roles (Titular/Colaborador/Equipo). |
+| `tecnicos_en_vivo` | **GET** | Provee el estado en tiempo real (`TRABAJANDO` o `LIBRE`), el ticket actual y la duración activa para cada técnico. |
+| `historial_semanal` | **GET** | Alimenta el heatmap de intensidad de trabajo y zonas calientes estilo GitHub. |
+
+---
+
 ## 2. Matriz de Seguridad y Control de Acceso
 
 No todas las ventanillas están abiertas para todo el mundo. El sistema aplica tres niveles de candado:
@@ -274,10 +286,11 @@ A continuación se lista cada cajón y su función:
 - **Relaciones:** Se vincula con las órdenes de servicio en `soporte_tecnico` y con los lotes en `lote_equipos`.
 
 ### 3. `soporte_tecnico` (Órdenes de Trabajo y Tickets)
-- **Columnas clave:** `id`, `numero_atencion` (`ST-...` o `TAR-...`), `cliente_id` (quién la trajo), `equipo_codigo`, `equipo_serie`, `equipo_descripcion`, `motivo_ingreso`, `diagnostico`, `solucion`, `prioridad`, `estado` (`PENDIENTE`, `EN_DIAGNOSTICO`, `EN_REPARACION`, `LISTO_PARA_ENTREGA`, `ENTREGADO`), `tecnico_id` (quién repara), `fecha_ingreso`, `fecha_entrega`.
+- **Columnas clave:** `id`, `numero_atencion` (`ST-...` o `TAR-...`), `cliente_id` (quién la trajo), `equipo_codigo`, `equipo_serie`, `equipo_descripcion`, `motivo_ingreso`, `diagnostico`, `solucion`, `prioridad`, `estado` (`PENDIENTE`, `EN_DIAGNOSTICO`, `EN_REPARACION`, `LISTO_PARA_ENTREGA`, `ENTREGADO`), `tecnico_id` (técnico titular), `tecnicos_adicionales` (IDs de técnicos colaboradores separados por coma), `fecha_ingreso`, `fecha_entrega`.
 - **Relaciones:**  
-  - `cliente_id` apunta a `personas.id` (el cliente dueño).  
-  - `tecnico_id` apunta a `personas.id` (el técnico asignado).
+  - `cliente_id` apunta a `personas.id` (el cliente dueño o nulo en órdenes internas).  
+  - `tecnico_id` apunta a `personas.id` (el técnico asignado titular).
+  - `tecnicos_adicionales` referencia múltiples IDs de `personas.id` para trabajo colaborativo o en equipo.
 
 ### 4. `secuencias_tickets` (Contador de Tickets Diarios)
 - **Columnas clave:** `fecha_str` (fecha en formato `AAAAMMDD`), `ultimo_valor` (número correlativo actual del día).
