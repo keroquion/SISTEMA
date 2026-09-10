@@ -28,6 +28,18 @@ Para garantizar trazabilidad absoluta, auditoría técnica rigurosa y claridad e
 - **`[Security]`**: Implementación de un pipeline de Integración y Despliegue Continuo (CI/CD) automatizado desde GitHub hacia el hosting de producción (cPanel/Apache) para reemplazar el traspaso manual por FTP y mitigar el riesgo de desincronización o error humano en despliegues.
 - **`[Changed]`**: Coordinación en el panel de control del servidor (cPanel) para renombrar la base de datos de `petumjvq_pruebas` a un identificador formal de producción (ej. `petumjvq_sistema`), actualizando la variable de entorno en el servidor de forma segura.
 
+## [1.5.7] — 2026-09-10
+
+### Fixed
+- `garantias.html`: Bug crítico — overlays `#modal-overlay` y `#modal-triaje-overlay` sin `display:none` causaban efecto blur/pantalla borrosa en carga inicial. Agregado `style="display:none"` a ambos nodos.
+
+### Changed
+- `garantias.html`: Sección de contenido rediseñada con fila de KPI (6 tarjetas: Total, Preparando, Enviado, En Proceso, Resuelto, Rechazado). Carga asíncrona vía `api/garantias.php?action=resumen`.
+- `garantias.html`: Filtro `<select>` reemplazado por chips interactivos con función `filtrarEstado()`. Renderizado de lista mejorado con tarjetas tipo `gar-card` + badges de estado con colores semánticos.
+- `login.html`: Rediseño premium con panel izquierdo de branding institucional (logo oficial, sedes Lima/Arequipa, garantía 90 días), panel derecho con formulario refinado, password toggle, ícono de ojo, gradiente azul corporativo, footer con versión y RUC.
+- `api/garantias.php`: Nuevo action `resumen` — retorna conteos agrupados por estado para alimentar los KPI cards.
+- `sw.js`: Cache bumpeado de `petulap-v26` a `petulap-v27`.
+
 ## [1.5.6] - Septiembre 2026
 
 ### Remediación Integral de Creación de Órdenes en Recepción y Sincronización de Estados en Tablero Kanban

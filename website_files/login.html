@@ -4,189 +4,421 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
   <title>Login - Petulap SST</title>
-  
+  <meta name="description" content="Acceso seguro al Sistema de Seguimiento Técnico de Petulap S.A.C.">
+
   <link rel="stylesheet" href="css/tokens.css?v=1">
-    <link rel="stylesheet" href="css/styles.css?v=3">
-      <link rel="icon" type="image/png" href="img/favicon-petulap.png">
-    <link rel="apple-touch-icon" href="img/favicon-petulap.png">
-    <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#F4F7FE">
+  <link rel="stylesheet" href="css/styles.css?v=3">
+  <link rel="icon" type="image/png" href="img/favicon-petulap.png">
+  <link rel="apple-touch-icon" href="img/favicon-petulap.png">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#1E3A5F">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Petulap SST">
-  
+
   <script>
-    if ("serviceWorker" in navigator) { 
-      window.addEventListener("load", () => { 
-        navigator.serviceWorker.register("sw.js").then(r => console.log("SW ok")).catch(e => console.log("SW fail", e)); 
-      }); 
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("sw.js").then(r => console.log("SW ok")).catch(e => console.log("SW fail", e));
+      });
     }
   </script>
 
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- Icons -->
-    <script src="https://unpkg.com/@phosphor-icons/web"></script>
-    
-    <!-- Dashboard Styles -->
-    <link rel="stylesheet" href="css/dashboard.css?v=3">
-    <style>
-      body {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          min-height: 100vh;
-          background-color: var(--bg-body);
-          margin: 0;
-          font-family: 'Inter', sans-serif;
-      }
-      .login-container {
-          width: 100%;
-          max-width: 400px;
-          padding: 20px;
-      }
-      .login-card {
-          background: var(--bg-card);
-          padding: 40px 30px;
-          border-radius: var(--border-radius);
-          box-shadow: var(--card-shadow);
-          text-align: center;
-      }
-      .login-logo {
-          font-size: 48px;
-          margin-bottom: 10px;
-      }
-      .login-card h2 {
-          color: var(--dark-text);
-          font-size: 24px;
-          font-weight: 700;
-          margin-bottom: 5px;
-          margin-top: 0;
-      }
-      .login-subtitle {
-          color: var(--gray-text);
-          font-size: 14px;
-          margin-bottom: 30px;
-      }
-      .form-group {
-          margin-bottom: 20px;
-          text-align: left;
-      }
-      .form-label {
-          display: block;
-          font-size: 13px;
-          font-weight: 600;
-          color: var(--dark-text);
-          margin-bottom: 8px;
-      }
-      .form-control {
-          width: 100%;
-          padding: 12px 16px;
-          border: 1px solid var(--border-color);
-          border-radius: 8px;
-          font-size: 14px;
-          font-family: 'Inter', sans-serif;
-          transition: var(--transition);
-          box-sizing: border-box;
-      }
-      .form-control:focus {
-          outline: none;
-          border-color: var(--primary);
-          box-shadow: 0 0 0 3px var(--primary-light);
-      }
-      .btn-primary {
-          width: 100%;
-          padding: 14px;
-          background-color: var(--primary);
-          color: white;
-          border: none;
-          border-radius: 8px;
-          font-size: 15px;
-          font-weight: 600;
-          cursor: pointer;
-          transition: var(--transition);
-          margin-top: 10px;
-      }
-      .btn-primary:hover {
-          background-color: var(--primary-hover);
-      }
-      .public-link {
-          display: block;
-          margin-top: 25px;
-          color: var(--primary);
-          font-size: 13px;
-          font-weight: 500;
-          text-decoration: none;
-      }
-      .error-msg {
-          color: var(--danger);
-          background-color: var(--danger-light);
-          padding: 12px;
-          border-radius: 8px;
-          font-size: 13px;
-          font-weight: 500;
-          margin-top: 20px;
-          display: none;
-      }
-    </style>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  <link rel="stylesheet" href="css/dashboard.css?v=3">
 
-    <script>
-      (function(){
-        if(localStorage.getItem('petulap-theme') === 'dark') {
-          document.documentElement.setAttribute('data-theme', 'dark');
-        }
-      })();
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body { height: 100%; margin: 0; font-family: 'Inter', sans-serif; }
 
-      function toggleTheme() {
-        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-        if (isDark) {
-          document.documentElement.removeAttribute('data-theme');
-          localStorage.setItem('petulap-theme', 'light');
-        } else {
-          document.documentElement.setAttribute('data-theme', 'dark');
-          localStorage.setItem('petulap-theme', 'dark');
-        }
-        const icon = document.querySelector('.theme-toggle-btn i');
-        if (icon) icon.className = isDark ? 'ph ph-moon' : 'ph ph-sun';
-      }
-      window.toggleTheme = toggleTheme;
+    body {
+      display: flex;
+      min-height: 100vh;
+      background: var(--bg-body);
+    }
 
-      document.addEventListener('DOMContentLoaded', () => {
-        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-        const icon = document.querySelector('.theme-toggle-btn i');
-        if (icon && isDark) icon.className = 'ph ph-sun';
-      });
-    </script>
+    /* ---- LEFT BRAND PANEL ---- */
+    .login-brand {
+      flex: 0 0 400px;
+      background: linear-gradient(145deg, #0D2B4E 0%, #1E4080 55%, #1A5276 100%);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 48px 44px;
+      position: relative;
+      overflow: hidden;
+    }
+    .login-brand::before {
+      content: '';
+      position: absolute;
+      width: 340px; height: 340px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.05);
+      top: -90px; left: -90px;
+    }
+    .login-brand::after {
+      content: '';
+      position: absolute;
+      width: 260px; height: 260px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.04);
+      bottom: -60px; right: -60px;
+    }
+    .brand-logo {
+      width: 130px;
+      margin-bottom: 28px;
+      filter: brightness(0) invert(1) drop-shadow(0 2px 8px rgba(0,0,0,.25));
+    }
+    .brand-tagline {
+      font-size: 24px;
+      font-weight: 800;
+      color: #fff;
+      line-height: 1.25;
+      margin: 0 0 10px 0;
+    }
+    .brand-sub {
+      font-size: 14px;
+      color: rgba(255,255,255,.68);
+      line-height: 1.65;
+      margin: 0 0 36px 0;
+    }
+    .brand-info-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .brand-info-item i {
+      color: rgba(255,255,255,.55);
+      font-size: 15px;
+      margin-top: 3px;
+      flex-shrink: 0;
+    }
+    .brand-info-item span {
+      font-size: 13px;
+      color: rgba(255,255,255,.75);
+      line-height: 1.5;
+    }
+    .brand-guarantee {
+      margin-top: 36px;
+      padding: 13px 16px;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 10px;
+      font-size: 13px;
+      color: rgba(255,255,255,.8);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .brand-guarantee i { font-size: 19px; color: #4ADE80; flex-shrink: 0; }
+
+    /* ---- RIGHT FORM PANEL ---- */
+    .login-form-panel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 48px;        /* más padding horizontal */
+      position: relative;
+      min-width: 0;
+    }
+
+    .theme-toggle-btn {
+      position: absolute;
+      top: 20px; right: 20px;
+      background: none;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      width: 38px; height: 38px;
+      cursor: pointer;
+      color: var(--text-secondary);
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: var(--transition);
+    }
+    .theme-toggle-btn:hover { background: var(--bg-hover); color: var(--primary); }
+
+    /* Container que centra el card */
+    .login-container {
+      width: 100%;
+      max-width: 440px;          /* ligeramente más ancho */
+    }
+
+    /* Logo mobile */
+    .mobile-logo {
+      display: none;
+      text-align: center;
+      margin-bottom: 24px;
+    }
+    .mobile-logo img { height: 40px; }
+
+    /* CARD */
+    .login-card {
+      background: var(--bg-card);
+      padding: 40px 40px;        /* padding generoso para que el contenido respire */
+      border-radius: 16px;
+      box-shadow: 0 4px 32px rgba(0,0,0,.1);
+    }
+
+    .login-heading {
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--text-primary);
+      margin: 0 0 6px 0;
+    }
+    .login-subtitle {
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin: 0 0 28px 0;
+    }
+
+    .form-group { margin-bottom: 18px; }
+    .form-label {
+      display: block;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 7px;
+      letter-spacing: .4px;
+      text-transform: uppercase;
+    }
+    .input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    .input-wrapper i.input-icon {
+      position: absolute;
+      left: 12px;
+      color: var(--text-secondary);
+      font-size: 16px;
+      pointer-events: none;
+    }
+    .form-control {
+      width: 100%;
+      padding: 13px 16px 13px 40px;
+      border: 1.5px solid var(--border-color);
+      border-radius: 10px;
+      font-size: 14px;
+      font-family: 'Inter', sans-serif;
+      background: var(--bg-body);
+      color: var(--text-primary);
+      transition: var(--transition);
+    }
+    .form-control:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(30,64,175,.12);
+    }
+    .toggle-pass-btn {
+      position: absolute;
+      right: 10px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--text-secondary);
+      font-size: 16px;
+      padding: 4px 6px;
+      border-radius: 6px;
+      transition: var(--transition);
+      line-height: 1;
+    }
+    .toggle-pass-btn:hover { color: var(--primary); }
+
+    /* BOTÓN — sin wrap de texto */
+    .btn-login {
+      width: 100%;
+      padding: 14px 20px;
+      background: linear-gradient(135deg, #1E3A8A, #2563EB);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      transition: all .2s;
+      margin-top: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      white-space: nowrap;     /* ← evita el salto de línea */
+    }
+    .btn-login:hover:not(:disabled) {
+      background: linear-gradient(135deg, #1D4ED8, #3B82F6);
+      box-shadow: 0 4px 18px rgba(30,64,175,.38);
+      transform: translateY(-1px);
+    }
+    .btn-login:disabled { opacity: .65; cursor: not-allowed; transform: none; }
+
+    .error-msg {
+      display: none;
+      margin-top: 14px;
+      padding: 11px 14px;
+      background: #FEE2E2;
+      color: #991B1B;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      border-left: 4px solid #DC2626;
+    }
+    [data-theme="dark"] .error-msg { background: rgba(239,68,68,.15); color: #FCA5A5; }
+
+    .public-link {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      margin-top: 18px;
+      color: var(--primary);
+      font-size: 13px;
+      font-weight: 500;
+      text-decoration: none;
+      padding: 10px 14px;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      transition: var(--transition);
+      white-space: nowrap;
+    }
+    .public-link:hover { background: var(--bg-hover); border-color: var(--primary); }
+
+    .login-footer {
+      margin-top: 24px;
+      text-align: center;
+      font-size: 11.5px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    /* ---- RESPONSIVE ---- */
+    @media (max-width: 820px) {
+      .login-brand { display: none; }
+      .mobile-logo { display: block; }
+      .login-form-panel { padding: 32px 20px; }
+      .login-card { padding: 28px 22px; }
+    }
+  </style>
+
+  <script>
+    (function(){
+      if(localStorage.getItem('petulap-theme') === 'dark')
+        document.documentElement.setAttribute('data-theme', 'dark');
+    })();
+    function toggleTheme() {
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      if (isDark) { document.documentElement.removeAttribute('data-theme'); localStorage.setItem('petulap-theme','light'); }
+      else         { document.documentElement.setAttribute('data-theme','dark'); localStorage.setItem('petulap-theme','dark'); }
+      const icon = document.querySelector('.theme-toggle-btn i');
+      if (icon) icon.className = isDark ? 'ph ph-moon' : 'ph ph-sun';
+    }
+    window.toggleTheme = toggleTheme;
+    document.addEventListener('DOMContentLoaded', () => {
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      const icon = document.querySelector('.theme-toggle-btn i');
+      if (icon && isDark) icon.className = 'ph ph-sun';
+    });
+  </script>
 </head>
 <body>
-  <button class="theme-toggle-btn" aria-label="Cambiar tema" onclick="toggleTheme()" style="position:absolute; top:20px; right:20px; background:none; border:none; font-size:24px; cursor:pointer; color:var(--text-secondary);">
-    <i class="ph ph-moon"></i>
-  </button>
 
-  <div class="login-container">
-    <div class="card login-card">
-      <div class="login-logo"><i class="ph ph-lock-key"></i></div>
-      <h2>Petulap SST</h2>
-      <p class="login-subtitle">Acceso Seguro al Sistema</p>
+  <!-- ===== PANEL IZQUIERDO — BRANDING ===== -->
+  <div class="login-brand">
+    <img src="img/logo-petulap.png" alt="Petulap S.A.C." class="brand-logo">
 
-      <div class="form-group">
-        <label class="form-label">DNI / Usuario</label>
-        <input type="text" id="f-dni" class="form-control" placeholder="Ej: ADMIN001" autofocus onkeydown="if(event.key==='Enter') document.getElementById('f-pass').focus()">
+    <h1 class="brand-tagline">Sistema de Seguimiento Técnico</h1>
+    <p class="brand-sub">Gestión integral de equipos, garantías y soporte técnico profesional.</p>
+
+    <div class="brand-info-item">
+      <i class="ph ph-map-pin"></i>
+      <span>
+        <strong style="color:rgba(255,255,255,.9)">Oficina Yanahuara</strong><br>
+        Av. Ejército 314, 2do piso — Arequipa<br>
+        <strong style="color:rgba(255,255,255,.9)">Oficina Cayma</strong><br>
+        León XIII Mza A-4, 1er piso — Arequipa
+      </span>
+    </div>
+
+    <div class="brand-info-item">
+      <i class="ph ph-whatsapp-logo"></i>
+      <span>+51 983 396 137<br>
+        <span style="opacity:.7;font-size:12px">B2B / ventas: 942 770 228</span>
+      </span>
+    </div>
+
+    <div class="brand-info-item">
+      <i class="ph ph-clock"></i>
+      <span>Lun–Vie 10:30–19:30 · Sáb 10:30–18:00</span>
+    </div>
+
+    <div class="brand-guarantee">
+      <i class="ph ph-shield-check"></i>
+      <span>Garantía oficial de 90 días en todos los equipos reparados</span>
+    </div>
+  </div>
+
+  <!-- ===== PANEL DERECHO — FORMULARIO ===== -->
+  <div class="login-form-panel">
+    <button class="theme-toggle-btn" aria-label="Cambiar tema" onclick="toggleTheme()">
+      <i class="ph ph-moon"></i>
+    </button>
+
+    <div class="login-container">
+
+      <!-- Logo solo visible en mobile -->
+      <div class="mobile-logo">
+        <img src="img/logo-petulap.png" alt="Petulap S.A.C.">
       </div>
-      
-      <div class="form-group">
-        <label class="form-label">Contrasena</label>
-        <input type="password" id="f-pass" class="form-control" placeholder="••••••••" onkeydown="if(event.key==='Enter') intentarLogin()">
+
+      <div class="login-card">
+        <h2 class="login-heading">Bienvenido</h2>
+        <p class="login-subtitle">Ingresa tus credenciales para acceder al sistema</p>
+
+        <div class="form-group">
+          <label class="form-label" for="f-dni">DNI / Usuario</label>
+          <div class="input-wrapper">
+            <i class="ph ph-identification-badge input-icon"></i>
+            <input type="text" id="f-dni" class="form-control"
+              placeholder="Ej: ADMIN001" autocomplete="username"
+              autofocus onkeydown="if(event.key==='Enter') document.getElementById('f-pass').focus()">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="f-pass">Contraseña</label>
+          <div class="input-wrapper">
+            <i class="ph ph-lock-key input-icon"></i>
+            <input type="password" id="f-pass" class="form-control"
+              placeholder="••••••••" autocomplete="current-password"
+              onkeydown="if(event.key==='Enter') intentarLogin()">
+            <button type="button" class="toggle-pass-btn" onclick="togglePassword()" title="Mostrar/ocultar contraseña">
+              <i class="ph ph-eye" id="pass-eye-icon"></i>
+            </button>
+          </div>
+        </div>
+
+        <button class="btn-login" onclick="intentarLogin()" id="btn-submit">
+          <i class="ph ph-sign-in"></i> Ingresar al Sistema
+        </button>
+
+        <div class="error-msg" id="error-msg"></div>
+
+        <a href="consulta.html" class="public-link">
+          <i class="ph ph-magnifying-glass"></i> ¿Eres cliente? Rastrea tu equipo aquí
+        </a>
       </div>
 
-      <button class="btn btn-primary" onclick="intentarLogin()" id="btn-submit">Ingresar al Sistema</button>
-      
-      <div class="error-msg" id="error-msg"></div>
-
-      <a href="consulta.html" class="public-link">Eres cliente? Rastrear equipo aqui</a>
+      <div class="login-footer">
+        Petulap S.A.C. &copy; 2024–2026 &nbsp;·&nbsp; Sistema v1.5.7<br>
+        Acceso restringido a personal autorizado
+      </div>
     </div>
   </div>
 
@@ -194,52 +426,55 @@
   <script src="js/push.js"></script>
   <script src="js/check_auth.js"></script>
   <script>
+    function togglePassword() {
+      const input = document.getElementById('f-pass');
+      const icon = document.getElementById('pass-eye-icon');
+      input.type = input.type === 'password' ? 'text' : 'password';
+      icon.className = input.type === 'text' ? 'ph ph-eye-slash' : 'ph ph-eye';
+    }
+
     async function intentarLogin() {
-      const dni = document.getElementById('f-dni').value.trim();
+      const dni  = document.getElementById('f-dni').value.trim();
       const pass = document.getElementById('f-pass').value.trim();
       const errorDiv = document.getElementById('error-msg');
       const btn = document.getElementById('btn-submit');
 
       if (!dni || !pass) {
-        errorDiv.textContent = "Ingresa DNI y contrasena";
-        errorDiv.style.display = "block";
+        errorDiv.innerHTML = '<i class="ph ph-warning"></i> Ingresa DNI y contraseña';
+        errorDiv.style.display = 'block';
         if(typeof playSound === 'function') playSound('error');
         return;
       }
 
       btn.disabled = true;
       btn.innerHTML = '<i class="ph ph-spinner ph-spin"></i> Validando...';
-      errorDiv.style.display = "none";
+      errorDiv.style.display = 'none';
 
       try {
         const res = await fetch('api/auth.php?action=login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ dni: dni, password: pass })
+          body: JSON.stringify({ dni, password: pass })
         }).then(r => r.json());
 
         if (res.ok) {
           if(typeof playSound === 'function') playSound('success');
-          localStorage.setItem('tecnico_id', res.data.id);
+          localStorage.setItem('tecnico_id',     res.data.id);
           localStorage.setItem('tecnico_nombre', res.data.nombre);
-          localStorage.setItem('tecnico_tipo', res.data.tipo);
-          
-          // Subscribe to push notifications (non-blocking)
-          try { await petulap_subscribePush(); } catch(e) { console.log('Push setup skipped:', e); }
-          
+          localStorage.setItem('tecnico_tipo',   res.data.tipo);
+          try { await petulap_subscribePush(); } catch(e) { console.log('Push skip:', e); }
           window.location.href = res.data.start_url || 'index.html';
         } else {
-          throw new Error(res.msg || "Credenciales invalidas");
+          throw new Error(res.msg || 'Credenciales inválidas');
         }
-      } catch (err) {
+      } catch(err) {
         errorDiv.innerHTML = '<i class="ph ph-x"></i> ' + err.message;
-        errorDiv.style.display = "block";
+        errorDiv.style.display = 'block';
         if(typeof playSound === 'function') playSound('error');
         btn.disabled = false;
-        btn.innerHTML = "Ingresar al Sistema";
+        btn.innerHTML = '<i class="ph ph-sign-in"></i> Ingresar al Sistema';
       }
     }
   </script>
-
 </body>
 </html>

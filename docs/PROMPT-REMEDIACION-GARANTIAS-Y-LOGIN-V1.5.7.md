@@ -1,192 +1,222 @@
-# PROMPT MAESTRO: Remediación de Bug de Desenfoque (Blur), Rediseño de Garantías de Proveedor y Elevación Corporativa del Login (v1.5.7)
+# PROMPT MAESTRO DE INGENIERÍA: Remediación de Bug de Desenfoque (Blur), Rediseño de Garantías de Proveedor y Elevación Corporativa del Login (v1.5.7)
 
-> **Documento de Gobernanza Técnica y Control de Calidad Asistido por IA**  
-> **Basado en:** `docs/00-PROTOCOLO-DE-CAMBIOS-Y-PROMPTS.md` y `docs/12-SISTEMA-DE-DISENO-UI-UX.md`  
-> **Versión del Sistema:** Petulap SST v1.5.6 $\rightarrow$ **v1.5.7**  
-> **Objetivo:** Erradicar el bug visual de pantalla borrosa (blur overlay inicial) en `garantias.html`, modernizar integralmente la gestión de garantías de taller bajo estándar SaaS y transformar `login.html` en un portal de acceso corporativo de alto nivel con identidad de marca oficial, badges institucionales y usabilidad avanzada.
-
----
-
-## 1. ROL
-Actúa como **Ingeniero de Software Fullstack Senior y Diseñador de Producto UI/UX** para el proyecto **Petulap SST**.
+> **Documento de Gobernanza Técnica y Ejecución Asistida por IA de Nivel Élite (1 en 1 Millón)**  
+> **Sistema:** Petulap SST (Plataforma de Soporte Técnico, Taller, Lotes e Inventario)  
+> **Ubicación:** `docs/PROMPT-REMEDIACION-GARANTIAS-Y-LOGIN-V1.5.7.md`  
+> **Basado estrictamente en:** `docs/00-INICIALIZACION-EJECUTOR-DESARROLLADOR.MD`, `docs/00-PROTOCOLO-DE-CAMBIOS-Y-PROMPTS.md` y `docs/12-SISTEMA-DE-DISENO-UI-UX.md`  
+> **Versión del Sistema:** Petulap SST v1.5.6 $\rightarrow$ **v1.5.7**
 
 ---
 
-## 2. CONTEXTO OBLIGATORIO DE ARQUITECTURA
-Antes de generar o modificar cualquier archivo, consulta los documentos de gobernanza técnica:
-- `docs/00-PROTOCOLO-DE-CAMBIOS-Y-PROMPTS.md` (Las 7 Reglas de Oro y ciclo de 5 pasos).
-- `docs/02-BACKEND.md` (Catálogo de endpoints y base de datos relacional).
-- `docs/03-FRONTEND.md` (Catálogo de pantallas y Sección 7: *Cosas Frágiles* con identificadores protegidos).
-- `docs/05-CHANGELOG.md` (Historial oficial; la versión actual es **1.5.6**, este cambio será **[1.5.7]**).
-- `docs/08-CHECKLIST-TESTING.md` (Protocolo de Smoke Testing).
-- `docs/12-SISTEMA-DE-DISENO-UI-UX.md` (Tokens semánticos, componentes en vivo, heatmaps, badges `.live-chip` y microinteracciones).
+```markdown
+================================================================================
+BLOQUE DE ACTIVACIÓN OBLIGATORIO PARA EL AGENTE DE IA (COPIAR Y EJECUTAR)
+================================================================================
 
----
+ROL DEL AGENTE:
+Actúa como Ingeniero de Software Fullstack Senior y Desarrollador Ejecutor Quirúrgico para el proyecto Petulap SST, bajo las directrices estrictas de docs/00-INICIALIZACION-EJECUTOR-DESARROLLADOR.MD y docs/00-PROTOCOLO-DE-CAMBIOS-Y-PROMPTS.md.
 
-## 3. LAS 7 REGLAS DE ORO INNEGOCIABLES (COSAS FRÁGILES)
-1. **Jerarquía CSS estricta:** `<link>` en `<head>` en orden:  
-   `tokens.css` $\rightarrow$ `styles.css` $\rightarrow$ `dashboard.css`.
-2. **Identificadores protegidos intactos:**  
-   No alterar ni renombrar: `#mobile-menu-toggle`, `#mobile-sidebar`, `#lbl-nombre`, `#lbl-tecnico`, `.fab-chat`, `.notification-btn`, `#notif-dropdown`, `#notif-badge`.
-3. **Hrefs exactos en minúsculas:**  
-   Enlaces limpios sin `./` ni mayúsculas (ej: `href="garantias.html"`, `href="login.html"`).
-4. **Anti-flicker de modo oscuro:**  
-   El primer `<script>` en `<head>` debe ser el bloque síncrono que lee `localStorage.getItem('petulap-theme')`.
-5. **Consultas SQL 100% preparadas:**  
-   Toda interacción en `api/garantias.php` debe emplear `$stmt = $db->prepare(...)` y `bind_param()`.
-6. **Seguridad Backend y Sesiones:**  
-   Validar sesión activa en endpoints y respetar niveles de rol.
-7. **Zero dependencias externas:**  
-   Vanilla JavaScript ES6+, CSS nativo con variables de diseño, Phosphor Icons y Google Fonts Inter.
+DIRECTIVA PRIMARIA:
+Tu misión es resolver con precisión milimétrica y quirúrgica el bug de pantalla borrosa (blur) en garantias.html, modernizar la interfaz de gestión de garantías bajo el sistema de diseño ejecutivo SaaS (v1.5), y transformar login.html en un portal corporativo con la identidad visual oficial de Petulap S.A.C., sin introducir regresiones ni alterar código no solicitado.
 
----
+================================================================================
+GUARDRAILS Y RESTRICCIONES NEGATIVAS EXPLÍCITAS (HARD NEGATIVE CONSTRAINTS)
+================================================================================
+Bajo ninguna circunstancia debes violar las siguientes 8 restricciones. Cualquier infracción anulará la entrega:
 
-## 4. ANÁLISIS DE CAUSA RAÍZ: ¿POR QUÉ APARECE LA PANTALLA BORROSA (BLUR) EN `garantias.html`?
+1. ESTÁ ESTRICTAMENTE PROHIBIDO modificar o tocar archivos fuera de esta lista blanca:
+   - website_files/garantias.html
+   - website_files/login.html
+   - website_files/api/garantias.php
+   - website_files/sw.js
+   - CHANGELOG.md
+   - docs/05-CHANGELOG.md
+   - docs/02-BACKEND.md
+   - docs/PROMPT-REMEDIACION-GARANTIAS-Y-LOGIN-V1.5.7.md
+   (No toques mis_ordenes.html, recepcion_movil.html, soporte.html, inventario.html, repuestos.html ni ningún otro archivo).
 
-Tras la inspección del código fuente de `website_files/garantias.html` y las hojas de estilo:
+2. ESTÁ ESTRICTAMENTE PROHIBIDO renombrar, eliminar, desplazar u ocultar los IDENTIFICADORES PROTEGIDOS del DOM:
+   #mobile-menu-toggle, #mobile-sidebar, #lbl-nombre, #lbl-tecnico, .fab-chat, .notification-btn, #notif-dropdown, #notif-badge.
+   Son consumidos por dashboard.js y check_auth.js. Si los tocas, romperás la navegación global.
 
-1. **Causa Raíz del Blur en `garantias.html` (Línea 688):**
-   - En `website_files/garantias.html` (línea 688) se encuentra declarado el modal de triaje:
-     ```html
-     <!-- MODAL TRIAJE -->
-     <div class="modal-overlay" id="modal-triaje-overlay" onclick="cerrarModalTriaje()"></div>
-     <div class="modal card" id="modal-triaje">
-     ```
-   - **El Error Crítico:** El elemento `<div class="modal-overlay" id="modal-triaje-overlay">` **NO TIENE** `style="display:none;"` ni clase que lo oculte por defecto en la carga inicial del documento.
-   - En `website_files/css/styles.css` (línea 557), la clase `.modal-overlay` tiene las siguientes propiedades:
-     ```css
-     .modal-overlay {
-         position: fixed;
-         top: 0; left: 0; width: 100%; height: 100%;
-         background-color: rgba(15, 23, 42, 0.4);
-         backdrop-filter: blur(8px);
-         -webkit-backdrop-filter: blur(8px);
-         display: flex;
-         z-index: 1000;
-         animation: fadeIn 0.3s forwards;
+3. ESTÁ ESTRICTAMENTE PROHIBIDO alterar la jerarquía inalterable de CSS en el <head>:
+   1º tokens.css -> 2º styles.css -> 3º dashboard.css.
+
+4. ESTÁ ESTRICTAMENTE PROHIBIDO incorporar dependencias o librerías externas:
+   Cero Bootstrap, cero TailwindCSS, cero jQuery, cero paquetes npm. Exclusivamente Vanilla JavaScript ES6+, CSS nativo con variables de diseño, Phosphor Icons y Google Fonts Inter.
+
+5. ESTÁ ESTRICTAMENTE PROHIBIDO usar consultas SQL concatenadas en PHP:
+   100% de las consultas en api/garantias.php deben usar sentencias preparadas nativas ($stmt = $db->prepare(...) y bind_param()). Tolerancia cero a Inyección SQL.
+
+6. ESTÁ ESTRICTAMENTE PROHIBIDO alterar enlaces (href) o inventar rutas:
+   Mantener coincidencia milimétrica en minúsculas sin ./ (ej. href="garantias.html", href="pedidos_repuestos.html", href="consulta.html") para compatibilidad con check_auth.js y roles_config.
+
+7. ESTÁ ESTRICTAMENTE PROHIBIDO omitir el script anti-flicker de modo oscuro:
+   El bloque síncrono que lee localStorage.getItem('petulap-theme') debe permanecer como el primer <script> dentro de <head>.
+
+8. ESTÁ ESTRICTAMENTE PROHIBIDO inventar datos de la empresa:
+   Usar única y exclusivamente la información institucional oficial de Petulap S.A.C. estipulada en este documento.
+
+================================================================================
+CONTEXTO CORPORATIVO OFICIAL DE LA EMPRESA (PETULAP S.A.C.)
+================================================================================
+Usa estos datos exactos para enriquecer y elevar el portal de login.html:
+- Razón Social: Petulap S.A.C.
+- Eslogan / Especialidad: "Importación Directa de Laptops desde EE.UU. & Europa · Laboratorio Especializado de Servicio Técnico".
+- Ubicación Central: Arequipa, Perú.
+- Sedes Físicas Oficiales:
+  * Sede Yanahuara: Centro Comercial Cayma / Av. Ejército.
+  * Sede Cayma: Taller Central de Diagnóstico y Laboratorio Técnico.
+- Política de Garantía Oficial:
+  * 6 meses de garantía directa en laptops importadas.
+  * 3 años de cobertura en soporte técnico especializado.
+- Canales de Atención al Cliente: WhatsApp Oficial (+51 983 396 137).
+- Activos Visuales Oficiales:
+  * Logotipo Horizontal Oficial: img/logo-petulap.png
+  * Favicon e Icono de Aplicación: img/favicon-petulap.png
+
+================================================================================
+DIAGNÓSTICO TÉCNICO DE CAUSA RAÍZ: EL BUG DEL BLUR EN garantias.html
+================================================================================
+- Ubicación del Error: website_files/garantias.html, línea 688.
+- Código Responsable:
+  <!-- MODAL TRIAJE -->
+  <div class="modal-overlay" id="modal-triaje-overlay" onclick="cerrarModalTriaje()"></div>
+  <div class="modal card" id="modal-triaje">
+- Mecanismo del Fallo:
+  El elemento <div class="modal-overlay" id="modal-triaje-overlay"> carece del atributo style="display:none;".
+  En website_files/css/styles.css (línea 557), la regla .modal-overlay tiene:
+  {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background-color: rgba(15, 23, 42, 0.4);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      display: flex;
+      z-index: 1000;
+  }
+  Por tanto, al cargar la página, el navegador aplica de inmediato una capa fija a pantalla completa con desenfoque de 8px (blur).
+  Al hacer clic en cualquier lugar, se dispara onclick="cerrarModalTriaje()", el cual ejecuta document.getElementById('modal-triaje-overlay').style.display = 'none', haciendo que el blur desaparezca.
+- Solución Obligatoria:
+  Asignar explícitamente style="display:none;" tanto a #modal-triaje-overlay como a #modal-triaje, y asegurar que todos los modales permanezcan ocultos hasta que se invoque su función de apertura.
+
+================================================================================
+ESPECIFICACIÓN TÉCNICA Y TAREAS PASO A PASO
+================================================================================
+
+--------------------------------------------------------------------------------
+PASO 1: REMEDIACIÓN Y REDISEÑO EJECUTIVO DE website_files/garantias.html
+--------------------------------------------------------------------------------
+1.1. Corrección del Desenfoque (Blur):
+     Garantizar que los overlays y modales inicien con style="display:none;".
+
+1.2. Cabecera Ejecutiva & Barra de Acciones:
+     - Título: "Garantías con Proveedores" con icono <i class="ph-bold ph-shield-check">.
+     - Subtítulo: "Trazabilidad de equipos y repuestos enviados a garantía con mayoristas y proveedores de lotes."
+     - Botones de acción:
+       * <button class="btn-primary" onclick="abrirModalTriaje()"><i class="ph-bold ph-magic-wand"></i> Nueva Garantía (Desde Triaje)</button>
+       * <button class="btn-cross-nav" onclick="abrirModalManual()"><i class="ph-bold ph-plus-circle"></i> Nueva Garantía Manual</button>
+       * <button class="btn-refresh" onclick="cargarGarantias()"><i class="ph-bold ph-arrows-clockwise"></i> Actualizar</button>
+
+1.3. Fila de 4 Tarjetas KPI Ejecutivas (.kpis-row):
+     - KPI 1: Total Garantías Registradas (Azul, icono ph-shield-check, id="kpi-total").
+     - KPI 2: En Trámite / Enviadas (Pulso Ámbar, icono ph-paper-plane-tilt, id="kpi-enviadas").
+     - KPI 3: Aceptadas / Resueltas (Pulso Verde, icono ph-check-circle, id="kpi-aceptadas").
+     - KPI 4: Rechazadas / Observadas (Pulso Rojo, icono ph-x-circle, id="kpi-rechazadas").
+
+1.4. Filtros por Chips de Estado y Buscador con Debounce:
+     - Buscador instantáneo con input reactivo (250 ms debounce): filtra por N° Garantía, Proveedor, RUC, Lote de Origen o Notas.
+     - Chips interactivos con contadores vivos:
+       * [Todas]
+       * [Enviadas / En Trámite] (con punto pulsante ámbar .pulse-amber)
+       * [Aceptadas] (con punto pulsante verde .pulse-green)
+       * [Reemplazo Recibido]
+       * [Rechazadas] (con punto pulsante rojo .pulse-red)
+
+1.5. Vista Dual: Tabla Desktop y Tarjetas Móviles:
+     - Desktop: Tabla moderna con diseño alineado a dashboard.css.
+       Columnas: N° Garantía & Fecha, Lote / Origen, Proveedor & RUC, Equipos / Ítems, Estado con Badges Vivos (.badge-warning, .badge-success, .badge-danger, .badge-info), Acciones.
+       Acciones: Botón Ver/Gestionar (<i class="ph-bold ph-eye">), Botón Imprimir Guía (<i class="ph-bold ph-printer">).
+     - Mobile (@media max-width: 768px):
+       Grid de tarjetas apiladas con badges táctiles, resumen de lote y botones de acción de 44px de altura mínima.
+
+1.6. Modales Optimizados:
+     - Modal Detalle de Garantía: Muestra la información completa del proveedor, lote de origen, lista de laptops/repuestos incluidos, notas técnicas, y formulario para cambiar el estado (Aceptado, Rechazado, Reemplazo) con registro de nota de resolución.
+     - Modal Nueva Garantía Manual: Formulario compacto de 2 columnas para registrar proveedor, RUC, lote y observaciones sin invadir la pantalla principal.
+
+--------------------------------------------------------------------------------
+PASO 2: BACKEND EN website_files/api/garantias.php
+--------------------------------------------------------------------------------
+2.1. Incorporar el endpoint action=resumen o action=metricas:
+     Retornar en formato JSON estructurado:
+     {
+         "ok": true,
+         "data": {
+             "total": N,
+             "enviadas": N,
+             "aceptadas": N,
+             "rechazadas": N
+         }
      }
-     ```
-   - **Comportamiento Anómalo:** Tan pronto el usuario entra a `https://petulap.store/garantias.html`, el navegador renderiza este `div` en pantalla completa con filtro `backdrop-filter: blur(8px)`.
-   - **Por qué desaparece al hacer clic:** Porque el overlay tiene el atributo `onclick="cerrarModalTriaje()"`, cuya función de JavaScript ejecuta:
-     ```javascript
-     function cerrarModalTriaje() {
-         document.getElementById('modal-triaje').style.display = 'none';
-         document.getElementById('modal-triaje-overlay').style.display = 'none';
-     }
-     ```
-   - Al hacer clic en cualquier parte de la pantalla, se activa esta función y se oculta el overlay, revelando la página subyacente.
+2.2. Asegurar que las consultas de listado (case "list") soporten filtrado seguro por estado (?estado=...) usando sentencias preparadas ($stmt->prepare y bind_param).
 
-2. **Deficiencias Actuales en `garantias.html`:**
-   - La pantalla muestra formularios planos desplegados en todo el ancho, ocupando espacio vertical innecesario.
-   - Carece de tarjetas métricas (KPIs) ejecutivas para auditar garantías en trámite, aprobadas o rechazadas.
-   - Botón de cierre en modal con icono de casa (`<i class="ph ph-house"></i>`) en lugar de `ph-x`.
-   - No tiene vista responsive adaptativa en tarjetas para dispositivos móviles (`@media <= 768px`).
+--------------------------------------------------------------------------------
+PASO 3: ELEVACIÓN CORPORATIVA DE website_files/login.html
+--------------------------------------------------------------------------------
+3.1. Identidad Visual Oficial de Marca:
+     - Reemplazar el icono genérico <i class="ph ph-lock-key"> por el logotipo horizontal oficial:
+       <img src="img/logo-petulap.png" alt="Petulap SST" class="login-brand-logo" style="max-width: 220px; height: auto; margin-bottom: 16px;">
+     - Título: "Sistema de Soporte Técnico (SST)"
+     - Subtítulo: "Petulap S.A.C. · Laboratorio Técnico & Control Operativo"
 
-3. **Deficiencias Actuales en `login.html`:**
-   - Emplea un icono genérico de candado (`<div class="login-logo"><i class="ph ph-lock-key"></i></div>`) en lugar del logotipo oficial de la empresa (`img/logo-petulap.png`).
-   - Falta de contexto institucional: no menciona a **Petulap S.A.C.**, su trayectoria en importación desde EE.UU. y Europa, sus sedes en Arequipa (Yanahuara y Cayma), ni sus políticas de garantía (6 meses en laptops + 3 años de soporte técnico).
-   - El campo de contraseña carece de botón interactivo para mostrar/ocultar contraseña (`<i class="ph ph-eye"></i>` / `ph-eye-slash`).
-   - El diseño es básico y no transmite la solidez ejecutiva de una plataforma corporativa.
+3.2. Formulario de Acceso de Alto Nivel:
+     - Campo DNI / Usuario con icono <i class="ph-bold ph-user">.
+     - Campo Contraseña con icono <i class="ph-bold ph-lock-key"> y botón interactivo para Mostrar / Ocultar contraseña:
+       <button type="button" class="btn-toggle-password" onclick="togglePasswordVisibility()" title="Mostrar u ocultar contraseña">
+           <i class="ph-bold ph-eye" id="icon-toggle-pass"></i>
+       </button>
+     - Botón principal de login con estado interactivo ("Validando..." + spinner Phosphor) al enviar credenciales.
+     - Manejo de tema claro/oscuro respetando anti-flicker y botón superior de tema (Sol/Luna).
 
----
+3.3. Sección de Confianza Institucional:
+     - Badges semánticos debajo del formulario:
+       * <span class="trust-badge"><i class="ph-bold ph-map-pin"></i> Sedes Yanahuara & Cayma (Arequipa)</span>
+       * <span class="trust-badge"><i class="ph-bold ph-shield-check"></i> Garantía 6 Meses + 3 Años Soporte</span>
+     - Enlace prominente para clientes externos:
+       <div class="client-portal-card">
+           <span>¿Eres cliente de servicio técnico?</span>
+           <a href="consulta.html" class="client-track-link">
+               <strong>Rastrear el estado de tu equipo aquí</strong> <i class="ph-bold ph-arrow-right"></i>
+           </a>
+       </div>
 
-## 5. DEFINICIÓN DEL CAMBIO SOLICITADO (v1.5.7)
+--------------------------------------------------------------------------------
+PASO 4: ACTUALIZACIÓN DE SERVICE WORKER (website_files/sw.js)
+--------------------------------------------------------------------------------
+- Incrementar la versión de la caché PWA a:
+  const CACHE_NAME = 'petulap-v27';
+- Garantizar la invalidación instantánea de caché para garantias.html y login.html.
 
-- **Módulos a intervenir:**
-  1. `website_files/garantias.html` (Corrección inmediata del overlay con blur, rediseño completo de la interfaz de garantías bajo el sistema de diseño v1.5, 4 KPIs, filtros de estado, búsqueda debounced y modales limpios).
-  2. `website_files/api/garantias.php` (Incorporación de endpoint de métricas/resumen `action=resumen` y optimización de filtros por estado).
-  3. `website_files/login.html` (Rediseño visual integral con logo corporativo oficial `img/logo-petulap.png`, badges institucionales, selector mostrar/ocultar contraseña, microanimaciones y link de alta visibilidad para clientes a `consulta.html`).
-  4. `website_files/sw.js` (Incremento de versión de Service Worker: a `petulap-v27`).
-  5. `CHANGELOG.md` y `docs/05-CHANGELOG.md` (Registro oficial v1.5.7).
-  6. `docs/02-BACKEND.md` (Actualización de documentación de `api/garantias.php`).
+--------------------------------------------------------------------------------
+PASO 5: REGISTRO DOCUMENTAL Y DESPLIEGUE A PRODUCCIÓN
+--------------------------------------------------------------------------------
+- Actualizar CHANGELOG.md y docs/05-CHANGELOG.md registrando la versión [1.5.7] bajo el estándar Keep a Changelog.
+- Actualizar docs/02-BACKEND.md con el nuevo endpoint de api/garantias.php.
+- Ejecutar el script FTP oficial:
+  python private_scripts/sync_ftp_production.py
+- Verificar en vivo en https://petulap.store/garantias.html y https://petulap.store/login.html.
 
-- **Tipo de Intervención:** `[Fixed]`, `[Changed]`, `[Added]`.
-
----
-
-## 6. PLAN DETALLADO DE EJECUCIÓN PASO A PASO
-
-### Paso 1: Remediación y Rediseño de `garantias.html`
-1. **Corrección de Bug de Desenfoque:**
-   - Asegurar `style="display:none;"` explícito en `#modal-triaje-overlay` y `#modal-triaje`, así como en `#modal-overlay` y `#modal`.
-2. **Cabecera Ejecutiva:**
-   - Título: `Garantías con Proveedores` con icono `ph-shield-check`.
-   - Subtítulo: `Control de devoluciones, notas de crédito, piezas de recambio y reemplazos de lotes de importación.`
-   - Botones de acción en cabecera:
-     - `+ Nueva Garantía (Desde Triaje)` (abre modal de triaje asistido).
-     - `+ Nueva Garantía Manual` (abre modal de registro manual ordenado).
-     - `Actualizar` (recarga rápida de datos).
-3. **4 Tarjetas KPI Ejecutivas:**
-   - KPI 1: **Total Garantías** (Icono: `ph-shield-check`, Azul).
-   - KPI 2: **En Trámite / Enviadas** (Icono: `ph-paper-plane-tilt`, Pulso Ámbar).
-   - KPI 3: **Aceptadas / Resueltas** (Icono: `ph-check-circle`, Pulso Verde).
-   - KPI 4: **Rechazadas / Observadas** (Icono: `ph-x-circle`, Pulso Rojo).
-4. **Filtros por Chips y Búsqueda Debounced:**
-   - Barra de búsqueda reactiva (250 ms) por número de garantía, nombre de proveedor, RUC, lote o notas.
-   - Chips interactivos con contadores: `[Todas]`, `[Enviadas / En Trámite]`, `[Aceptadas]`, `[Reemplazo Recibido]`, `[Rechazadas]`.
-5. **Tabla Desktop y Tarjetas Móviles:**
-   - Desktop: Columnas claras para N° Garantía, Lote / Origen, Proveedor & RUC, Cantidad de Equipos/Piezas, Estado con Badges Vivos (`.badge-warning`, `.badge-success`, `.badge-danger`, `.badge-info`), Fecha de Registro y Acciones.
-   - Mobile (`@media <= 768px`): Tarjetas apiladas con toda la información clave, badges de estado y botones táctiles de 44px de altura.
-6. **Modales Rediseñados:**
-   - Modal de Detalle y Trazabilidad con historial de cambios, notas de resolución y formulario para actualizar estado (Aceptado, Rechazado, etc.).
-   - Modal de Creación (Manual / Desde Triaje) compacto, de 2 columnas, con validación de campos y cierre limpio (tecla ESC o clic en overlay).
-
----
-
-### Paso 2: Backend `api/garantias.php`
-1. **Endpoint `action=resumen` / `action=metricas`:**
-   - Retornar conteos consolidados:
-     - `total_garantias`
-     - `en_tramite` (estado `ENVIADO` o `PENDIENTE`)
-     - `aceptadas` (estado `ACEPTADO` o `REEMPLAZO_RECIBIDO`)
-     - `rechazadas` (estado `RECHAZADO`)
-2. **Consultas 100% Preparadas (`bind_param`):**
-   - Asegurar que todas las consultas SQL sigan el estándar de blindaje de `04-PREVENCION-SQL-INJECTION.md`.
-
----
-
-### Paso 3: Elevación Visual del Portal de Login (`login.html`)
-1. **Identidad de Marca Oficial:**
-   - Reemplazar el icono genérico `<i class="ph ph-lock-key"></i>` por el logotipo oficial horizontal:
-     `<img src="img/logo-petulap.png" alt="Petulap SST" class="login-brand-logo">`
-   - Título: `Sistema de Soporte Técnico (SST)`
-   - Subtítulo Institucional: `Petulap S.A.C. · Importación Directa & Laboratorio Especializado`
-2. **Insignias Institucionales de Confianza:**
-   - Badges visuales sutiles en la parte inferior o tarjeta lateral:
-     - *Sedes en Arequipa:* Yanahuara & Cayma.
-     - *Garantía Petulap:* 6 meses en laptops + 3 años de soporte técnico.
-3. **Usabilidad del Formulario:**
-   - Campo Usuario/DNI con icono `ph-user`.
-   - Campo Contraseña con icono `ph-lock-key` y botón de alternancia mostrar/ocultar (`togglePassword` con icono `ph-eye` / `ph-eye-slash`).
-   - Botón CTA principal "Ingresar al Sistema" con animación de spinner durante la validación.
-   - Enlace destacado para clientes externos:
-     *"¿Eres cliente y buscas tu orden? **Rastrear equipo aquí →**"* hacia `consulta.html`.
-4. **Anti-flicker y Soporte de Modo Oscuro:**
-   - Mantener el botón flotante superior de cambio de tema (Sol / Luna) y el script anti-flicker al inicio del `<head>`.
-
----
-
-### Paso 4: Service Worker y Cache Busting
-1. Actualizar `website_files/sw.js` a la versión `petulap-v27`:
-   `const CACHE_NAME = 'petulap-v27';`
-2. Asegurar que tanto `garantias.html` como `login.html` se sirvan con la versión más reciente sin retención en caché viejo.
-
----
-
-### Paso 5: Despliegue y Pruebas en Vivo
-1. Ejecutar el script FTP de sincronización a producción:
-   `python private_scripts/sync_ftp_production.py`
-2. Comprobar en vivo:
-   - `https://petulap.store/garantias.html`: Carga directa y nítida **SIN ningún desenfoque ni overlay fantasma**.
-   - `https://petulap.store/login.html`: Presentación del logotipo oficial, badges institucionales, alternador de visibilidad de contraseña y acceso fluido.
-3. Actualizar `CHANGELOG.md` y `docs/05-CHANGELOG.md` registrando `[1.5.7]`.
-
----
-
-## 7. ENTREGABLES ESPERADOS
-- Código corregido y modernizado de `website_files/garantias.html`.
-- Código optimizado de `website_files/api/garantias.php`.
-- Código elevado de `website_files/login.html`.
-- Incremento a `petulap-v27` en `website_files/sw.js`.
-- Registro formal en la bitácora `CHANGELOG.md`.
-- Despliegue confirmado vía FTP y reporte de pruebas en vivo.
+================================================================================
+CRITERIOS DE ACEPTACIÓN INNEGOCIABLES (DEFINITION OF DONE)
+================================================================================
+[ ] 1. Al acceder a https://petulap.store/garantias.html, la página carga limpia, nítida y SIN NINGÚN DESENFOQUE (blur) ni overlay visible.
+[ ] 2. Al hacer clic en "Nueva Garantía (Desde Triaje)" o "Nueva Garantía Manual", se abre el modal correspondiente suavemente y se cierra con botón X, cancelar o ESC.
+[ ] 3. Las 4 tarjetas KPI muestran métricas en tiempo real con pulsos ámbar/verde/rojo.
+[ ] 4. El buscador por texto filtra dinámicamente con debounce sin recargar la página.
+[ ] 5. En vista móvil (<= 768px), las garantías se muestran como tarjetas apiladas táctiles legibles sin desbordamiento horizontal.
+[ ] 6. En https://petulap.store/login.html se exhibe el logotipo oficial img/logo-petulap.png nítido en lugar de un icono genérico.
+[ ] 7. El botón de alternancia de contraseña en login permite alternar entre tipo "password" y "text" con cambio de icono (ph-eye / ph-eye-slash).
+[ ] 8. El enlace a consulta.html es visible y funcional para clientes que acceden desde WhatsApp.
+[ ] 9. sw.js está en la versión petulap-v27 y la transferencia FTP culmina sin errores.
+[ ] 10. Las 7 Cosas Frágiles están intactas y validadas contra docs/08-CHECKLIST-TESTING.md.
+```

@@ -162,6 +162,21 @@ switch ($action) {
         echo json_encode(["ok" => true, "msg" => "Garantía actualizada a $estado"]);
         break;
 
+
+    // KPI resumen por estado
+    case "resumen":
+        $sql = "SELECT
+            COUNT(*) as total,
+            SUM(estado='PREPARANDO') as preparando,
+            SUM(estado='ENVIADO') as enviado,
+            SUM(estado='EN_PROCESO_PROVEEDOR') as en_proceso,
+            SUM(estado='RESUELTO') as resuelto,
+            SUM(estado='RECHAZADO') as rechazado
+            FROM garantias_proveedor";
+        $row = $db->query($sql)->fetch_assoc();
+        echo json_encode(["ok" => true, "data" => $row]);
+        break;
+
     default:
         echo json_encode(["ok" => false, "msg" => "Accion no valida"]);
 }

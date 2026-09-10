@@ -104,6 +104,7 @@ Controla las computadoras o repuestos fallados que se envían a los mayoristas p
 | `crear_desde_lote` | **POST** | Junta en un solo clic todas las máquinas falladas de un lote nacional y arma la orden de garantía. |
 | `crear_desde_triaje` | **POST** | Arma una orden de garantía con todos los equipos fallados de una sesión masiva de inventario. |
 | `actualizar` | **POST** | Cambia el estado de la garantía (Enviado, Aprobado, Rechazado) y programa días de alarma de seguimiento. |
+| `resumen` | **GET** | Retorna conteo de KPI ejecutivos en tiempo real (total, enviadas, en proceso, resueltas, rechazadas). |
 
 ---
 

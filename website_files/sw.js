@@ -1,6 +1,6 @@
-// Service Worker - Petulap PWA v26 (Remediación recepción móvil y sincronización de Kanban v1.5.6)
+// Service Worker - Petulap PWA v27 (Garantias KPI, Login premium, Fix blur overlays v1.5.7)
  
-var CACHE_NAME = 'petulap-v26';
+var CACHE_NAME = 'petulap-v27';
 var ASSETS = [
     './',
     'index.html',
