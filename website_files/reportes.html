@@ -821,18 +821,18 @@ async function cargarReporte(doc = '') {
         rowStyle = "background-color: rgba(0, 198, 255, 0.15); border-left: 3px solid #00c6ff;";
     }
 
-    html += `<tr >
-      <td >${item.observacion||'-'}</td>
-      <td>${item.doc_compra||'-'}</td>
-      <td>
+    html += `<tr style="${rowStyle}">
+      <td data-label="Proveedor (Obs)">${item.observacion||'-'}</td>
+      <td data-label="Doc. Compra">${item.doc_compra||'-'}</td>
+      <td data-label="Código">
         <b>${item.codigo||'-'}</b>
-        ${tieneFecVenta ? `<br><small >Venta: ${item.fec_venta}</small>` : ''}
+        ${tieneFecVenta ? `<br><small>Venta: ${item.fec_venta}</small>` : ''}
       </td>
-      <td>${item.serie||'-'}</td>
-      <td>${item.marca||''} ${item.modelo||''}</td>
-      <td >${item.falla||'-'}</td>
-      <td class="triaje-${item.triaje_inicial}" style="opacity:0.8">${(item.triaje_inicial||'').replace(/_/g,' ')}</td>
-      <td class="triaje-${item.triaje}" >${(item.triaje||'').replace(/_/g,' ')}</td>
+      <td data-label="Serie">${item.serie||'-'}</td>
+      <td data-label="Marca/Modelo">${item.marca||''} ${item.modelo||''}</td>
+      <td data-label="Falla Registrada">${item.falla||'-'}</td>
+      <td data-label="Triaje Inicial" class="triaje-${item.triaje_inicial}" style="opacity:0.8">${(item.triaje_inicial||'').replace(/_/g,' ')}</td>
+      <td data-label="Triaje Actual" class="triaje-${item.triaje}">${(item.triaje||'').replace(/_/g,' ')}</td>
     </tr>`;
   });
   html += '</tbody></table>';

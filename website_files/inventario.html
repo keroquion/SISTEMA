@@ -83,8 +83,49 @@ if ("serviceWorker" in navigator) { window.addEventListener("load", () => { navi
     display: none !important;
   }
 
+  /* Detalle técnico colapsable en tarjeta móvil */
+  #tabla-inv .mobile-specs-cell {
+    display: block !important;
+    padding: 10px 14px !important;
+    background: var(--bg-surface-hover, #f8fafc) !important;
+    border-top: 1px dashed var(--border-default, #e2e8f0) !important;
+  }
+  #tabla-inv .mobile-specs-cell::before {
+    display: none !important;
+  }
+  .inv-specs-details summary {
+    font-weight: 600;
+    font-size: 12px;
+    color: var(--color-brand, #2563eb);
+    cursor: pointer;
+    user-select: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .inv-specs-details summary:hover {
+    text-decoration: underline;
+  }
+  .inv-specs-grid {
+    margin-top: 8px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px 12px;
+    font-size: 12px;
+    color: var(--text-secondary, #64748b);
+    background: var(--bg-card, #ffffff);
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid var(--border-default, #e2e8f0);
+  }
+
   /* Stats cards → 2 columnas en móvil */
   .stats { grid-template-columns: 1fr 1fr !important; gap: 10px !important; }
+}
+
+/* Celda oculta en escritorio */
+.mobile-specs-cell {
+  display: none;
 }
 </style>
 
@@ -510,6 +551,17 @@ function renderizar(lista, total) {
       <td data-label="Estado" class="badge-${e.estado}">${e.estado||''}</td>
       <td data-label="Doc.Compra">${e.doc_compra||''}</td>
       <td data-label="Observacion" style="max-width:150px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap" title="${(e.observacion||'').replace(/"/g,"'")}">${e.observacion||''}</td>
+      <td class="mobile-specs-cell">
+        <details class="inv-specs-details">
+          <summary><i class="ph ph-sliders"></i> Ver detalles técnicos</summary>
+          <div class="inv-specs-grid">
+            <div><b>CPU:</b> ${e.procesador||'—'}</div>
+            <div><b>RAM:</b> ${e.ram||'—'}</div>
+            <div><b>Disco:</b> ${e.hd_ssd||'—'}</div>
+            <div class="inv-obs-span"><b>Observación:</b> ${e.observacion||'—'}</div>
+          </div>
+        </details>
+      </td>
     </tr>`;
   });
   html += '</tbody></table>';

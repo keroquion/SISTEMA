@@ -143,20 +143,17 @@ Evaluación realizada emulando un dispositivo móvil compacto estándar (ancho d
 
 ---
 
-## 7. Qué Queda Pendiente (Próximos Pasos Recomendados)
-
-A pesar de que el rediseño responsive está 100% operativo en los archivos intervenidos, se documentan los siguientes puntos pendientes y optimizaciones futuras:
+## 7. Qué Queda Pendiente y Estado de Resoluciones
 
 1. **Inyección de `data-label` en `renderTabla()` de [reportes.html](file:///c:/Users/Admin/Desktop/tdf/website_files/reportes.html):**
-   - *Situación:* La estructura CSS para transformar `#tabla-reporte` en tarjetas ya fue agregada y está activa en el archivo. Sin embargo, en el código JavaScript donde se generan dinámicamente las celdas dentro del panel de detalle, no se agregaron los atributos `data-label="..."` debido a que la tabla depende de las columnas variables que retorne `api/equipos.php`.
-   - *Acción recomendada:* Una vez congelado el esquema final de campos del reporte de auditoría de equipos, mapear los atributos `data-label` en la función generadora de filas.
+   - *Estado:* ✅ **COMPLETADO (v1.4.8)**. Se inyectaron todos los atributos `data-label` (`"Proveedor (Obs)"`, `"Doc. Compra"`, `"Código"`, `"Serie"`, `"Marca/Modelo"`, `"Falla Registrada"`, `"Triaje Inicial"`, `"Triaje Actual"`) en cada celda dinámica generada en `cargarReporte()`, asegurando que la tabla de auditoría se despliegue como tarjetas verticales legibles con etiquetas en smartphones.
 
 2. **Despliegue Opcional de Especificaciones Ocultas en [inventario.html](file:///c:/Users/Admin/Desktop/tdf/website_files/inventario.html):**
-   - *Situación:* En dispositivos móviles menores a 768px se ocultaron intencionalmente las columnas `Procesador`, `RAM`, `HD/SSD` y `Observacion` para evitar tarjetas saturadas.
-   - *Mejora sugerida:* Implementar un botón o elemento colapsable nativo `<details><summary>Ver detalles técnicos</summary></details>` dentro de cada tarjeta para que el usuario pueda consultar esas especificaciones bajo demanda sin recargar la pantalla.
+   - *Estado:* ✅ **COMPLETADO (v1.4.8)**. Se implementó un elemento colapsable nativo `<details><summary>` con clase `.mobile-specs-cell` y grilla interna `.inv-specs-grid` (`Procesador`, `RAM`, `Disco`, `Observación`), manteniéndola oculta en escritorio (`display: none`) y expandible al toque en pantallas móviles sin sobrecargar la tarjeta inicial.
 
 3. **Renovación de Versión en Service Worker PWA (`sw.js`):**
-   - *Situación:* Durante la Parte 1 se actualizó la caché a `'petulap-v8'`. Dado que en esta Parte 2 se modificaron las vistas principales de trabajo diario de técnicos y administradores, se recomienda incrementar a `'petulap-v9'` en `website_files/sw.js` al momento de la publicación a producción para forzar la recarga de las nuevas reglas de estilo sin intervención del usuario.
+   - *Estado:* ✅ **COMPLETADO (v1.4.8)**. Se incrementó la caché a `'petulap-v17'` para forzar la actualización automática de activos en todos los clientes PWA y dispositivos móviles.
 
 4. **Batería de Pruebas E2E Automatizadas Móviles:**
    - *Recomendación:* Ejecutar una suite con Playwright o Cypress configurada con viewport móvil (`{ width: 375, height: 667 }`) para verificar de forma continua que futuras modificaciones en `styles.css` o `dashboard.css` no reintroduzcan barras de desplazamiento horizontal accidentales en ninguna de estas pantallas.
+

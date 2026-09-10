@@ -1,6 +1,6 @@
-// Service Worker - Petulap PWA v16 (Navegador Semanal, Fechas en Heatmap y Tiempo Asignado)
+// Service Worker - Petulap PWA v17 (Responsive Reportes data-label y Detalles Técnicos en Inventario)
  
-var CACHE_NAME = 'petulap-v16';
+var CACHE_NAME = 'petulap-v17';
 var ASSETS = [
     './',
     'index.html',

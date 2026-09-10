@@ -27,8 +27,22 @@ Para garantizar trazabilidad absoluta, auditoría técnica rigurosa y claridad e
 - **`[Security]`**: Parametrización con sentencias preparadas nativas de MySQLi (`prepare()` + `bind_param()`) en subconsultas dinámicas y reportes analíticos complejos restantes del backend.
 - **`[Security]`**: Implementación de un pipeline de Integración y Despliegue Continuo (CI/CD) automatizado desde GitHub hacia el hosting de producción (cPanel/Apache) para reemplazar el traspaso manual por FTP y mitigar el riesgo de desincronización o error humano en despliegues.
 - **`[Changed]`**: Coordinación en el panel de control del servidor (cPanel) para renombrar la base de datos de `petumjvq_pruebas` a un identificador formal de producción (ej. `petumjvq_sistema`), actualizando la variable de entorno en el servidor de forma segura.
-- **`[Added]`**: Implementación de inyección dinámica de atributos `data-label` en la función `renderTabla()` de [website_files/reportes.html](website_files/reportes.html) una vez congelado el esquema final de columnas de reportes, permitiendo el despliegue responsivo completo en tablas de auditoría dinámica.
-- **`[Added]`**: Incorporación de un elemento colapsable nativo `<details><summary>` en las tarjetas móviles de [website_files/inventario.html](website_files/inventario.html) para permitir consultar bajo demanda las especificaciones técnicas secundarias (`Procesador`, `RAM`, `HD/SSD`, `Observacion`) sin saturar la vista vertical en smartphones.
+
+---
+
+## [1.4.8] - Septiembre 2026
+
+### Remediación Responsive Completa: Data-Labels en Reportes y Detalles Técnicos Colapsables en Inventario
+*Módulos impactados:* `website_files/reportes.html`, `website_files/inventario.html`, `website_files/sw.js`.
+
+### Added
+- **`website_files/reportes.html`**:
+  - Inyección de atributos `data-label` (`Proveedor (Obs)`, `Doc. Compra`, `Código`, `Serie`, `Marca/Modelo`, `Falla Registrada`, `Triaje Inicial`, `Triaje Actual`) en cada una de las celdas generadas por `cargarReporte()`. Con esto se consumen al 100% las reglas CSS previamente definidas, mostrando tarjetas apiladas completas y legibles en dispositivos móviles sin desbordamiento horizontal.
+- **`website_files/inventario.html`**:
+  - Incorporación de componente colapsable nativo `<details><summary>` mediante la celda `.mobile-specs-cell` y su grilla de especificaciones `.inv-specs-grid`.
+  - Mantenimiento estricto del aislamiento en escritorio: `.mobile-specs-cell` permanece en `display: none` en monitores (>768px) para no alterar la estructura tabular de 12 columnas. En smartphones (<=768px), permite consultar bajo demanda `Procesador`, `RAM`, `HD/SSD` y `Observación` sin saturar la vista inicial de tarjetas.
+- **`website_files/sw.js`**:
+  - Incremento de versión de caché PWA a `'petulap-v17'` para forzar la actualización transparente de estilos y scripts en clientes en producción.
 
 ---
 

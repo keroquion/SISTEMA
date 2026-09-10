@@ -86,18 +86,22 @@ print('\n--- 4. Subiendo endpoints optimizados de escalabilidad a public_html/ap
 ftp.cwd('../api')
 
 api_files = [
+    'auth.php',
+    'consulta.php',
     'desempeno.php',
     'equipos.php',
     'garantias.php',
     'historial.php',
+    'importar.php',
     'lotes.php',
     'notificaciones.php',
     'personas.php',
+    'push.php',
     'repuestos.php',
+    'roles.php',
     'sesiones.php',
     'soporte.php',
     'turnos.php',
-    'auth.php',
 ]
 
 for fname in api_files:
