@@ -47,7 +47,8 @@ Para garantizar trazabilidad absoluta, auditoría técnica rigurosa y claridad e
 - `garantias.html`: Filtro `<select>` reemplazado por chips interactivos con función `filtrarEstado()`. Renderizado de lista mejorado con tarjetas tipo `gar-card` + badges de estado con colores semánticos.
 - `login.html`: Rediseño corporativo de alto impacto con sedes oficiales de Arequipa (Yanahuara y Cayma) según `petulap-info-y-recomendaciones.md`. Enlaces inteligentes de WhatsApp (+51 983 396 137 y 942 770 228) que reconocen dispositivo para abrir app nativa en móviles o WhatsApp Web en PC. Soporte técnico por 3 años para equipos adquiridos en Petulap y footer reubicado al panel izquierdo.
 - `api/garantias.php`: Nuevo action `resumen` — retorna conteos agrupados por estado para alimentar los KPI cards.
-- `sw.js`: Cache bumpeado a `petulap-v28` para invalidación instantánea de caché.
+- `recepcion_movil.html`: Botón de envío de ticket por WhatsApp con detección inteligente de dispositivo (`enviarWhatsAppInteligente()`) para abrir la app nativa en smartphones y WhatsApp Web directamente en PC/Laptop sin pantallas intermedias.
+- `sw.js`: Cache bumpeado a `petulap-v29` para invalidación instantánea de caché.
 
 ## [1.5.6] - Septiembre 2026
 

@@ -791,7 +791,12 @@
 
 ¡Muchas gracias por confiar en Petulap! 🤝`;
 
-          document.getElementById('btn-wp-exito').href = `https://wa.me/51${telCliente}?text=${encodeURIComponent(msgWP)}`;
+          const btnWp = document.getElementById('btn-wp-exito');
+          btnWp.href = `https://wa.me/51${telCliente}?text=${encodeURIComponent(msgWP)}`;
+          btnWp.onclick = function(e) {
+            e.preventDefault();
+            enviarWhatsAppInteligente(telCliente, msgWP);
+          };
           
           document.getElementById('btn-sticker-exito').dataset.numero = numero;
           document.getElementById('btn-sticker-exito').dataset.cliente = nombreCliente;
@@ -820,6 +825,26 @@
           btn.disabled = false;
           btn.innerHTML = originalHtml;
         }
+      }
+    }
+
+    /**
+     * Detección inteligente de dispositivo para envío de ticket por WhatsApp:
+     * - Móvil/Tablet: Abre directamente la app nativa (whatsapp://)
+     * - PC/Laptop: Abre WhatsApp Web directamente (https://web.whatsapp.com)
+     */
+    function enviarWhatsAppInteligente(telefono, mensaje) {
+      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      const cleanPhone = (telefono || '').replace(/\D/g, '');
+      const finalPhone = cleanPhone.startsWith('51') ? cleanPhone : ('51' + cleanPhone);
+      const encodedMsg = encodeURIComponent(mensaje || '');
+      if (isMobile) {
+        window.location.href = `whatsapp://send?phone=${finalPhone}&text=${encodedMsg}`;
+        setTimeout(() => {
+          window.open(`https://api.whatsapp.com/send?phone=${finalPhone}&text=${encodedMsg}`, '_blank');
+        }, 1200);
+      } else {
+        window.open(`https://web.whatsapp.com/send?phone=${finalPhone}&text=${encodedMsg}`, '_blank');
       }
     }
 
