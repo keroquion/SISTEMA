@@ -1,5 +1,3 @@
-
-
 # Changelog - Petulap SST
 
 Todas las modificaciones notables, remediaciones de seguridad, optimizaciones de interfaz y actualizaciones arquitectónicas de este proyecto se documentan en esta bitácora oficial.
@@ -29,6 +27,33 @@ Para garantizar trazabilidad absoluta, auditoría técnica rigurosa y claridad e
 - **`[Security]`**: Parametrización con sentencias preparadas nativas de MySQLi (`prepare()` + `bind_param()`) en subconsultas dinámicas y reportes analíticos complejos restantes del backend.
 - **`[Security]`**: Implementación de un pipeline de Integración y Despliegue Continuo (CI/CD) automatizado desde GitHub hacia el hosting de producción (cPanel/Apache) para reemplazar el traspaso manual por FTP y mitigar el riesgo de desincronización o error humano en despliegues.
 - **`[Changed]`**: Coordinación en el panel de control del servidor (cPanel) para renombrar la base de datos de `petumjvq_pruebas` a un identificador formal de producción (ej. `petumjvq_sistema`), actualizando la variable de entorno en el servidor de forma segura.
+
+## [1.5.5] - Septiembre 2026
+
+### Remediación Integral del Catálogo de Repuestos, Resiliencia Backend y Stock de Taller
+*Módulos impactados:* `website_files/repuestos.html`, `website_files/api/repuestos.php`, `website_files/sw.js`, `docs/02-BACKEND.md`, `docs/PROMPT-REMEDIACION-CATALOGO-REPUESTOS-V1.5.5.md`.
+
+> **Causa Raíz ("El Por Qué"):** Al acceder a `https://petulap.store/repuestos.html`, los usuarios reportaron que la pantalla mostraba "NO HAY NADA". La investigación técnica reveló una severa condición de carrera en la autenticación: un script en línea ejecutaba `setTimeout(checkAdmin, 500)`, disparando una alerta forzada y expulsando al usuario a `index.html` cuando la llamada asíncrona de `check_auth.js` demoraba más de 500 ms (frecuente en redes móviles o latencia de red). Además, los roles técnicos de taller no contaban con permisos para consultar existencias físicas de repuestos, y el backend carecía de una rutina de aseguramiento (`$ensureTableRepuestos`), retornando un arreglo vacío `[]` si la tabla no existía o estaba vacía. La interfaz previa era obsoleta, no cumplía el sistema de diseño v1.5, carecía de tarjetas KPI, chips de categoría y responsive móvil, y mostraba botones con iconos erróneos de casitas (`ph-house`). Se rediseñó integralmente el módulo bajo el estándar ejecutivo SaaS con 4 KPIs en vivo, filtros interactivos por chips, búsqueda instantánea debounced, vista responsive dual (tabla desktop y tarjetas táctiles móvil), modal moderno con validaciones y auto-poblado de piezas esenciales de taller.
+
+### Fixed
+- **Condición de Carrera en Autenticación (`repuestos.html`)**: Erradicación del temporizador rígido `setTimeout(checkAdmin, 500)`. La verificación de privilegios ahora se ejecuta de forma asíncrona y reactiva tras la respuesta del backend, habilitando Modo Consulta para técnicos y Modo Edición para administradores/gerencia sin expulsiones forzadas ni alertas intrusivas.
+- **Acceso por Roles en `roles_config`**: Auto-sincronización en backend para asegurar que `repuestos.html` y `pedidos_repuestos.html` figuren en los módulos permitidos de todos los roles operativos (`admin`, `gerencia`, `tecnico`).
+- **Iconografía en Acciones**: Sustitución de los iconos erróneos `ph-house` por los iconos oficiales `ph-pencil-simple` (Editar) y `ph-trash` (Eliminar).
+- **Desbordamiento Móvil**: Sustitución de la tabla densa no adaptable en pantallas `≤ 768px` por un contenedor de tarjetas móviles apiladas con badges táctiles y tipografía legible.
+
+### Added
+- **Auto-Aseguramiento y Catálogo Semilla en Backend (`api/repuestos.php`)**: Rutina `$ensureTableRepuestos` que garantiza la existencia y actualización de columnas (`categoria`, `stock_minimo`, `ubicacion`) e inserta automáticamente 10 repuestos esenciales de taller si la tabla está vacía (pantallas LED 15.6/14.0, teclados ThinkPad/HP, cargadores Tipo-C y punta azul, baterías y pasta térmica Arctic MX-4).
+- **Endpoint de Resumen y Métricas (`action=resumen` / `action=metricas`)**: Cálculo consolidado de total de ítems, stock total, conteo de stock crítico/agotado ($\le$ stock mínimo), valorización total en Soles (S/.) y desglose por categorías.
+- **4 Tarjetas KPI Ejecutivas (`repuestos.html`)**: Indicadores visuales de alto contraste para Total Catálogo, Unidades en Stock, Stock Crítico/Agotado y Valorización del Inventario.
+- **Chips Interactivos de Categoría**: Filtros vivos con contadores automáticos para `Todos`, `Stock Crítico`, `Pantallas`, `Teclados`, `Cargadores`, `Baterías`, `Insumos` y `Flex / Cables`.
+- **Búsqueda Reactiva con Debounce (250 ms)**: Filtrado instantáneo por nombre, número de parte (P/N), categoría o ubicación física en taller.
+- **Empty State Profesional**: Vista amigable con botón de restablecimiento de filtros ante búsquedas sin resultados.
+- **Enlace de Navegación Cruzada**: Acceso directo y banner contextual hacia `pedidos_repuestos.html` ("Compras y Envíos en Tránsito").
+
+### Changed
+- **`website_files/repuestos.html`**: Rediseño integral de interfaz, modal accesible de creación/edición, notificaciones flotantes toast y compatibilidad total con tokens de diseño semánticos y modo oscuro.
+- **`website_files/sw.js`**: Incremento de versión de caché PWA a `petulap-v25` para forzar la actualización instantánea de la vista en clientes y dispositivos de taller.
+- **`docs/02-BACKEND.md`**: Actualización de la documentación de endpoints de `api/repuestos.php`.
 
 ## [1.5.4] - Septiembre 2026
 
@@ -112,10 +137,44 @@ Para garantizar trazabilidad absoluta, auditoría técnica rigurosa y claridad e
 - **`website_files/sw.js`**:
   - Incremento de versión de caché a `'petulap-v21'` para invalidación instantánea de caché PWA en clientes.
 
-## [1.5.0] - Septiembre 2026
-
 ### Plataforma Ejecutiva de Control de Compras y Trazabilidad de Repuestos Multiorigen con Motor de SLA
 *Módulos impactados:* `website_files/api/repuestos.php`, `website_files/pedidos_repuestos.html`, `website_files/sw.js`.
+
+> **Causa Raíz ("El Por Qué"):** Anteriormente, la gestión de pedidos de repuestos era rudimentaria, careciendo de visibilidad sobre los tres canales críticos de demanda de taller: clientes externos de pago, garantías de servicio (donde el cliente no asume costo y Petulap cubre el repuesto) y laptops de lotes masivos (`lote_equipos`) marcadas en triaje como `NECESITA_REPUESTO`. Adicionalmente, el equipo de taller y compras no disponía de un cálculo de SLA ni alertas por envíos retrasados por couriers (Olva, Shalom, DHL, AliExpress, Deltron), generando cuellos de botella en las reparaciones. Se implementó una arquitectura centralizada con auto-sincronización en `api/repuestos.php`, semáforo inteligente de SLA (`A_TIEMPO`, `LLEGA_PRONTO`, `RETRASADO`, `SIN_FECHA`), recepción en taller con un clic que avanza los tickets a `EN_REPARACION` registrando en `historial_cambios`, y una interfaz ejecutiva SaaS en `pedidos_repuestos.html` con 5 tarjetas KPI con animación pulse, chips de filtrado en tiempo real, stepper de 4 fases y modal de control de envíos.
+
+### Added & Changed
+- **`website_files/api/repuestos.php`**:
+  - **Acción `tracking_pedidos` con Auto-Sincronización Multiorigen**:
+    * Creación y migración automática de la tabla `pedidos_repuestos` si no existe.
+    * Sincronización transparente de tickets de `soporte_tecnico` en estado `ESPERANDO_REPUESTO` o con repuesto especificado, segregando automáticamente entre clientes facturables (`CLIENTE`) y garantías de taller (`GARANTIA` con `precio_cliente = 0.00`).
+    * Sincronización automática de laptops en `lote_equipos` con triaje `NECESITA_REPUESTO` (`LOTE`), trayendo modelo, PN, falla y costo.
+  - **Motor de Cálculo de SLA de Envíos**:
+    * Cálculo de `dias_restantes = DATEDIFF(fecha_estimada_llegada, CURDATE())`.
+    * Asignación de semáforo: `A_TIEMPO` (≥ 3 días), `LLEGA_PRONTO` (0 a 2 días), `RETRASADO` (< 0 días) y `SIN_FECHA` (pedido sin fecha asignada).
+    * Cálculo de 5 KPIs consolidados de cabecera: total de pedidos activos, pedidos en tránsito, garantías asumidas por taller, pedidos con SLA retrasado y piezas requeridas para lotes.
+  - **Acción `guardar_tracking`**:
+    * Registro y actualización de proveedor, courier, número de tracking, fecha de compra, fecha estimada de llegada, costo de compra, precio al cliente, flag de garantía y notas.
+    * Sincronización bidireccional automática con la orden en `soporte_tecnico` (`repuesto_fecha_llegada_aprox`, `repuesto_precio`, `en_garantia`).
+  - **Acción `marcar_recibido`**:
+    * Actualización del estado a `RECIBIDO_EN_TALLER`.
+    * Transición automática del ticket `ST-` de `ESPERANDO_REPUESTO` a `EN_REPARACION` con registro de fecha de llegada física.
+    * Auditoría automática en `historial_cambios` e inserción de alerta en `notificaciones` para el técnico asignado.
+  - **Seguridad**: Sanitización con sentencias preparadas (`prepare()` + `bind_param()`) en todas las consultas y blindaje de endpoints legados del catálogo de repuestos (`crear`, `actualizar`, `eliminar`).
+
+- **`website_files/pedidos_repuestos.html`**:
+  - **Rediseño Ejecutivo SaaS**: Reemplazo integral de la vista por un dashboard moderno bajo el sistema oficial de diseño UI/UX (`tokens.css`, `styles.css`, `dashboard.css`).
+  - **Fila de 5 Tarjetas KPI con `.pulse-dot`**: Total Activos (`.pulse-green`), En Tránsito (`.pulse-blue`), Garantías S/ 0 (`.pulse-amber`), SLA Retrasado (`.pulse-red`) y Piezas para Lotes (`.pulse-slate`).
+  - **Barra de Filtrado Rápido Segmentada**: Chips interactivos con contadores reactivos: `[Todos (N)]`, `[Clientes Facturables (N)]`, `[Garantías Cliente S/ 0 (N)]`, `[Lotes Internos LOT (N)]` y `[⚠️ Retrasados (N)]`.
+  - **Tarjetas Ejecutivas de Trazabilidad (`.tracking-rep-card`)**:
+    * Cabecera con código de orden (`ST-`, `LOT-`), insignia de tipo e insignia de semáforo SLA con borde animado para retrasos.
+    * Mini-stepper de progreso en 4 fases (`[1. Solicitado] ➔ [2. En Tránsito] ➔ [3. En Taller] ➔ [4. Instalado]`).
+    * Desglose visual de pieza, Part Number, modelo de laptop, proveedor, courier con botón de copiar código de tracking y desglose financiero con transparencia de costo vs cobro.
+    * Botones de acción directa: `[Editar Tracking]` y `[Marcar Recibido en Taller]`.
+  - **Modal de Tracking (#modal-tracking)**: Formulario dinámico con auto-desactivación de precio al marcar garantía (S/ 0.00).
+  - **Preservación Rigurosa de las 7 Cosas Frágiles**: Identificadores `#mobile-menu-toggle`, `#mobile-sidebar`, `#lbl-nombre`, `#lbl-tecnico`, `.notification-btn`, `.fab-chat`, script anti-flicker en `<head>`, 37 enlaces canónicos y adaptabilidad móvil en 375px.
+
+- **`website_files/sw.js`**:
+  - Actualización de versión de caché a `'petulap-v19'` para forzar la invalidación inmediata de recursos obsoletos en PWA y navegadores de taller.
 
 ## [1.4.10] - Septiembre 2026
 

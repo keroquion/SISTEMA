@@ -144,16 +144,20 @@ Directorio central de clientes, recepcionistas, técnicos y administradores.
 
 ---
 
-### 1.10. Catálogo de Repuestos: `api/repuestos.php`
-Controla el stock de piezas de recambio (pantallas, teclados, cargadores, discos, memorias).
+### 1.10. Catálogo de Repuestos y Compras de Taller: `api/repuestos.php`
+Controla el stock de piezas de recambio (pantallas, teclados, cargadores, baterías, flex) y la trazabilidad de compras y couriers.
 
 | Acción (`action`) | Método | ¿Qué hace en una frase simple? |
 | :--- | :---: | :--- |
-| `list` | **GET** | Lista todas las piezas del catálogo con su precio de venta y cantidad disponible. |
-| `buscar` | **GET** | Busca repuestos escribiendo su nombre o su número de parte (`Part Number`). |
-| `crear` | **POST** | Registra un repuesto nuevo con su precio y cantidad inicial. |
-| `editar` | **POST** | Modifica el precio, las notas o las existencias de una pieza. |
-| `eliminar` | **POST** | Borra un repuesto del inventario. |
+| `resumen` / `metricas` | **GET** | Devuelve métricas KPI (total catálogo, stock físico, piezas críticas/agotadas, valorización en S/. y conteos por categoría). |
+| `list` | **GET** | Lista piezas del catálogo con soporte de filtros por categoría (`?categoria=...`) y stock crítico (`?critico=1`). |
+| `buscar` | **GET** | Búsqueda reactiva por texto libre en nombre, número de parte (P/N), categoría o ubicación en taller. |
+| `crear` | **POST** | Registra un nuevo repuesto con precio referencial, stock actual, stock mínimo y ubicación (restringido a admin/gerencia). |
+| `actualizar` | **POST** | Modifica datos técnicos, existencias físicas, precios o ubicación de una pieza existente. |
+| `eliminar` | **GET / POST** | Da de baja definitivamente una pieza del catálogo (restringido exclusivamente a administradores). |
+| `tracking_pedidos` | **GET** | Auto-sincroniza y lista las compras de repuestos en tránsito, couriers y fechas estimadas de llegada. |
+| `guardar_tracking` | **POST** | Actualiza proveedor, courier, número de tracking, costo y estado de envío de un pedido de repuesto. |
+| `marcar_recibido` | **POST** | Cambia el estado de la pieza a "RECIBIDO_EN_TALLER", actualiza el ticket de soporte a "EN_REPARACION" y notifica al técnico. |
 
 ---
 

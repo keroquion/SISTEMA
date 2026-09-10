@@ -1,6 +1,6 @@
-// Service Worker - Petulap PWA v24 (Estandarización navegación escritorio y 20 módulos canónicos)
+// Service Worker - Petulap PWA v25 (Remediación integral y catálogo de repuestos v1.5.5)
  
-var CACHE_NAME = 'petulap-v24';
+var CACHE_NAME = 'petulap-v25';
 var ASSETS = [
     './',
     'index.html',

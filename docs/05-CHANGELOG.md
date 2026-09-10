@@ -28,6 +28,33 @@ Para garantizar trazabilidad absoluta, auditoría técnica rigurosa y claridad e
 - **`[Security]`**: Implementación de un pipeline de Integración y Despliegue Continuo (CI/CD) automatizado desde GitHub hacia el hosting de producción (cPanel/Apache) para reemplazar el traspaso manual por FTP y mitigar el riesgo de desincronización o error humano en despliegues.
 - **`[Changed]`**: Coordinación en el panel de control del servidor (cPanel) para renombrar la base de datos de `petumjvq_pruebas` a un identificador formal de producción (ej. `petumjvq_sistema`), actualizando la variable de entorno en el servidor de forma segura.
 
+## [1.5.5] - Septiembre 2026
+
+### Remediación Integral del Catálogo de Repuestos, Resiliencia Backend y Stock de Taller
+*Módulos impactados:* `website_files/repuestos.html`, `website_files/api/repuestos.php`, `website_files/sw.js`, `docs/02-BACKEND.md`, `docs/PROMPT-REMEDIACION-CATALOGO-REPUESTOS-V1.5.5.md`.
+
+> **Causa Raíz ("El Por Qué"):** Al acceder a `https://petulap.store/repuestos.html`, los usuarios reportaron que la pantalla mostraba "NO HAY NADA". La investigación técnica reveló una severa condición de carrera en la autenticación: un script en línea ejecutaba `setTimeout(checkAdmin, 500)`, disparando una alerta forzada y expulsando al usuario a `index.html` cuando la llamada asíncrona de `check_auth.js` demoraba más de 500 ms (frecuente en redes móviles o latencia de red). Además, los roles técnicos de taller no contaban con permisos para consultar existencias físicas de repuestos, y el backend carecía de una rutina de aseguramiento (`$ensureTableRepuestos`), retornando un arreglo vacío `[]` si la tabla no existía o estaba vacía. La interfaz previa era obsoleta, no cumplía el sistema de diseño v1.5, carecía de tarjetas KPI, chips de categoría y responsive móvil, y mostraba botones con iconos erróneos de casitas (`ph-house`). Se rediseñó integralmente el módulo bajo el estándar ejecutivo SaaS con 4 KPIs en vivo, filtros interactivos por chips, búsqueda instantánea debounced, vista responsive dual (tabla desktop y tarjetas táctiles móvil), modal moderno con validaciones y auto-poblado de piezas esenciales de taller.
+
+### Fixed
+- **Condición de Carrera en Autenticación (`repuestos.html`)**: Erradicación del temporizador rígido `setTimeout(checkAdmin, 500)`. La verificación de privilegios ahora se ejecuta de forma asíncrona y reactiva tras la respuesta del backend, habilitando Modo Consulta para técnicos y Modo Edición para administradores/gerencia sin expulsiones forzadas ni alertas intrusivas.
+- **Acceso por Roles en `roles_config`**: Auto-sincronización en backend para asegurar que `repuestos.html` y `pedidos_repuestos.html` figuren en los módulos permitidos de todos los roles operativos (`admin`, `gerencia`, `tecnico`).
+- **Iconografía en Acciones**: Sustitución de los iconos erróneos `ph-house` por los iconos oficiales `ph-pencil-simple` (Editar) y `ph-trash` (Eliminar).
+- **Desbordamiento Móvil**: Sustitución de la tabla densa no adaptable en pantallas `≤ 768px` por un contenedor de tarjetas móviles apiladas con badges táctiles y tipografía legible.
+
+### Added
+- **Auto-Aseguramiento y Catálogo Semilla en Backend (`api/repuestos.php`)**: Rutina `$ensureTableRepuestos` que garantiza la existencia y actualización de columnas (`categoria`, `stock_minimo`, `ubicacion`) e inserta automáticamente 10 repuestos esenciales de taller si la tabla está vacía (pantallas LED 15.6/14.0, teclados ThinkPad/HP, cargadores Tipo-C y punta azul, baterías y pasta térmica Arctic MX-4).
+- **Endpoint de Resumen y Métricas (`action=resumen` / `action=metricas`)**: Cálculo consolidado de total de ítems, stock total, conteo de stock crítico/agotado ($\le$ stock mínimo), valorización total en Soles (S/.) y desglose por categorías.
+- **4 Tarjetas KPI Ejecutivas (`repuestos.html`)**: Indicadores visuales de alto contraste para Total Catálogo, Unidades en Stock, Stock Crítico/Agotado y Valorización del Inventario.
+- **Chips Interactivos de Categoría**: Filtros vivos con contadores automáticos para `Todos`, `Stock Crítico`, `Pantallas`, `Teclados`, `Cargadores`, `Baterías`, `Insumos` y `Flex / Cables`.
+- **Búsqueda Reactiva con Debounce (250 ms)**: Filtrado instantáneo por nombre, número de parte (P/N), categoría o ubicación física en taller.
+- **Empty State Profesional**: Vista amigable con botón de restablecimiento de filtros ante búsquedas sin resultados.
+- **Enlace de Navegación Cruzada**: Acceso directo y banner contextual hacia `pedidos_repuestos.html` ("Compras y Envíos en Tránsito").
+
+### Changed
+- **`website_files/repuestos.html`**: Rediseño integral de interfaz, modal accesible de creación/edición, notificaciones flotantes toast y compatibilidad total con tokens de diseño semánticos y modo oscuro.
+- **`website_files/sw.js`**: Incremento de versión de caché PWA a `petulap-v25` para forzar la actualización instantánea de la vista en clientes y dispositivos de taller.
+- **`docs/02-BACKEND.md`**: Actualización de la documentación de endpoints de `api/repuestos.php`.
+
 ## [1.5.4] - Septiembre 2026
 
 ### Estandarización Canónica de Navegación de Escritorio y Recuperación de Compras de Repuestos y Módulos Huérfanos

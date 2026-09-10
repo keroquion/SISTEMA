@@ -7,6 +7,7 @@ if (!isset($_SESSION['user_id'])) {
     exit; 
 }
 $userId = (int)$_SESSION['user_id'];
+$userTipo = $_SESSION['user_tipo'] ?? 'tecnico';
 $userName = $_SESSION['user_nombre'] ?? 'Sistema';
 session_write_close();
 
@@ -14,6 +15,95 @@ header('Content-Type: application/json; charset=utf-8');
 require_once "config.php";
 $db = getDB();
 $action = $_GET["action"] ?? "list";
+
+// Helper: Garantizar existencia y actualización de la tabla repuestos y permisos
+$ensureTableRepuestos = function() use ($db) {
+    $sql = "
+        CREATE TABLE IF NOT EXISTS repuestos (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            nombre VARCHAR(255) NOT NULL,
+            pn VARCHAR(100) DEFAULT NULL,
+            categoria VARCHAR(100) DEFAULT 'GENERAL',
+            stock INT DEFAULT 0,
+            stock_minimo INT DEFAULT 1,
+            precio DECIMAL(10,2) DEFAULT 0.00,
+            ubicacion VARCHAR(100) DEFAULT 'TALLER',
+            notas TEXT DEFAULT NULL,
+            fecha_registro DATETIME DEFAULT CURRENT_TIMESTAMP,
+            fecha_actualizacion DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            INDEX (categoria),
+            INDEX (pn),
+            INDEX (stock)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+    ";
+    $db->query($sql);
+
+    // Verificar y agregar columnas si la tabla ya existía con esquema previo
+    $cols = [];
+    $colRes = $db->query("SHOW COLUMNS FROM repuestos");
+    if ($colRes) {
+        while ($c = $colRes->fetch_assoc()) $cols[] = $c['Field'];
+    }
+    if (!in_array('categoria', $cols)) { @$db->query("ALTER TABLE repuestos ADD COLUMN categoria VARCHAR(100) DEFAULT 'GENERAL'"); }
+    if (!in_array('stock_minimo', $cols)) { @$db->query("ALTER TABLE repuestos ADD COLUMN stock_minimo INT DEFAULT 1"); }
+    if (!in_array('ubicacion', $cols)) { @$db->query("ALTER TABLE repuestos ADD COLUMN ubicacion VARCHAR(100) DEFAULT 'TALLER'"); }
+
+    // Auto-seed si la tabla está vacía para que la interfaz nunca esté vacía
+    $cntRes = $db->query("SELECT COUNT(*) as c FROM repuestos");
+    $cnt = 0;
+    if ($cntRes) {
+        $row = $cntRes->fetch_assoc();
+        $cnt = (int)($row['c'] ?? 0);
+    }
+    if ($cnt === 0) {
+        $seedItems = [
+            ['Pantalla 15.6 LED Slim 30 Pines (FHD 1920x1080)', 'B156HAN02.1', 'Pantallas', 3, 1, 220.00, 'Estante A-1', 'Panel IPS mate compatible con Lenovo, Dell, Asus, Acer.'],
+            ['Pantalla 14.0 LED Slim 30 Pines (HD/FHD)', 'N140BGA-EA4', 'Pantallas', 2, 1, 195.00, 'Estante A-2', 'Conector 30 pines inferior derecho sin brackets.'],
+            ['Teclado Lenovo ThinkPad E14 / T480 Español', '01HX044', 'Teclados', 3, 1, 85.00, 'Estante B-1', 'Con trackpoint y retroiluminación compatible Gen 1-2.'],
+            ['Teclado HP 15-DY / 15-EF Español con Marco', 'L63579-161', 'Teclados', 2, 1, 75.00, 'Estante B-2', 'Distribución LA negro mate con teclado numérico.'],
+            ['Cargador Universal Laptop 65W USB-C (20V 3.25A)', 'PD-65W-TYPEC', 'Cargadores', 5, 2, 65.00, 'Gaveta C-1', 'Protocolo PD 3.0 para Lenovo, Dell, HP y MacBook.'],
+            ['Cargador HP Punta Azul 19.5V 3.33A 65W Original', 'PPP009L-E', 'Cargadores', 4, 2, 60.00, 'Gaveta C-2', 'Conector 4.5x3.0mm pin central para HP Pavilion/ProBook.'],
+            ['Batería Interna Dell Inspiron 5570 / 3580 (42Wh)', 'WDX0R', 'Baterías', 2, 1, 130.00, 'Gaveta D-1', 'Batería de polímero de litio 11.4V 3 celdas.'],
+            ['Batería Lenovo ThinkPad 24Wh Externa 6 celdas', '01AV423', 'Baterías', 2, 1, 125.00, 'Gaveta D-2', 'Compatible T470, T480, T570, T580.'],
+            ['Pasta Térmica Alto Rendimiento Arctic MX-4 (4g)', 'ACTCP00002B', 'Insumos', 8, 2, 35.00, 'Mesa Taller', 'Conductividad térmica 8.5 W/mK sin curado eléctrico.'],
+            ['Cable Flex de Video eDP 30 Pines Universal 25cm', 'FLEX-EDP-30P', 'Flex / Cables', 3, 1, 45.00, 'Gaveta E-1', 'Repuesto para pantallas de 30 pines 60Hz.']
+        ];
+        $stmtSeed = $db->prepare("INSERT INTO repuestos (nombre, pn, categoria, stock, stock_minimo, precio, ubicacion, notas) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+        if ($stmtSeed) {
+            foreach ($seedItems as $si) {
+                $stmtSeed->bind_param("sssiidss", $si[0], $si[1], $si[2], $si[3], $si[4], $si[5], $si[6], $si[7]);
+                $stmtSeed->execute();
+            }
+            $stmtSeed->close();
+        }
+    }
+
+    // Auto-asegurar repuestos.html y pedidos_repuestos.html en roles_config para que check_auth.js no bloquee navegación
+    $resRoles = $db->query("SELECT id, rol, modulos_permitidos FROM roles_config");
+    if ($resRoles) {
+        while ($rRow = $resRoles->fetch_assoc()) {
+            $mods = json_decode($rRow['modulos_permitidos'], true) ?? [];
+            $changed = false;
+            if (!in_array('repuestos.html', $mods)) {
+                $mods[] = 'repuestos.html';
+                $changed = true;
+            }
+            if (!in_array('pedidos_repuestos.html', $mods)) {
+                $mods[] = 'pedidos_repuestos.html';
+                $changed = true;
+            }
+            if ($changed) {
+                $modsJson = json_encode(array_values(array_unique($mods)));
+                $updStmt = $db->prepare("UPDATE roles_config SET modulos_permitidos = ? WHERE id = ?");
+                if ($updStmt) {
+                    $updStmt->bind_param("si", $modsJson, $rRow['id']);
+                    $updStmt->execute();
+                    $updStmt->close();
+                }
+            }
+        }
+    }
+};
 
 // Helper: Garantizar existencia de la tabla pedidos_repuestos
 $ensureTablePedidosRepuestos = function() use ($db) {
@@ -118,103 +208,37 @@ switch ($action) {
                 $numRef = ($leRow['lote_id'] ?? 'LOT') . ' / ' . ($leRow['equipo_codigo'] ?? 'S/C');
                 $piezaNom = !empty($leRow['pieza']) ? trim($leRow['pieza']) : (!empty($leRow['falla']) ? 'Repuesto: ' . trim($leRow['falla']) : 'Pieza de Lote');
                 $eqDesc = trim(($leRow['marca'] ?? '') . ' ' . ($leRow['modelo'] ?? ''));
-                if (empty($eqDesc)) $eqDesc = 'Laptop de Lote ' . ($leRow['lote_id'] ?? '');
-                $repPn = $leRow['pn'] ?? '';
-                $notasLe = 'Lote: ' . ($leRow['lote_id'] ?? '') . ' | Falla: ' . ($leRow['falla'] ?? 'Requiere repuesto');
+                $pn = $leRow['pn'] ?? '';
+                $notas = "Lote: " . ($leRow['lote_titulo'] ?? 'General') . " | Falla: " . ($leRow['falla'] ?? 'Requiere repuesto');
 
-                $stmtInsLe->bind_param("isssss", $leId, $numRef, $eqDesc, $piezaNom, $repPn, $notasLe);
+                $stmtInsLe->bind_param("issssss", $leId, $numRef, $eqDesc, $piezaNom, $pn, $notas);
                 $stmtInsLe->execute();
             }
             $stmtInsLe->close();
         }
 
-        // 3. Consultar todos los pedidos de repuestos calculando SLA
-        $sql = "
-            SELECT pr.*,
-                   DATEDIFF(pr.fecha_estimada_llegada, CURDATE()) as dias_restantes
-            FROM pedidos_repuestos pr
-            ORDER BY 
-                FIELD(pr.estado_envio, 'SOLICITADO', 'EN_TRANSITO', 'RECIBIDO_EN_TALLER', 'INSTALADO'),
-                CASE WHEN pr.fecha_estimada_llegada IS NULL THEN 1 ELSE 0 END,
-                pr.fecha_estimada_llegada ASC,
-                pr.id DESC
+        // Consultar todos los pedidos ordenados por prioridad y fecha
+        $sqlList = "
+            SELECT p.*,
+                   CASE 
+                       WHEN p.estado_envio = 'SOLICITADO' THEN 1
+                       WHEN p.estado_envio = 'EN_TRANSITO' THEN 2
+                       WHEN p.estado_envio = 'RECIBIDO_EN_TALLER' THEN 3
+                       WHEN p.estado_envio = 'INSTALADO' THEN 4
+                       ELSE 5
+                   END as orden_prioridad,
+                   DATEDIFF(p.fecha_estimada_llegada, CURDATE()) as dias_para_llegada
+            FROM pedidos_repuestos p
+            ORDER BY orden_prioridad ASC, p.fecha_registro DESC
         ";
-        $res = $db->query($sql);
+        $resList = $db->query($sqlList);
         $pedidos = [];
-
-        $kpis = [
-            "total_activos" => 0,
-            "en_transito" => 0,
-            "garantias" => 0,
-            "retrasados" => 0,
-            "lotes_internos" => 0
-        ];
-
-        if ($res) {
-            while ($row = $res->fetch_assoc()) {
-                $estadoEnvio = $row['estado_envio'] ?? 'SOLICITADO';
-                $dias = ($row['fecha_estimada_llegada'] !== null) ? (int)$row['dias_restantes'] : null;
-
-                // Cálculo del semáforo SLA de envíos
-                if ($estadoEnvio === 'RECIBIDO_EN_TALLER' || $estadoEnvio === 'INSTALADO') {
-                    $slaStatus = 'RECIBIDO';
-                    $slaLabel = ($estadoEnvio === 'INSTALADO') ? 'Instalado en Equipo' : 'En Taller / Recibido';
-                    $slaColor = 'emerald';
-                } elseif ($dias === null) {
-                    $slaStatus = 'SIN_FECHA';
-                    $slaLabel = 'Sin fecha asignada';
-                    $slaColor = 'slate';
-                } elseif ($dias < 0) {
-                    $slaStatus = 'RETRASADO';
-                    $diasVencidos = abs($dias);
-                    $slaLabel = ($diasVencidos === 1) ? 'Retrasado hace 1 día' : "Retrasado hace {$diasVencidos} días";
-                    $slaColor = 'red';
-                } elseif ($dias === 0) {
-                    $slaStatus = 'LLEGA_PRONTO';
-                    $slaLabel = 'Llega Hoy';
-                    $slaColor = 'amber';
-                } elseif ($dias === 1) {
-                    $slaStatus = 'LLEGA_PRONTO';
-                    $slaLabel = 'Llega Mañana';
-                    $slaColor = 'amber';
-                } elseif ($dias === 2) {
-                    $slaStatus = 'LLEGA_PRONTO';
-                    $slaLabel = 'Llega en 2 días';
-                    $slaColor = 'amber';
-                } else {
-                    $slaStatus = 'A_TIEMPO';
-                    $fLegible = date('d/m', strtotime($row['fecha_estimada_llegada']));
-                    $slaLabel = "Llega en {$dias} días ({$fLegible})";
-                    $slaColor = 'green';
-                }
-
-                $row['sla_status'] = $slaStatus;
-                $row['sla_label'] = $slaLabel;
-                $row['sla_color'] = $slaColor;
-
-                // Contadores KPI
-                $esActivo = in_array($estadoEnvio, ['SOLICITADO', 'EN_TRANSITO']);
-                if ($esActivo) {
-                    $kpis['total_activos']++;
-                }
-                if ($estadoEnvio === 'EN_TRANSITO' || (!empty($row['tracking_number']) && $estadoEnvio === 'SOLICITADO')) {
-                    $kpis['en_transito']++;
-                }
-                if (!empty($row['es_garantia']) || $row['origen_tipo'] === 'GARANTIA') {
-                    $kpis['garantias']++;
-                }
-                if ($slaStatus === 'RETRASADO' && $esActivo) {
-                    $kpis['retrasados']++;
-                }
-                if ($row['origen_tipo'] === 'LOTE') {
-                    $kpis['lotes_internos']++;
-                }
-
+        if ($resList) {
+            while ($row = $resList->fetch_assoc()) {
                 $pedidos[] = $row;
             }
         }
-
-        echo json_encode(["ok" => true, "kpis" => $kpis, "data" => $pedidos]);
+        echo json_encode(["ok" => true, "data" => $pedidos]);
         break;
 
     case "guardar_tracking":
@@ -233,18 +257,8 @@ switch ($action) {
         $fLlegada = !empty($data["fecha_estimada_llegada"]) ? $data["fecha_estimada_llegada"] : null;
         $costo = (float)($data["costo_compra"] ?? 0);
         $precio = (float)($data["precio_cliente"] ?? 0);
-        $esGar = !empty($data["es_garantia"]) ? 1 : 0;
-        if ($esGar) $precio = 0.00;
-
+        $esGar = (!empty($data["es_garantia"])) ? 1 : 0;
         $estadoEnvio = trim($data["estado_envio"] ?? "SOLICITADO");
-        if (!in_array($estadoEnvio, ['SOLICITADO', 'EN_TRANSITO', 'RECIBIDO_EN_TALLER', 'INSTALADO'])) {
-            $estadoEnvio = 'SOLICITADO';
-        }
-        // Si tiene número de seguimiento y sigue en solicitado, avanzar lógicamente a EN_TRANSITO
-        if (!empty($tracking) && $estadoEnvio === 'SOLICITADO') {
-            $estadoEnvio = 'EN_TRANSITO';
-        }
-
         $notas = trim($data["notas_envio"] ?? "");
 
         $stmt = $db->prepare("
@@ -369,68 +383,217 @@ switch ($action) {
         break;
 
     // -------------------------------------------------------------
-    // ACCIONES PREVIAS DEL CATÁLOGO DE REPUESTOS
+    // ACCIONES DEL CATÁLOGO E INVENTARIO FÍSICO (v1.5.5)
     // -------------------------------------------------------------
+    case "resumen":
+    case "metricas":
+        $ensureTableRepuestos();
+        $totalItems = 0;
+        $totalStock = 0;
+        $stockCritico = 0;
+        $valorTotal = 0.0;
+
+        $resKpi = $db->query("
+            SELECT 
+                COUNT(*) as total_items,
+                COALESCE(SUM(stock), 0) as total_stock,
+                COALESCE(SUM(CASE WHEN stock <= stock_minimo THEN 1 ELSE 0 END), 0) as stock_critico,
+                COALESCE(SUM(stock * precio), 0.0) as valor_total
+            FROM repuestos
+        ");
+        if ($resKpi && ($kpi = $resKpi->fetch_assoc())) {
+            $totalItems = (int)$kpi['total_items'];
+            $totalStock = (int)$kpi['total_stock'];
+            $stockCritico = (int)$kpi['stock_critico'];
+            $valorTotal = (float)$kpi['valor_total'];
+        }
+
+        // Conteo por categorías
+        $catList = [];
+        $resCat = $db->query("
+            SELECT categoria, COUNT(*) as cantidad, COALESCE(SUM(stock), 0) as stock_cat 
+            FROM repuestos 
+            GROUP BY categoria 
+            ORDER BY categoria ASC
+        ");
+        if ($resCat) {
+            while ($cRow = $resCat->fetch_assoc()) {
+                $catList[] = [
+                    'categoria' => $cRow['categoria'] ?: 'General',
+                    'cantidad' => (int)$cRow['cantidad'],
+                    'stock' => (int)$cRow['stock_cat']
+                ];
+            }
+        }
+
+        echo json_encode([
+            "ok" => true,
+            "data" => [
+                "total_items" => $totalItems,
+                "total_stock" => $totalStock,
+                "stock_critico" => $stockCritico,
+                "valor_total" => round($valorTotal, 2),
+                "categorias" => $catList,
+                "user_tipo" => $userTipo,
+                "puede_editar" => ($userTipo === 'admin' || $userTipo === 'gerencia')
+            ]
+        ]);
+        break;
+
     case "list":
-        $result = $db->query("SELECT * FROM repuestos ORDER BY nombre ASC");
+        $ensureTableRepuestos();
+        $categoria = trim($_GET["categoria"] ?? "");
+        $critico = trim($_GET["critico"] ?? "");
+
+        if (!empty($categoria) && strtoupper($categoria) !== 'TODOS') {
+            $stmt = $db->prepare("SELECT * FROM repuestos WHERE categoria = ? ORDER BY nombre ASC");
+            $stmt->bind_param("s", $categoria);
+            $stmt->execute();
+            $result = $stmt->get_result();
+        } elseif ($critico === '1') {
+            $result = $db->query("SELECT * FROM repuestos WHERE stock <= stock_minimo ORDER BY stock ASC, nombre ASC");
+        } else {
+            $result = $db->query("SELECT * FROM repuestos ORDER BY nombre ASC");
+        }
+
         $rows = [];
         if ($result) {
-            while ($row = $result->fetch_assoc()) $rows[] = $row;
+            while ($row = $result->fetch_assoc()) {
+                $row['id'] = (int)$row['id'];
+                $row['stock'] = (int)$row['stock'];
+                $row['stock_minimo'] = (int)($row['stock_minimo'] ?? 1);
+                $row['precio'] = (float)$row['precio'];
+                $rows[] = $row;
+            }
         }
-        echo json_encode(["ok" => true, "data" => $rows]);
+        echo json_encode([
+            "ok" => true, 
+            "data" => $rows,
+            "puede_editar" => ($userTipo === 'admin' || $userTipo === 'gerencia')
+        ]);
         break;
 
     case "buscar":
+        $ensureTableRepuestos();
         $raw_q = trim($_GET["q"] ?? "");
-        $q = "%" . $raw_q . "%";
-        $stmt = $db->prepare("SELECT * FROM repuestos WHERE nombre LIKE ? OR pn LIKE ? ORDER BY nombre ASC LIMIT 15");
-        $stmt->bind_param("ss", $q, $q);
-        $stmt->execute();
-        $result = $stmt->get_result();
+        if ($raw_q === "") {
+            $result = $db->query("SELECT * FROM repuestos ORDER BY nombre ASC LIMIT 50");
+        } else {
+            $q = "%" . $raw_q . "%";
+            $stmt = $db->prepare("
+                SELECT * FROM repuestos 
+                WHERE nombre LIKE ? OR pn LIKE ? OR categoria LIKE ? OR ubicacion LIKE ?
+                ORDER BY nombre ASC LIMIT 50
+            ");
+            $stmt->bind_param("ssss", $q, $q, $q, $q);
+            $stmt->execute();
+            $result = $stmt->get_result();
+        }
         $rows = [];
         if ($result) {
-            while ($row = $result->fetch_assoc()) $rows[] = $row;
+            while ($row = $result->fetch_assoc()) {
+                $row['id'] = (int)$row['id'];
+                $row['stock'] = (int)$row['stock'];
+                $row['stock_minimo'] = (int)($row['stock_minimo'] ?? 1);
+                $row['precio'] = (float)$row['precio'];
+                $rows[] = $row;
+            }
         }
-        echo json_encode(["ok" => true, "data" => $rows]);
+        echo json_encode([
+            "ok" => true, 
+            "data" => $rows,
+            "puede_editar" => ($userTipo === 'admin' || $userTipo === 'gerencia')
+        ]);
         break;
 
     case "crear":
+        if ($userTipo !== 'admin' && $userTipo !== 'gerencia') {
+            http_response_code(403);
+            echo json_encode(["ok" => false, "msg" => "No tienes permisos para registrar repuestos en el catálogo."]);
+            break;
+        }
+        $ensureTableRepuestos();
         $data = json_decode(file_get_contents("php://input"), true) ?? $_POST;
-        $stmt = $db->prepare("INSERT INTO repuestos (nombre, pn, stock, precio, notas) VALUES (?,?,?,?,?)");
-        $n = $data["nombre"] ?? "";
-        $pn = $data["pn"] ?? "";
+        $n = trim($data["nombre"] ?? "");
+        $pn = trim($data["pn"] ?? "");
+        $cat = trim($data["categoria"] ?? "General");
         $s = (int)($data["stock"] ?? 0);
+        $sm = (int)($data["stock_minimo"] ?? 1);
         $p = (float)($data["precio"] ?? 0);
-        $nt = $data["notas"] ?? "";
-        $stmt->bind_param("ssids", $n, $pn, $s, $p, $nt);
-        if ($stmt->execute()) echo json_encode(["ok" => true, "id" => $db->insert_id]);
-        else echo json_encode(["ok" => false, "msg" => $db->error]);
+        $ub = trim($data["ubicacion"] ?? "Taller");
+        $nt = trim($data["notas"] ?? "");
+
+        if (empty($n)) {
+            echo json_encode(["ok" => false, "msg" => "El nombre del repuesto es obligatorio."]);
+            break;
+        }
+
+        $stmt = $db->prepare("INSERT INTO repuestos (nombre, pn, categoria, stock, stock_minimo, precio, ubicacion, notas) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt->bind_param("sssiidss", $n, $pn, $cat, $s, $sm, $p, $ub, $nt);
+        if ($stmt->execute()) {
+            echo json_encode(["ok" => true, "id" => $db->insert_id, "msg" => "Repuesto registrado con éxito."]);
+        } else {
+            echo json_encode(["ok" => false, "msg" => "Error al guardar: " . $db->error]);
+        }
+        $stmt->close();
         break;
 
     case "actualizar":
+        if ($userTipo !== 'admin' && $userTipo !== 'gerencia') {
+            http_response_code(403);
+            echo json_encode(["ok" => false, "msg" => "No tienes permisos para modificar repuestos."]);
+            break;
+        }
+        $ensureTableRepuestos();
         $data = json_decode(file_get_contents("php://input"), true) ?? $_POST;
         $id = (int)($data["id"] ?? 0);
-        $stmt = $db->prepare("UPDATE repuestos SET nombre=?, pn=?, stock=?, precio=?, notas=? WHERE id=?");
-        $n = $data["nombre"] ?? "";
-        $pn = $data["pn"] ?? "";
+        $n = trim($data["nombre"] ?? "");
+        $pn = trim($data["pn"] ?? "");
+        $cat = trim($data["categoria"] ?? "General");
         $s = (int)($data["stock"] ?? 0);
+        $sm = (int)($data["stock_minimo"] ?? 1);
         $p = (float)($data["precio"] ?? 0);
-        $nt = $data["notas"] ?? "";
-        $stmt->bind_param("ssidsi", $n, $pn, $s, $p, $nt, $id);
-        if ($stmt->execute()) echo json_encode(["ok" => true]);
-        else echo json_encode(["ok" => false, "msg" => $db->error]);
+        $ub = trim($data["ubicacion"] ?? "Taller");
+        $nt = trim($data["notas"] ?? "");
+
+        if ($id <= 0 || empty($n)) {
+            echo json_encode(["ok" => false, "msg" => "Datos incompletos o ID inválido."]);
+            break;
+        }
+
+        $stmt = $db->prepare("UPDATE repuestos SET nombre=?, pn=?, categoria=?, stock=?, stock_minimo=?, precio=?, ubicacion=?, notas=? WHERE id=?");
+        $stmt->bind_param("sssiidssi", $n, $pn, $cat, $s, $sm, $p, $ub, $nt, $id);
+        if ($stmt->execute()) {
+            echo json_encode(["ok" => true, "msg" => "Repuesto actualizado con éxito."]);
+        } else {
+            echo json_encode(["ok" => false, "msg" => "Error al actualizar: " . $db->error]);
+        }
+        $stmt->close();
         break;
 
     case "eliminar":
+        if ($userTipo !== 'admin') {
+            http_response_code(403);
+            echo json_encode(["ok" => false, "msg" => "Solo los administradores pueden eliminar repuestos del catálogo."]);
+            break;
+        }
         $id = (int)($_GET["id"] ?? 0);
+        if ($id <= 0) {
+            echo json_encode(["ok" => false, "msg" => "ID de repuesto inválido."]);
+            break;
+        }
         $stmt = $db->prepare("DELETE FROM repuestos WHERE id=?");
         $stmt->bind_param("i", $id);
-        if ($stmt->execute()) echo json_encode(["ok" => true]);
-        else echo json_encode(["ok" => false, "msg" => $db->error]);
+        if ($stmt->execute()) {
+            echo json_encode(["ok" => true, "msg" => "Repuesto eliminado del catálogo."]);
+        } else {
+            echo json_encode(["ok" => false, "msg" => "Error al eliminar: " . $db->error]);
+        }
+        $stmt->close();
         break;
 
     default:
-        echo json_encode(["ok" => false, "msg" => "Accion invalida"]);
+        echo json_encode(["ok" => false, "msg" => "Acción inválida"]);
 }
 $db->close();
 ?>

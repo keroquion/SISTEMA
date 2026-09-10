@@ -35,6 +35,672 @@
 <script>
 if ("serviceWorker" in navigator) { window.addEventListener("load", () => { navigator.serviceWorker.register("sw.js").then(r => console.log("SW ok")).catch(e => console.log("SW fail", e)); }); }
 </script>
+
+    <!-- Estilos Ejecutivos UI/UX Catálogo de Repuestos (v1.5.5) -->
+    <style>
+        /* Animaciones */
+        @keyframes pulse-green {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+        @keyframes pulse-amber {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(245, 158, 11, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+        }
+        @keyframes pulse-red {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+
+        .pulse-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+            flex-shrink: 0;
+        }
+        .pulse-green { background-color: #10B981; animation: pulse-green 1.8s infinite; }
+        .pulse-amber { background-color: #F59E0B; animation: pulse-amber 1.8s infinite; }
+        .pulse-red   { background-color: #EF4444; animation: pulse-red 1.8s infinite; }
+
+        /* Fila de Tarjetas KPI Ejecutivas */
+        .kpis-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .kpi-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-default);
+            border-radius: 14px;
+            padding: 18px 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .kpi-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+        }
+        .kpi-icon-wrap {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+        .kpi-val {
+            font-size: 1.55rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1.2;
+            margin-top: 2px;
+        }
+        .kpi-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+        }
+
+        /* Banner de Cabecera y Navegación Cruzada */
+        .header-banner {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-bottom: 22px;
+        }
+        .header-title-wrap h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .header-title-wrap p {
+            color: var(--text-secondary);
+            font-size: 0.88rem;
+            margin: 4px 0 0 0;
+        }
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        /* Botones personalizados */
+        .btn-cross-nav {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 9px 16px;
+            border-radius: 10px;
+            border: 1px solid var(--border-default);
+            background: var(--bg-card);
+            color: var(--text-primary);
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+        .btn-cross-nav:hover {
+            border-color: var(--color-brand);
+            color: var(--color-brand);
+            background: rgba(2, 132, 199, 0.05);
+        }
+        .btn-refresh {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 9px 14px;
+            border-radius: 10px;
+            border: 1px solid var(--border-default);
+            background: var(--bg-card);
+            color: var(--text-primary);
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .btn-refresh:hover {
+            background: var(--bg-surface);
+        }
+        .btn-new-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 9px 18px;
+            border-radius: 10px;
+            border: none;
+            background: #10B981;
+            color: #ffffff;
+            font-size: 0.88rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(16, 185, 129, 0.3);
+            transition: all 0.2s ease;
+        }
+        .btn-new-item:hover {
+            background: #059669;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+        }
+
+        /* Barra de Filtros y Búsqueda */
+        .filter-panel {
+            background: var(--bg-card);
+            border: 1px solid var(--border-default);
+            border-radius: 14px;
+            padding: 16px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+        }
+        .search-row {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            margin-bottom: 14px;
+        }
+        .search-box-wrap {
+            position: relative;
+            flex: 1;
+        }
+        .search-box-wrap i.search-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 18px;
+            color: var(--text-secondary);
+            pointer-events: none;
+        }
+        .search-box-wrap input {
+            width: 100%;
+            padding: 10px 38px 10px 42px;
+            border-radius: 10px;
+            border: 1px solid var(--border-default);
+            background: var(--bg-surface);
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            outline: none;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        .search-box-wrap input:focus {
+            border-color: var(--color-brand);
+            box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
+        }
+        .search-clear-btn {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 16px;
+            cursor: pointer;
+            display: none;
+            padding: 4px;
+        }
+        .search-clear-btn:hover {
+            color: var(--text-primary);
+        }
+
+        /* Chips de Categoría */
+        .chips-container {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .filter-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border-default);
+            background: var(--bg-surface);
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+        .filter-chip:hover {
+            color: var(--text-primary);
+            border-color: var(--color-brand);
+        }
+        .filter-chip.active {
+            background: var(--color-brand);
+            color: #ffffff;
+            border-color: var(--color-brand);
+            font-weight: 600;
+        }
+        .filter-chip.chip-critico.active {
+            background: #EF4444;
+            border-color: #EF4444;
+        }
+        .chip-count {
+            background: rgba(0,0,0,0.12);
+            padding: 1px 6px;
+            border-radius: 6px;
+            font-size: 0.72rem;
+            font-weight: 600;
+        }
+        .filter-chip.active .chip-count {
+            background: rgba(255,255,255,0.25);
+        }
+
+        /* Tabla de Repuestos Ejecutiva */
+        .catalog-table-wrap {
+            background: var(--bg-card);
+            border: 1px solid var(--border-default);
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+        }
+        .catalog-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+        .catalog-table thead {
+            background: var(--bg-surface);
+            border-bottom: 1px solid var(--border-default);
+        }
+        .catalog-table th {
+            padding: 13px 16px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+        }
+        .catalog-table tbody tr {
+            border-bottom: 1px solid var(--border-default);
+            transition: background-color 0.15s ease;
+        }
+        .catalog-table tbody tr:last-child {
+            border-bottom: none;
+        }
+        .catalog-table tbody tr:hover {
+            background-color: rgba(2, 132, 199, 0.03);
+        }
+        .catalog-table td {
+            padding: 14px 16px;
+            font-size: 0.88rem;
+            color: var(--text-primary);
+            vertical-align: middle;
+        }
+
+        /* Elementos en Celdas */
+        .repuesto-name {
+            font-weight: 600;
+            color: var(--text-primary);
+            display: block;
+            margin-bottom: 2px;
+        }
+        .repuesto-pn {
+            font-family: monospace;
+            font-size: 0.78rem;
+            background: var(--bg-surface);
+            padding: 2px 6px;
+            border-radius: 4px;
+            border: 1px solid var(--border-default);
+            color: var(--text-secondary);
+            display: inline-block;
+        }
+        .repuesto-notas {
+            font-size: 0.76rem;
+            color: var(--text-secondary);
+            margin-top: 4px;
+            display: block;
+            max-width: 320px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .badge-cat {
+            display: inline-flex;
+            align-items: center;
+            padding: 3px 9px;
+            border-radius: 6px;
+            font-size: 0.76rem;
+            font-weight: 600;
+            background: rgba(2, 132, 199, 0.08);
+            color: var(--color-brand);
+            border: 1px solid rgba(2, 132, 199, 0.2);
+        }
+        .ubicacion-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+        }
+        .stock-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        .stock-ok {
+            background: rgba(16, 185, 129, 0.12);
+            color: #10B981;
+        }
+        .stock-warning {
+            background: rgba(245, 158, 11, 0.12);
+            color: #F59E0B;
+        }
+        .stock-danger {
+            background: rgba(239, 68, 68, 0.12);
+            color: #EF4444;
+        }
+        .precio-tag {
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: var(--text-primary);
+        }
+
+        /* Botones de acción */
+        .actions-cell {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        .btn-action-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: 1px solid var(--border-default);
+            background: var(--bg-surface);
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.2s ease;
+        }
+        .btn-action-icon:hover {
+            color: var(--color-brand);
+            border-color: var(--color-brand);
+            background: rgba(2, 132, 199, 0.08);
+        }
+        .btn-action-icon.btn-delete:hover {
+            color: #EF4444;
+            border-color: #EF4444;
+            background: rgba(239, 68, 68, 0.08);
+        }
+
+        /* Vista de Tarjetas Móvil */
+        .mobile-cards-grid {
+            display: none;
+            gap: 14px;
+        }
+        .repuesto-mobile-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-default);
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+        }
+        .rmc-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+        .rmc-title {
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: var(--text-primary);
+            line-height: 1.3;
+        }
+        .rmc-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        .rmc-details {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-top: 1px solid var(--border-default);
+            border-bottom: 1px solid var(--border-default);
+            margin-bottom: 12px;
+        }
+        .rmc-actions {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+        }
+
+        /* Empty State */
+        .empty-state-box {
+            padding: 48px 20px;
+            text-align: center;
+            background: var(--bg-card);
+            border: 1px dashed var(--border-default);
+            border-radius: 14px;
+            margin: 20px 0;
+        }
+        .empty-state-icon {
+            font-size: 52px;
+            color: var(--text-secondary);
+            opacity: 0.6;
+            margin-bottom: 12px;
+        }
+        .empty-state-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+        }
+        .empty-state-desc {
+            font-size: 0.88rem;
+            color: var(--text-secondary);
+            max-width: 420px;
+            margin: 0 auto 16px auto;
+        }
+
+        /* Modal Rediseñado */
+        .modal-repuesto-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border-default);
+            border-radius: 16px;
+            width: 100%;
+            max-width: 580px;
+            box-shadow: 0 16px 36px rgba(0,0,0,0.2);
+            overflow: hidden;
+            animation: modalFadeIn 0.2s ease;
+        }
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: scale(0.96); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        .modal-repuesto-header {
+            padding: 18px 24px;
+            border-bottom: 1px solid var(--border-default);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--bg-surface);
+        }
+        .modal-repuesto-header h3 {
+            margin: 0;
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .modal-close-btn {
+            background: none;
+            border: none;
+            font-size: 20px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 6px;
+        }
+        .modal-close-btn:hover {
+            color: var(--text-primary);
+            background: rgba(0,0,0,0.05);
+        }
+        .modal-repuesto-body {
+            padding: 24px;
+            max-height: calc(85vh - 140px);
+            overflow-y: auto;
+        }
+        .form-grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+        .form-group {
+            margin-bottom: 16px;
+        }
+        .form-group label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border-default);
+            background: var(--bg-surface);
+            color: var(--text-primary);
+            font-size: 0.88rem;
+            outline: none;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+            box-sizing: border-box;
+        }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            border-color: var(--color-brand);
+            box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
+        }
+        .modal-repuesto-footer {
+            padding: 16px 24px;
+            border-top: 1px solid var(--border-default);
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            background: var(--bg-surface);
+        }
+
+        /* Toast de Notificación */
+        #repuesto-toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: #1E293B;
+            color: #ffffff;
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-size: 0.88rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+            z-index: 99999;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: none;
+        }
+        #repuesto-toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        #repuesto-toast.toast-success { background: #065F46; border: 1px solid #10B981; }
+        #repuesto-toast.toast-error { background: #991B1B; border: 1px solid #EF4444; }
+
+        /* Badge Modo Consulta */
+        .badge-role-readonly {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 8px;
+            background: rgba(2, 132, 199, 0.1);
+            color: var(--color-brand);
+            font-size: 0.82rem;
+            font-weight: 600;
+            border: 1px solid rgba(2, 132, 199, 0.25);
+        }
+
+        /* Responsive Breakpoint <= 768px */
+        @media (max-width: 768px) {
+            .header-banner {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .header-actions {
+                width: 100%;
+                justify-content: space-between;
+            }
+            .kpis-row {
+                grid-template-columns: 1fr 1fr;
+                gap: 10px;
+            }
+            .kpi-card {
+                padding: 12px 14px;
+                gap: 10px;
+            }
+            .kpi-icon-wrap {
+                width: 38px;
+                height: 38px;
+                font-size: 20px;
+            }
+            .kpi-val {
+                font-size: 1.25rem;
+            }
+            .catalog-table-wrap {
+                display: none;
+            }
+            .mobile-cards-grid {
+                display: flex;
+                flex-direction: column;
+            }
+            .form-grid-2 {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+
 </head>
 <body class="dashboard-body">
 
@@ -439,154 +1105,664 @@ if ("serviceWorker" in navigator) { window.addEventListener("load", () => { navi
         <!-- DASHBOARD CONTENT -->
         <div class="content">
 
+            <!-- Banner de Cabecera Ejecutiva -->
+            <div class="header-banner">
+                <div class="header-title-wrap">
+                    <h2><i class="ph-bold ph-nut" style="color: var(--color-brand)"></i> Catálogo de Repuestos & Taller</h2>
+                    <p>Inventario físico de componentes, compatibilidades y disponibilidad para órdenes de servicio.</p>
+                </div>
+                <div class="header-actions">
+                    <a href="pedidos_repuestos.html" class="btn-cross-nav">
+                        <i class="ph-bold ph-truck"></i> Compras & Envíos en Tránsito <i class="ph ph-arrow-right"></i>
+                    </a>
+                    <button class="btn-refresh" onclick="recargarTodo()" title="Actualizar datos">
+                        <i class="ph-bold ph-arrows-clockwise"></i> Actualizar
+                    </button>
+                    <div id="container-btn-nuevo">
+                        <button class="btn-new-item" id="btn-nuevo-repuesto" onclick="abrirModalNuevo()">
+                            <i class="ph-bold ph-plus-circle"></i> Nuevo Repuesto
+                        </button>
+                    </div>
+                </div>
+            </div>
 
+            <!-- Fila de 4 Tarjetas KPI Ejecutivas -->
+            <div class="kpis-row">
+                <div class="kpi-card">
+                    <div class="kpi-icon-wrap" style="background: rgba(2, 132, 199, 0.12); color: #0284c7;">
+                        <i class="ph-bold ph-package"></i>
+                    </div>
+                    <div>
+                        <div class="kpi-label">Total Catálogo</div>
+                        <div class="kpi-val" id="kpi-total-items">0</div>
+                    </div>
+                </div>
 
-<div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px">
-  <h2><i class="ph ph-package"></i> Catalogo de Repuestos</h2>
-  <button class="btn-green" onclick="abrirModal()"><i class="ph ph-plus"></i> Nuevo Repuesto</button>
-</div>
+                <div class="kpi-card">
+                    <div class="kpi-icon-wrap" style="background: rgba(16, 185, 129, 0.12); color: #10B981;">
+                        <i class="ph-bold ph-check-circle"></i>
+                    </div>
+                    <div>
+                        <div class="kpi-label">Unidades en Stock</div>
+                        <div class="kpi-val" id="kpi-total-stock">0</div>
+                    </div>
+                </div>
 
-<div style="margin-top:15px; display:flex; gap:10px">
-  <input type="text" id="buscador" placeholder="Buscar por nombre o PN (Enter)" onkeydown="if(event.key==='Enter') buscar()">
-  <button class="btn-primary" onclick="buscar()">Buscar</button>
-</div>
+                <div class="kpi-card">
+                    <div class="kpi-icon-wrap" style="background: rgba(239, 68, 68, 0.12); color: #EF4444;">
+                        <i class="ph-bold ph-warning-circle"></i>
+                    </div>
+                    <div>
+                        <div class="kpi-label">Stock Crítico / Agotado</div>
+                        <div class="kpi-val" id="kpi-stock-critico" style="color: #EF4444;">0</div>
+                    </div>
+                </div>
 
-<div id="tabla-repuestos">Cargando...</div>
+                <div class="kpi-card">
+                    <div class="kpi-icon-wrap" style="background: rgba(168, 85, 247, 0.12); color: #A855F7;">
+                        <i class="ph-bold ph-coins"></i>
+                    </div>
+                    <div>
+                        <div class="kpi-label">Valorización Estimada</div>
+                        <div class="kpi-val" id="kpi-valor-total">S/ 0.00</div>
+                    </div>
+                </div>
+            </div>
 
-<!-- MODAL REPUESTO -->
-<div class="modal-overlay" id="modal">
-  <div class="modal">
-    <h3 id="m-titulo" style="margin-top:0">Nuevo Repuesto</h3>
-    <input type="hidden" id="r-id">
-    
-    <label >Nombre / Descripcion</label>
-    <input type="text" id="r-nombre" placeholder="Ej: Pantalla LED 15.6 30 pines">
-    
-    <label >Numero de Parte (PN) (Opcional)</label>
-    <input type="text" id="r-pn" placeholder="Ej: B156XTN02.0">
-    
-    <div style="display:flex; gap:10px">
-      <div style="flex:1">
-        <label >Stock Actual</label>
-        <input type="number" id="r-stock" value="0">
-      </div>
-      <div style="flex:1">
-        <label >Precio Referencial</label>
-        <input type="number" step="0.01" id="r-precio" value="0.00">
-      </div>
-    </div>
-    
-    <label >Notas Adicionales</label>
-    <textarea id="r-notas" rows="2"></textarea>
-    
-    <div style="display:flex; gap:10px; margin-top:10px">
-      <button class="btn-outline" style="flex:1" onclick="document.getElementById('modal').style.display='none'">Cancelar</button>
-      <button class="btn-primary" style="flex:1" onclick="guardar()">💾 Guardar</button>
-    </div>
-  </div>
-</div>
+            <!-- Panel de Búsqueda y Chips de Filtro -->
+            <div class="filter-panel">
+                <div class="search-row">
+                    <div class="search-box-wrap">
+                        <i class="ph-bold ph-magnifying-glass search-icon"></i>
+                        <input type="text" id="buscador-repuestos" placeholder="Buscar por nombre, número de parte (P/N), categoría o ubicación..." oninput="onBuscadorInput()">
+                        <button class="search-clear-btn" id="btn-clear-search" onclick="limpiarBuscador()" title="Limpiar búsqueda">
+                            <i class="ph-bold ph-x"></i>
+                        </button>
+                    </div>
+                </div>
 
-<script src="js/check_auth.js"></script>
-<script>
-async function checkAdmin() {
-  if (window.miId !== 'admin') {
-    alert("Solo el Administrador puede gestionar el catalogo de repuestos.");
-    window.location.href = "index.html";
-  }
-}
-setTimeout(checkAdmin, 500);
+                <div class="chips-container" id="chips-container">
+                    <div class="filter-chip active" data-cat="TODOS" onclick="filtrarCategoria('TODOS')">
+                        <span>Todos</span>
+                        <span class="chip-count" id="count-todos">0</span>
+                    </div>
+                    <div class="filter-chip chip-critico" data-cat="CRITICO" onclick="filtrarCategoria('CRITICO')">
+                        <span class="pulse-dot pulse-red"></span>
+                        <span>Stock Crítico</span>
+                        <span class="chip-count" id="count-critico">0</span>
+                    </div>
+                    <div class="filter-chip" data-cat="Pantallas" onclick="filtrarCategoria('Pantallas')">
+                        <span>Pantallas</span>
+                    </div>
+                    <div class="filter-chip" data-cat="Teclados" onclick="filtrarCategoria('Teclados')">
+                        <span>Teclados</span>
+                    </div>
+                    <div class="filter-chip" data-cat="Cargadores" onclick="filtrarCategoria('Cargadores')">
+                        <span>Cargadores</span>
+                    </div>
+                    <div class="filter-chip" data-cat="Baterías" onclick="filtrarCategoria('Baterías')">
+                        <span>Baterías</span>
+                    </div>
+                    <div class="filter-chip" data-cat="Insumos" onclick="filtrarCategoria('Insumos')">
+                        <span>Insumos</span>
+                    </div>
+                    <div class="filter-chip" data-cat="Flex / Cables" onclick="filtrarCategoria('Flex / Cables')">
+                        <span>Flex / Cables</span>
+                    </div>
+                </div>
+            </div>
 
-function buscar() {
-  const q = document.getElementById('buscador').value.trim();
-  cargarData(q ? `api/repuestos.php?action=buscar&q=${encodeURIComponent(q)}` : 'api/repuestos.php');
-}
+            <!-- Contenedor Principal: Tabla Desktop -->
+            <div class="catalog-table-wrap" id="tabla-desktop-container">
+                <table class="catalog-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 32%;">Repuesto / Descripción</th>
+                            <th style="width: 14%;">Categoría</th>
+                            <th style="width: 14%;">Ubicación</th>
+                            <th style="width: 14%;">Disponibilidad</th>
+                            <th style="width: 12%;">Precio Ref.</th>
+                            <th style="width: 14%; text-align: right;">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabla-repuestos-body">
+                        <tr>
+                            <td colspan="6" style="text-align: center; padding: 36px; color: var(--text-secondary);">
+                                <i class="ph-bold ph-spinner ph-spin" style="font-size: 24px;"></i> Cargando catálogo de repuestos...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
 
-async function cargarData(url = 'api/repuestos.php') {
-  document.getElementById('tabla-repuestos').innerHTML = 'Cargando...';
-  const res = await fetch(url).then(r=>r.json());
-  if (!res.ok) return;
-  
-  if (!res.data.length) {
-    document.getElementById('tabla-repuestos').innerHTML = '<p >No hay repuestos registrados.</p>';
-    return;
-  }
-  
-  let html = `<table><thead><tr>
-    <th>Nombre / Desc.</th><th>P/N</th><th>Stock</th><th>Precio</th><th>Opciones</th>
-  </tr></thead><tbody>`;
-  
-  res.data.forEach(r => {
-    html += `<tr>
-      <td><b>${r.nombre}</b></td>
-      <td>${r.pn || '-'}</td>
-      <td >${r.stock}</td>
-      <td>S/ ${r.precio}</td>
-      <td class="actions">
-        <button class="btn-outline" style="padding:4px 8px" onclick='editar(${JSON.stringify(r).replace(/'/g, "&apos;")})'><i class="ph ph-house"></i></button>
-        <button class="btn-danger" style="padding:4px 8px" onclick="eliminar(${r.id}, '${r.nombre}')"><i class="ph ph-house"></i></button>
-      </td>
-    </tr>`;
-  });
-  html += '</tbody></table>';
-  document.getElementById('tabla-repuestos').innerHTML = html;
-}
+            <!-- Contenedor Alternativo: Tarjetas Móvil -->
+            <div class="mobile-cards-grid" id="tarjetas-movil-container">
+                <!-- Se inyecta dinámicamente -->
+            </div>
 
-function abrirModal() {
-  document.getElementById('m-titulo').textContent = 'Nuevo Repuesto';
-  document.getElementById('r-id').value = '';
-  document.getElementById('r-nombre').value = '';
-  document.getElementById('r-pn').value = '';
-  document.getElementById('r-stock').value = '0';
-  document.getElementById('r-precio').value = '0.00';
-  document.getElementById('r-notas').value = '';
-  document.getElementById('modal').style.display = 'flex';
-}
-
-function editar(r) {
-  document.getElementById('m-titulo').textContent = 'Editar Repuesto';
-  document.getElementById('r-id').value = r.id;
-  document.getElementById('r-nombre').value = r.nombre;
-  document.getElementById('r-pn').value = r.pn;
-  document.getElementById('r-stock').value = r.stock;
-  document.getElementById('r-precio').value = r.precio;
-  document.getElementById('r-notas').value = r.notas;
-  document.getElementById('modal').style.display = 'flex';
-}
-
-async function guardar() {
-  const body = {
-    id: document.getElementById('r-id').value,
-    nombre: document.getElementById('r-nombre').value.trim(),
-    pn: document.getElementById('r-pn').value.trim(),
-    stock: document.getElementById('r-stock').value,
-    precio: document.getElementById('r-precio').value,
-    notas: document.getElementById('r-notas').value
-  };
-  if(!body.nombre) return alert("Falta el nombre");
-  
-  const action = body.id ? 'actualizar' : 'crear';
-  const res = await fetch(`api/repuestos.php?action=${action}`, { method:'POST', body:JSON.stringify(body) }).then(r=>r.json());
-  if (res.ok) {
-    document.getElementById('modal').style.display = 'none';
-    buscar();
-  } else {
-    alert("Error: " + res.msg);
-  }
-}
-
-async function eliminar(id, nombre) {
-  if (!confirm(`Eliminar el repuesto ${nombre}?`)) return;
-  const res = await fetch(`api/repuestos.php?action=eliminar&id=${id}`).then(r=>r.json());
-  if (res.ok) buscar();
-  else alert("Error: " + res.msg);
-}
-
-cargarData();
-</script>
-
+            <!-- Empty State -->
+            <div class="empty-state-box" id="empty-state" style="display: none;">
+                <div class="empty-state-icon">
+                    <i class="ph-bold ph-package-open"></i>
+                </div>
+                <div class="empty-state-title" id="empty-state-title">No se encontraron repuestos</div>
+                <div class="empty-state-desc" id="empty-state-desc">No hay piezas que coincidan con los criterios de búsqueda o el filtro actual.</div>
+                <button class="btn-cross-nav" onclick="restablecerFiltros()" style="margin: 0 auto;">
+                    <i class="ph-bold ph-arrow-counter-clockwise"></i> Restablecer Filtros
+                </button>
+            </div>
 
         </div>
-        
+
+        <!-- MODAL GESTIÓN DE REPUESTO (NUEVO / EDITAR) -->
+        <div class="modal-overlay" id="modal-repuesto" style="display: none;" onclick="if(event.target===this) cerrarModal()">
+            <div class="modal-repuesto-box">
+                <div class="modal-repuesto-header">
+                    <h3 id="modal-titulo"><i class="ph-bold ph-wrench" style="color: var(--color-brand)"></i> Nuevo Repuesto</h3>
+                    <button class="modal-close-btn" onclick="cerrarModal()" title="Cerrar ventana">
+                        <i class="ph-bold ph-x"></i>
+                    </button>
+                </div>
+                <div class="modal-repuesto-body">
+                    <input type="hidden" id="r-id">
+                    
+                    <div class="form-group">
+                        <label for="r-nombre">Nombre / Descripción del Repuesto *</label>
+                        <input type="text" id="r-nombre" placeholder="Ej: Pantalla LED 15.6 Slim 30 pines FHD" autocomplete="off">
+                    </div>
+
+                    <div class="form-grid-2">
+                        <div class="form-group">
+                            <label for="r-pn">Número de Parte (P/N)</label>
+                            <input type="text" id="r-pn" placeholder="Ej: B156HAN02.1" autocomplete="off">
+                        </div>
+                        <div class="form-group">
+                            <label for="r-categoria">Categoría</label>
+                            <select id="r-categoria">
+                                <option value="Pantallas">Pantallas</option>
+                                <option value="Teclados">Teclados</option>
+                                <option value="Cargadores">Cargadores</option>
+                                <option value="Baterías">Baterías</option>
+                                <option value="Flex / Cables">Flex / Cables</option>
+                                <option value="Insumos">Insumos</option>
+                                <option value="Placas / Chips">Placas / Chips</option>
+                                <option value="Almacenamiento / RAM">Almacenamiento / RAM</option>
+                                <option value="General">General / Otros</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-grid-2">
+                        <div class="form-group">
+                            <label for="r-ubicacion">Ubicación en Taller</label>
+                            <input type="text" id="r-ubicacion" placeholder="Ej: Estante A-1, Gaveta C-2" autocomplete="off">
+                        </div>
+                        <div class="form-group">
+                            <label for="r-precio">Precio Referencial (S/.)</label>
+                            <input type="number" step="0.50" min="0" id="r-precio" placeholder="0.00">
+                        </div>
+                    </div>
+
+                    <div class="form-grid-2">
+                        <div class="form-group">
+                            <label for="r-stock">Stock Físico Actual *</label>
+                            <input type="number" min="0" id="r-stock" value="0">
+                        </div>
+                        <div class="form-group">
+                            <label for="r-stock-minimo">Stock Mínimo de Alerta</label>
+                            <input type="number" min="1" id="r-stock-minimo" value="1">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="r-notas">Notas / Modelos Compatibles</label>
+                        <textarea id="r-notas" rows="3" placeholder="Detalles de compatibilidad, modelos compatibles o notas de taller..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-repuesto-footer">
+                    <button class="btn-refresh" onclick="cerrarModal()">Cancelar</button>
+                    <button class="btn-new-item" id="btn-guardar-repuesto" onclick="guardarRepuesto()">
+                        <i class="ph-bold ph-floppy-disk"></i> Guardar Repuesto
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Toast de Notificación -->
+        <div id="repuesto-toast">
+            <i class="ph-bold ph-info" id="toast-icon"></i>
+            <span id="toast-msg">Mensaje de notificación</span>
+        </div>
+
+        <!-- Script de Autenticación Segura y Control UI -->
+        <script src="js/check_auth.js"></script>
+        <script>
+        // Estado Global del Módulo
+        let catalogoData = [];
+        let categoriaActiva = 'TODOS';
+        let debounceTimer = null;
+        let puedeGestionar = false;
+
+        // Inicialización tras carga de DOM
+        document.addEventListener('DOMContentLoaded', async () => {
+            await inicializarModulo();
+        });
+
+        async function inicializarModulo() {
+            try {
+                // 1. Cargar métricas y permisos
+                await cargarResumen();
+                // 2. Cargar listado inicial
+                await cargarTabla();
+            } catch (err) {
+                console.error("Error al inicializar catálogo de repuestos:", err);
+                mostrarToast("Error al conectar con el servidor", "error");
+            }
+        }
+
+        async function recargarTodo() {
+            await cargarResumen();
+            await cargarTabla();
+            mostrarToast("Catálogo actualizado", "success");
+        }
+
+        // Carga de KPIs y Resumen
+        async function cargarResumen() {
+            try {
+                const res = await fetch('api/repuestos.php?action=resumen').then(r => r.json());
+                if (res.ok && res.data) {
+                    const d = res.data;
+                    document.getElementById('kpi-total-items').textContent = d.total_items || 0;
+                    document.getElementById('kpi-total-stock').textContent = d.total_stock || 0;
+                    document.getElementById('kpi-stock-critico').textContent = d.stock_critico || 0;
+                    document.getElementById('kpi-valor-total').textContent = 'S/ ' + (Number(d.valor_total || 0).toFixed(2));
+                    
+                    document.getElementById('count-todos').textContent = d.total_items || 0;
+                    document.getElementById('count-critico').textContent = d.stock_critico || 0;
+
+                    // Permisos
+                    puedeGestionar = Boolean(d.puede_editar);
+                    const containerBtn = document.getElementById('container-btn-nuevo');
+                    if (!puedeGestionar && containerBtn) {
+                        containerBtn.innerHTML = `
+                            <span class="badge-role-readonly" title="Tienes permisos de consulta para disponibilidad de repuestos.">
+                                <i class="ph-bold ph-eye"></i> Modo Consulta Taller
+                            </span>
+                        `;
+                    }
+                }
+            } catch (e) {
+                console.warn("Fallo al cargar resumen de métricas:", e);
+            }
+        }
+
+        // Carga de Tabla con Filtros
+        async function cargarTabla() {
+            const tbody = document.getElementById('tabla-repuestos-body');
+            const mobileGrid = document.getElementById('tarjetas-movil-container');
+            const emptyState = document.getElementById('empty-state');
+
+            let url = 'api/repuestos.php?action=list';
+            if (categoriaActiva === 'CRITICO') {
+                url += '&critico=1';
+            } else if (categoriaActiva !== 'TODOS') {
+                url += `&categoria=${encodeURIComponent(categoriaActiva)}`;
+            }
+
+            try {
+                const res = await fetch(url).then(r => r.json());
+                if (!res.ok || !res.data) {
+                    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:30px; color:#EF4444;">Error al cargar datos.</td></tr>`;
+                    return;
+                }
+
+                catalogoData = res.data;
+                if (typeof res.puede_editar !== 'undefined') {
+                    puedeGestionar = Boolean(res.puede_editar);
+                }
+
+                aplicarFiltroTexto();
+
+            } catch (err) {
+                console.error("Error al cargar repuestos:", err);
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:30px; color:#EF4444;">Error de conexión.</td></tr>`;
+            }
+        }
+
+        // Búsqueda con Debounce
+        function onBuscadorInput() {
+            const val = document.getElementById('buscador-repuestos').value.trim();
+            document.getElementById('btn-clear-search').style.display = val ? 'block' : 'none';
+
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => {
+                aplicarFiltroTexto();
+            }, 250);
+        }
+
+        function limpiarBuscador() {
+            document.getElementById('buscador-repuestos').value = '';
+            document.getElementById('btn-clear-search').style.display = 'none';
+            aplicarFiltroTexto();
+        }
+
+        function restablecerFiltros() {
+            document.getElementById('buscador-repuestos').value = '';
+            document.getElementById('btn-clear-search').style.display = 'none';
+            filtrarCategoria('TODOS');
+        }
+
+        // Filtrado en Memoria por Texto
+        function aplicarFiltroTexto() {
+            const q = document.getElementById('buscador-repuestos').value.trim().toLowerCase();
+            const items = catalogoData.filter(r => {
+                if (!q) return true;
+                const matchNombre = (r.nombre || '').toLowerCase().includes(q);
+                const matchPn = (r.pn || '').toLowerCase().includes(q);
+                const matchCat = (r.categoria || '').toLowerCase().includes(q);
+                const matchUb = (r.ubicacion || '').toLowerCase().includes(q);
+                return matchNombre || matchPn || matchCat || matchUb;
+            });
+
+            renderizarCatalogos(items);
+        }
+
+        // Renderizado Dual (Desktop y Móvil)
+        function renderizarCatalogos(items) {
+            const tbody = document.getElementById('tabla-repuestos-body');
+            const mobileGrid = document.getElementById('tarjetas-movil-container');
+            const emptyState = document.getElementById('empty-state');
+            const desktopWrap = document.getElementById('tabla-desktop-container');
+
+            if (!items || items.length === 0) {
+                tbody.innerHTML = '';
+                mobileGrid.innerHTML = '';
+                desktopWrap.style.display = 'none';
+                mobileGrid.style.display = 'none';
+                emptyState.style.display = 'block';
+                return;
+            }
+
+            emptyState.style.display = 'none';
+            desktopWrap.style.display = '';
+            mobileGrid.style.display = '';
+
+            // 1. Render Desktop Table
+            let htmlDesktop = '';
+            let htmlMobile = '';
+
+            items.forEach(r => {
+                const stock = Number(r.stock) || 0;
+                const min = Number(r.stock_minimo) || 1;
+                const precio = Number(r.precio) || 0;
+
+                let badgeClass = 'stock-ok';
+                let badgeText = `${stock} disp.`;
+                let pulseClass = 'pulse-green';
+
+                if (stock === 0) {
+                    badgeClass = 'stock-danger';
+                    badgeText = 'Agotado (0)';
+                    pulseClass = 'pulse-red';
+                } else if (stock <= min) {
+                    badgeClass = 'stock-warning';
+                    badgeText = `Bajo Stock (${stock})`;
+                    pulseClass = 'pulse-amber';
+                }
+
+                const catName = r.categoria || 'General';
+                const pnText = r.pn ? `<span class="repuesto-pn">${escapeHtml(r.pn)}</span>` : '<span style="color:var(--text-secondary); font-size:0.8rem;">S/PN</span>';
+                const ubicacion = r.ubicacion || 'Taller General';
+                const notas = r.notas ? `<span class="repuesto-notas" title="${escapeHtml(r.notas)}">${escapeHtml(r.notas)}</span>` : '';
+
+                // Botones de acción según permisos
+                let actionBtns = '';
+                if (puedeGestionar) {
+                    actionBtns = `
+                        <div class="actions-cell" style="justify-content: flex-end;">
+                            <button class="btn-action-icon" title="Editar Repuesto" onclick='editarRepuesto(${JSON.stringify(r).replace(/'/g, "&apos;")})'>
+                                <i class="ph-bold ph-pencil-simple"></i>
+                            </button>
+                            <button class="btn-action-icon btn-delete" title="Eliminar Repuesto" onclick="eliminarRepuesto(${r.id}, '${escapeHtml(r.nombre)}')">
+                                <i class="ph-bold ph-trash"></i>
+                            </button>
+                        </div>
+                    `;
+                } else {
+                    actionBtns = `
+                        <div style="text-align: right; color: var(--text-secondary); font-size: 0.78rem;">
+                            <i class="ph-bold ph-lock-simple"></i> Consulta
+                        </div>
+                    `;
+                }
+
+                // Desktop Row
+                htmlDesktop += `
+                    <tr>
+                        <td>
+                            <span class="repuesto-name">${escapeHtml(r.nombre)}</span>
+                            <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+                                ${pnText}
+                                ${notas}
+                            </div>
+                        </td>
+                        <td>
+                            <span class="badge-cat">${escapeHtml(catName)}</span>
+                        </td>
+                        <td>
+                            <span class="ubicacion-pill">
+                                <i class="ph-bold ph-map-pin" style="color: var(--color-brand);"></i>
+                                ${escapeHtml(ubicacion)}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="stock-badge ${badgeClass}">
+                                <span class="pulse-dot ${pulseClass}"></span>
+                                <span>${badgeText}</span>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="precio-tag">S/ ${precio.toFixed(2)}</span>
+                        </td>
+                        <td>
+                            ${actionBtns}
+                        </td>
+                    </tr>
+                `;
+
+                // Mobile Card
+                htmlMobile += `
+                    <div class="repuesto-mobile-card">
+                        <div class="rmc-header">
+                            <div class="rmc-title">${escapeHtml(r.nombre)}</div>
+                            <span class="precio-tag">S/ ${precio.toFixed(2)}</span>
+                        </div>
+                        <div class="rmc-meta">
+                            ${pnText}
+                            <span class="badge-cat">${escapeHtml(catName)}</span>
+                            <span class="ubicacion-pill">
+                                <i class="ph-bold ph-map-pin"></i> ${escapeHtml(ubicacion)}
+                            </span>
+                        </div>
+                        <div class="rmc-details">
+                            <div class="stock-badge ${badgeClass}">
+                                <span class="pulse-dot ${pulseClass}"></span>
+                                <span>${badgeText}</span>
+                            </div>
+                            ${notas ? `<div style="font-size:0.75rem; color:var(--text-secondary); max-width:180px; text-overflow:ellipsis; overflow:hidden; white-space:nowrap;">${escapeHtml(r.notas)}</div>` : ''}
+                        </div>
+                        ${puedeGestionar ? `
+                            <div class="rmc-actions">
+                                <button class="btn-action-icon" title="Editar" onclick='editarRepuesto(${JSON.stringify(r).replace(/'/g, "&apos;")})'>
+                                    <i class="ph-bold ph-pencil-simple"></i>
+                                </button>
+                                <button class="btn-action-icon btn-delete" title="Eliminar" onclick="eliminarRepuesto(${r.id}, '${escapeHtml(r.nombre)}')">
+                                    <i class="ph-bold ph-trash"></i>
+                                </button>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            });
+
+            tbody.innerHTML = htmlDesktop;
+            mobileGrid.innerHTML = htmlMobile;
+        }
+
+        // Selección de Filtro por Categoría
+        function filtrarCategoria(cat) {
+            categoriaActiva = cat;
+            document.querySelectorAll('.filter-chip').forEach(chip => {
+                if (chip.getAttribute('data-cat') === cat) {
+                    chip.classList.add('active');
+                } else {
+                    chip.classList.remove('active');
+                }
+            });
+            cargarTabla();
+        }
+
+        // Modal Nuevo Repuesto
+        function abrirModalNuevo() {
+            if (!puedeGestionar) {
+                mostrarToast("Solo administradores pueden crear repuestos.", "error");
+                return;
+            }
+            document.getElementById('modal-titulo').innerHTML = '<i class="ph-bold ph-plus-circle" style="color:#10B981;"></i> Nuevo Repuesto';
+            document.getElementById('r-id').value = '';
+            document.getElementById('r-nombre').value = '';
+            document.getElementById('r-pn').value = '';
+            document.getElementById('r-categoria').value = 'General';
+            document.getElementById('r-ubicacion').value = 'Taller';
+            document.getElementById('r-stock').value = '1';
+            document.getElementById('r-stock-minimo').value = '1';
+            document.getElementById('r-precio').value = '0.00';
+            document.getElementById('r-notas').value = '';
+            document.getElementById('modal-repuesto').style.display = 'flex';
+            setTimeout(() => document.getElementById('r-nombre').focus(), 100);
+        }
+
+        // Modal Editar Repuesto
+        function editarRepuesto(r) {
+            if (!puedeGestionar) {
+                mostrarToast("No tienes permisos para editar repuestos.", "error");
+                return;
+            }
+            document.getElementById('modal-titulo').innerHTML = '<i class="ph-bold ph-pencil-simple" style="color:var(--color-brand);"></i> Editar Repuesto';
+            document.getElementById('r-id').value = r.id;
+            document.getElementById('r-nombre').value = r.nombre || '';
+            document.getElementById('r-pn').value = r.pn || '';
+            document.getElementById('r-categoria').value = r.categoria || 'General';
+            document.getElementById('r-ubicacion').value = r.ubicacion || 'Taller';
+            document.getElementById('r-stock').value = r.stock || 0;
+            document.getElementById('r-stock-minimo').value = r.stock_minimo || 1;
+            document.getElementById('r-precio').value = Number(r.precio || 0).toFixed(2);
+            document.getElementById('r-notas').value = r.notas || '';
+            document.getElementById('modal-repuesto').style.display = 'flex';
+            setTimeout(() => document.getElementById('r-nombre').focus(), 100);
+        }
+
+        function cerrarModal() {
+            document.getElementById('modal-repuesto').style.display = 'none';
+        }
+
+        // Guardar Repuesto (Crear o Actualizar)
+        async function guardarRepuesto() {
+            const id = document.getElementById('r-id').value;
+            const nombre = document.getElementById('r-nombre').value.trim();
+            const pn = document.getElementById('r-pn').value.trim();
+            const categoria = document.getElementById('r-categoria').value;
+            const ubicacion = document.getElementById('r-ubicacion').value.trim() || 'Taller';
+            const stock = parseInt(document.getElementById('r-stock').value, 10) || 0;
+            const stock_minimo = parseInt(document.getElementById('r-stock-minimo').value, 10) || 1;
+            const precio = parseFloat(document.getElementById('r-precio').value) || 0.0;
+            const notas = document.getElementById('r-notas').value.trim();
+
+            if (!nombre) {
+                mostrarToast("El nombre del repuesto es obligatorio", "error");
+                document.getElementById('r-nombre').focus();
+                return;
+            }
+
+            const btn = document.getElementById('btn-guardar-repuesto');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="ph-bold ph-spinner ph-spin"></i> Guardando...';
+
+            const payload = { id, nombre, pn, categoria, ubicacion, stock, stock_minimo, precio, notas };
+            const action = id ? 'actualizar' : 'crear';
+
+            try {
+                const res = await fetch(`api/repuestos.php?action=${action}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                }).then(r => r.json());
+
+                if (res.ok) {
+                    cerrarModal();
+                    mostrarToast(id ? "Repuesto actualizado con éxito" : "Repuesto registrado con éxito", "success");
+                    await cargarResumen();
+                    await cargarTabla();
+                } else {
+                    mostrarToast("Error: " + (res.msg || "No se pudo guardar"), "error");
+                }
+            } catch (err) {
+                console.error("Error al guardar repuesto:", err);
+                mostrarToast("Error de conexión con el servidor", "error");
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="ph-bold ph-floppy-disk"></i> Guardar Repuesto';
+            }
+        }
+
+        // Eliminar Repuesto
+        async function eliminarRepuesto(id, nombre) {
+            if (!confirm(`¿Estás seguro de eliminar "${nombre}" del catálogo? Esta acción no se puede deshacer.`)) {
+                return;
+            }
+
+            try {
+                const res = await fetch(`api/repuestos.php?action=eliminar&id=${id}`).then(r => r.json());
+                if (res.ok) {
+                    mostrarToast("Repuesto eliminado correctamente", "success");
+                    await cargarResumen();
+                    await cargarTabla();
+                } else {
+                    mostrarToast("Error: " + (res.msg || "No se pudo eliminar"), "error");
+                }
+            } catch (err) {
+                console.error("Error al eliminar repuesto:", err);
+                mostrarToast("Error de comunicación", "error");
+            }
+        }
+
+        // Toast de Notificaciones
+        function mostrarToast(mensaje, tipo = 'success') {
+            const toast = document.getElementById('repuesto-toast');
+            const msgEl = document.getElementById('toast-msg');
+            const iconEl = document.getElementById('toast-icon');
+
+            msgEl.textContent = mensaje;
+            toast.className = tipo === 'success' ? 'toast-success' : 'toast-error';
+            iconEl.className = tipo === 'success' ? 'ph-bold ph-check-circle' : 'ph-bold ph-warning-circle';
+
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3200);
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            return String(text)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+        </script>
+
         <!-- FAB Button -->
         <button class="fab-chat" onclick="if(typeof abrirModalTareaGlobal === 'function') abrirModalTareaGlobal();" title="Crear Tarea Interna">
             <i class="ph-bold ph-kanban"></i>
