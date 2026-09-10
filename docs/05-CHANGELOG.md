@@ -28,6 +28,26 @@ Para garantizar trazabilidad absoluta, auditoría técnica rigurosa y claridad e
 - **`[Security]`**: Implementación de un pipeline de Integración y Despliegue Continuo (CI/CD) automatizado desde GitHub hacia el hosting de producción (cPanel/Apache) para reemplazar el traspaso manual por FTP y mitigar el riesgo de desincronización o error humano en despliegues.
 - **`[Changed]`**: Coordinación en el panel de control del servidor (cPanel) para renombrar la base de datos de `petumjvq_pruebas` a un identificador formal de producción (ej. `petumjvq_sistema`), actualizando la variable de entorno en el servidor de forma segura.
 
+## [1.5.6] - Septiembre 2026
+
+### Remediación Integral de Creación de Órdenes en Recepción y Sincronización de Estados en Tablero Kanban
+*Módulos impactados:* `website_files/api/soporte.php`, `website_files/recepcion_movil.html`, `website_files/mis_ordenes.html`, `website_files/sw.js`, `docs/02-BACKEND.md`, `docs/PROMPT-REMEDIACION-RECEPCION-Y-KANBAN-V1.5.6.md`.
+
+> **Causa Raíz ("El Por Qué"):** Al registrar una orden desde `https://petulap.store/recepcion_movil.html`, el botón de envío quedaba perpetuamente colgado y deshabilitado mostrando `<i class="ph ph-hourglass"></i> Guardando...` sin crear el ticket. La auditoría técnica detectó una severa desincronización en el backend (`api/soporte.php` en acción `crear`): la sentencia `INSERT INTO soporte_tecnico` contenía 10 columnas y 10 comodines `?`, mientras que `bind_param("sisssissssi", ...)` recibía 11 tipos y 11 variables al haber incorporado `$tiempo_est` en v1.4.6 sin incluir la columna `tiempo_estimado` en el query. Esto arrojaba un `mysqli_sql_exception` no capturado (error HTTP 500) que provocaba el colapso del parser JSON en el frontend al carecer de un bloque `try...catch`, dejando el botón congelado e impidiendo la creación del ticket. Asimismo, en el tablero Kanban (`mis_ordenes.html`), el chip superior reportaba "3 órdenes en taller" pero solo se visualizaba 1 tarjeta bajo "Esperando Repuesto". La causa residió en que el filtro de órdenes activas solo excluía `ENTREGADO`, permitiendo que tickets con estado `ELIMINADO` (soft-delete) y `CANCELADO` inflaran el contador global, mientras que la rutina de reparto a columnas los ignoraba silenciosamente por no coincidir con ningún condicional, convirtiéndolos en órdenes fantasma. Se remediaron quirúrgicamente ambas capas sincronizando los 11 parámetros en backend, blindando con `try...catch` y restauración de botón en recepción móvil, unificando la lógica de estados activos y de columnas en Kanban e incrementando la versión de caché a `petulap-v26`.
+
+### Fixed
+- **Desincronización de Parámetros en Backend (`api/soporte.php`)**: Incorporación explícita de la columna `tiempo_estimado` y su respectivo placeholder en `INSERT INTO soporte_tecnico`, logrando paridad absoluta (11 columnas, 11 `?`, 11 variables tipadas con `"sisssissssi"`).
+- **Exclusión de Borrados Lógicos en Listado (`api/soporte.php`)**: Filtrado automático `st.estado != 'ELIMINADO'` en `action=list` por defecto, impidiendo que registros eliminados sean transferidos al cliente.
+- **Bloqueo de Botón en Recepción Móvil (`recepcion_movil.html`)**: Blindaje total de la función `crearOrden()` mediante bloque `try...catch`. Ante errores de conexión o HTTP, el botón se rehabilita instantáneamente (`disabled = false`), restituye su contenido original (`GENERAR ORDEN`) y despliega un `toast` informativo.
+- **Transición Limpia a Pantalla de Éxito (`recepcion_movil.html`)**: Ocultamiento limpio de los pasos `#step-1`, `#step-2` y `#step-3`, visualización directa de `#step-exito` con scroll suave y erradicación de referencias a selectores inexistentes (`.stepper`, `.step-card`).
+- **Sincronización Aritmética de Contadores en Tablero Kanban (`mis_ordenes.html`)**: Exclusión estricta de estados inactivos (`ENTREGADO`, `CANCELADO`, `ELIMINADO`) en la consulta de órdenes activas y cálculo del chip `#txt-total-active` como la suma aritmética exacta de las tarjetas clasificadas en las columnas (`cols.pend + cols.diag + cols.rep + cols.listo`).
+- **Eliminación de Órdenes Fantasma en Kanban (`mis_ordenes.html`)**: Normalización en mayúsculas de estados, mapeo de sinónimos (`LISTO_PARA_ENTREGA` y `COMPLETADO` a columna Listos) y mecanismo de fallback a revisión (`cols.diag`) para cualquier estado activo no contemplado.
+- **Mejora de UX Móvil en Acordeones (`mis_ordenes.html`)**: Despliegue automático de la primera columna que posea órdenes de trabajo reales cuando la columna por defecto esté vacía, evitando que el usuario aterrice en un acordeón cerrado o sin contenido.
+
+### Changed
+- **`website_files/sw.js`**: Incremento de la versión de caché PWA a `petulap-v26` para garantizar la actualización inmediata en terminales móviles y navegadores de taller.
+- **`docs/02-BACKEND.md`**: Actualización del catálogo de endpoints de `api/soporte.php` y esquema de columnas de la tabla `soporte_tecnico`.
+
 ## [1.5.5] - Septiembre 2026
 
 ### Remediación Integral del Catálogo de Repuestos, Resiliencia Backend y Stock de Taller

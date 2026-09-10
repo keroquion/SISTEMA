@@ -1,6 +1,6 @@
-// Service Worker - Petulap PWA v25 (Remediación integral y catálogo de repuestos v1.5.5)
+// Service Worker - Petulap PWA v26 (Remediación recepción móvil y sincronización de Kanban v1.5.6)
  
-var CACHE_NAME = 'petulap-v25';
+var CACHE_NAME = 'petulap-v26';
 var ASSETS = [
     './',
     'index.html',

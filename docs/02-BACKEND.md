@@ -43,9 +43,9 @@ El núcleo operativo del taller: administra las órdenes de servicio, diagnósti
 
 | Acción (`action`) | Método | ¿Qué hace en una frase simple? |
 | :--- | :---: | :--- |
-| `list` | **GET** | Consulta y filtra la lista de órdenes de trabajo por estado, fechas, técnico o texto libre. |
+| `list` | **GET** | Consulta y filtra la lista de órdenes de trabajo por estado, fechas, técnico o texto libre (excluye registros con estado `ELIMINADO` por defecto). |
 | `ver` | **GET** | Devuelve toda la información detallada de una sola orden a partir de su identificador numérico (`id`). |
-| `crear` | **POST** | Registra el ingreso de una laptop de un cliente externo y genera un número de ticket con formato `ST-AAAAMMDD-XXX`. |
+| `crear` | **POST** | Registra el ingreso de una laptop de un cliente externo y genera un número de ticket con formato `ST-AAAAMMDD-XXX` (recibe 11 parámetros incluyendo `tiempo_estimado` y asignación de técnico). |
 | `crear_tarea` | **POST** | Registra una tarea de trabajo interna y genera un número de ticket con formato `TAR-AAAA-XXX`. |
 | `crear_interno` | **POST** | Registra una reparación sobre un equipo propio de la empresa con formato `ST-INT-AAAA-XXX`. |
 | `actualizar` | **POST** | Cambia el estado de un ticket (ej. de diagnóstico a listo), guarda notas técnicas y registra la fecha. |
@@ -290,7 +290,7 @@ A continuación se lista cada cajón y su función:
 - **Relaciones:** Se vincula con las órdenes de servicio en `soporte_tecnico` y con los lotes en `lote_equipos`.
 
 ### 3. `soporte_tecnico` (Órdenes de Trabajo y Tickets)
-- **Columnas clave:** `id`, `numero_atencion` (`ST-...` o `TAR-...`), `cliente_id` (quién la trajo), `equipo_codigo`, `equipo_serie`, `equipo_descripcion`, `motivo_ingreso`, `diagnostico`, `solucion`, `prioridad`, `estado` (`PENDIENTE`, `EN_DIAGNOSTICO`, `EN_REPARACION`, `LISTO_PARA_ENTREGA`, `ENTREGADO`), `tecnico_id` (técnico titular), `tecnicos_adicionales` (IDs de técnicos colaboradores separados por coma), `fecha_ingreso`, `fecha_entrega`.
+- **Columnas clave:** `id`, `numero_atencion` (`ST-...` o `TAR-...`), `cliente_id` (quién la trajo), `equipo_codigo`, `equipo_serie`, `equipo_descripcion`, `motivo_ingreso`, `diagnostico`, `solucion`, `tiempo_estimado`, `prioridad`, `estado` (`PENDIENTE`, `EN_DIAGNOSTICO`, `EN_REPARACION`, `ESPERANDO_REPUESTO`, `LISTO_PARA_RECOGER`, `ENTREGADO`, `CANCELADO`, `ELIMINADO`), `tecnico_id` (técnico titular), `tecnicos_adicionales` (IDs de técnicos colaboradores separados por coma), `fecha_ingreso`, `fecha_entrega`.
 - **Relaciones:**  
   - `cliente_id` apunta a `personas.id` (el cliente dueño o nulo en órdenes internas).  
   - `tecnico_id` apunta a `personas.id` (el técnico asignado titular).

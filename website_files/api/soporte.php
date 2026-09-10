@@ -31,6 +31,8 @@ switch ($action) {
                 $types .= "s";
                 $params[] = $estado;
             }
+        } else {
+            $whereClauses[] = "st.estado != 'ELIMINADO'";
         }
 
         if ($origen === "clientes") {
@@ -100,7 +102,7 @@ switch ($action) {
         $numero = "ST-$fecha-$seq";
         // --- FIN GENERACION SEGURA CONCURRENTE ---
 
-        $stmt = $db->prepare("INSERT INTO soporte_tecnico (numero_atencion, cliente_id, equipo_codigo, equipo_serie, equipo_descripcion, es_externo, motivo_ingreso, prioridad, fecha_estimada, tecnico_id) VALUES (?,?,?,?,?,?,?,?,?,?)");
+        $stmt = $db->prepare("INSERT INTO soporte_tecnico (numero_atencion, cliente_id, equipo_codigo, equipo_serie, equipo_descripcion, es_externo, motivo_ingreso, prioridad, fecha_estimada, tiempo_estimado, tecnico_id) VALUES (?,?,?,?,?,?,?,?,?,?,?)");
         $cliente_id = (int)$data["cliente_id"];
         $eq_cod = $data["equipo_codigo"] ?? "";
         $eq_ser = $data["equipo_serie"] ?? "";

@@ -515,7 +515,7 @@
         </select>
       </div>
 
-      <button class="btn btn-primary" style="width: 100%; padding: 18px; font-size: 1.1rem; justify-content: center;" onclick="validarYCrearOrden()">
+      <button class="btn btn-primary" id="btn-generar-orden" style="width: 100%; padding: 18px; font-size: 1.1rem; justify-content: center;" onclick="validarYCrearOrden()">
         <i class="ph-bold ph-floppy-disk"></i> GENERAR ORDEN
       </button>
     </div>
@@ -678,89 +678,116 @@
     }
 
     async function crearOrden() {
-      const btn = event.target;
-      btn.disabled = true;
-      btn.innerHTML = '<i class="ph ph-hourglass"></i> Guardando...';
-
-      const clienteBody = {
-        dni: document.getElementById('f-dni').value.trim(),
-        nombre: document.getElementById('f-nombre').value.trim(),
-        telefono: document.getElementById('f-tel').value.trim(),
-        tipo: 'cliente'
-      };
-      
-      let clienteId = null;
-      try {
-        const cRes = await fetch(`api/personas.php?action=crear`, { method:'POST', body:JSON.stringify(clienteBody) }).then(r=>r.json());
-        if(cRes.ok && cRes.id) {
-           clienteId = cRes.id;
-        } else {
-           const bRes = await fetch(`api/personas.php?action=buscar_dni&dni=${clienteBody.dni}`).then(r=>r.json());
-           if(bRes.ok && bRes.data) clienteId = bRes.data.id;
-        }
-      } catch(e) {}
-
-      if (!clienteId) {
-        showToast('Error al procesar el cliente');
-        btn.disabled = false;
-        btn.innerHTML = '💾 GENERAR ORDEN';
-        return;
+      const btn = document.getElementById('btn-generar-orden') || document.querySelector('#step-3 button.btn-primary');
+      const originalHtml = btn ? btn.innerHTML : '<i class="ph-bold ph-floppy-disk"></i> GENERAR ORDEN';
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<i class="ph ph-hourglass"></i> Guardando...';
       }
 
-      const eqCodigo = document.getElementById('f-eq-codigo').value.trim();
-      const eqNombre = document.getElementById('f-eq-nombre').value.trim();
-      const falla = document.getElementById('f-falla').value.trim() || 'Revision General';
-      let idTecnicoFinal = isAdmin ? document.getElementById('sel-admin-tecnico').value : tecnicoId;
-
-      const sopBody = {
-        cliente_id: parseInt(clienteId),
-        es_externo: eqCodigo ? 0 : 1,
-        equipo_codigo: eqCodigo,
-        equipo_serie: equipoSerie,
-        equipo_descripcion: eqNombre,
-        motivo_ingreso: falla,
-        prioridad: 'NORMAL',
-        fecha_estimada: null,
-        tecnico_id: idTecnicoFinal || null
-      };
-
-      const sRes = await fetch(`api/soporte.php?action=crear`, { method:'POST', body:JSON.stringify(sopBody) }).then(r=>r.json());
-      
-      if(sRes.ok) {
-        if(typeof playSound === 'function') playSound('notification');
+      try {
+        const clienteBody = {
+          dni: document.getElementById('f-dni').value.trim(),
+          nombre: document.getElementById('f-nombre').value.trim(),
+          telefono: document.getElementById('f-tel').value.trim(),
+          tipo: 'cliente'
+        };
         
-        const numero = sRes.numero || '?';
-        const nombreCliente = document.getElementById('f-nombre').value.trim();
-        const telCliente = document.getElementById('f-tel').value.trim();
-        const eqDesc = document.getElementById('f-eq-nombre').value.trim();
-        
-        document.getElementById('exito-numero').textContent = numero;
-        document.getElementById('exito-cliente').textContent = nombreCliente + ' - ' + eqDesc;
-        
-        const baseUrl = window.location.origin + window.location.pathname.replace('recepcion_movil.html','');
-        const linkSeguimiento = baseUrl + 'consulta.html?ticket=' + encodeURIComponent(numero);
-        const msgWP = `Hola ${nombreCliente}, somos PETULAP 🔧
+        let clienteId = null;
+        try {
+          const cRes = await fetch(`api/personas.php?action=crear`, { 
+            method: 'POST', 
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(clienteBody) 
+          }).then(r => r.json());
+          
+          if (cRes.ok && cRes.id) {
+             clienteId = cRes.id;
+          } else {
+             const bRes = await fetch(`api/personas.php?action=buscar_dni&dni=${encodeURIComponent(clienteBody.dni)}`).then(r => r.json());
+             if (bRes.ok && bRes.data) clienteId = bRes.data.id;
+          }
+        } catch(e) {
+          console.warn('Fallo procesando cliente:', e);
+        }
 
-Tu equipo (*${eqDesc}*) ha ingresado correctamente.
+        if (!clienteId) {
+          showToast('Error al procesar el cliente. Verifica DNI o Nombre.');
+          if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = originalHtml;
+          }
+          return;
+        }
 
-📋 *Ticket:* ${numero}
+        const eqCodigo = document.getElementById('f-eq-codigo').value.trim();
+        const eqNombre = document.getElementById('f-eq-nombre').value.trim();
+        const falla = document.getElementById('f-falla').value.trim() || 'Revision General';
+        let idTecnicoFinal = isAdmin ? document.getElementById('sel-admin-tecnico').value : tecnicoId;
 
-Puedes rastrear tu equipo aqui:
-https://petulap.store/consulta.html?ticket=${encodeURIComponent(numero)}
+        const sopBody = {
+          cliente_id: parseInt(clienteId),
+          es_externo: eqCodigo ? 0 : 1,
+          equipo_codigo: eqCodigo,
+          equipo_serie: equipoSerie || '',
+          equipo_descripcion: eqNombre,
+          motivo_ingreso: falla,
+          prioridad: 'NORMAL',
+          fecha_estimada: null,
+          tecnico_id: idTecnicoFinal ? parseInt(idTecnicoFinal) : null
+        };
 
-Gracias por confiar en nosotros! 🙌`;
-        document.getElementById('btn-wp-exito').href = `https://wa.me/51${telCliente}?text=${encodeURIComponent(msgWP)}`;
+        const sRes = await fetch(`api/soporte.php?action=crear`, { 
+          method: 'POST', 
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(sopBody) 
+        }).then(r => {
+          if (!r.ok) throw new Error('Error HTTP en servidor (' + r.status + ')');
+          return r.json();
+        });
         
-        document.getElementById('btn-sticker-exito').dataset.numero = numero;
-        document.getElementById('btn-sticker-exito').dataset.cliente = nombreCliente;
-        
-        document.querySelectorAll('.step-card').forEach(c => c.classList.remove('active'));
-        document.getElementById('step-exito').classList.add('active');
-        document.querySelector('.stepper').style.display = 'none';
-      } else {
-        showToast('Error al crear orden: ' + sRes.msg);
-        btn.disabled = false;
-        btn.innerHTML = '💾 GENERAR ORDEN';
+        if (sRes.ok) {
+          if (typeof playSound === 'function') playSound('notification');
+          
+          const numero = sRes.numero || 'ST-OK';
+          const nombreCliente = document.getElementById('f-nombre').value.trim();
+          const telCliente = document.getElementById('f-tel').value.trim();
+          const eqDesc = document.getElementById('f-eq-nombre').value.trim();
+          
+          document.getElementById('exito-numero').textContent = numero;
+          document.getElementById('exito-cliente').textContent = nombreCliente + ' - ' + eqDesc;
+          
+          const baseUrl = window.location.origin + window.location.pathname.replace('recepcion_movil.html','');
+          const msgWP = `Hola ${nombreCliente}, somos PETULAP 🔧\n\nTu equipo (*${eqDesc}*) ha ingresado correctamente.\n\n📋 *Ticket:* ${numero}\n\nPuedes rastrear tu equipo aqui:\nhttps://petulap.store/consulta.html?ticket=${encodeURIComponent(numero)}\n\nGracias por confiar en nosotros! 🙌`;
+          document.getElementById('btn-wp-exito').href = `https://wa.me/51${telCliente}?text=${encodeURIComponent(msgWP)}`;
+          
+          document.getElementById('btn-sticker-exito').dataset.numero = numero;
+          document.getElementById('btn-sticker-exito').dataset.cliente = nombreCliente;
+          
+          // Ocultar pasos anteriores y mostrar pantalla de éxito limpiamente
+          ['step-1', 'step-2', 'step-3'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.style.display = 'none';
+          });
+          const stepExito = document.getElementById('step-exito');
+          if (stepExito) {
+            stepExito.style.display = 'block';
+            stepExito.scrollIntoView({ behavior: 'smooth' });
+          }
+        } else {
+          showToast('Error al crear orden: ' + (sRes.msg || 'Respuesta no exitosa'));
+          if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = originalHtml;
+          }
+        }
+      } catch (err) {
+        console.error('Error crítico en crearOrden:', err);
+        showToast('Error de conexión o fallo en servidor al guardar orden.');
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = originalHtml;
+        }
       }
     }
 

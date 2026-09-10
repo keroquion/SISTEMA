@@ -1061,13 +1061,14 @@ async function cargarMisOrdenes() {
   const res = await fetch('api/soporte.php?action=list').then(r=>r.json());
   if (!res.ok) return;
   
-  let misTickets = res.data;
-  todosMisTickets = res.data;
+  let misTickets = res.data || [];
+  todosMisTickets = res.data || [];
   if (miId !== 'admin') {
-    misTickets = res.data.filter(t => t.tecnico_id == miId);
+    misTickets = misTickets.filter(t => t.tecnico_id == miId);
   }
   
-  misTickets = misTickets.filter(t => t.estado !== 'ENTREGADO');
+  // Excluir estados terminados o inactivos (ENTREGADO, CANCELADO, ELIMINADO)
+  misTickets = misTickets.filter(t => !['ENTREGADO', 'CANCELADO', 'ELIMINADO'].includes((t.estado || '').toUpperCase().trim()));
 
   if (modoVista === 'clientes') {
     misTickets = misTickets.filter(t => t.es_externo != 2 && t.cliente_id != 1);
@@ -1075,12 +1076,7 @@ async function cargarMisOrdenes() {
     misTickets = misTickets.filter(t => t.es_externo == 2 || t.cliente_id == 1);
   }
   
-  const countSpan = document.getElementById('txt-total-active');
-  if (countSpan) {
-    countSpan.textContent = `${misTickets.length} órdenes en taller`;
-  }
-  
-  const pendientesActuales = misTickets.filter(t => t.estado === 'PENDIENTE');
+  const pendientesActuales = misTickets.filter(t => (t.estado || '').toUpperCase().trim() === 'PENDIENTE');
   if (ultimosTickets.length > 0) {
     const idsViejos = ultimosTickets.map(t => t.id);
     const hayNuevos = pendientesActuales.some(t => !idsViejos.includes(t.id));
@@ -1090,16 +1086,47 @@ async function cargarMisOrdenes() {
   
   const cols = { pend:[], diag:[], rep:[], listo:[] };
   misTickets.forEach(t => {
-    if (t.estado === 'PENDIENTE') cols.pend.push(t);
-    else if (t.estado === 'EN_DIAGNOSTICO' || t.estado === 'EN_REPARACION') cols.diag.push(t);
-    else if (t.estado === 'ESPERANDO_REPUESTO') cols.rep.push(t);
-    else if (t.estado === 'LISTO_PARA_RECOGER' || t.estado === 'ENTREGADO') cols.listo.push(t);
+    const est = (t.estado || '').toUpperCase().trim();
+    if (est === 'PENDIENTE') {
+      cols.pend.push(t);
+    } else if (est === 'EN_DIAGNOSTICO' || est === 'EN_REPARACION') {
+      cols.diag.push(t);
+    } else if (est === 'ESPERANDO_REPUESTO') {
+      cols.rep.push(t);
+    } else if (est === 'LISTO_PARA_RECOGER' || est === 'LISTO_PARA_ENTREGA' || est === 'COMPLETADO') {
+      cols.listo.push(t);
+    } else {
+      // Fallback seguro: colocar en revisión para visibilidad inmediata y evitar tickets fantasma
+      cols.diag.push(t);
+    }
   });
+
+  const totalActivos = cols.pend.length + cols.diag.length + cols.rep.length + cols.listo.length;
+  const countSpan = document.getElementById('txt-total-active');
+  if (countSpan) {
+    countSpan.textContent = `${totalActivos} ${totalActivos === 1 ? 'orden' : 'órdenes'} en taller`;
+  }
   
   renderCol('pend', cols.pend);
   renderCol('diag', cols.diag);
   renderCol('rep', cols.rep);
   renderCol('listo', cols.listo);
+
+  // En móvil, si la primera columna está vacía pero otra tiene órdenes, asegurar que se expanda una con contenido
+  if (window.innerWidth <= 768) {
+    const hayExpandido = document.querySelector('.k-col.expanded');
+    if (!hayExpandido || (hayExpandido.id === 'kcol-pend' && cols.pend.length === 0)) {
+      let colAExpandir = 'kcol-pend';
+      if (cols.pend.length > 0) colAExpandir = 'kcol-pend';
+      else if (cols.diag.length > 0) colAExpandir = 'kcol-diag';
+      else if (cols.rep.length > 0) colAExpandir = 'kcol-rep';
+      else if (cols.listo.length > 0) colAExpandir = 'kcol-listo';
+      
+      document.querySelectorAll('.k-col').forEach(c => c.classList.remove('expanded'));
+      const targetCol = document.getElementById(colAExpandir);
+      if (targetCol) targetCol.classList.add('expanded');
+    }
+  }
 }
 
 function iniciarAutoRefresh() {
