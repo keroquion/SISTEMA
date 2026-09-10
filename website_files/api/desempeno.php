@@ -122,15 +122,40 @@ if ($action === "resumen") {
         return null;
     };
 
+    // Helper: Normalización de actividades (Clientes ST, Soporte Interno ST-INT y Tareas de Taller TAR)
+    $normalizarTicketInfo = function($num, $st_equipo, $motivo, $diag, $clienteRaw) {
+        $numUpper = strtoupper(trim($num ?? ''));
+        if (strpos($numUpper, 'TAR-') === 0) {
+            $tipoOrigen = 'TAREA';
+            $desc = !empty(trim($motivo ?? '')) ? trim($motivo) : (!empty(trim($diag ?? '')) ? trim($diag) : (!empty(trim($st_equipo ?? '')) ? trim($st_equipo) : 'Tarea de Taller'));
+            $cliente = 'Interno / Taller';
+        } elseif (strpos($numUpper, 'ST-INT-') === 0) {
+            $tipoOrigen = 'INTERNO';
+            $desc = !empty(trim($st_equipo ?? '')) ? trim($st_equipo) : (!empty(trim($motivo ?? '')) ? trim($motivo) : 'Equipo Propio Empresa');
+            $cliente = 'Stock Propio Empresa';
+        } else {
+            $tipoOrigen = 'CLIENTE';
+            $desc = !empty(trim($st_equipo ?? '')) ? trim($st_equipo) : (!empty(trim($motivo ?? '')) ? trim($motivo) : 'Equipo Laptop');
+            $cliente = !empty(trim($clienteRaw ?? '')) ? trim($clienteRaw) : 'Cliente General';
+        }
+        return [
+            'tipo_origen' => $tipoOrigen,
+            'equipo_descripcion' => $desc,
+            'cliente_nombre' => $cliente
+        ];
+    };
+
     // 2. Fuente Intervención: Extraer historial de cambios de estado relevantes
     $sqlHist = "
         SELECT h.registro_id, h.fecha_cambio, h.valor_nuevo, h.valor_anterior, h.usuario_nombre,
                st.tecnico_id as titular_tecnico_id, st.numero_atencion,
-               COALESCE(NULLIF(st.equipo_descripcion, ''), NULLIF(st.motivo_ingreso, ''), 'Tarea Interna') as equipo_descripcion,
+               st.motivo_ingreso, st.diagnostico, st.equipo_descripcion as st_equipo,
+               CONCAT(c.nombre, ' ', COALESCE(c.apellido, '')) as cliente_nombre_raw,
                st.estado as estado_actual,
                st.tiempo_estimado
         FROM historial_cambios h
         INNER JOIN soporte_tecnico st ON h.registro_id = st.id
+        LEFT JOIN personas c ON st.cliente_id = c.id
         WHERE h.tabla_origen = 'soporte_tecnico' 
         AND h.campo_cambiado = 'estado'
         AND ($whereFechaHist OR DATE(h.fecha_cambio) = CURDATE())
@@ -165,10 +190,20 @@ if ($action === "resumen") {
             $tk_id = (int)$row['registro_id'];
             $esColab = ($titularId && $ejecutorId !== $titularId);
 
+            $infoNorm = $normalizarTicketInfo(
+                $row['numero_atencion'],
+                $row['st_equipo'],
+                $row['motivo_ingreso'],
+                $row['diagnostico'],
+                $row['cliente_nombre_raw']
+            );
+
             if (!isset($eventosPorTecnicoTicket[$ejecutorId][$tk_id])) {
                 $eventosPorTecnicoTicket[$ejecutorId][$tk_id] = [
                     'numero' => $row['numero_atencion'],
-                    'equipo' => $row['equipo_descripcion'],
+                    'equipo' => $infoNorm['equipo_descripcion'],
+                    'cliente' => $infoNorm['cliente_nombre'],
+                    'tipo_origen' => $infoNorm['tipo_origen'],
                     'titular_id' => $titularId,
                     'estado_actual' => $row['estado_actual'],
                     'tiempo_estimado' => $row['tiempo_estimado'] ?? null,
@@ -203,30 +238,36 @@ if ($action === "resumen") {
                 } else {
                     if ($inicio !== null) {
                         $dur = strtotime($fech) - strtotime($inicio);
-                        if ($dur > 0) {
+                        if ($dur >= 0) {
+                            $esInstant = ($dur < 60);
+                            $durSeg = max(0, $dur);
                             $claveAct = $tk['numero'] . '_' . date('Y-m-d_H', strtotime($inicio));
                             if (!isset($actividadesUnicas[$tid][$claveAct])) {
                                 $actividadesUnicas[$tid][$claveAct] = true;
                                 $tecnicos[$tid]['actividades'][] = [
                                     'ticket' => $tk['numero'],
                                     'equipo' => $tk['equipo'],
+                                    'cliente' => $tk['cliente'],
+                                    'tipo_origen' => $tk['tipo_origen'],
                                     'inicio' => $inicio,
                                     'fin' => $fech,
                                     'estado_fin' => $est,
-                                    'duracion_seg' => max(0, $dur),
+                                    'duracion_seg' => $durSeg,
+                                    'minutos_reales' => (int)round($durSeg / 60),
+                                    'es_instantaneo' => $esInstant,
                                     'tiempo_estimado' => $tk['tiempo_estimado'],
                                     'es_colaboracion' => $esColabAct,
                                     'rol_intervencion' => $esColabAct ? 'Colaborador' : 'Titular'
                                 ];
-                                $tecnicos[$tid]['horas_trabajadas'] += $dur;
+                                $tecnicos[$tid]['horas_trabajadas'] += $durSeg;
                                 $ticketsConActividad[$tid][$tk_id] = true;
                             }
                         }
                         $inicio = null;
                     } else {
                         // Cierre directo o pase a repuesto por este técnico
-                        if (in_array($est, ['LISTO_PARA_RECOGER', 'ENTREGADO', 'ESPERANDO_REPUESTO'])) {
-                            $dur = ($est === 'ESPERANDO_REPUESTO') ? 2700 : 3600; // 45m o 60m
+                        if (in_array($est, ['LISTO_PARA_RECOGER', 'ENTREGADO', 'ESPERANDO_REPUESTO', 'COMPLETADO', 'ENTREGADA'])) {
+                            $dur = ($est === 'ESPERANDO_REPUESTO') ? 2700 : 3600; // 45m o 60m estándar
                             $inicioEst = date('Y-m-d H:i:s', strtotime($fech) - $dur);
                             $claveAct = $tk['numero'] . '_' . date('Y-m-d_H', strtotime($inicioEst));
                             if (!isset($actividadesUnicas[$tid][$claveAct])) {
@@ -234,10 +275,14 @@ if ($action === "resumen") {
                                 $tecnicos[$tid]['actividades'][] = [
                                     'ticket' => $tk['numero'],
                                     'equipo' => $tk['equipo'],
+                                    'cliente' => $tk['cliente'],
+                                    'tipo_origen' => $tk['tipo_origen'],
                                     'inicio' => $inicioEst,
                                     'fin' => $fech,
                                     'estado_fin' => ($est === 'ESPERANDO_REPUESTO') ? 'ESPERANDO_REPUESTO' : 'COMPLETADO',
                                     'duracion_seg' => $dur,
+                                    'minutos_reales' => (int)round($dur / 60),
+                                    'es_instantaneo' => false,
                                     'tiempo_estimado' => $tk['tiempo_estimado'],
                                     'es_colaboracion' => $esColab,
                                     'rol_intervencion' => $esColab ? 'Colaborador' : 'Titular'
@@ -253,22 +298,28 @@ if ($action === "resumen") {
             // Si el trabajo sigue en progreso abierto
             if ($inicio !== null) {
                 $dur = time() - strtotime($inicio);
-                if ($dur > 0) {
+                if ($dur >= 0) {
+                    $esInstant = ($dur < 60);
+                    $durSeg = max(0, $dur);
                     $claveAct = $tk['numero'] . '_' . date('Y-m-d_H', strtotime($inicio));
                     if (!isset($actividadesUnicas[$tid][$claveAct])) {
                         $actividadesUnicas[$tid][$claveAct] = true;
                         $tecnicos[$tid]['actividades'][] = [
                             'ticket' => $tk['numero'],
                             'equipo' => $tk['equipo'],
+                            'cliente' => $tk['cliente'],
+                            'tipo_origen' => $tk['tipo_origen'],
                             'inicio' => $inicio,
                             'fin' => null,
                             'estado_fin' => 'EN_PROCESO',
-                            'duracion_seg' => max(0, $dur),
+                            'duracion_seg' => $durSeg,
+                            'minutos_reales' => (int)round($durSeg / 60),
+                            'es_instantaneo' => $esInstant,
                             'tiempo_estimado' => $tk['tiempo_estimado'],
                             'es_colaboracion' => $esColabAct,
                             'rol_intervencion' => $esColabAct ? 'Colaborador' : 'Titular'
                         ];
-                        $tecnicos[$tid]['horas_trabajadas'] += $dur;
+                        $tecnicos[$tid]['horas_trabajadas'] += $durSeg;
                         $ticketsConActividad[$tid][$tk_id] = true;
                     }
                 }
@@ -279,10 +330,12 @@ if ($action === "resumen") {
     // 4. Fuente Titular: Respaldo para órdenes asignadas en soporte_tecnico sin transiciones suficientes en historial
     $sqlFallback = "
         SELECT st.id, st.numero_atencion,
-               COALESCE(NULLIF(st.equipo_descripcion, ''), NULLIF(st.motivo_ingreso, ''), 'Tarea Interna') as equipo_descripcion,
+               st.motivo_ingreso, st.diagnostico, st.equipo_descripcion as st_equipo,
+               CONCAT(c.nombre, ' ', COALESCE(c.apellido, '')) as cliente_nombre_raw,
                st.estado, st.tecnico_id, st.fecha_ingreso, st.fecha_entrega, st.tiempo_estimado,
                COALESCE(st.fecha_entrega, st.fecha_ingreso) as fecha_referencia
         FROM soporte_tecnico st
+        LEFT JOIN personas c ON st.cliente_id = c.id
         WHERE st.tecnico_id IS NOT NULL
         AND ($whereFechaSt OR st.estado IN ('EN_DIAGNOSTICO', 'EN_REPARACION', 'ESPERANDO_REPUESTO', 'PENDIENTE'))
         ORDER BY fecha_referencia ASC
@@ -307,7 +360,16 @@ if ($action === "resumen") {
 
             $est = $row['estado'];
             $num = $row['numero_atencion'];
-            $eq = $row['equipo_descripcion'];
+            $infoNorm = $normalizarTicketInfo(
+                $num,
+                $row['st_equipo'],
+                $row['motivo_ingreso'],
+                $row['diagnostico'],
+                $row['cliente_nombre_raw']
+            );
+            $eq = $infoNorm['equipo_descripcion'];
+            $cli = $infoNorm['cliente_nombre'];
+            $tipoOrigen = $infoNorm['tipo_origen'];
             $ingreso = $row['fecha_ingreso'];
             $entrega = $row['fecha_entrega'];
             $tiempoEst = $row['tiempo_estimado'] ?? null;
@@ -316,22 +378,28 @@ if ($action === "resumen") {
                 $ingresoYmd = date('Y-m-d', strtotime($ingreso));
                 $inicio = ($ingresoYmd < $hoyYmd) ? date('Y-m-d 08:00:00') : $ingreso;
                 $dur = time() - strtotime($inicio);
-                if ($dur > 0) {
+                if ($dur >= 0) {
+                    $esInstant = ($dur < 60);
+                    $durSeg = max(0, $dur);
                     $claveAct = $num . '_' . date('Y-m-d_H', strtotime($inicio));
                     if (!isset($actividadesUnicas[$tid][$claveAct])) {
                         $actividadesUnicas[$tid][$claveAct] = true;
                         $tecnicos[$tid]['actividades'][] = [
                             'ticket' => $num,
                             'equipo' => $eq,
+                            'cliente' => $cli,
+                            'tipo_origen' => $tipoOrigen,
                             'inicio' => $inicio,
                             'fin' => null,
                             'estado_fin' => 'EN_PROCESO',
-                            'duracion_seg' => max(0, $dur),
+                            'duracion_seg' => $durSeg,
+                            'minutos_reales' => (int)round($durSeg / 60),
+                            'es_instantaneo' => $esInstant,
                             'tiempo_estimado' => $tiempoEst,
                             'es_colaboracion' => false,
                             'rol_intervencion' => 'Titular'
                         ];
-                        $tecnicos[$tid]['horas_trabajadas'] += $dur;
+                        $tecnicos[$tid]['horas_trabajadas'] += $durSeg;
                         $ticketsConActividad[$tid][$tk_id] = true;
                     }
                 }
@@ -346,10 +414,14 @@ if ($action === "resumen") {
                     $tecnicos[$tid]['actividades'][] = [
                         'ticket' => $num,
                         'equipo' => $eq,
+                        'cliente' => $cli,
+                        'tipo_origen' => $tipoOrigen,
                         'inicio' => $inicio,
                         'fin' => $fin,
                         'estado_fin' => 'ESPERANDO_REPUESTO',
                         'duracion_seg' => $dur,
+                        'minutos_reales' => (int)round($dur / 60),
+                        'es_instantaneo' => false,
                         'tiempo_estimado' => $tiempoEst,
                         'es_colaboracion' => false,
                         'rol_intervencion' => 'Titular'
@@ -357,20 +429,31 @@ if ($action === "resumen") {
                     $tecnicos[$tid]['horas_trabajadas'] += $dur;
                     $ticketsConActividad[$tid][$tk_id] = true;
                 }
-            } elseif ($est === 'LISTO_PARA_RECOGER' || $est === 'ENTREGADO') {
+            } elseif (in_array($est, ['LISTO_PARA_RECOGER', 'ENTREGADO', 'COMPLETADO', 'ENTREGADA'])) {
                 $fin = !empty($entrega) ? $entrega : $ingreso;
-                $dur = 5400; // 90 min promedio
-                $inicio = date('Y-m-d H:i:s', strtotime($fin) - $dur);
+                $diffFechas = (!empty($entrega) && !empty($ingreso)) ? (strtotime($entrega) - strtotime($ingreso)) : 5400;
+                $esInstant = ($diffFechas >= 0 && $diffFechas < 60);
+                if ($esInstant) {
+                    $dur = max(0, $diffFechas);
+                    $inicio = $ingreso;
+                } else {
+                    $dur = ($diffFechas > 0 && $diffFechas < 86400) ? $diffFechas : 5400;
+                    $inicio = date('Y-m-d H:i:s', strtotime($fin) - $dur);
+                }
                 $claveAct = $num . '_' . date('Y-m-d_H', strtotime($inicio));
                 if (!isset($actividadesUnicas[$tid][$claveAct])) {
                     $actividadesUnicas[$tid][$claveAct] = true;
                     $tecnicos[$tid]['actividades'][] = [
                         'ticket' => $num,
                         'equipo' => $eq,
+                        'cliente' => $cli,
+                        'tipo_origen' => $tipoOrigen,
                         'inicio' => $inicio,
                         'fin' => $fin,
                         'estado_fin' => 'COMPLETADO',
                         'duracion_seg' => $dur,
+                        'minutos_reales' => (int)round($dur / 60),
+                        'es_instantaneo' => $esInstant,
                         'tiempo_estimado' => $tiempoEst,
                         'es_colaboracion' => false,
                         'rol_intervencion' => 'Titular'
@@ -393,6 +476,8 @@ if ($action === "resumen") {
                     $tec['ticket_actual'] = [
                         'numero' => $act['ticket'],
                         'equipo' => $act['equipo'],
+                        'cliente' => $act['cliente'] ?? '',
+                        'tipo_origen' => $act['tipo_origen'] ?? 'CLIENTE',
                         'inicio' => $act['inicio'],
                         'es_colaboracion' => !empty($act['es_colaboracion']),
                         'rol_intervencion' => !empty($act['es_colaboracion']) ? 'Colaborador' : 'Titular'
@@ -406,11 +491,13 @@ if ($action === "resumen") {
 
     $sqlLive = "
         SELECT st.id, st.numero_atencion,
-               COALESCE(NULLIF(st.equipo_descripcion, ''), NULLIF(st.motivo_ingreso, ''), 'Tarea Interna') as equipo_descripcion,
+               st.motivo_ingreso, st.diagnostico, st.equipo_descripcion as st_equipo,
+               CONCAT(c.nombre, ' ', COALESCE(c.apellido, '')) as cliente_nombre_raw,
                st.estado, st.tecnico_id,
                COALESCE(st.fecha_entrega, st.fecha_ingreso) as fecha_referencia,
                st.fecha_ingreso
         FROM soporte_tecnico st
+        LEFT JOIN personas c ON st.cliente_id = c.id
         WHERE st.tecnico_id IS NOT NULL
         AND (st.estado IN ('EN_DIAGNOSTICO', 'EN_REPARACION', 'ESPERANDO_REPUESTO', 'PENDIENTE') OR DATE(COALESCE(st.fecha_entrega, st.fecha_ingreso)) = CURDATE())
         ORDER BY 
@@ -424,12 +511,22 @@ if ($action === "resumen") {
             if (!isset($tecnicos[$tid])) continue;
             if ($tecnicos[$tid]['estado_en_vivo'] === 'TRABAJANDO') continue; // Ya detectado por actividad
 
+            $infoNorm = $normalizarTicketInfo(
+                $row['numero_atencion'],
+                $row['st_equipo'],
+                $row['motivo_ingreso'],
+                $row['diagnostico'],
+                $row['cliente_nombre_raw']
+            );
+
             $est = $row['estado'];
             if (in_array($est, ['EN_DIAGNOSTICO', 'EN_REPARACION'])) {
                 $tecnicos[$tid]['estado_en_vivo'] = 'TRABAJANDO';
                 $tecnicos[$tid]['ticket_actual'] = [
                     'numero' => $row['numero_atencion'],
-                    'equipo' => $row['equipo_descripcion'],
+                    'equipo' => $infoNorm['equipo_descripcion'],
+                    'cliente' => $infoNorm['cliente_nombre'],
+                    'tipo_origen' => $infoNorm['tipo_origen'],
                     'inicio' => $row['fecha_referencia'],
                     'es_colaboracion' => false,
                     'rol_intervencion' => 'Titular'
@@ -438,7 +535,9 @@ if ($action === "resumen") {
                 $tecnicos[$tid]['estado_en_vivo'] = 'ESPERANDO';
                 $tecnicos[$tid]['ticket_actual'] = [
                     'numero' => $row['numero_atencion'],
-                    'equipo' => $row['equipo_descripcion'],
+                    'equipo' => $infoNorm['equipo_descripcion'],
+                    'cliente' => $infoNorm['cliente_nombre'],
+                    'tipo_origen' => $infoNorm['tipo_origen'],
                     'inicio' => $row['fecha_referencia'],
                     'es_colaboracion' => false,
                     'rol_intervencion' => 'Titular'
@@ -447,7 +546,9 @@ if ($action === "resumen") {
                 $tecnicos[$tid]['estado_en_vivo'] = 'EN_ESPERA';
                 $tecnicos[$tid]['ticket_actual'] = [
                     'numero' => $row['numero_atencion'],
-                    'equipo' => $row['equipo_descripcion'],
+                    'equipo' => $infoNorm['equipo_descripcion'],
+                    'cliente' => $infoNorm['cliente_nombre'],
+                    'tipo_origen' => $infoNorm['tipo_origen'],
                     'inicio' => $row['fecha_referencia'],
                     'es_pendiente' => true,
                     'es_colaboracion' => false,
@@ -472,9 +573,15 @@ if ($action === "resumen") {
                     'hora' => $h,
                     'hora_label' => sprintf('%02d:00', $h),
                     'minutos' => 0,
+                    'tipo_celda' => 'vacio',
+                    'nivel_visual' => '0',
+                    'es_instantaneo' => false,
                     'ticket' => null,
                     'equipo' => null,
+                    'cliente' => null,
+                    'tipo_origen' => null,
                     'actividad' => null,
+                    'actividades_detalle' => [],
                     'es_colaboracion' => false,
                     'rol' => null
                 ];
@@ -494,6 +601,50 @@ if ($action === "resumen") {
         foreach ($tec['actividades'] as $act) {
             $actStart = strtotime($act['inicio']);
             $actEnd = !empty($act['fin']) ? strtotime($act['fin']) : time();
+            $esInstantAct = !empty($act['es_instantaneo']);
+
+            // Si es instantáneo (actEnd == actStart o duración < 60)
+            if ($esInstantAct || ($actEnd - $actStart < 60)) {
+                $refTs = !empty($act['fin']) ? strtotime($act['fin']) : $actStart;
+                $refDiaYmd = date('Y-m-d', $refTs);
+                $refHora = (int)date('G', $refTs);
+
+                for ($d = 0; $d <= 5; $d++) {
+                    if ($heatmap[$d]['fecha'] === $refDiaYmd) {
+                        if ($refHora >= 8 && $refHora <= 18) {
+                            $hi = $refHora - 8;
+                            $cell = &$heatmap[$d]['horas'][$hi];
+                            $cell['actividades_detalle'][] = [
+                                'ticket' => $act['ticket'],
+                                'equipo' => $act['equipo'],
+                                'cliente' => $act['cliente'] ?? '',
+                                'tipo_origen' => $act['tipo_origen'] ?? 'CLIENTE',
+                                'es_instantaneo' => true,
+                                'es_colaboracion' => !empty($act['es_colaboracion']),
+                                'rol' => !empty($act['es_colaboracion']) ? 'Colaborador' : 'Titular'
+                            ];
+                            // Si la celda no tiene minutos acumulados (> 0), marcar visualmente como instantánea
+                            if ($cell['minutos'] === 0) {
+                                $cell['tipo_celda'] = 'instantaneo';
+                                $cell['nivel_visual'] = 'instant';
+                                $cell['es_instantaneo'] = true;
+                                if (!$cell['ticket']) {
+                                    $cell['ticket'] = $act['ticket'];
+                                    $cell['equipo'] = $act['equipo'];
+                                    $cell['cliente'] = $act['cliente'] ?? '';
+                                    $cell['tipo_origen'] = $act['tipo_origen'] ?? 'CLIENTE';
+                                    $cell['es_colaboracion'] = !empty($act['es_colaboracion']);
+                                    $cell['rol'] = !empty($act['es_colaboracion']) ? 'Colaborador' : 'Titular';
+                                }
+                            }
+                            unset($cell);
+                        }
+                        break;
+                    }
+                }
+                continue;
+            }
+
             if ($actEnd <= $actStart) continue;
 
             // Si la actividad ocurrió hoy, acumular segundos hoy
@@ -520,9 +671,24 @@ if ($action === "resumen") {
                             $prevMins = $heatmap[$d]['horas'][$hi]['minutos'];
                             $newMins = min(60, $prevMins + $mins);
                             $heatmap[$d]['horas'][$hi]['minutos'] = $newMins;
+                            $heatmap[$d]['horas'][$hi]['tipo_celda'] = 'regular';
+                            $heatmap[$d]['horas'][$hi]['nivel_visual'] = ($newMins >= 46) ? '3' : (($newMins >= 26) ? '2' : '1');
+                            $heatmap[$d]['horas'][$hi]['es_instantaneo'] = false;
+                            $heatmap[$d]['horas'][$hi]['actividades_detalle'][] = [
+                                'ticket' => $act['ticket'],
+                                'equipo' => $act['equipo'],
+                                'cliente' => $act['cliente'] ?? '',
+                                'tipo_origen' => $act['tipo_origen'] ?? 'CLIENTE',
+                                'minutos' => $mins,
+                                'es_instantaneo' => false,
+                                'es_colaboracion' => !empty($act['es_colaboracion']),
+                                'rol' => !empty($act['es_colaboracion']) ? 'Colaborador' : 'Titular'
+                            ];
                             if (!$heatmap[$d]['horas'][$hi]['ticket']) {
                                 $heatmap[$d]['horas'][$hi]['ticket'] = $act['ticket'];
                                 $heatmap[$d]['horas'][$hi]['equipo'] = $act['equipo'];
+                                $heatmap[$d]['horas'][$hi]['cliente'] = $act['cliente'] ?? '';
+                                $heatmap[$d]['horas'][$hi]['tipo_origen'] = $act['tipo_origen'] ?? 'CLIENTE';
                                 $heatmap[$d]['horas'][$hi]['es_colaboracion'] = !empty($act['es_colaboracion']);
                                 $heatmap[$d]['horas'][$hi]['rol'] = !empty($act['es_colaboracion']) ? 'Colaborador' : 'Titular';
                             }

@@ -30,6 +30,38 @@ Para garantizar trazabilidad absoluta, auditoría técnica rigurosa y claridad e
 
 ---
 
+## [1.4.9] - Septiembre 2026
+
+### Visibilización de Actividades Internas (TAR / ST-INT), Detección de Actividades Instantáneas y Filtros Segmentados
+*Módulos impactados:* `website_files/api/desempeno.php`, `website_files/desempeno_tecnicos.html`, `website_files/sw.js`.
+
+> **Causa Raíz ("El Por Qué"):** Anteriormente, la pantalla de Desempeño omitía tickets internos o tareas operativas de taller (`TAR-` y `ST-INT-`) debido a restricciones o acoplamientos innecesarios hacia la tabla de clientes externos, o porque no tenían un `cliente_id` asociado. Además, cuando un técnico completaba o cerraba una orden flash/directa en el mismo minuto de su apertura (< 1 min o 0 minutos cronometrados), la matriz semanal del Heatmap descartaba la actividad y pintaba la celda horaria como vacía (`level-0`), dando la falsa impresión de inactividad técnica. Se erradicó esta omisión implementando `LEFT JOIN personas c ON st.cliente_id = c.id`, normalizando los tres orígenes de actividad (`CLIENTE`, `INTERNO`, `TAREA`), detectando actividades instantáneas con bandera `es_instantaneo: true` para resaltarlas en el Heatmap (`level-instant` y tooltip detallado) y agregando una barra interactiva de filtrado segmentado en tiempo real.
+
+### Added & Fixed
+- **`website_files/api/desempeno.php`**:
+  - **Inclusión Total de Tickets Internos**: Sustitución de cualquier acoplamiento rígido con clientes por `LEFT JOIN personas c ON st.cliente_id = c.id`, permitiendo listar órdenes sin cliente asignado (tareas internas y stock propio).
+  - **Normalización de Tres Tipos de Origen**:
+    * **`CLIENTE`** (`ST-AAAAMMDD-XXX`): Reparaciones para clientes externos con laptop y nombre del cliente.
+    * **`INTERNO`** (`ST-INT-AAAA-XXX`): Reparaciones y mantenimiento de equipos propios de la empresa (`Stock Propio Empresa`).
+    * **`TAREA`** (`TAR-AAAA-XXX`): Tareas operativas de taller (diagnóstico/motivo destacado como título, cliente `Interno / Taller`).
+  - **Detección de Actividades Instantáneas / Cierres Flash (< 1 min)**:
+    * Si la duración calculada entre fechas es menor a 60 segundos (o cierre inmediato), se calcula `minutos_reales = 0`, pero se marca la bandera booleana `es_instantaneo = true`.
+    * En la matriz horaria semanal (`heatmap_semanal`), si una franja horaria tiene 0 minutos acumulados pero registra al menos 1 actividad completada en esa hora, se clasifica como `tipo_celda = 'instantaneo'` y `nivel_visual = 'instant'`, impidiendo que se muestre como tiempo ocioso (`level-0`).
+- **`website_files/desempeno_tecnicos.html`**:
+  - **Barra de Filtrado Rápido Segmentada**: Componente interactivo `.historial-filter-bar` situado encima de la tabla cronológica con chips reactivos `[ Todos (N) ]`, `[ Clientes ST (N) ]`, `[ Tareas e Internos (TAR/INT) (N) ]`, operando en memoria en tiempo real con contadores dinámicos.
+  - **Insignias Semánticas de Tipo (.badge-tipo)**:
+    * Azul `.tipo-cliente` (`Cliente`).
+    * Ámbar `.tipo-tarea` (`Tarea Interna`).
+    * Cian `.tipo-interno` (`Stock Interno`).
+    * Coexistencia armónica con la insignia de rol (`Titular` / `Colaborador`).
+  - **Tratamiento de Cierres Flash en la Tabla**: En la columna "Tiempo Real", si la actividad duró < 1 min, se renderiza la insignia `<span class="badge-instant"><i class="ph-bold ph-lightning"></i> Instantáneo (<1m)</span>` acompañada del tiempo asignado de referencia si existiera (`(Asignado: Xm)`).
+  - **Celdas Instantáneas en Heatmap (.level-instant)**: Estilo violeta sutil con borde punteado diferenciado del verde continuo; tooltip flotante contextual detallando `⚡ Actividad puntual registrada (<1 min) | Ticket: ...`.
+  - **Muestra en la Leyenda del Heatmap**: Inclusión de la muestra `.level-instant` en la leyenda inferior para lectura intuitiva de la supervisión.
+- **`website_files/sw.js`**:
+  - Incremento del Service Worker a `petulap-v18` para asegurar la propagación instantánea a dispositivos móviles y cache PWA.
+
+---
+
 ## [1.4.8] - Septiembre 2026
 
 ### Auditoría Colaborativa Multi-Técnico, Data-Labels en Reportes y Detalles Técnicos en Inventario

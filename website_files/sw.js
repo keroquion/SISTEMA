@@ -1,6 +1,6 @@
-// Service Worker - Petulap PWA v17 (Auditoría Colaborativa Multi-Técnico, Reportes data-label y Detalles en Inventario)
+// Service Worker - Petulap PWA v18 (Visibilización TAR/INT, Actividades Instantáneas y Filtros Segmentados)
  
-var CACHE_NAME = 'petulap-v17';
+var CACHE_NAME = 'petulap-v18';
 var ASSETS = [
     './',
     'index.html',

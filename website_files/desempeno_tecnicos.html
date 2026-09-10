@@ -466,31 +466,53 @@
                         </div>
 
                         <!-- Leyenda estilo GitHub -->
-                        <div class="heatmap-legend" style="display:flex; justify-content:flex-end; align-items:center; gap:8px; margin-top:15px; font-size:0.85rem; color:var(--text-secondary);">
+                        <div class="heatmap-legend" style="display:flex; justify-content:flex-end; align-items:center; gap:8px; margin-top:15px; font-size:0.85rem; color:var(--text-secondary); flex-wrap:wrap;">
                             <span>Menos actividad</span>
                             <span class="heatmap-sample level-0" title="0 minutos"></span>
                             <span class="heatmap-sample level-1" title="1 a 25 minutos"></span>
                             <span class="heatmap-sample level-2" title="26 a 45 minutos"></span>
                             <span class="heatmap-sample level-3" title="46 a 60 minutos"></span>
                             <span>Más actividad</span>
+                            <span style="margin: 0 4px; color:var(--border-default);">|</span>
+                            <span class="heatmap-sample level-instant" title="Cierre directo o actividad puntual (<1 min)"></span>
+                            <span style="display:inline-flex; align-items:center; gap:4px;"><i class="ph-bold ph-lightning" style="color:#a855f7;"></i> Puntual (&lt;1m)</span>
                         </div>
                     </div>
                 </div>
 
                 <!-- Historial de actividades en el periodo -->
                 <div class="card" style="background: var(--bg-surface); border: 1px solid var(--border-default); border-radius: var(--radius-lg); padding: 22px; box-shadow: var(--shadow-sm);">
-                    <h3 style="margin-top:0; margin-bottom:15px; font-size:1.05rem; display:flex; align-items:center; gap:8px; color: var(--text-primary);">
-                        <i class="ph-bold ph-clock-counter-clockwise" style="color:var(--color-brand)"></i> Historial Cronológico de Tickets / Tareas
-                    </h3>
+                    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:15px;">
+                        <h3 style="margin:0; font-size:1.05rem; display:flex; align-items:center; gap:8px; color: var(--text-primary);">
+                            <i class="ph-bold ph-clock-counter-clockwise" style="color:var(--color-brand)"></i> Historial Cronológico de Tickets / Tareas
+                        </h3>
+                    </div>
+
+                    <!-- BARRA DE FILTRADO RÁPIDO SEGMENTADO -->
+                    <div class="historial-filter-bar" id="historial-filter-bar">
+                        <span style="font-size:0.85rem; font-weight:600; color:var(--text-secondary); display:inline-flex; align-items:center; gap:5px;">
+                            <i class="ph-bold ph-funnel"></i> Filtrar Actividades:
+                        </span>
+                        <button class="filter-chip active" id="chip-filter-todos" onclick="filtrarHistorialTipo('TODOS')">
+                            Todos (<span class="chip-count" id="count-filter-todos">0</span>)
+                        </button>
+                        <button class="filter-chip" id="chip-filter-cliente" onclick="filtrarHistorialTipo('CLIENTE')">
+                            <i class="ph-bold ph-laptop"></i> Clientes ST (<span class="chip-count" id="count-filter-cliente">0</span>)
+                        </button>
+                        <button class="filter-chip" id="chip-filter-tareas" onclick="filtrarHistorialTipo('TAREAS_INTERNOS')">
+                            <i class="ph-bold ph-wrench"></i> Tareas e Internos (TAR/INT) (<span class="chip-count" id="count-filter-tareas">0</span>)
+                        </button>
+                    </div>
+
                     <div style="overflow-x:auto;">
                         <table class="timesheet-table">
                             <thead>
                                 <tr>
                                     <th style="width:110px;">Inicio</th>
                                     <th style="width:110px;">Fin</th>
-                                    <th style="width:90px;">Tiempo Real</th>
+                                    <th style="width:130px;">Tiempo Real</th>
                                     <th style="width:110px;">Tiempo Asignado</th>
-                                    <th style="min-width:200px;">Ticket y Equipo / Tarea</th>
+                                    <th style="min-width:220px;">Ticket y Equipo / Tarea</th>
                                     <th style="width:110px;">Estado</th>
                                 </tr>
                             </thead>
@@ -693,6 +715,11 @@
         .heatmap-cell.level-1 { background: rgba(16, 185, 129, 0.3); border-color: rgba(16, 185, 129, 0.4); }
         .heatmap-cell.level-2 { background: rgba(16, 185, 129, 0.65); border-color: rgba(16, 185, 129, 0.75); }
         .heatmap-cell.level-3 { background: #10B981; border-color: #059669; }
+        .heatmap-cell.level-instant {
+            background: rgba(168, 85, 247, 0.22);
+            border: 1px dashed #a855f7;
+            box-shadow: inset 0 0 5px rgba(168, 85, 247, 0.25);
+        }
 
         /* Muestras de la leyenda */
         .heatmap-sample {
@@ -705,6 +732,97 @@
         .heatmap-sample.level-1 { background: rgba(16, 185, 129, 0.3); border: 1px solid rgba(16, 185, 129, 0.4); }
         .heatmap-sample.level-2 { background: rgba(16, 185, 129, 0.65); border: 1px solid rgba(16, 185, 129, 0.75); }
         .heatmap-sample.level-3 { background: #10B981; border: 1px solid #059669; }
+        .heatmap-sample.level-instant {
+            background: rgba(168, 85, 247, 0.3);
+            border: 1px dashed #a855f7;
+        }
+
+        /* Barra de filtros rápidos segmentada */
+        .historial-filter-bar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+        .filter-chip {
+            background: var(--bg-surface-hover);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-default);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.15s ease-in-out;
+            user-select: none;
+        }
+        .filter-chip:hover {
+            background: var(--bg-surface);
+            color: var(--text-primary);
+            border-color: var(--color-brand);
+        }
+        .filter-chip.active {
+            background: var(--color-brand);
+            color: #ffffff;
+            border-color: var(--color-brand);
+            box-shadow: 0 2px 6px rgba(13, 138, 188, 0.3);
+        }
+        .filter-chip .chip-count {
+            font-size: 0.75rem;
+            background: rgba(0,0,0,0.12);
+            padding: 1px 6px;
+            border-radius: 10px;
+        }
+        .filter-chip.active .chip-count {
+            background: rgba(255,255,255,0.25);
+            color: #ffffff;
+        }
+
+        /* Insignias de tipo de actividad */
+        .badge-tipo {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            padding: 2px 7px;
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        .badge-tipo.tipo-cliente {
+            background: rgba(2, 132, 199, 0.12);
+            color: #0284c7;
+            border: 1px solid rgba(2, 132, 199, 0.3);
+        }
+        .badge-tipo.tipo-tarea {
+            background: rgba(245, 158, 11, 0.12);
+            color: #d97706;
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+        .badge-tipo.tipo-interno {
+            background: rgba(6, 182, 212, 0.12);
+            color: #0891b2;
+            border: 1px solid rgba(6, 182, 212, 0.3);
+        }
+
+        /* Insignia de Actividad Instantánea (<1m) */
+        .badge-instant {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: rgba(147, 51, 234, 0.12);
+            color: #9333ea;
+            border: 1px solid rgba(147, 51, 234, 0.3);
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.78rem;
+            font-weight: 700;
+        }
 
         /* Tooltip flotante estilizado */
         .floating-tooltip {
@@ -804,6 +922,8 @@
         let gVistaActual = 'live';
         let gTecnicoSeleccionadoId = null;
         let gSemanaOffset = 0;
+        let gFiltroHistorial = 'TODOS';
+        let gActividadesActuales = [];
 
         function formatDurationSeconds(sec) {
             if (!sec || sec < 0) return '0m';
@@ -1132,11 +1252,33 @@
                 </div>
             `;
 
+            // Mantener 'TODOS' como filtro por defecto al cambiar técnico
+            gFiltroHistorial = 'TODOS';
+            actualizarBotonesFiltro();
+
+            gActividadesActuales = tec.actividades || [];
+
             // Construir la matriz Heatmap estilo GitHub
             renderHeatmapMatriz(tec.heatmap_semanal);
 
             // Construir la tabla de actividades del periodo
-            renderTablaActividades(tec.actividades);
+            renderTablaActividades(gActividadesActuales);
+        }
+
+        // Filtrado en tiempo real sin recarga de página
+        function filtrarHistorialTipo(tipo) {
+            gFiltroHistorial = tipo;
+            actualizarBotonesFiltro();
+            renderTablaActividades(gActividadesActuales);
+        }
+
+        function actualizarBotonesFiltro() {
+            const btnTodos = document.getElementById('chip-filter-todos');
+            const btnCli = document.getElementById('chip-filter-cliente');
+            const btnTar = document.getElementById('chip-filter-tareas');
+            if (btnTodos) btnTodos.classList.toggle('active', gFiltroHistorial === 'TODOS');
+            if (btnCli) btnCli.classList.toggle('active', gFiltroHistorial === 'CLIENTE');
+            if (btnTar) btnTar.classList.toggle('active', gFiltroHistorial === 'TAREAS_INTERNOS');
         }
 
         // Generar la matriz gráfica semanal (Lunes a Sábado x 8am a 6pm)
@@ -1167,19 +1309,33 @@
                 horasHeaders.forEach((h, idx) => {
                     const slot = (dia.horas && dia.horas[idx]) ? dia.horas[idx] : { minutos: 0, ticket: null, equipo: null };
                     const mins = slot.minutos || 0;
+                    const esInstantSlot = (slot.tipo_celda === 'instantaneo' || slot.nivel_visual === 'instant' || !!slot.es_instantaneo);
 
                     let levelClass = 'level-0';
-                    if (mins >= 46) levelClass = 'level-3';
-                    else if (mins >= 26) levelClass = 'level-2';
-                    else if (mins >= 1) levelClass = 'level-1';
+                    if (esInstantSlot) {
+                        levelClass = 'level-instant';
+                    } else if (mins >= 46) {
+                        levelClass = 'level-3';
+                    } else if (mins >= 26) {
+                        levelClass = 'level-2';
+                    } else if (mins >= 1) {
+                        levelClass = 'level-1';
+                    }
 
                     const horaFinStr = String(h + 1).padStart(2, '0') + ':00';
                     let ticketInfo = 'Sin asignación';
                     if (slot.ticket) {
                         const rolTxt = slot.es_colaboracion ? ' [Colaboración]' : ' [Titular]';
-                        ticketInfo = `${slot.ticket} (${slot.equipo || 'Diagnóstico'})${rolTxt}`;
+                        const tipoTxt = (slot.tipo_origen === 'TAREA') ? ' [Tarea Interna]' : ((slot.tipo_origen === 'INTERNO') ? ' [Stock Interno]' : '');
+                        ticketInfo = `${slot.ticket}${tipoTxt} (${slot.equipo || 'Diagnóstico'})${rolTxt}`;
                     }
-                    const tooltipMsg = `${dia.dia_nombre} ${String(h).padStart(2, '0')}:00 - ${horaFinStr} | ${mins} min | Ticket: ${ticketInfo}`;
+
+                    let tooltipMsg = '';
+                    if (esInstantSlot) {
+                        tooltipMsg = `${dia.dia_nombre} ${String(h).padStart(2, '0')}:00 - ${horaFinStr} | ⚡ Actividad puntual registrada (<1 min) | Ticket: ${ticketInfo}`;
+                    } else {
+                        tooltipMsg = `${dia.dia_nombre} ${String(h).padStart(2, '0')}:00 - ${horaFinStr} | ${mins} min | Ticket: ${ticketInfo}`;
+                    }
 
                     html += `
                         <div class="heatmap-cell ${levelClass}" 
@@ -1196,24 +1352,67 @@
             wrapper.innerHTML = html;
         }
 
-        // Renderizar tabla de historial cronológico
+        // Renderizar tabla de historial cronológico con filtros dinámicos e insignias semánticas
         function renderTablaActividades(actividades) {
             const tbody = document.getElementById('tbody-historial-individual');
-            if (!actividades || actividades.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:var(--text-muted); padding:20px;">Sin actividades registradas en el periodo seleccionado.</td></tr>';
+            if (!actividades) actividades = [];
+
+            // 1. Contadores dinámicos para los chips de filtrado
+            let cTodos = 0;
+            let cClientes = 0;
+            let cTareasInternos = 0;
+
+            actividades.forEach(a => {
+                cTodos++;
+                const tipo = a.tipo_origen || (String(a.ticket || '').startsWith('TAR-') ? 'TAREA' : (String(a.ticket || '').startsWith('ST-INT-') ? 'INTERNO' : 'CLIENTE'));
+                if (tipo === 'CLIENTE') {
+                    cClientes++;
+                } else {
+                    cTareasInternos++;
+                }
+            });
+
+            const elTodos = document.getElementById('count-filter-todos');
+            const elCli = document.getElementById('count-filter-cliente');
+            const elTar = document.getElementById('count-filter-tareas');
+            if (elTodos) elTodos.textContent = cTodos;
+            if (elCli) elCli.textContent = cClientes;
+            if (elTar) elTar.textContent = cTareasInternos;
+
+            // 2. Filtrar actividades según la pestaña activa
+            const actividadesFiltradas = actividades.filter(a => {
+                if (gFiltroHistorial === 'TODOS') return true;
+                const tipo = a.tipo_origen || (String(a.ticket || '').startsWith('TAR-') ? 'TAREA' : (String(a.ticket || '').startsWith('ST-INT-') ? 'INTERNO' : 'CLIENTE'));
+                if (gFiltroHistorial === 'CLIENTE') return tipo === 'CLIENTE';
+                if (gFiltroHistorial === 'TAREAS_INTERNOS') return (tipo === 'TAREA' || tipo === 'INTERNO');
+                return true;
+            });
+
+            if (actividadesFiltradas.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:var(--text-muted); padding:24px;">No se encontraron actividades registradas para este filtro en el periodo seleccionado.</td></tr>';
                 return;
             }
 
             let rows = '';
-            actividades.forEach(act => {
-                const duracion = formatDurationDates(act.inicio, act.fin);
+            actividadesFiltradas.forEach(act => {
+                const esInstant = !!act.es_instantaneo || (act.duracion_seg !== undefined && act.duracion_seg < 60);
+
+                let duracionHtml = '';
+                if (esInstant) {
+                    const asignadoTxt = act.tiempo_estimado ? `<span style="font-size:0.75rem; color:var(--text-secondary); margin-left:4px;">(Asignado: ${act.tiempo_estimado})</span>` : '';
+                    duracionHtml = `<span class="badge-instant" title="Cierre directo o actividad rápida sin cronómetro previo"><i class="ph-bold ph-lightning"></i> Instantáneo (&lt;1m)</span>${asignadoTxt}`;
+                } else {
+                    const duracion = formatDurationDates(act.inicio, act.fin);
+                    duracionHtml = `<span style="font-weight:700; color:var(--text-primary);">${duracion}</span>`;
+                }
+
                 let badgeClass = 'status-otro';
                 let estadoTexto = act.estado_fin;
 
                 if (act.estado_fin === 'EN_PROCESO') {
                     badgeClass = 'status-en-proceso';
                     estadoTexto = 'En Proceso';
-                } else if (act.estado_fin === 'LISTO_PARA_RECOGER' || act.estado_fin === 'ENTREGADO' || act.estado_fin === 'COMPLETADO') {
+                } else if (act.estado_fin === 'LISTO_PARA_RECOGER' || act.estado_fin === 'ENTREGADO' || act.estado_fin === 'COMPLETADO' || act.estado_fin === 'ENTREGADA') {
                     badgeClass = 'status-completado';
                     estadoTexto = 'Completado';
                 } else if (act.estado_fin === 'ESPERANDO_REPUESTO') {
@@ -1225,21 +1424,60 @@
                     ? `<span style="display:inline-flex; align-items:center; gap:4px; font-weight:600; color:var(--text-primary);"><i class="ph ph-timer" style="color:var(--color-brand)"></i> ${act.tiempo_estimado}</span>`
                     : '<span style="color:var(--text-muted);">—</span>';
 
+                const tipo = act.tipo_origen || (String(act.ticket || '').startsWith('TAR-') ? 'TAREA' : (String(act.ticket || '').startsWith('ST-INT-') ? 'INTERNO' : 'CLIENTE'));
+                let badgeTipoHtml = '';
+                if (tipo === 'TAREA') {
+                    badgeTipoHtml = '<span class="badge-tipo tipo-tarea"><i class="ph-bold ph-wrench"></i> Tarea Interna</span>';
+                } else if (tipo === 'INTERNO') {
+                    badgeTipoHtml = '<span class="badge-tipo tipo-interno"><i class="ph-bold ph-cpu"></i> Stock Interno</span>';
+                } else {
+                    badgeTipoHtml = '<span class="badge-tipo tipo-cliente"><i class="ph-bold ph-laptop"></i> Cliente</span>';
+                }
+
+                const roleBadgeHtml = act.es_colaboracion 
+                    ? '<span class="role-chip chip-colaborador" title="Intervención / Cambio de estado realizado en orden de otro compañero"><i class="ph-bold ph-handshake"></i> Colaborador</span>' 
+                    : '<span class="role-chip chip-titular" title="Técnico titular asignado a la orden"><i class="ph-bold ph-user-check"></i> Titular</span>';
+
+                let ticketColHtml = '';
+                if (tipo === 'TAREA') {
+                    ticketColHtml = `
+                        <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin-bottom:4px;">
+                            <span style="color:var(--color-brand); font-weight:bold; font-size:0.9rem;">${act.ticket}</span>
+                            ${badgeTipoHtml}
+                            ${roleBadgeHtml}
+                        </div>
+                        <div style="font-weight:600; color:var(--text-primary); font-size:0.9rem;">${act.equipo || 'Tarea Operativa de Taller'}</div>
+                        <div style="color:var(--text-secondary); font-size:0.78rem; margin-top:2px;"><i class="ph ph-wrench"></i> ${act.cliente || 'Interno / Taller'}</div>
+                    `;
+                } else if (tipo === 'INTERNO') {
+                    ticketColHtml = `
+                        <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin-bottom:4px;">
+                            <span style="color:var(--color-brand); font-weight:bold; font-size:0.9rem;">${act.ticket}</span>
+                            ${badgeTipoHtml}
+                            ${roleBadgeHtml}
+                        </div>
+                        <div style="font-weight:600; color:var(--text-primary); font-size:0.9rem;">${act.equipo || 'Equipo Propio Empresa'}</div>
+                        <div style="color:var(--text-secondary); font-size:0.78rem; margin-top:2px;"><i class="ph ph-shield-check"></i> ${act.cliente || 'Stock Propio Empresa'}</div>
+                    `;
+                } else {
+                    ticketColHtml = `
+                        <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin-bottom:4px;">
+                            <span style="color:var(--color-brand); font-weight:bold; font-size:0.9rem;">${act.ticket}</span>
+                            ${badgeTipoHtml}
+                            ${roleBadgeHtml}
+                        </div>
+                        <div style="color:var(--text-primary); font-weight:500; font-size:0.88rem;">${act.equipo || 'Laptop de Cliente'}</div>
+                        <div style="color:var(--text-secondary); font-size:0.78rem; margin-top:2px;"><i class="ph ph-user"></i> ${act.cliente || 'Cliente General'}</div>
+                    `;
+                }
+
                 rows += `
                     <tr>
                         <td style="white-space:nowrap; font-size:0.85rem; color:var(--text-secondary);">${formatDateTimeShort(act.inicio)}</td>
                         <td style="white-space:nowrap; font-size:0.85rem;">${act.fin ? formatDateTimeShort(act.fin) : '<span class="status-badge status-en-proceso" style="font-size:0.75rem;">En Curso</span>'}</td>
-                        <td style="white-space:nowrap; font-weight:700; color:var(--text-primary);">${duracion}</td>
+                        <td style="white-space:nowrap;">${duracionHtml}</td>
                         <td style="white-space:nowrap;">${tiempoAsignado}</td>
-                        <td>
-                            <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-                                <span style="color:var(--color-brand); font-weight:bold;">${act.ticket}</span>
-                                ${act.es_colaboracion 
-                                    ? '<span class="role-chip chip-colaborador" title="Intervención / Cambio de estado realizado en orden de otro compañero"><i class="ph-bold ph-handshake"></i> Colaborador</span>' 
-                                    : '<span class="role-chip chip-titular" title="Técnico titular asignado a la orden"><i class="ph-bold ph-user-check"></i> Titular</span>'}
-                            </div>
-                            <div style="color:var(--text-secondary); font-size:0.85rem; margin-top:3px;">${act.equipo || 'Equipo Laptop'}</div>
-                        </td>
+                        <td>${ticketColHtml}</td>
                         <td><span class="status-badge ${badgeClass}">${estadoTexto}</span></td>
                     </tr>
                 `;
