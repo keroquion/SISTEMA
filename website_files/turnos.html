@@ -238,6 +238,7 @@ if ("serviceWorker" in navigator) { window.addEventListener("load", () => { navi
                 </div>
             </a>
 
+            <!-- SECCIÓN 1: SOPORTE Y TALLER -->
             <div class="menu-section">
                 <span class="menu-title">Soporte y Taller</span>
                 <a href="soporte.html" class="menu-item">
@@ -257,19 +258,34 @@ if ("serviceWorker" in navigator) { window.addEventListener("load", () => { navi
                 <a href="tecnicos.html" class="menu-item">
                     <div class="menu-item-left">
                         <i class="ph ph-users"></i>
-                        <span>Tecnicos</span>
+                        <span>Técnicos</span>
                     </div>
                     <div class="status-dot dot-yellow"></div>
                 </a>
                 <a href="recepcion_movil.html" class="menu-item">
                     <div class="menu-item-left">
                         <i class="ph ph-device-mobile"></i>
-                        <span>App Recepcion</span>
+                        <span>App Recepción</span>
                     </div>
                     <div class="status-dot dot-gray"></div>
                 </a>
+                <a href="garantias.html" class="menu-item">
+                    <div class="menu-item-left">
+                        <i class="ph ph-shield-check"></i>
+                        <span>Garantías</span>
+                    </div>
+                    <div class="status-dot dot-blue"></div>
+                </a>
+                <a href="pedidos_repuestos.html" class="menu-item">
+                    <div class="menu-item-left">
+                        <i class="ph ph-truck"></i>
+                        <span>Pedidos Repuestos</span>
+                    </div>
+                    <div class="status-dot dot-blue"></div>
+                </a>
             </div>
 
+            <!-- SECCIÓN 2: INVENTARIO Y OPERACIONES -->
             <div class="menu-section">
                 <span class="menu-title">Inventario y Operaciones</span>
                 <a href="inventario.html" class="menu-item">
@@ -286,6 +302,27 @@ if ("serviceWorker" in navigator) { window.addEventListener("load", () => { navi
                     </div>
                     <div class="status-dot dot-green"></div>
                 </a>
+                <a href="repuestos.html" class="menu-item">
+                    <div class="menu-item-left">
+                        <i class="ph ph-wrench"></i>
+                        <span>Repuestos</span>
+                    </div>
+                    <div class="status-dot dot-orange"></div>
+                </a>
+                <a href="historial_entregados.html" class="menu-item">
+                    <div class="menu-item-left">
+                        <i class="ph ph-clock-counter-clockwise"></i>
+                        <span>Historial Entregados</span>
+                    </div>
+                    <div class="status-dot dot-gray"></div>
+                </a>
+                <a href="importar.html" class="menu-item">
+                    <div class="menu-item-left">
+                        <i class="ph ph-download-simple"></i>
+                        <span>Importar Equipos</span>
+                    </div>
+                    <div class="status-dot dot-blue"></div>
+                </a>
                 <a href="caja.html" class="menu-item">
                     <div class="menu-item-left">
                         <i class="ph ph-money"></i>
@@ -294,13 +331,14 @@ if ("serviceWorker" in navigator) { window.addEventListener("load", () => { navi
                     <div class="status-dot dot-blue"></div>
                 </a>
             </div>
-            
+
+            <!-- SECCIÓN 3: GERENCIA Y CLIENTES -->
             <div class="menu-section">
-                <span class="menu-title">Gerencia y Utilidades</span>
-                <a href="reportes.html" class="menu-item">
+                <span class="menu-title">Gerencia y Clientes</span>
+                <a href="lotes.html" class="menu-item">
                     <div class="menu-item-left">
-                        <i class="ph ph-chart-bar"></i>
-                        <span>Reportes</span>
+                        <i class="ph ph-stack"></i>
+                        <span>Lotes Masivos</span>
                     </div>
                     <div class="status-dot dot-blue"></div>
                 </a>
@@ -311,12 +349,31 @@ if ("serviceWorker" in navigator) { window.addEventListener("load", () => { navi
                     </div>
                     <div class="status-dot dot-blue"></div>
                 </a>
-                <a href="lotes.html" class="menu-item">
+                <a href="clientes.html" class="menu-item">
                     <div class="menu-item-left">
-                        <i class="ph ph-stack"></i>
-                        <span>Lotes Masivos</span>
+                        <i class="ph ph-user-list"></i>
+                        <span>Clientes y Contactos</span>
+                    </div>
+                    <div class="status-dot dot-green"></div>
+                </a>
+            </div>
+
+            <!-- SECCIÓN 4: REPORTES Y CONFIGURACIÓN -->
+            <div class="menu-section">
+                <span class="menu-title">Reportes y Configuración</span>
+                <a href="reportes.html" class="menu-item">
+                    <div class="menu-item-left">
+                        <i class="ph ph-chart-bar"></i>
+                        <span>Reportes y Métricas</span>
                     </div>
                     <div class="status-dot dot-blue"></div>
+                </a>
+                <a href="turnos.html" class="menu-item active">
+                    <div class="menu-item-left">
+                        <i class="ph ph-clock"></i>
+                        <span>Turnos de Taller</span>
+                    </div>
+                    <div class="status-dot dot-yellow"></div>
                 </a>
                 <a href="admin_roles.html" class="menu-item">
                     <div class="menu-item-left">
@@ -325,19 +382,28 @@ if ("serviceWorker" in navigator) { window.addEventListener("load", () => { navi
                     </div>
                     <div class="status-dot dot-yellow"></div>
                 </a>
+                <a href="manual.html" class="menu-item">
+                    <div class="menu-item-left">
+                        <i class="ph ph-book-open"></i>
+                        <span>Manual de Usuario</span>
+                    </div>
+                    <div class="status-dot dot-gray"></div>
+                </a>
             </div>
+
+            <!-- SECCIÓN 5: ACCIONES DE SISTEMA -->
             <div class="menu-section">
-                <div class="menu-title" style="color: var(--danger)">SISTEMA</div>
+                <div class="menu-title" style="color: var(--danger)">Sistema</div>
                 <a href="#" class="menu-item" onclick="clearCache(event)">
                     <div class="menu-item-left">
                         <i class="ph ph-trash"></i>
-                        <span>Eliminar Cache</span>
+                        <span>Eliminar Caché</span>
                     </div>
                 </a>
                 <a href="#" class="menu-item" onclick="logout(event)">
                     <div class="menu-item-left">
                         <i class="ph ph-sign-out"></i>
-                        <span>Cerrar Sesion</span>
+                        <span>Cerrar Sesión</span>
                     </div>
                 </a>
             </div>

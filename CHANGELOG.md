@@ -30,6 +30,21 @@ Para garantizar trazabilidad absoluta, auditoría técnica rigurosa y claridad e
 - **`[Security]`**: Implementación de un pipeline de Integración y Despliegue Continuo (CI/CD) automatizado desde GitHub hacia el hosting de producción (cPanel/Apache) para reemplazar el traspaso manual por FTP y mitigar el riesgo de desincronización o error humano en despliegues.
 - **`[Changed]`**: Coordinación en el panel de control del servidor (cPanel) para renombrar la base de datos de `petumjvq_pruebas` a un identificador formal de producción (ej. `petumjvq_sistema`), actualizando la variable de entorno en el servidor de forma segura.
 
+## [1.5.4] - Septiembre 2026
+
+### Estandarización Canónica de Navegación de Escritorio y Recuperación de Compras de Repuestos y Módulos Huérfanos
+*Módulos impactados:* Las 20 pantallas operativas internas (`website_files/*.html`), `website_files/css/dashboard.css`, `website_files/sw.js`.
+
+> **Causa Raíz ("El Por Qué"):** La barra lateral izquierda de navegación en modo escritorio (`<aside class="sidebar">`) en 18 pantallas del sistema utilizaba una plantilla legada de solo 12 accesos que omitía 8 módulos operacionales críticos creados en versiones anteriores, notablemente `pedidos_repuestos.html` (*Control de Compras y Seguimiento de Repuestos SLA*), `repuestos.html` (*Catálogo de Piezas*), `garantias.html` (*Garantías de Proveedor*), `historial_entregados.html` (*Historial de Órdenes Entregadas*), `importar.html` (*Importación Masiva Excel*), `clientes.html` (*Directorio CRM de Clientes*), `turnos.html` (*Planificador de Turnos*) y `manual.html` (*Manual de Usuario*). Mientras que el menú móvil colapsable (`#mobile-sidebar`) sí disponía de estos módulos desde la versión 1.4.0, los usuarios de taller y gerencia que operaban desde laptops o computadoras de escritorio no contaban con acceso directo a la plataforma de compras de repuestos ni al resto de herramientas. Se homogeneizó la barra lateral de escritorio en las 20 pantallas bajo una arquitectura canónica estructurada en 4 secciones jerárquicas ("Soporte y Taller", "Inventario y Operaciones", "Gerencia y Clientes", "Reportes y Configuración") con estado activo reactivo (`.menu-item.active`), preservando el filtrado dinámico de privilegios gobernado por `check_auth.js` y las 7 reglas de oro de arquitectura.
+
+### Added
+- **Acceso Canónico en Escritorio a 8 Módulos Operacionales**: Integración formal en `<aside class="sidebar">` de `pedidos_repuestos.html` (icono `ph-truck`), `repuestos.html` (icono `ph-wrench`), `garantias.html` (icono `ph-shield-check`), `historial_entregados.html` (icono `ph-clock-counter-clockwise`), `importar.html` (icono `ph-download-simple`), `clientes.html` (icono `ph-user-list`), `turnos.html` (icono `ph-clock`) y `manual.html` (icono `ph-book-open`).
+- **`website_files/css/dashboard.css`**: Incorporación de la regla utilitaria `.dot-orange { background-color: #F97316; }` para coherencia visual semántica en el catálogo de repuestos.
+
+### Changed
+- **Navegación de Escritorio en 20 Pantallas (`website_files/*.html`)**: Unificación del contenedor `<div class="sidebar-menu">` en las 20 pantallas operativas, organizando los 20 módulos en 4 secciones funcionales idénticas entre pantallas y consistentes con el menú móvil.
+- **`website_files/sw.js`**: Incremento de caché PWA a `petulap-v24` para invalidación y propagación inmediata en navegadores de taller.
+
 ## [1.5.3] - Septiembre 2026
 
 ### Identidad Oficial de Marca, Favicon y Rediseño Integral del Portal Público de Seguimiento

@@ -1,6 +1,6 @@
-// Service Worker - Petulap PWA v23 (Logo oficial, favicon y rediseño portal consulta.html)
+// Service Worker - Petulap PWA v24 (Estandarización navegación escritorio y 20 módulos canónicos)
  
-var CACHE_NAME = 'petulap-v23';
+var CACHE_NAME = 'petulap-v24';
 var ASSETS = [
     './',
     'index.html',

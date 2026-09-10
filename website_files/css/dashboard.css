@@ -998,3 +998,5 @@ body.dashboard-body {
 .sidebar.collapsed .sidebar-logo {
     max-width: 42px;
 }
+
+.dot-orange { background-color: #F97316; }
