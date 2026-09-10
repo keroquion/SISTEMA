@@ -10,22 +10,55 @@ switch ($action) {
 
     case "list":
         $estado = isset($_GET["estado"]) ? trim($_GET["estado"]) : "";
-        $where = $estado ? "WHERE st.estado = ?" : "";
+        $origen = isset($_GET["origen"]) ? trim($_GET["origen"]) : ""; // 'clientes', 'internos'
+        $whereClauses = [];
+        $params = [];
+        $types = "";
+
+        if ($estado !== "") {
+            if ($estado === "TERMINADOS" || $estado === "HISTORIAL") {
+                $whereClauses[] = "st.estado IN ('ENTREGADO', 'LISTO_PARA_RECOGER')";
+            } elseif (strpos($estado, ',') !== false) {
+                $estadosArr = array_map('trim', explode(',', $estado));
+                $placeholders = implode(',', array_fill(0, count($estadosArr), '?'));
+                $whereClauses[] = "st.estado IN ($placeholders)";
+                foreach ($estadosArr as $est) {
+                    $types .= "s";
+                    $params[] = $est;
+                }
+            } else {
+                $whereClauses[] = "st.estado = ?";
+                $types .= "s";
+                $params[] = $estado;
+            }
+        }
+
+        if ($origen === "clientes") {
+            $whereClauses[] = "st.es_externo = 1";
+        } elseif ($origen === "internos") {
+            $whereClauses[] = "st.es_externo IN (0, 2)";
+        }
+
+        $where = !empty($whereClauses) ? "WHERE " . implode(" AND ", $whereClauses) : "";
+
         $sql = "SELECT st.id, st.numero_atencion, st.equipo_codigo, st.equipo_serie, st.equipo_descripcion,
                 st.es_externo, st.motivo_ingreso, st.diagnostico, st.solucion, st.notas_internas, st.tiempo_estimado,
                 st.estado, st.prioridad, st.en_garantia, st.meses_garantia_restantes,
-                st.fecha_ingreso, st.fecha_estimada, st.fecha_entrega,
-                CONCAT(c.nombre,' ',c.apellido) as cliente_nombre, c.dni as cliente_dni, c.telefono as cliente_tel,
+                st.fecha_ingreso, st.fecha_estimada, st.fecha_entrega, st.monto_cobrado, st.metodo_pago,
+                COALESCE(NULLIF(TRIM(CONCAT(COALESCE(c.nombre,''), ' ', COALESCE(c.apellido,''))), ''), IF(st.es_externo=2, 'Tarea Interna', 'Stock Propio / Taller')) as cliente_nombre,
+                COALESCE(c.dni, '-') as cliente_dni, 
+                COALESCE(c.telefono, '-') as cliente_tel,
                 CONCAT(COALESCE(t.nombre,''),IF(t.apellido IS NOT NULL AND t.apellido != '',' ',''),COALESCE(t.apellido,'')) as tecnico_nombre,
                 st.cliente_id, st.tecnico_id, st.tecnicos_adicionales
                 FROM soporte_tecnico st
-                JOIN personas c ON st.cliente_id = c.id
+                LEFT JOIN personas c ON st.cliente_id = c.id
                 LEFT JOIN personas t ON st.tecnico_id = t.id
                 $where
                 ORDER BY FIELD(st.estado,'PENDIENTE','EN_DIAGNOSTICO','ESPERANDO_REPUESTO','EN_REPARACION','LISTO_PARA_RECOGER','ENTREGADO','CANCELADO'), st.prioridad DESC, st.fecha_ingreso DESC";
-        if ($estado) {
+
+        if (!empty($params)) {
             $stmt = $db->prepare($sql);
-            $stmt->bind_param("s", $estado);
+            $stmt->bind_param($types, ...$params);
             $stmt->execute();
             $result = $stmt->get_result();
         } else {
@@ -38,13 +71,18 @@ switch ($action) {
 
     case "ver":
         $id = (int)($_GET["id"] ?? 0);
-        $sql = "SELECT st.*, CONCAT(c.nombre,' ',c.apellido) as cliente_nombre, c.dni as cliente_dni, c.telefono as cliente_tel,
+        $stmt = $db->prepare("SELECT st.*, 
+                COALESCE(NULLIF(TRIM(CONCAT(COALESCE(c.nombre,''), ' ', COALESCE(c.apellido,''))), ''), IF(st.es_externo=2, 'Tarea Interna', 'Stock Propio / Taller')) as cliente_nombre,
+                COALESCE(c.dni, '-') as cliente_dni, 
+                COALESCE(c.telefono, '-') as cliente_tel,
                 CONCAT(COALESCE(t.nombre,''),' ',COALESCE(t.apellido,'')) as tecnico_nombre
                 FROM soporte_tecnico st
-                JOIN personas c ON st.cliente_id = c.id
+                LEFT JOIN personas c ON st.cliente_id = c.id
                 LEFT JOIN personas t ON st.tecnico_id = t.id
-                WHERE st.id = $id LIMIT 1";
-        $result = $db->query($sql);
+                WHERE st.id = ? LIMIT 1");
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+        $result = $stmt->get_result();
         $row = $result->fetch_assoc();
         if ($row) echo json_encode(["ok" => true, "data" => $row]);
         else echo json_encode(["ok" => false, "msg" => "No encontrado"]);

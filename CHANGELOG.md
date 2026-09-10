@@ -30,6 +30,39 @@ Para garantizar trazabilidad absoluta, auditoría técnica rigurosa y claridad e
 - **`[Security]`**: Implementación de un pipeline de Integración y Despliegue Continuo (CI/CD) automatizado desde GitHub hacia el hosting de producción (cPanel/Apache) para reemplazar el traspaso manual por FTP y mitigar el riesgo de desincronización o error humano en despliegues.
 - **`[Changed]`**: Coordinación en el panel de control del servidor (cPanel) para renombrar la base de datos de `petumjvq_pruebas` a un identificador formal de producción (ej. `petumjvq_sistema`), actualizando la variable de entorno en el servidor de forma segura.
 
+## [1.5.1] - Septiembre 2026
+
+### Plataforma Ejecutiva de Historial de Tickets Entregados y Finalizados Multiorigen
+*Módulos impactados:* `website_files/historial_entregados.html`, `website_files/api/soporte.php`, `website_files/sw.js`.
+
+> **Causa Raíz ("El Por Qué"):** La vista de `historial_entregados.html` se encontraba en un estado preliminar sin diseño, sin estilos responsivos y restringida exclusivamente a `estado=ENTREGADO`. Dado que en el taller las órdenes terminadas permanecen en `LISTO_PARA_RECOGER` hasta la entrega física al cliente y no existían tickets en `ENTREGADO`, la pantalla devolvía una lista vacía y mostraba el texto plano "No hay tickets entregados todavia.", pareciendo inoperativa. Adicionalmente, la consulta SQL en `api/soporte.php?action=list` utilizaba un `INNER JOIN personas c` que descartaba silenciosamente todas las órdenes internas (`ST-INT-`, `TAR-`, inventario y lotes) cuyo `cliente_id` es nulo o cero. Se resolvió la consulta con `LEFT JOIN personas c`, se habilitó el parámetro `estado=TERMINADOS` para agrupar tanto entregados como listos en taller, y se rediseñó integralmente la pantalla bajo el estándar ejecutivo SaaS de `docs/12-SISTEMA-DE-DISENO-UI-UX.md` con 4 KPIs con pulso en tiempo real, filtros segmentados por demanda y estado, buscador instantáneo, tarjetas móviles adaptativas y modal de detalle técnico.
+
+### Fixed & Added
+- **`website_files/api/soporte.php`**:
+  - **Inclusión de Tickets Internos (`LEFT JOIN`)**: Reemplazo de `JOIN personas c ON st.cliente_id = c.id` por `LEFT JOIN` en las acciones `list` y `ver`, resolviendo nombres amigables mediante `COALESCE` ('Tarea Interna' para `es_externo=2`, 'Stock Propio / Taller' para `es_externo=0`) y evitando la exclusión silenciosa de actividades de taller.
+  - **Soporte de Agrupación de Estados (`TERMINADOS`)**: Habilitación del valor especial `estado=TERMINADOS` (que filtra por `st.estado IN ('ENTREGADO', 'LISTO_PARA_RECOGER')`) y soporte para listas de estados separadas por coma con sentencias preparadas nativas (`bind_param`).
+  - **Filtro Opcional por Origen**: Soporte para parámetro `origen=clientes` (`es_externo = 1`) y `origen=internos` (`es_externo IN (0, 2)`).
+- **`website_files/historial_entregados.html`**:
+  - **Rediseño Ejecutivo SaaS**: Reemplazo total de la vista preliminar por la arquitectura estándar de diseño (`tokens.css -> styles.css -> dashboard.css`), garantizando contraste perfecto en modo oscuro y respetando los 7 identificadores protegidos.
+  - **Fila de 4 Tarjetas KPI con `.pulse-dot`**:
+    * *Total Finalizados* (`.pulse-blue`): Conteo total consolidado de tickets completados.
+    * *Entregados / Archivados* (`.pulse-green`): Órdenes físicamente entregadas o tareas archivadas.
+    * *Listos en Taller* (`.pulse-amber`): Órdenes listas esperando entrega al cliente.
+    * *Distribución Clientes / Internos* (`.pulse-purple`): Desglose comparativo `ST-` vs `TAR-`/`ST-INT-`.
+  - **Barra de Herramientas y Filtros Segmentados**:
+    * Buscador en tiempo real con filtrado multicampo (número de atención, cliente, DNI, teléfono, modelo, serie, técnico o solución).
+    * Selector de períodos (Todo el historial, este mes, últimos 30 días, hoy).
+    * Chips interactivos por Origen (`[Todos]`, `[Clientes ST]`, `[Tareas e Internos]`) y por Estado (`[Ambos Estados]`, `[Entregados]`, `[Listos en Taller]`) con contadores automáticos reactivos.
+  - **Tabla Desktop y Tarjetas Móviles Adaptativas**: Visualización tabular para pantallas grandes y grid de tarjetas apiladas en `@media (max-width: 768px)` con badges `.live-chip`.
+  - **Modal de Detalle Rápido**: Visualización modal completa del ticket con diagnóstico, solución aplicada, fechas de ingreso y entrega, técnico asignado, cobro final y botón de impresión de sticker para clientes.
+- **`website_files/sw.js`**:
+  - Incremento de versión de caché a `'petulap-v21'` para invalidación instantánea de caché PWA en clientes.
+
+## [1.5.0] - Septiembre 2026
+
+### Plataforma Ejecutiva de Control de Compras y Trazabilidad de Repuestos Multiorigen con Motor de SLA
+*Módulos impactados:* `website_files/api/repuestos.php`, `website_files/pedidos_repuestos.html`, `website_files/sw.js`.
+
 ## [1.4.10] - Septiembre 2026
 
 ### Restauración del Visualizador Semanal (Heatmap de Zonas Calientes) y Corrección de KPI "Ocupados Ahora"

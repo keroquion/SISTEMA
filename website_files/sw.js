@@ -1,6 +1,6 @@
-// Service Worker - Petulap PWA v20 (Restauración de Heatmap Semanal y Fix KPI Ocupados)
+// Service Worker - Petulap PWA v21 (Historial Ejecutivo de Tickets Entregados y Finalizados Multiorigen)
  
-var CACHE_NAME = 'petulap-v20';
+var CACHE_NAME = 'petulap-v21';
 var ASSETS = [
     './',
     'index.html',

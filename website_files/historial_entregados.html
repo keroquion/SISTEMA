@@ -1,29 +1,30 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>Historial Entregados - Petulap SST</title>
-<link rel="stylesheet" href="css/tokens.css?v=1">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <title>Historial de Entregados y Finalizados - Petulap SST</title>
+    
+    <!-- Jerarquía CSS Oficial (Innegociable) -->
+    <link rel="stylesheet" href="css/tokens.css?v=1">
     <link rel="stylesheet" href="css/styles.css?v=3">
+    <link rel="stylesheet" href="css/dashboard.css?v=3">
 
-<link rel="manifest" href="manifest.json">
+    <link rel="manifest" href="manifest.json">
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
     <!-- Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     
-    <!-- Dashboard Styles -->
-    <link rel="stylesheet" href="css/dashboard.css?v=3">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="icon.jpg">
 
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<link rel="apple-touch-icon" href="icon.jpg">
-
+    <!-- Anti-flicker Modo Oscuro (Innegociable) -->
     <script>
       (function(){
         if(localStorage.getItem('petulap-theme') === 'dark') {
@@ -31,13 +32,413 @@
         }
       })();
     </script>
-<script>
-if ("serviceWorker" in navigator) { window.addEventListener("load", () => { navigator.serviceWorker.register("sw.js").then(r => console.log("SW ok")).catch(e => console.log("SW fail", e)); }); }
-</script>
+    <script>
+    if ("serviceWorker" in navigator) { 
+        window.addEventListener("load", () => { 
+            navigator.serviceWorker.register("sw.js").then(r => console.log("SW ok")).catch(e => console.log("SW fail", e)); 
+        }); 
+    }
+    </script>
+
+    <style>
+        /* Estilos Ejecutivos SaaS para Historial */
+        .kpis-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 22px;
+        }
+        @media (max-width: 1024px) {
+            .kpis-row { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 600px) {
+            .kpis-row { grid-template-columns: 1fr; }
+        }
+
+        .kpi-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-default);
+            border-radius: 12px;
+            padding: 18px 20px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .kpi-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 14px rgba(0,0,0,0.06);
+        }
+
+        .kpi-icon-wrap {
+            width: 48px;
+            height: 48px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+
+        /* Pulse dots */
+        .pulse-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+            flex-shrink: 0;
+        }
+        .pulse-blue {
+            background: #0284c7;
+            box-shadow: 0 0 0 0 rgba(2, 132, 199, 0.7);
+            animation: pulse-blue 1.8s infinite;
+        }
+        .pulse-green {
+            background: #10B981;
+            box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+            animation: pulse-green 1.8s infinite;
+        }
+        .pulse-amber {
+            background: #F59E0B;
+            box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7);
+            animation: pulse-amber 1.8s infinite;
+        }
+        .pulse-purple {
+            background: #8B5CF6;
+            box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.7);
+            animation: pulse-purple 1.8s infinite;
+        }
+        @keyframes pulse-blue {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(2, 132, 199, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(2, 132, 199, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(2, 132, 199, 0); }
+        }
+        @keyframes pulse-green {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+        @keyframes pulse-amber {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(245, 158, 11, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+        }
+        @keyframes pulse-purple {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(139, 92, 246, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(139, 92, 246, 0); }
+        }
+
+        /* Toolbar & Filtros */
+        .historial-toolbar {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-default);
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .toolbar-top-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .search-input-wrap {
+            position: relative;
+            flex: 1;
+            min-width: 280px;
+        }
+        .search-input-wrap i {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            font-size: 17px;
+        }
+        .search-input-wrap input {
+            width: 100%;
+            padding: 10px 14px 10px 40px;
+            border-radius: 8px;
+            border: 1px solid var(--border-default);
+            background: var(--bg-card);
+            color: var(--text-primary);
+            font-size: 13.5px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .search-input-wrap input:focus {
+            border-color: var(--color-brand);
+        }
+
+        .filter-groups-wrap {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            padding-top: 10px;
+            border-top: 1px solid var(--border-default);
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .filter-group-label {
+            font-size: 0.78rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+            margin-right: 4px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .filter-chip {
+            background: var(--bg-card);
+            border: 1px solid var(--border-default);
+            color: var(--text-secondary);
+            border-radius: 20px;
+            padding: 6px 13px;
+            font-size: 12.5px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            user-select: none;
+        }
+        .filter-chip:hover {
+            border-color: var(--color-brand);
+            color: var(--text-primary);
+        }
+        .filter-chip.active {
+            background: var(--color-brand);
+            color: #ffffff;
+            border-color: var(--color-brand);
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(13, 138, 188, 0.3);
+        }
+        .chip-badge {
+            background: rgba(255,255,255,0.2);
+            padding: 1px 6px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+        .filter-chip:not(.active) .chip-badge {
+            background: var(--border-default);
+            color: var(--text-secondary);
+        }
+
+        /* Tabla y Badges */
+        .table-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-default);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+        }
+
+        .table-responsive-desktop {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        .custom-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+        .custom-table th {
+            background: var(--bg-card);
+            padding: 14px 16px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+            border-bottom: 1px solid var(--border-default);
+            white-space: nowrap;
+        }
+        .custom-table td {
+            padding: 14px 16px;
+            font-size: 13px;
+            color: var(--text-primary);
+            border-bottom: 1px solid var(--border-default);
+            vertical-align: middle;
+        }
+        .custom-table tbody tr {
+            transition: background 0.15s ease;
+        }
+        .custom-table tbody tr:hover {
+            background: rgba(13, 138, 188, 0.04);
+        }
+
+        /* Chips de Estado y Tipo */
+        .live-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 11.5px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        .chip-cliente {
+            background: rgba(2, 132, 199, 0.12);
+            color: #0284c7;
+            border: 1px solid rgba(2, 132, 199, 0.28);
+        }
+        .chip-interno {
+            background: rgba(139, 92, 246, 0.12);
+            color: #8b5cf6;
+            border: 1px solid rgba(139, 92, 246, 0.28);
+        }
+        .chip-tarea {
+            background: rgba(236, 72, 153, 0.12);
+            color: #ec4899;
+            border: 1px solid rgba(236, 72, 153, 0.28);
+        }
+        .chip-entregado {
+            background: rgba(16, 185, 129, 0.12);
+            color: #10b981;
+            border: 1px solid rgba(16, 185, 129, 0.28);
+        }
+        .chip-listo {
+            background: rgba(245, 158, 11, 0.12);
+            color: #f59e0b;
+            border: 1px solid rgba(245, 158, 11, 0.28);
+        }
+
+        /* Vista Tarjetas Móvil */
+        .mobile-cards-view {
+            display: none;
+            padding: 12px;
+            gap: 12px;
+        }
+        @media (max-width: 768px) {
+            .table-responsive-desktop { display: none; }
+            .mobile-cards-view { display: flex; flex-direction: column; }
+        }
+
+        .m-ticket-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-default);
+            border-radius: 10px;
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .m-ticket-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .m-ticket-num {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        .m-ticket-body {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            font-size: 12px;
+        }
+        .m-field-label {
+            font-size: 11px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+        }
+        .m-field-val {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* Modal Detalle */
+        .modal-backdrop {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(4px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 16px;
+        }
+        .modal-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-default);
+            border-radius: 14px;
+            width: 100%;
+            max-width: 620px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+            display: flex;
+            flex-direction: column;
+        }
+        .modal-header {
+            padding: 18px 22px;
+            border-bottom: 1px solid var(--border-default);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .modal-body {
+            padding: 22px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .modal-footer {
+            padding: 16px 22px;
+            border-top: 1px solid var(--border-default);
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            background: var(--bg-card);
+            border-radius: 0 0 14px 14px;
+        }
+
+        /* Empty State */
+        .empty-state-box {
+            padding: 45px 20px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            color: var(--text-secondary);
+        }
+        .empty-state-box i {
+            font-size: 48px;
+            color: var(--border-default);
+        }
+    </style>
 </head>
 <body class="dashboard-body">
 
-    <!-- MOBILE HEADER -->
+    <!-- MOBILE HEADER (Innegociable) -->
     <header class="mobile-header">
         <button class="menu-toggle" id="mobile-menu-toggle">
             <i class="ph ph-list"></i>
@@ -46,11 +447,10 @@ if ("serviceWorker" in navigator) { window.addEventListener("load", () => { navi
             <div class="logo-icon">P</div>
             <span>PETULAP S.A.C.</span>
         </div>
-        
-                <button class="theme-toggle-btn" aria-label="Cambiar tema" onclick="toggleTheme()" style="background: none; border: none; font-size: 20px; cursor: pointer; color: var(--text-secondary); margin-right: 15px; display: flex; align-items: center;">
-                    <i class="ph ph-moon"></i>
-                </button>
-                <button class="notification-btn">
+        <button class="theme-toggle-btn" aria-label="Cambiar tema" onclick="toggleTheme()" style="background: none; border: none; font-size: 20px; cursor: pointer; color: var(--text-secondary); margin-right: 15px; display: flex; align-items: center;">
+            <i class="ph ph-moon"></i>
+        </button>
+        <button class="notification-btn" aria-label="Notificaciones">
             <i class="ph ph-bell"></i>
         </button>
     </header>
@@ -114,8 +514,8 @@ if ("serviceWorker" in navigator) { window.addEventListener("load", () => { navi
                     <i class="ph-fill ph-cpu acc-icon-orange"></i>
                     Repuestos
                 </a>
-                <a href="historial_entregados.html" class="accordion-link">
-                    <i class="ph-fill ph-clock-counter-clockwise acc-icon-gray"></i>
+                <a href="historial_entregados.html" class="accordion-link active" style="font-weight:700;">
+                    <i class="ph-fill ph-clock-counter-clockwise acc-icon-green"></i>
                     Historial de Entregados
                 </a>
                 <a href="importar.html" class="accordion-link">
@@ -267,6 +667,20 @@ if ("serviceWorker" in navigator) { window.addEventListener("load", () => { navi
                     </div>
                     <div class="status-dot dot-gray"></div>
                 </a>
+                <a href="garantias.html" class="menu-item">
+                    <div class="menu-item-left">
+                        <i class="ph ph-shield-check"></i>
+                        <span>Garantias</span>
+                    </div>
+                    <div class="status-dot dot-blue"></div>
+                </a>
+                <a href="pedidos_repuestos.html" class="menu-item">
+                    <div class="menu-item-left">
+                        <i class="ph ph-wrench"></i>
+                        <span>Pedidos Repuestos</span>
+                    </div>
+                    <div class="status-dot dot-blue"></div>
+                </a>
             </div>
 
             <div class="menu-section">
@@ -282,6 +696,20 @@ if ("serviceWorker" in navigator) { window.addEventListener("load", () => { navi
                     <div class="menu-item-left">
                         <i class="ph ph-scan"></i>
                         <span>Escaneo / Triaje</span>
+                    </div>
+                    <div class="status-dot dot-green"></div>
+                </a>
+                <a href="repuestos.html" class="menu-item">
+                    <div class="menu-item-left">
+                        <i class="ph ph-nut"></i>
+                        <span>Repuestos</span>
+                    </div>
+                    <div class="status-dot dot-orange"></div>
+                </a>
+                <a href="historial_entregados.html" class="menu-item active">
+                    <div class="menu-item-left">
+                        <i class="ph ph-clock-counter-clockwise"></i>
+                        <span>Historial Entregados</span>
                     </div>
                     <div class="status-dot dot-green"></div>
                 </a>
@@ -353,79 +781,609 @@ if ("serviceWorker" in navigator) { window.addEventListener("load", () => { navi
     <!-- MAIN WRAPPER -->
     <main class="main-wrapper">
         
-        <!-- DESKTOP TOPBAR -->
+        <!-- TOPBAR (Identificadores Protegidos) -->
         <header class="topbar">
             <div class="search-bar">
                 <i class="ph ph-magnifying-glass"></i>
-                <input type="text" placeholder="Buscar en el sistema...">
+                <input type="text" id="topbar-search" placeholder="Buscar en el sistema..." oninput="if(document.getElementById('input-busqueda')) { document.getElementById('input-busqueda').value = this.value; filtrarTickets(); }">
             </div>
             
             <div class="topbar-right">
-                <button class="notification-btn">
+                <button class="notification-btn" aria-label="Notificaciones">
                     <i class="ph ph-bell"></i>
-                    <span class="badge-counter">3</span>
                 </button>
-                <a href="login.html" class="user-profile">
-                    <img src="https://ui-avatars.com/api/?name=User+Profile&background=0D8ABC&color=fff" alt="User Profile">
-                </a>
+                <div class="user-profile" id="lbl-nombre">👨‍ Cargando...</div>
+                <span id="lbl-tecnico" style="display:none;"></span>
             </div>
         </header>
 
         <!-- DASHBOARD CONTENT -->
         <div class="content">
 
+            <!-- Encabezado de Página -->
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px; margin-bottom: 22px;">
+                <div>
+                    <h2 style="display:flex; align-items:center; gap:10px; margin:0;">
+                        <i class="ph-bold ph-clock-counter-clockwise" style="color: var(--color-brand);"></i>
+                        Historial de Tickets Entregados & Finalizados
+                    </h2>
+                    <p style="color: var(--text-secondary); margin-top: 5px; font-size: 13.5px;">
+                        Auditoría y consulta histórica de órdenes de soporte (Clientes ST) y actividades de laboratorio (Stock / Lotes / Tareas).
+                    </p>
+                </div>
+                <div style="display:flex; gap: 10px; flex-wrap:wrap;">
+                    <a href="mis_ordenes.html" class="btn btn-secondary">
+                        <i class="ph-bold ph-kanban"></i> Panel Kanban
+                    </a>
+                    <button class="btn btn-primary" onclick="cargarData()">
+                        <i class="ph-bold ph-arrows-clockwise"></i> Actualizar
+                    </button>
+                </div>
+            </div>
 
+            <!-- Fila de 4 Tarjetas KPI Ejecutivas -->
+            <div class="kpis-row">
+                <div class="kpi-card">
+                    <div class="kpi-icon-wrap" style="background: rgba(2,132,199,0.12); color: #0284c7;">
+                        <i class="ph-bold ph-check-circle"></i>
+                    </div>
+                    <div>
+                        <div style="font-size:0.75rem; font-weight:700; text-transform:uppercase; color:var(--text-secondary); display:flex; align-items:center; gap:6px;">
+                            <span class="pulse-dot pulse-blue"></span> Total Finalizados
+                        </div>
+                        <div id="kpi-total-finalizados" style="font-size:1.55rem; font-weight:800; color:var(--text-primary); margin-top:2px;">0</div>
+                    </div>
+                </div>
 
-<h2>📋 Historial de Tickets Entregados / Cerrados</h2>
+                <div class="kpi-card">
+                    <div class="kpi-icon-wrap" style="background: rgba(16,185,129,0.12); color: #10B981;">
+                        <i class="ph-bold ph-handshake"></i>
+                    </div>
+                    <div>
+                        <div style="font-size:0.75rem; font-weight:700; text-transform:uppercase; color:var(--text-secondary); display:flex; align-items:center; gap:6px;">
+                            <span class="pulse-dot pulse-green"></span> Entregados / Archivados
+                        </div>
+                        <div id="kpi-entregados" style="font-size:1.55rem; font-weight:800; color:#10B981; margin-top:2px;">0</div>
+                    </div>
+                </div>
 
-<div id="tabla-tickets">Cargando historial...</div>
+                <div class="kpi-card">
+                    <div class="kpi-icon-wrap" style="background: rgba(245,158,11,0.12); color: #F59E0B;">
+                        <i class="ph-bold ph-package"></i>
+                    </div>
+                    <div>
+                        <div style="font-size:0.75rem; font-weight:700; text-transform:uppercase; color:var(--text-secondary); display:flex; align-items:center; gap:6px;">
+                            <span class="pulse-dot pulse-amber"></span> Listos en Taller
+                        </div>
+                        <div id="kpi-listos" style="font-size:1.55rem; font-weight:800; color:#F59E0B; margin-top:2px;">0</div>
+                    </div>
+                </div>
 
-<script src="js/check_auth.js"></script>
-<script>
-async function cargarData() {
-  document.getElementById('tabla-tickets').innerHTML = 'Cargando...';
-  const res = await fetch('api/soporte.php?action=list&estado=ENTREGADO').then(r=>r.json());
-  if (!res.ok) return;
-  
-  if (!res.data.length) {
-    document.getElementById('tabla-tickets').innerHTML = '<p >No hay tickets entregados todavia.</p>';
-    return;
-  }
-  
-  let html = `<table><thead><tr>
-    <th>Ticket</th><th>Tipo</th><th>Cliente / Equipo</th><th>Tecnico</th><th>Fecha Entrega</th><th>Solucion</th>
-  </tr></thead><tbody>`;
-  
-  res.data.forEach(t => {
-    let tipoBadge = t.es_externo == 1 ? '<span class="badge-ext">Cliente</span>' : '<span class="badge-int">Interno/Lote</span>';
-    html += `<tr>
-      <td><b>${t.numero_atencion}</b></td>
-      <td>${tipoBadge}</td>
-      <td>${t.cliente_nombre}<br><span >${t.equipo_descripcion || t.equipo_codigo}</span></td>
-      <td>${t.tecnico_nombre || 'Sin asignar'}</td>
-      <td>${t.fecha_entrega || t.fecha_ingreso}</td>
-      <td>${t.solucion || t.diagnostico || '-'}</td>
-    </tr>`;
-  });
-  html += '</tbody></table>';
-  document.getElementById('tabla-tickets').innerHTML = html;
-}
+                <div class="kpi-card">
+                    <div class="kpi-icon-wrap" style="background: rgba(139,92,246,0.12); color: #8B5CF6;">
+                        <i class="ph-bold ph-users-three"></i>
+                    </div>
+                    <div>
+                        <div style="font-size:0.75rem; font-weight:700; text-transform:uppercase; color:var(--text-secondary); display:flex; align-items:center; gap:6px;">
+                            <span class="pulse-dot pulse-purple"></span> Clientes / Internos
+                        </div>
+                        <div id="kpi-distribucion" style="font-size:1.55rem; font-weight:800; color:var(--text-primary); margin-top:2px;">0 / 0</div>
+                    </div>
+                </div>
+            </div>
 
-cargarData();
-</script>
+            <!-- Barra de Herramientas: Búsqueda y Filtros Rápidos -->
+            <div class="historial-toolbar">
+                <div class="toolbar-top-row">
+                    <div class="search-input-wrap">
+                        <i class="ph-bold ph-magnifying-glass"></i>
+                        <input type="text" id="input-busqueda" placeholder="Buscar por N° ticket, cliente, DNI, equipo, técnico o solución..." oninput="filtrarTickets()">
+                    </div>
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <span style="font-size:12px; color:var(--text-secondary); font-weight:600;"><i class="ph-bold ph-calendar"></i> Período:</span>
+                        <select id="select-periodo" onchange="filtrarTickets()" style="padding:9px 12px; border-radius:8px; border:1px solid var(--border-default); background:var(--bg-card); color:var(--text-primary); font-size:12.5px; outline:none;">
+                            <option value="TODOS">Todo el Historial</option>
+                            <option value="MES_ACTUAL">Este Mes</option>
+                            <option value="ULTIMOS_30">Últimos 30 Días</option>
+                            <option value="HOY">Hoy</option>
+                        </select>
+                    </div>
+                </div>
 
+                <!-- Chips Segmentados por Demanda y Estado -->
+                <div class="filter-groups-wrap">
+                    <div class="filter-group">
+                        <span class="filter-group-label"><i class="ph-bold ph-funnel"></i> Origen:</span>
+                        <button class="filter-chip active" id="chip-origen-todos" onclick="cambiarFiltroOrigen('TODOS')">
+                            Todos <span class="chip-badge" id="badge-count-todos">0</span>
+                        </button>
+                        <button class="filter-chip" id="chip-origen-clientes" onclick="cambiarFiltroOrigen('CLIENTES')">
+                            <i class="ph-bold ph-user"></i> Clientes ST <span class="chip-badge" id="badge-count-clientes">0</span>
+                        </button>
+                        <button class="filter-chip" id="chip-origen-internos" onclick="cambiarFiltroOrigen('INTERNOS')">
+                            <i class="ph-bold ph-wrench"></i> Tareas e Internos <span class="chip-badge" id="badge-count-internos">0</span>
+                        </button>
+                    </div>
+
+                    <div class="filter-group" style="margin-left: auto;">
+                        <span class="filter-group-label"><i class="ph-bold ph-tag"></i> Estado:</span>
+                        <button class="filter-chip active" id="chip-estado-todos" onclick="cambiarFiltroEstado('TODOS')">
+                            Ambos Estados
+                        </button>
+                        <button class="filter-chip" id="chip-estado-entregado" onclick="cambiarFiltroEstado('ENTREGADO')">
+                            <i class="ph-bold ph-handshake"></i> Entregados
+                        </button>
+                        <button class="filter-chip" id="chip-estado-listo" onclick="cambiarFiltroEstado('LISTO_PARA_RECOGER')">
+                            <i class="ph-bold ph-package"></i> Listos en Taller
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contenedor Principal de Datos -->
+            <div class="table-card">
+                
+                <!-- Vista Tabla para Pantallas Grandes -->
+                <div class="table-responsive-desktop">
+                    <table class="custom-table" id="tabla-tickets">
+                        <thead>
+                            <tr>
+                                <th>Ticket / Tipo</th>
+                                <th>Equipo / Falla</th>
+                                <th>Cliente / Contacto</th>
+                                <th>Técnico</th>
+                                <th>Fecha Entrega</th>
+                                <th>Estado</th>
+                                <th>Solución Aplicada</th>
+                                <th style="text-align:right;">Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody-tickets">
+                            <tr>
+                                <td colspan="8" style="text-align:center; padding:35px;">
+                                    <i class="ph-bold ph-spinner ph-spin" style="font-size:24px; color:var(--color-brand);"></i>
+                                    <div style="margin-top:8px; color:var(--text-secondary); font-size:13px;">Cargando historial de tickets...</div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Vista Móvil en Tarjetas Responsivas (@media <= 768px) -->
+                <div class="mobile-cards-view" id="mobile-tickets-container">
+                    <!-- Se inyecta dinámicamente -->
+                </div>
+
+                <!-- Estado Vacío -->
+                <div id="empty-state" class="empty-state-box" style="display:none;">
+                    <i class="ph ph-folder-open"></i>
+                    <h4 style="margin:0; color:var(--text-primary); font-size:15px;">No se encontraron tickets finalizados</h4>
+                    <p style="margin:0; font-size:13px; max-width:380px;">No hay registros que coincidan con la búsqueda o los filtros seleccionados.</p>
+                    <button class="btn btn-secondary" onclick="resetearFiltros()" style="margin-top:6px; font-size:12px;">
+                        <i class="ph-bold ph-arrow-counter-clockwise"></i> Restablecer Filtros
+                    </button>
+                </div>
+
+            </div>
 
         </div>
         
-        <!-- FAB Button -->
+        <!-- FAB Button Tarea (Identificador Protegido) -->
         <button class="fab-chat" onclick="if(typeof abrirModalTareaGlobal === 'function') abrirModalTareaGlobal();" title="Crear Tarea Interna">
             <i class="ph-bold ph-kanban"></i>
         </button>
 
     </main>
 
-    <!-- Scripts -->
+    <!-- MODAL DE DETALLE COMPLETO DEL TICKET -->
+    <div class="modal-backdrop" id="modal-detalle" onclick="if(event.target === this) cerrarModalDetalle();">
+        <div class="modal-card">
+            <div class="modal-header">
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <i class="ph-bold ph-ticket" style="font-size:20px; color:var(--color-brand);"></i>
+                    <h3 style="margin:0; font-size:16px; color:var(--text-primary);" id="modal-title">Detalle de Ticket</h3>
+                </div>
+                <button onclick="cerrarModalDetalle()" style="background:none; border:none; color:var(--text-secondary); font-size:20px; cursor:pointer;">
+                    <i class="ph ph-x"></i>
+                </button>
+            </div>
+            <div class="modal-body" id="modal-detalle-content">
+                <!-- Contenido dinámico -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="cerrarModalDetalle()">Cerrar</button>
+                <button class="btn btn-primary" id="btn-modal-print" onclick="imprimirStickerModal()">
+                    <i class="ph-bold ph-printer"></i> Imprimir Sticker
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts Oficiales (Innegociable) -->
+    <script src="js/check_auth.js"></script>
     <script src="js/dashboard.js?v=3"></script>
 
+    <script>
+        // ESTADO GLOBAL
+        let todosLosTickets = [];
+        let filtroOrigenActual = 'TODOS'; // 'TODOS', 'CLIENTES', 'INTERNOS'
+        let filtroEstadoActual = 'TODOS'; // 'TODOS', 'ENTREGADO', 'LISTO_PARA_RECOGER'
+        let ticketSeleccionado = null;
+
+        // CARGA PRINCIPAL DESDE BACKEND
+        async function cargarData() {
+            const tbody = document.getElementById('tbody-tickets');
+            const mobileContainer = document.getElementById('mobile-tickets-container');
+            const emptyBox = document.getElementById('empty-state');
+            
+            tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:35px;">
+                <i class="ph-bold ph-spinner ph-spin" style="font-size:24px; color:var(--color-brand);"></i>
+                <div style="margin-top:8px; color:var(--text-secondary); font-size:13px;">Cargando historial de tickets...</div>
+            </td></tr>`;
+            mobileContainer.innerHTML = '';
+            emptyBox.style.display = 'none';
+
+            try {
+                // Consultar tickets en estados terminados (ENTREGADO y LISTO_PARA_RECOGER)
+                const res = await fetch('api/soporte.php?action=list&estado=TERMINADOS').then(r => r.json());
+                
+                if (!res.ok || !Array.isArray(res.data)) {
+                    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:30px; color:var(--danger);">
+                        <i class="ph-bold ph-warning-circle" style="font-size:22px;"></i>
+                        <div style="margin-top:6px;">Error al cargar el historial desde el servidor.</div>
+                    </td></tr>`;
+                    return;
+                }
+
+                todosLosTickets = res.data;
+                actualizarKPIs();
+                filtrarTickets();
+
+            } catch (err) {
+                console.error("Error en cargarData:", err);
+                tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:30px; color:var(--danger);">
+                    <i class="ph-bold ph-warning-circle" style="font-size:22px;"></i>
+                    <div style="margin-top:6px;">Fallo de conexión al cargar datos.</div>
+                </td></tr>`;
+            }
+        }
+
+        // CALCULO Y ACTUALIZACION DE KPIS
+        function actualizarKPIs() {
+            const total = todosLosTickets.length;
+            const entregados = todosLosTickets.filter(t => t.estado === 'ENTREGADO').length;
+            const listos = todosLosTickets.filter(t => t.estado === 'LISTO_PARA_RECOGER').length;
+            const clientes = todosLosTickets.filter(t => Number(t.es_externo) === 1).length;
+            const internos = todosLosTickets.filter(t => Number(t.es_externo) !== 1).length;
+
+            document.getElementById('kpi-total-finalizados').textContent = total;
+            document.getElementById('kpi-entregados').textContent = entregados;
+            document.getElementById('kpi-listos').textContent = listos;
+            document.getElementById('kpi-distribucion').textContent = `${clientes} / ${internos}`;
+
+            document.getElementById('badge-count-todos').textContent = total;
+            document.getElementById('badge-count-clientes').textContent = clientes;
+            document.getElementById('badge-count-internos').textContent = internos;
+        }
+
+        // FILTRADO DINÁMICO EN MEMORIA
+        function filtrarTickets() {
+            const busqueda = (document.getElementById('input-busqueda').value || '').toLowerCase().trim();
+            const periodo = document.getElementById('select-periodo').value;
+
+            const ahora = new Date();
+            const inicioMes = new Date(ahora.getFullYear(), ahora.getMonth(), 1);
+            const hace30dias = new Date(ahora.getTime() - (30 * 24 * 60 * 60 * 1000));
+            const hoyStr = ahora.toISOString().split('T')[0];
+
+            const filtrados = todosLosTickets.filter(t => {
+                // Filtro por Origen
+                if (filtroOrigenActual === 'CLIENTES' && Number(t.es_externo) !== 1) return false;
+                if (filtroOrigenActual === 'INTERNOS' && Number(t.es_externo) === 1) return false;
+
+                // Filtro por Estado
+                if (filtroEstadoActual !== 'TODOS' && t.estado !== filtroEstadoActual) return false;
+
+                // Filtro por Período
+                const fechaRef = t.fecha_entrega || t.fecha_ingreso;
+                if (periodo !== 'TODOS' && fechaRef) {
+                    const f = new Date(fechaRef);
+                    if (periodo === 'MES_ACTUAL' && f < inicioMes) return false;
+                    if (periodo === 'ULTIMOS_30' && f < hace30dias) return false;
+                    if (periodo === 'HOY' && !fechaRef.startsWith(hoyStr)) return false;
+                }
+
+                // Filtro por Búsqueda de Texto
+                if (busqueda) {
+                    const strTicket = (t.numero_atencion || '').toLowerCase();
+                    const strCliente = (t.cliente_nombre || '').toLowerCase();
+                    const strDni = (t.cliente_dni || '').toLowerCase();
+                    const strEquipo = (t.equipo_descripcion || t.equipo_codigo || '').toLowerCase();
+                    const strTecnico = (t.tecnico_nombre || '').toLowerCase();
+                    const strSolucion = (t.solucion || t.diagnostico || '').toLowerCase();
+                    
+                    const coincide = strTicket.includes(busqueda) || 
+                                     strCliente.includes(busqueda) || 
+                                     strDni.includes(busqueda) || 
+                                     strEquipo.includes(busqueda) || 
+                                     strTecnico.includes(busqueda) || 
+                                     strSolucion.includes(busqueda);
+                    if (!coincide) return false;
+                }
+
+                return true;
+            });
+
+            renderizarResultados(filtrados);
+        }
+
+        // RENDERIZADO EN TABLA Y CARDS
+        function renderizarResultados(lista) {
+            const tbody = document.getElementById('tbody-tickets');
+            const mobileContainer = document.getElementById('mobile-tickets-container');
+            const emptyBox = document.getElementById('empty-state');
+
+            if (!lista.length) {
+                tbody.innerHTML = '';
+                mobileContainer.innerHTML = '';
+                emptyBox.style.display = 'flex';
+                return;
+            }
+
+            emptyBox.style.display = 'none';
+
+            // 1. Render Desktop
+            let htmlDesktop = '';
+            lista.forEach(t => {
+                const esExt = Number(t.es_externo) === 1;
+                const esTarea = Number(t.es_externo) === 2 || (t.numero_atencion && t.numero_atencion.startsWith('TAR'));
+                
+                let tipoBadge = '';
+                if (esExt) {
+                    tipoBadge = `<span class="live-chip chip-cliente"><i class="ph-bold ph-user"></i> Cliente ST</span>`;
+                } else if (esTarea) {
+                    tipoBadge = `<span class="live-chip chip-tarea"><i class="ph-bold ph-kanban"></i> Tarea Interna</span>`;
+                } else {
+                    tipoBadge = `<span class="live-chip chip-interno"><i class="ph-bold ph-wrench"></i> Interno / Lote</span>`;
+                }
+
+                const esEntregado = t.estado === 'ENTREGADO';
+                const estadoBadge = esEntregado 
+                    ? `<span class="live-chip chip-entregado"><span class="pulse-dot pulse-green"></span> ENTREGADO</span>`
+                    : `<span class="live-chip chip-listo"><span class="pulse-dot pulse-amber"></span> LISTO EN TALLER</span>`;
+
+                const fechaShow = t.fecha_entrega ? t.fecha_entrega : (t.fecha_ingreso ? t.fecha_ingreso : '-');
+                const equipoDesc = t.equipo_descripcion || t.equipo_codigo || (esTarea ? (t.motivo_ingreso || 'Tarea Técnica') : 'Equipo en Taller');
+                const clienteNombre = t.cliente_nombre || (esTarea ? 'Laboratorio' : 'Stock Propio');
+                const solucionTxt = t.solucion || t.diagnostico || 'Sin registro detallado';
+                const solucionTrunc = solucionTxt.length > 55 ? solucionTxt.substring(0, 52) + '...' : solucionTxt;
+
+                htmlDesktop += `<tr>
+                    <td>
+                        <div style="font-weight:700; color:var(--text-primary); font-family:monospace; font-size:13.5px;">${t.numero_atencion}</div>
+                        <div style="margin-top:4px;">${tipoBadge}</div>
+                    </td>
+                    <td>
+                        <div style="font-weight:600; color:var(--text-primary);">${equipoDesc}</div>
+                        <div style="font-size:11.5px; color:var(--text-secondary); margin-top:2px;">${t.motivo_ingreso || '-'}</div>
+                    </td>
+                    <td>
+                        <div style="font-weight:600;">${clienteNombre}</div>
+                        ${t.cliente_tel && t.cliente_tel !== '-' ? `
+                            <div style="font-size:11.5px; color:var(--text-secondary); display:flex; align-items:center; gap:4px; margin-top:2px;">
+                                <i class="ph-bold ph-phone"></i> ${t.cliente_tel}
+                                ${esExt ? `<a href="https://wa.me/51${t.cliente_tel}" target="_blank" style="color:#10b981; margin-left:4px;" title="Contactar por WhatsApp"><i class="ph-fill ph-whatsapp-logo"></i></a>` : ''}
+                            </div>
+                        ` : ''}
+                    </td>
+                    <td>
+                        <div style="display:flex; align-items:center; gap:6px;">
+                            <i class="ph-bold ph-user-circle" style="color:var(--text-secondary); font-size:16px;"></i>
+                            <span>${t.tecnico_nombre || 'Sin asignar'}</span>
+                        </div>
+                    </td>
+                    <td>
+                        <div style="font-size:12.5px; font-weight:500;">${fechaShow}</div>
+                    </td>
+                    <td>${estadoBadge}</td>
+                    <td>
+                        <span style="font-size:12px; color:var(--text-secondary);" title="${solucionTxt.replace(/"/g, '&quot;')}">${solucionTrunc}</span>
+                    </td>
+                    <td style="text-align:right;">
+                        <button class="btn btn-secondary" style="min-height:30px; padding:0 10px; font-size:11.5px;" onclick="abrirModalDetalle(${t.id})">
+                            <i class="ph-bold ph-eye"></i> Detalle
+                        </button>
+                    </td>
+                </tr>`;
+            });
+            tbody.innerHTML = htmlDesktop;
+
+            // 2. Render Móvil
+            let htmlMobile = '';
+            lista.forEach(t => {
+                const esExt = Number(t.es_externo) === 1;
+                const esTarea = Number(t.es_externo) === 2 || (t.numero_atencion && t.numero_atencion.startsWith('TAR'));
+                
+                let tipoBadge = esExt 
+                    ? `<span class="live-chip chip-cliente"><i class="ph-bold ph-user"></i> Cliente</span>`
+                    : (esTarea ? `<span class="live-chip chip-tarea"><i class="ph-bold ph-kanban"></i> Tarea</span>` : `<span class="live-chip chip-interno"><i class="ph-bold ph-wrench"></i> Interno</span>`);
+
+                const esEntregado = t.estado === 'ENTREGADO';
+                const estadoBadge = esEntregado 
+                    ? `<span class="live-chip chip-entregado">ENTREGADO</span>`
+                    : `<span class="live-chip chip-listo">LISTO EN TALLER</span>`;
+
+                const fechaShow = t.fecha_entrega || t.fecha_ingreso || '-';
+                const equipoDesc = t.equipo_descripcion || t.equipo_codigo || (esTarea ? (t.motivo_ingreso || 'Tarea') : 'Equipo');
+                const clienteNombre = t.cliente_nombre || (esTarea ? 'Laboratorio' : 'Stock');
+
+                htmlMobile += `<div class="m-ticket-card">
+                    <div class="m-ticket-header">
+                        <span class="m-ticket-num">${t.numero_atencion}</span>
+                        <div>${estadoBadge}</div>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        ${tipoBadge}
+                        <span style="font-weight:600; font-size:13px; color:var(--text-primary);">${equipoDesc}</span>
+                    </div>
+                    <div class="m-ticket-body">
+                        <div>
+                            <div class="m-field-label">Cliente / Solicitante</div>
+                            <div class="m-field-val">${clienteNombre}</div>
+                        </div>
+                        <div>
+                            <div class="m-field-label">Técnico</div>
+                            <div class="m-field-val">${t.tecnico_nombre || 'Sin asignar'}</div>
+                        </div>
+                        <div>
+                            <div class="m-field-label">Fecha</div>
+                            <div class="m-field-val">${fechaShow}</div>
+                        </div>
+                        <div>
+                            <div class="m-field-label">Cobrado</div>
+                            <div class="m-field-val">${t.monto_cobrado ? 'S/ ' + Number(t.monto_cobrado).toFixed(2) : '-'}</div>
+                        </div>
+                    </div>
+                    <button class="btn btn-secondary" style="width:100%; min-height:34px; font-size:12px; justify-content:center;" onclick="abrirModalDetalle(${t.id})">
+                        <i class="ph-bold ph-eye"></i> Ver Detalle Completo
+                    </button>
+                </div>`;
+            });
+            mobileContainer.innerHTML = htmlMobile;
+        }
+
+        // CONTROLADORES DE FILTRO
+        function cambiarFiltroOrigen(origen) {
+            filtroOrigenActual = origen;
+            document.getElementById('chip-origen-todos').classList.toggle('active', origen === 'TODOS');
+            document.getElementById('chip-origen-clientes').classList.toggle('active', origen === 'CLIENTES');
+            document.getElementById('chip-origen-internos').classList.toggle('active', origen === 'INTERNOS');
+            filtrarTickets();
+        }
+
+        function cambiarFiltroEstado(estado) {
+            filtroEstadoActual = estado;
+            document.getElementById('chip-estado-todos').classList.toggle('active', estado === 'TODOS');
+            document.getElementById('chip-estado-entregado').classList.toggle('active', estado === 'ENTREGADO');
+            document.getElementById('chip-estado-listo').classList.toggle('active', estado === 'LISTO_PARA_RECOGER');
+            filtrarTickets();
+        }
+
+        function resetearFiltros() {
+            document.getElementById('input-busqueda').value = '';
+            document.getElementById('select-periodo').value = 'TODOS';
+            cambiarFiltroOrigen('TODOS');
+            cambiarFiltroEstado('TODOS');
+        }
+
+        // MODAL DETALLE DE TICKET
+        function abrirModalDetalle(id) {
+            const ticket = todosLosTickets.find(t => t.id == id);
+            if (!ticket) return;
+            ticketSeleccionado = ticket;
+
+            document.getElementById('modal-title').textContent = `Detalle de Ticket ${ticket.numero_atencion}`;
+            
+            const esExt = Number(ticket.es_externo) === 1;
+            const esTarea = Number(ticket.es_externo) === 2 || (ticket.numero_atencion && ticket.numero_atencion.startsWith('TAR'));
+            
+            let html = `
+                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; background:var(--bg-card); padding:12px 16px; border-radius:8px; border:1px solid var(--border-default);">
+                    <div>
+                        <div style="font-size:11px; color:var(--text-secondary); text-transform:uppercase; font-weight:700;">Número de Orden</div>
+                        <div style="font-size:17px; font-weight:800; color:var(--text-primary); font-family:monospace;">${ticket.numero_atencion}</div>
+                    </div>
+                    <div>
+                        <span class="live-chip ${ticket.estado === 'ENTREGADO' ? 'chip-entregado' : 'chip-listo'}">
+                            ${ticket.estado === 'ENTREGADO' ? 'ENTREGADO / ARCHIVADO' : 'LISTO EN TALLER'}
+                        </span>
+                    </div>
+                </div>
+
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+                    <div>
+                        <div style="font-size:11px; color:var(--text-secondary); text-transform:uppercase; font-weight:700;">Cliente / Propietario</div>
+                        <div style="font-size:13.5px; font-weight:600; color:var(--text-primary); margin-top:2px;">${ticket.cliente_nombre || 'Stock Propio'}</div>
+                        ${ticket.cliente_dni && ticket.cliente_dni !== '-' ? `<div style="font-size:12px; color:var(--text-secondary);">DNI: ${ticket.cliente_dni}</div>` : ''}
+                        ${ticket.cliente_tel && ticket.cliente_tel !== '-' ? `<div style="font-size:12px; color:var(--text-secondary);">Tel: ${ticket.cliente_tel}</div>` : ''}
+                    </div>
+                    <div>
+                        <div style="font-size:11px; color:var(--text-secondary); text-transform:uppercase; font-weight:700;">Técnico Responsable</div>
+                        <div style="font-size:13.5px; font-weight:600; color:var(--text-primary); margin-top:2px;">${ticket.tecnico_nombre || 'Sin asignar'}</div>
+                        <div style="font-size:12px; color:var(--text-secondary);">Prioridad: <b>${ticket.prioridad || 'NORMAL'}</b></div>
+                    </div>
+                </div>
+
+                <div style="background:var(--bg-card); padding:12px 14px; border-radius:8px; border:1px solid var(--border-default);">
+                    <div style="font-size:11px; color:var(--text-secondary); text-transform:uppercase; font-weight:700;">Equipo & Especificaciones</div>
+                    <div style="font-size:13.5px; font-weight:700; color:var(--text-primary); margin-top:3px;">
+                        ${ticket.equipo_descripcion || ticket.equipo_codigo || (esTarea ? (ticket.motivo_ingreso || 'Tarea Interna') : 'Equipo')}
+                    </div>
+                    ${ticket.equipo_serie ? `<div style="font-size:12px; color:var(--text-secondary); margin-top:2px;">Serie: <span style="font-family:monospace;">${ticket.equipo_serie}</span></div>` : ''}
+                    ${ticket.equipo_codigo ? `<div style="font-size:12px; color:var(--text-secondary);">Código interno: <b>${ticket.equipo_codigo}</b></div>` : ''}
+                </div>
+
+                <div style="display:flex; flex-direction:column; gap:8px;">
+                    <div>
+                        <div style="font-size:11px; color:var(--text-secondary); text-transform:uppercase; font-weight:700;">Motivo de Ingreso / Falla Reportada</div>
+                        <div style="font-size:13px; color:var(--text-primary); margin-top:3px; background:var(--bg-card); padding:10px; border-radius:6px; border:1px solid var(--border-default);">
+                            ${ticket.motivo_ingreso || 'No especificado'}
+                        </div>
+                    </div>
+                    <div>
+                        <div style="font-size:11px; color:var(--text-secondary); text-transform:uppercase; font-weight:700;">Diagnóstico Técnico</div>
+                        <div style="font-size:13px; color:var(--text-primary); margin-top:3px; background:var(--bg-card); padding:10px; border-radius:6px; border:1px solid var(--border-default);">
+                            ${ticket.diagnostico || 'Sin diagnóstico registrado'}
+                        </div>
+                    </div>
+                    <div>
+                        <div style="font-size:11px; color:#10b981; text-transform:uppercase; font-weight:700;">Solución Aplicada & Entrega</div>
+                        <div style="font-size:13px; color:var(--text-primary); margin-top:3px; background:rgba(16,185,129,0.06); padding:10px; border-radius:6px; border:1px solid rgba(16,185,129,0.2);">
+                            ${ticket.solucion || 'Pendiente de registrar solución detallada'}
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; font-size:12px;">
+                    <div style="background:var(--bg-card); padding:8px 10px; border-radius:6px; border:1px solid var(--border-default);">
+                        <div style="color:var(--text-secondary);">Fecha Ingreso</div>
+                        <div style="font-weight:600; margin-top:2px;">${ticket.fecha_ingreso ? ticket.fecha_ingreso.substring(0,10) : '-'}</div>
+                    </div>
+                    <div style="background:var(--bg-card); padding:8px 10px; border-radius:6px; border:1px solid var(--border-default);">
+                        <div style="color:var(--text-secondary);">Fecha Entrega</div>
+                        <div style="font-weight:600; margin-top:2px;">${ticket.fecha_entrega ? ticket.fecha_entrega.substring(0,10) : (ticket.estado==='ENTREGADO'?'Entregado':'En espera')}</div>
+                    </div>
+                    <div style="background:var(--bg-card); padding:8px 10px; border-radius:6px; border:1px solid var(--border-default);">
+                        <div style="color:var(--text-secondary);">Cobro Final</div>
+                        <div style="font-weight:700; color:#10b981; margin-top:2px;">${ticket.monto_cobrado ? 'S/ ' + Number(ticket.monto_cobrado).toFixed(2) : 'S/ 0.00'}</div>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('modal-detalle-content').innerHTML = html;
+            
+            // Ocultar botón de sticker si no es cliente
+            const btnPrint = document.getElementById('btn-modal-print');
+            if (btnPrint) {
+                btnPrint.style.display = esExt ? 'inline-flex' : 'none';
+            }
+
+            document.getElementById('modal-detalle').style.display = 'flex';
+        }
+
+        function cerrarModalDetalle() {
+            document.getElementById('modal-detalle').style.display = 'none';
+            ticketSeleccionado = null;
+        }
+
+        function imprimirStickerModal() {
+            if (!ticketSeleccionado) return;
+            const t = ticketSeleccionado;
+            window.open(`imprimir_sticker.html?numero=${t.numero_atencion}&cliente=${encodeURIComponent(t.cliente_nombre || '')}`, '_blank', 'width=320,height=240');
+        }
+
+        // INICIALIZACIÓN
+        cargarData();
+    </script>
 </body>
 </html>
