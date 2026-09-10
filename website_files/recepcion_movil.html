@@ -588,7 +588,18 @@
       toast.style.borderLeft = ok ? '4px solid var(--success)' : '4px solid var(--danger)';
       toast.style.display = 'block';
       setTimeout(() => toast.style.display='none', 3000);
-      if(typeof playSound === 'function') playSound(ok ? 'success' : 'error');
+      if (typeof playSound === 'function') playSound(ok ? 'success' : 'error');
+    }
+
+    function formatearNombreAmigable(nombreCompleto) {
+      if (!nombreCompleto) return 'Estimado/a cliente';
+      const partes = nombreCompleto.trim().toLowerCase().split(/\s+/).filter(Boolean);
+      if (!partes.length) return 'Estimado/a cliente';
+      const caps = partes.map(p => p.charAt(0).toUpperCase() + p.slice(1));
+      if (caps.length >= 3) {
+        return caps.length === 4 ? `${caps[0]} ${caps[2]}` : `${caps[0]} ${caps[1]}`;
+      }
+      return caps.join(' ');
     }
 
     function validarYCrearOrden() {
@@ -753,12 +764,33 @@
           const nombreCliente = document.getElementById('f-nombre').value.trim();
           const telCliente = document.getElementById('f-tel').value.trim();
           const eqDesc = document.getElementById('f-eq-nombre').value.trim();
+          const dniCliente = document.getElementById('f-dni') ? document.getElementById('f-dni').value.trim() : '';
           
           document.getElementById('exito-numero').textContent = numero;
           document.getElementById('exito-cliente').textContent = nombreCliente + ' - ' + eqDesc;
           
-          const baseUrl = window.location.origin + window.location.pathname.replace('recepcion_movil.html','');
-          const msgWP = `Hola ${nombreCliente}, somos PETULAP 🔧\n\nTu equipo (*${eqDesc}*) ha ingresado correctamente.\n\n📋 *Ticket:* ${numero}\n\nPuedes rastrear tu equipo aqui:\nhttps://petulap.store/consulta.html?ticket=${encodeURIComponent(numero)}\n\nGracias por confiar en nosotros! 🙌`;
+          const nombreAmigable = formatearNombreAmigable(nombreCliente);
+          const queryParams = `ticket=${encodeURIComponent(numero)}${dniCliente ? '&dni=' + encodeURIComponent(dniCliente) : ''}`;
+          const urlSeguimiento = `https://petulap.store/consulta.html?${queryParams}`;
+
+          const msgWP = `¡Hola, *${nombreAmigable}*! 👋 En *PETULAP* ya recibimos tu equipo en taller:
+
+💻 *Equipo:* ${eqDesc}
+📋 *N° de Ticket:* ${numero}
+🏢 *Atención:* Taller Especializado Petulap Arequipa
+
+🛠️ Nuestro equipo técnico iniciará la revisión y diagnóstico minucioso para darte la mejor solución con repuestos de calidad y garantía.
+
+🔍 *Sigue el estado de tu equipo en vivo (1 solo clic):*
+👉 ${urlSeguimiento}
+
+📍 *Nuestras Sedes en Arequipa:*
+• Yanahuara: Av. Ejército 314, 2do piso
+• Cayma: León XIII Mza A-4, 1er piso
+⏰ Lun - Vie: 10:30 am a 7:30 pm | Sáb: 10:30 am a 6:00 pm
+
+¡Muchas gracias por confiar en Petulap! 🤝`;
+
           document.getElementById('btn-wp-exito').href = `https://wa.me/51${telCliente}?text=${encodeURIComponent(msgWP)}`;
           
           document.getElementById('btn-sticker-exito').dataset.numero = numero;

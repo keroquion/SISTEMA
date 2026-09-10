@@ -28,6 +28,15 @@ Para garantizar trazabilidad absoluta, auditoría técnica rigurosa y claridad e
 - **`[Security]`**: Implementación de un pipeline de Integración y Despliegue Continuo (CI/CD) automatizado desde GitHub hacia el hosting de producción (cPanel/Apache) para reemplazar el traspaso manual por FTP y mitigar el riesgo de desincronización o error humano en despliegues.
 - **`[Changed]`**: Coordinación en el panel de control del servidor (cPanel) para renombrar la base de datos de `petumjvq_pruebas` a un identificador formal de producción (ej. `petumjvq_sistema`), actualizando la variable de entorno en el servidor de forma segura.
 
+## [1.5.8] — 2026-09-10
+
+### Changed
+- `recepcion_movil.html`: Humanización de plantilla de WhatsApp post-registro con bienvenida en Title Case, identidad oficial de Petulap Arequipa (sedes Yanahuara/Cayma, horarios y garantía) y generación de enlace 1-clic con parámetro `&dni=...`.
+- `mis_ordenes.html`: Plantillas de WhatsApp para "Recibo Inicial" y "Listo para Recoger" renovadas con tono cálido, nombres amigables y enlaces directos de tracking con DNI integrado.
+- `soporte.html`: Renovación del mensaje de WhatsApp "Listo para Recoger" en el modal de gestión técnica con dirección de sedes y enlace 1-clic.
+- `consulta.html`: Formateo visual del nombre del cliente a Title Case en la tarjeta de resultados y enlaces directos a Google Maps para las oficinas de Yanahuara y Cayma en Arequipa.
+- `sw.js`: Incremento de versión de caché a `petulap-v29` para garantizar la invalidación inmediata de caché PWA en clientes y técnicos.
+
 ## [1.5.7] — 2026-09-10
 
 ### Fixed

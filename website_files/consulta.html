@@ -995,9 +995,9 @@
                         <i class="ph-bold ph-map-pin"></i> Nuestras Oficinas en Arequipa
                     </div>
                     <ul class="info-card-list">
-                        <li><i class="ph-bold ph-navigation-arrow"></i> <strong>Sede Yanahuara:</strong> Av. Ejército 314, 2do piso</li>
-                        <li><i class="ph-bold ph-navigation-arrow"></i> <strong>Sede Cayma:</strong> León XIII Mza A-4, 1er piso</li>
-                        <li><i class="ph-bold ph-globe"></i> Arequipa, Perú</li>
+                        <li><i class="ph-bold ph-navigation-arrow"></i> <strong>Sede Yanahuara:</strong> <a href="https://maps.google.com/?q=Av.+Ejército+314,+Yanahuara,+Arequipa" target="_blank" title="Ver en Google Maps">Av. Ejército 314, 2do piso (frente a comisaría) ↗</a></li>
+                        <li><i class="ph-bold ph-navigation-arrow"></i> <strong>Sede Cayma:</strong> <a href="https://maps.google.com/?q=León+XIII+Mza+A-4,+Cayma,+Arequipa" target="_blank" title="Ver en Google Maps">León XIII Mza A-4, 1er piso (cruce Av. Ejército) ↗</a></li>
+                        <li><i class="ph-bold ph-globe"></i> Arequipa, Perú — Atención presencial y taller</li>
                     </ul>
                 </div>
 
@@ -1136,13 +1136,18 @@
         }
     }
 
+    function formatearNombreTitulo(nombreCompleto) {
+        if (!nombreCompleto) return '';
+        return nombreCompleto.trim().toLowerCase().split(/\s+/).filter(Boolean).map(p => p.charAt(0).toUpperCase() + p.slice(1)).join(' ');
+    }
+
     function mostrarResultados(data) {
         document.getElementById('search-box').style.display = 'none';
         document.getElementById('result-box').style.display = 'block';
 
         document.getElementById('lbl-ticket').textContent = data.numero_atencion || '--';
         document.getElementById('lbl-equipo').textContent = data.equipo_descripcion || 'No especificado';
-        document.getElementById('lbl-cliente').textContent = data.cliente_nombre || 'Cliente Petulap';
+        document.getElementById('lbl-cliente').textContent = formatearNombreTitulo(data.cliente_nombre) || 'Cliente Petulap';
         document.getElementById('lbl-ingreso').textContent = data.fecha_ingreso || '--';
         document.getElementById('lbl-motivo').textContent = data.motivo_ingreso || 'Sin motivo reportado';
 

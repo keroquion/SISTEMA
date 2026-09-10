@@ -1163,6 +1163,17 @@ function toggleExpand(colId) {
     }
 }
 
+function formatearNombreAmigable(nombreCompleto) {
+  if (!nombreCompleto) return 'Estimado/a cliente';
+  const partes = nombreCompleto.trim().toLowerCase().split(/\s+/).filter(Boolean);
+  if (!partes.length) return 'Estimado/a cliente';
+  const caps = partes.map(p => p.charAt(0).toUpperCase() + p.slice(1));
+  if (caps.length >= 3) {
+    return caps.length === 4 ? `${caps[0]} ${caps[2]}` : `${caps[0]} ${caps[1]}`;
+  }
+  return caps.join(' ');
+}
+
 function renderCol(colId, tickets) {
   const container = document.getElementById('col-' + colId);
   document.getElementById('c-' + colId).textContent = tickets.length;
@@ -1176,27 +1187,48 @@ function renderCol(colId, tickets) {
   tickets.forEach(t => {
     const esTarea = (t.es_externo == 2 || t.numero_atencion.startsWith('TAR'));
     const urg = t.prioridad === 'URGENTE' ? '<span class="urgente">URGENTE</span>' : '';
-    const baseUrl = window.location.origin + window.location.pathname.replace('mis_ordenes.html','');
-    const linkSeguimiento = baseUrl + 'consulta.html?ticket=' + encodeURIComponent(t.numero_atencion);
-    const msgWP = encodeURIComponent(`Hola ${t.cliente_nombre}, somos PETULAP 🔧
+    const dniQuery = (t.cliente_dni && t.cliente_dni !== '-') ? `&dni=${encodeURIComponent(t.cliente_dni)}` : '';
+    const linkSeguimiento = `https://petulap.store/consulta.html?ticket=${encodeURIComponent(t.numero_atencion)}${dniQuery}`;
+    const nombreAmigable = formatearNombreAmigable(t.cliente_nombre);
 
-Tu equipo *${t.equipo_descripcion || t.equipo_codigo}* ya se encuentra LISTO para recoger.
+    const msgWP = encodeURIComponent(`¡Excelentes noticias, *${nombreAmigable}*! 🎉
 
-📋 *Ticket:* ${t.numero_atencion}
-
-Horario de atencion: Lunes a Sabado de 10am a 8pm.
-Te esperamos! 🙌`);
-
-    const msgInitWP = encodeURIComponent(`Hola ${t.cliente_nombre}, somos PETULAP 🔧
-
-Tu equipo (*${t.equipo_descripcion || t.equipo_codigo}*) ha ingresado correctamente.
+Tu equipo *${t.equipo_descripcion || t.equipo_codigo}* ha completado satisfactoriamente su servicio técnico y ya se encuentra *LISTO PARA RECOGER* 💻✨
 
 📋 *Ticket:* ${t.numero_atencion}
 
-Puedes rastrear tu equipo aqui:
-${linkSeguimiento}
+Puedes acercarte a nuestra oficina dentro de nuestro horario de atención:
+⏰ *Lunes a Viernes:* 10:30 am – 7:30 pm
+⏰ *Sábados:* 10:30 am – 6:00 pm
 
-Gracias por confiar en nosotros! 🙌`);
+📍 *Sedes de Atención en Arequipa:*
+• Yanahuara: Av. Ejército 314, 2do piso (frente a la comisaría de Yanahuara)
+• Cayma: León XIII Mza A-4, 1er piso (cerca al cruce Av. Ejército con Av. Cayma)
+
+🔍 *Revisa tu informe técnico aquí (1 solo clic):*
+👉 ${linkSeguimiento}
+
+📌 *Importante:* Recuerda presentar tu DNI o el número de ticket al momento de retirar tu equipo.
+
+¡Te esperamos en Petulap! 🙌`);
+
+    const msgInitWP = encodeURIComponent(`¡Hola, *${nombreAmigable}*! 👋 En *PETULAP* ya recibimos tu equipo en taller:
+
+💻 *Equipo:* ${t.equipo_descripcion || t.equipo_codigo}
+📋 *N° de Ticket:* ${t.numero_atencion}
+🏢 *Atención:* Taller Especializado Petulap Arequipa
+
+🛠️ Nuestro equipo técnico iniciará la revisión y diagnóstico minucioso para darte la mejor solución con repuestos de calidad y garantía.
+
+🔍 *Sigue el estado de tu equipo en vivo (1 solo clic):*
+👉 ${linkSeguimiento}
+
+📍 *Nuestras Sedes en Arequipa:*
+• Yanahuara: Av. Ejército 314, 2do piso
+• Cayma: León XIII Mza A-4, 1er piso
+⏰ Lun - Vie: 10:30 am a 7:30 pm | Sáb: 10:30 am a 6:00 pm
+
+¡Muchas gracias por confiar en Petulap! 🤝`);
     
     const d1 = new Date(t.fecha_ingreso);
     const d2 = new Date();

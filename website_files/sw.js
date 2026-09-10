@@ -1,6 +1,6 @@
-// Service Worker - Petulap PWA v28 (Login WhatsApp detector, 3 anos soporte, footer v1.5.7c)
+// Service Worker - Petulap PWA v29 (Mensajería humanizada WhatsApp, tracking 1-clic con DNI y mapas Arequipa v1.5.8)
  
-var CACHE_NAME = 'petulap-v28';
+var CACHE_NAME = 'petulap-v29';
 var ASSETS = [
     './',
     'index.html',
