@@ -15,12 +15,14 @@ document.addEventListener('DOMContentLoaded', () => {
     cargarLeads();
     cargarStats();
     cargarPromociones();
+    cargarRecordatoriosHoy();
     initEventos();
 
     // Auto-refrescar cada 60 segundos para mantener el semáforo al día
     setInterval(() => {
         cargarLeads(false);
         cargarStats();
+        cargarRecordatoriosHoy();
     }, 60000);
 });
 
@@ -186,12 +188,13 @@ function crearTarjetaLead(lead) {
     div.draggable = true;
     div.dataset.id = lead.id;
 
-    // Semáforo SLA
+    // Semáforo SLA (4 Temperaturas)
     const tempClass = `temp-${lead.temperatura.toLowerCase()}`;
     const pulseClass = `pulse-${lead.temperatura.toLowerCase()}`;
-    const tempLabel = lead.temperatura === 'VERDE' ? 'Al día' 
-                    : lead.temperatura === 'AMBAR' ? 'Esperando resp.' 
-                    : '¡Cliente Frío!';
+    const tempLabel = lead.temperatura === 'PURPURA' ? '🟣 Cita Agendada'
+                    : lead.temperatura === 'VERDE' ? '🟢 Al día' 
+                    : lead.temperatura === 'AMBAR' ? '🟡 Esperando resp.' 
+                    : '🔴 ¡Cliente Frío!';
 
     // Formatear tiempo transcurrido
     let tiempoTexto = 'Hace instantes';
@@ -235,7 +238,10 @@ function crearTarjetaLead(lead) {
             <span class="lead-time"><i class="ph ph-clock"></i> ${tiempoTexto}</span>
             <div class="card-actions">
                 <button class="btn-card-move" onclick="abrirCotizador(${lead.id})" title="Enviar Ficha y Cotización">
-                    <i class="ph ph-file-text"></i> Cotizar
+                    <i class="ph ph-file-text"></i>
+                </button>
+                <button class="btn-card-move" style="color: #c084fc; border-color: #a855f7;" onclick="abrirModalAgendar(${lead.id})" title="Agendar Cita en Tienda / Llamada">
+                    <i class="ph-bold ph-calendar"></i>
                 </button>
                 <a href="${waUrl}" target="_blank" class="btn-card-wa" title="Abrir Chat WhatsApp">
                     <i class="ph-bold ph-whatsapp-logo"></i> Chat
@@ -408,6 +414,7 @@ function initEventos() {
     });
 
     document.getElementById('form-nuevo-lead')?.addEventListener('submit', guardarNuevoLead);
+    document.getElementById('form-agendar-lead')?.addEventListener('submit', guardarAgendamientoLead);
 
     // Filtros rápidos
     document.querySelectorAll('.chip').forEach(chip => {
@@ -418,6 +425,203 @@ function initEventos() {
             renderizarKanban();
         });
     });
+}
+
+// ----------------------------------------------------------
+// 8. RECORDATORIOS Y CITAS DE HOY (DRAWER Y CAMPANA)
+// ----------------------------------------------------------
+async function cargarRecordatoriosHoy() {
+    try {
+        const res = await fetch(`${API_BASE}/leads.php?action=recordatorios_hoy`);
+        const json = await res.json();
+        if (!json.success) return;
+
+        const total = json.total_pendientes || 0;
+        const badge = document.getElementById('badge-notif-count');
+        if (badge) {
+            badge.textContent = total;
+            badge.style.display = total > 0 ? 'inline-block' : 'none';
+        }
+
+        renderizarDrawerRecordatorios(json.citas_hoy || [], json.clientes_frios || []);
+    } catch (err) {
+        console.error('Error cargando recordatorios:', err);
+    }
+}
+
+function toggleDrawerRecordatorios() {
+    const drawer = document.getElementById('drawer-recordatorios');
+    if (drawer) drawer.classList.toggle('open');
+}
+
+function renderizarDrawerRecordatorios(citas, frios) {
+    const list = document.getElementById('drawer-recordatorios-list');
+    if (!list) return;
+    list.innerHTML = '';
+
+    if (citas.length === 0 && frios.length === 0) {
+        list.innerHTML = `
+            <div style="text-align: center; padding: 30px; color: var(--text-muted); font-size: 0.9rem;">
+                <i class="ph-bold ph-check-circle" style="font-size: 2rem; color: var(--success); display: block; margin-bottom: 8px;"></i>
+                ¡Todo al día! No hay citas pendientes ni clientes fríos urgentes.
+            </div>
+        `;
+        return;
+    }
+
+    // 1. Renderizar citas de hoy
+    if (citas.length > 0) {
+        const seccionCitas = document.createElement('div');
+        seccionCitas.innerHTML = `<div style="font-size: 0.8rem; font-weight: 800; color: #c084fc; margin-bottom: 8px; text-transform: uppercase;">📅 Citas Programadas para Hoy (${citas.length})</div>`;
+        
+        citas.forEach(c => {
+            const hora = new Date(c.fecha_hora).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            const item = document.createElement('div');
+            item.className = 'reminder-item purpura';
+            item.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <strong style="font-size: 0.95rem; color: #fff;">${escapar(c.cliente_nombre)}</strong>
+                    <span style="font-size: 0.8rem; font-weight: 800; color: #c084fc;">⏰ ${hora}</span>
+                </div>
+                <div style="font-size: 0.8rem; color: var(--text-secondary);">
+                    💻 ${escapar(c.modelo_laptop || 'Laptop por definir')} • 📍 ${c.tipo.includes('CAYMA') ? 'Cayma' : 'Yanahuara'}
+                </div>
+                ${c.notas ? `<div style="font-size: 0.75rem; color: var(--text-muted); font-style: italic;">"${escapar(c.notas)}"</div>` : ''}
+                <div style="display: flex; gap: 6px; margin-top: 4px;">
+                    <a href="https://wa.me/${c.telefono.replace(/\D/g, '')}" target="_blank" class="btn btn-wa" style="padding: 4px 8px; font-size: 0.72rem;">
+                        <i class="ph-bold ph-whatsapp-logo"></i> WhatsApp
+                    </a>
+                    <button class="btn btn-primary" style="padding: 4px 8px; font-size: 0.72rem; background: var(--success);" onclick="completarCita(${c.id}, true)">
+                        ✅ Venta Ganada
+                    </button>
+                    <button class="btn btn-ghost" style="padding: 4px 8px; font-size: 0.72rem;" onclick="completarCita(${c.id}, false)">
+                        ❌ No asistió
+                    </button>
+                </div>
+            `;
+            seccionCitas.appendChild(item);
+        });
+        list.appendChild(seccionCitas);
+    }
+
+    // 2. Renderizar clientes fríos (>24h)
+    if (frios.length > 0) {
+        const seccionFrios = document.createElement('div');
+        seccionFrios.style.marginTop = '14px';
+        seccionFrios.innerHTML = `<div style="font-size: 0.8rem; font-weight: 800; color: var(--danger); margin-bottom: 8px; text-transform: uppercase;">🔥 Clientes Fríos / Dejados en Visto (${frios.length})</div>`;
+        
+        frios.forEach(f => {
+            const item = document.createElement('div');
+            item.className = 'reminder-item rojo';
+            item.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <strong style="font-size: 0.95rem; color: #fff;">${escapar(f.nombre)}</strong>
+                    <span style="font-size: 0.75rem; color: var(--danger); font-weight: 700;">>24h sin respuesta</span>
+                </div>
+                <div style="font-size: 0.8rem; color: var(--text-secondary);">
+                    Interés: ${escapar(f.modelo_interes_texto || 'Laptop')}
+                </div>
+                <div style="display: flex; gap: 6px; margin-top: 4px;">
+                    <button class="btn btn-wa" style="padding: 4px 8px; font-size: 0.72rem;" onclick="enviarReengancheWhatsApp('${f.telefono}', '${escapar(f.nombre)}')">
+                        🔥 Enviar Re-enganche
+                    </button>
+                    <button class="btn btn-ghost" style="padding: 4px 8px; font-size: 0.72rem;" onclick="abrirModalAgendar(${f.id})">
+                        📅 Agendar Cita
+                    </button>
+                </div>
+            `;
+            seccionFrios.appendChild(item);
+        });
+        list.appendChild(seccionFrios);
+    }
+}
+
+function enviarReengancheWhatsApp(telefono, nombre) {
+    const primerNombre = nombre.split(' ')[0];
+    const mensaje = 
+`¡Hola, *${primerNombre}*! 👋 Te saluda nuevamente el equipo de *Petulap Arequipa* 💻
+
+¿Pudiste revisar la información de la laptop que conversamos? 
+Te comento que nos van quedando *pocas unidades disponibles en promoción*. Si te animas a pasar hoy por nuestra sede de Yanahuara o Cayma, te podemos incluir *mouse inalámbrico o funda de regalo* con tu compra 🎁✨
+
+¿Te gustaría que te reserve una para probarla hoy? 🙌`;
+
+    const telLimpio = telefono.replace(/\D/g, '');
+    window.open(`https://wa.me/${telLimpio}?text=${encodeURIComponent(mensaje)}`, '_blank');
+}
+
+// ----------------------------------------------------------
+// 9. MODAL Y ACCIÓN DE AGENDAR DESDE EL KANBAN
+// ----------------------------------------------------------
+function abrirModalAgendar(leadId) {
+    const lead = leadsData.find(l => l.id == leadId);
+    if (!lead) return;
+
+    document.getElementById('agenda-lead-id').value = lead.id;
+    document.getElementById('agenda-cliente-nombre').textContent = `${lead.nombre} (${lead.telefono})`;
+    document.getElementById('agenda-modelo').value = lead.modelo_interes_texto || '';
+    
+    // Sugerir fecha: hoy + 2 horas
+    const d = new Date();
+    d.setHours(d.getHours() + 2);
+    d.setMinutes(0);
+    document.getElementById('agenda-fecha-hora').value = d.toISOString().substring(0, 16);
+
+    abrirModal('modal-agendar-lead');
+}
+
+async function guardarAgendamientoLead(e) {
+    e.preventDefault();
+    const form = e.target;
+    const datos = {
+        lead_id: form.lead_id.value,
+        tipo: form.tipo.value,
+        fecha_hora: form.fecha_hora.value.replace('T', ' ') + ':00',
+        modelo_laptop: form.modelo_laptop.value.trim(),
+        notas: form.notas.value.trim()
+    };
+
+    try {
+        const res = await fetch(`${API_BASE}/leads.php?action=agendar`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(datos)
+        });
+        const json = await res.json();
+        if (json.success) {
+            cerrarModal('modal-agendar-lead');
+            cargarLeads(false);
+            cargarStats();
+            cargarRecordatoriosHoy();
+            alert('🎉 ¡Cita agendada con éxito! El lead avanzó a Visita/Separado con temperatura PÚRPURA.');
+        } else {
+            alert(json.error || 'Error al agendar');
+        }
+    } catch (err) {
+        console.error('Error guardando agendamiento:', err);
+    }
+}
+
+async function completarCita(agId, cerrarVenta) {
+    try {
+        const res = await fetch(`${API_BASE}/leads.php?action=completar_agendamiento`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                id: agId,
+                estado: cerrarVenta ? 'COMPLETADO' : 'NO_ASISTIO',
+                venta_cerrada: cerrarVenta
+            })
+        });
+        const json = await res.json();
+        if (json.success) {
+            cargarLeads(false);
+            cargarStats();
+            cargarRecordatoriosHoy();
+        }
+    } catch (err) {
+        console.error('Error completando cita:', err);
+    }
 }
 
 function abrirModal(id) {

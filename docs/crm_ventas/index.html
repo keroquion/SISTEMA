@@ -27,6 +27,10 @@
         </div>
 
         <div class="header-actions">
+            <button class="btn bell-btn" id="btn-recordatorios" onclick="toggleDrawerRecordatorios()" title="Ver Citas y Recordatorios de Hoy">
+                <i class="ph-bold ph-bell"></i> Recordatorios
+                <span class="bell-badge" id="badge-notif-count" style="display: none;">0</span>
+            </button>
             <button class="btn btn-ghost" id="theme-toggle-btn" onclick="toggleTheme()">
                 <i class="ph ph-sun"></i> Modo Claro
             </button>
@@ -229,6 +233,61 @@
                     <!-- Cargado dinámicamente por crm.js -->
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- 7. DRAWER LATERAL DE RECORDATORIOS Y CITAS DE HOY -->
+    <aside class="crm-drawer" id="drawer-recordatorios">
+        <div class="drawer-header">
+            <div style="font-size: 1rem; font-weight: 700; display: flex; align-items: center; gap: 8px;">
+                <i class="ph-bold ph-bell-ringing" style="color: #a855f7;"></i>
+                <span>Agenda y Recordatorios de Hoy</span>
+            </div>
+            <button class="modal-close" onclick="toggleDrawerRecordatorios()">&times;</button>
+        </div>
+        <div class="drawer-body" id="drawer-recordatorios-list">
+            <!-- Renderizado dinámicamente por crm.js -->
+        </div>
+    </aside>
+
+    <!-- 8. MODAL: AGENDAR CITA EN TIENDA / LLAMADA -->
+    <div class="modal-overlay" id="modal-agendar-lead" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">📅 Agendar Cita en Tienda / Llamada</div>
+                <button class="modal-close" onclick="cerrarModal('modal-agendar-lead')">&times;</button>
+            </div>
+            <form id="form-agendar-lead" class="modal-body">
+                <input type="hidden" name="lead_id" id="agenda-lead-id">
+                <div class="form-group">
+                    <label>Cliente:</label>
+                    <strong id="agenda-cliente-nombre" style="color: var(--text-primary); font-size: 1rem;">...</strong>
+                </div>
+                <div class="form-group">
+                    <label>Tipo de Agendamiento / Sede *</label>
+                    <select name="tipo" id="agenda-tipo">
+                        <option value="VISITA_YANAHUARA">Sede Yanahuara (Av. Ejército 314, 2do piso)</option>
+                        <option value="VISITA_CAYMA">Sede Cayma (León XIII Mza A-4, 1er piso)</option>
+                        <option value="LLAMADA_CIERRE">Llamada Telefónica de Cierre</option>
+                        <option value="SEGUIMIENTO_FRIO">Seguimiento a Cliente Frío</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Fecha y Hora Pactada *</label>
+                    <input type="datetime-local" name="fecha_hora" id="agenda-fecha-hora" required>
+                </div>
+                <div class="form-group">
+                    <label>Laptop de Interés / A Probar</label>
+                    <input type="text" name="modelo_laptop" id="agenda-modelo" placeholder="Ej: ThinkPad T14 o Dell 5410">
+                </div>
+                <div class="form-group">
+                    <label>Notas para el Vendedor</label>
+                    <textarea name="notas" id="agenda-notas" rows="2" placeholder="Ej: Trae a su hijo para probar pantalla y teclado..."></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary" style="justify-content: center; padding: 12px; background: #a855f7;">
+                    <i class="ph-bold ph-calendar-check"></i> Agendar Cita y Pasar a Púrpura
+                </button>
+            </form>
         </div>
     </div>
 

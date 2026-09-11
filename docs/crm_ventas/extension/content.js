@@ -135,7 +135,8 @@ function actualizarWidget(data, nombre, telefono, ultimoEmisor) {
     if (data.status === 'actualizado' && data.lead) {
         const l = data.lead;
         const tempClass = `petulap-badge-${(l.temperatura || 'VERDE').toLowerCase()}`;
-        const tempLabel = l.temperatura === 'VERDE' ? '🟢 Al día' 
+        const tempLabel = l.temperatura === 'PURPURA' ? '🟣 Cita Agendada'
+                        : l.temperatura === 'VERDE' ? '🟢 Al día' 
                         : l.temperatura === 'AMBAR' ? '🟡 Esperando (>6h)' 
                         : '🔴 ¡Cliente Frío (>24h)!';
 
@@ -154,11 +155,27 @@ function actualizarWidget(data, nombre, telefono, ultimoEmisor) {
             ` : ''}
 
             <div style="display: flex; flex-direction: column; gap: 6px; margin-top: 6px;">
+                <button class="petulap-btn-action" style="background: #a855f7;" onclick="mostrarFormAgendamiento(${l.id}, '${escapar(l.nombre || nombre)}', '${escapar(l.modelo_interes_texto || '')}')">
+                    📅 Agendar Cita en Tienda
+                </button>
                 <button class="petulap-btn-action" onclick="window.open('${CRM_API_URL}/../index.html', '_blank')">
                     📋 Ver en Tablero Kanban
                 </button>
                 <button class="petulap-btn-action petulap-btn-secondary" onclick="copiarFichaThinkPad()">
                     ⚡ Copiar Ficha ThinkPad T14
+                </button>
+            </div>
+
+            <div id="petulap-mini-form-agenda" style="display: none; margin-top: 8px; border-top: 1px solid #334155; padding-top: 8px;">
+                <div style="font-size: 11px; font-weight: 700; color: #c084fc; margin-bottom: 4px;">📅 Agendar Visita / Cita</div>
+                <select id="p-sede-select" style="width: 100%; padding: 5px; background: #0f172a; color: #fff; border: 1px solid #334155; border-radius: 4px; font-size: 11px; margin-bottom: 4px;">
+                    <option value="VISITA_YANAHUARA">Sede Yanahuara (Av. Ejército 314)</option>
+                    <option value="VISITA_CAYMA">Sede Cayma (León XIII Mza A-4)</option>
+                    <option value="LLAMADA_CIERRE">Llamada de Cierre</option>
+                </select>
+                <input type="datetime-local" id="p-fecha-input" style="width: 100%; padding: 5px; background: #0f172a; color: #fff; border: 1px solid #334155; border-radius: 4px; font-size: 11px; margin-bottom: 6px;">
+                <button class="petulap-btn-action" style="background: #10b981;" onclick="guardarCita(${l.id}, '${escapar(l.nombre || nombre)}')">
+                    ✅ Confirmar y Enviar WhatsApp
                 </button>
             </div>
         `;
@@ -211,6 +228,71 @@ window.copiarFichaThinkPad = function() {
     navigator.clipboard.writeText(texto).then(() => {
         alert('✅ Ficha de ThinkPad T14 copiada al portapapeles. Solo pega con Ctrl+V en el chat.');
     });
+};
+
+window.mostrarFormAgendamiento = function(leadId, nombre, modelo) {
+    const el = document.getElementById('petulap-mini-form-agenda');
+    if (el) {
+        el.style.display = el.style.display === 'none' ? 'block' : 'none';
+        // Poner fecha sugerida (hoy + 2 horas)
+        const d = new Date();
+        d.setHours(d.getHours() + 2);
+        d.setMinutes(0);
+        const iso = d.toISOString().substring(0, 16);
+        const input = document.getElementById('p-fecha-input');
+        if (input && !input.value) input.value = iso;
+    }
+};
+
+window.guardarCita = async function(leadId, nombre) {
+    const sede = document.getElementById('p-sede-select')?.value || 'VISITA_YANAHUARA';
+    const fechaHora = document.getElementById('p-fecha-input')?.value;
+
+    if (!fechaHora) {
+        alert('Por favor selecciona una fecha y hora para la cita.');
+        return;
+    }
+
+    try {
+        const res = await fetch(`${CRM_API_URL}/leads.php?action=agendar`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                lead_id: leadId,
+                tipo: sede,
+                fecha_hora: fechaHora.replace('T', ' ') + ':00'
+            })
+        });
+
+        const json = await res.json();
+        if (json.success) {
+            // Formatear texto de WhatsApp
+            const fechaObj = new Date(fechaHora);
+            const fechaStr = fechaObj.toLocaleDateString('es-PE', { weekday: 'long', day: 'numeric', month: 'long' });
+            const horaStr = fechaObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            
+            const sedeTexto = sede === 'VISITA_CAYMA' 
+                ? 'Sede Cayma (León XIII Mza A-4, 1er piso)' 
+                : sede === 'LLAMADA_CIERRE'
+                ? 'Llamada Telefónica'
+                : 'Sede Yanahuara (Av. Ejército 314, 2do piso)';
+
+            const confirmMsg = 
+`¡Confirmado, *${nombre.split(' ')[0]}*! 🤝
+
+📅 Te esperamos el *${fechaStr}* a las *${horaStr}* en nuestra *${sedeTexto}*.
+
+Tendremos la laptop lista y configurada para que la pruebes con total tranquilidad. ¡Nos vemos pronto en Petulap! 🙌`;
+
+            navigator.clipboard.writeText(confirmMsg).then(() => {
+                alert('🎉 ¡Cita agendada y registrada en el CRM con temperatura PÚRPURA!\n\n✅ El mensaje de confirmación se copió a tu portapapeles. Solo presiona Ctrl+V para enviárselo al cliente.');
+            });
+
+            document.getElementById('petulap-mini-form-agenda').style.display = 'none';
+        }
+    } catch (err) {
+        alert('Error conectando al CRM: ' + err.message);
+    }
 };
 
 function escapar(str) {

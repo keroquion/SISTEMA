@@ -64,12 +64,15 @@ if ($action === 'list') {
         $lead['horas_sin_contacto'] = $horas;
 
         // Regla inteligente anti-olvido:
+        // Si tiene cita agendada o está en VISITA_SEPARADO -> PURPURA
         // Si el cliente fue el último en escribir -> VERDE urgente (atenderlo ya!)
         // Si Petulap fue el último en escribir:
         //   < 6h -> VERDE
         //   6h a 24h -> AMBAR (esperando respuesta)
         //   > 24h -> ROJO (cliente frío, dejado en visto)
-        if ($lead['etapa'] === 'GANADO') {
+        if ($lead['etapa'] === 'VISITA_SEPARADO' || ($lead['temperatura'] ?? '') === 'PURPURA') {
+            $lead['temperatura'] = 'PURPURA';
+        } elseif ($lead['etapa'] === 'GANADO') {
             $lead['temperatura'] = 'VERDE';
         } elseif ($lead['etapa'] === 'PERDIDO') {
             $lead['temperatura'] = 'ROJO';
@@ -198,6 +201,144 @@ if ($action === 'stats') {
     }
 
     json_resp(['success' => true, 'stats' => $stats]);
+}
+
+// ----------------------------------------------------------
+// 5. AGENDAR CITA O LLAMADA (TEMPERATURA PÚRPURA)
+// ----------------------------------------------------------
+if ($action === 'agendar' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    $input = json_decode(file_get_contents('php://input'), true) ?? $_POST;
+    $lead_id = (int)($input['lead_id'] ?? 0);
+    $tipo = $input['tipo'] ?? 'VISITA_YANAHUARA';
+    $fecha_hora = $input['fecha_hora'] ?? date('Y-m-d H:i:s');
+    $modelo_laptop = trim($input['modelo_laptop'] ?? '');
+    $notas = trim($input['notas'] ?? '');
+    $vendedor_id = (int)($input['vendedor_id'] ?? 1);
+
+    if ($lead_id <= 0) {
+        json_resp(['success' => false, 'error' => 'Lead ID requerido'], 400);
+    }
+
+    // Insertar en crm_agendamientos
+    $sql_ag = "INSERT INTO crm_agendamientos (lead_id, vendedor_id, tipo, fecha_hora, modelo_laptop, notas, estado) 
+               VALUES (?, ?, ?, ?, ?, ?, 'PENDIENTE')";
+    if ($is_pdo) {
+        $stmt = $conn->prepare($sql_ag);
+        $stmt->execute([$lead_id, $vendedor_id, $tipo, $fecha_hora, $modelo_laptop, $notas]);
+        $ag_id = $conn->lastInsertId();
+    } else {
+        $stmt = $conn->prepare($sql_ag);
+        $stmt->bind_param("iissss", $lead_id, $vendedor_id, $tipo, $fecha_hora, $modelo_laptop, $notas);
+        $stmt->execute();
+        $ag_id = $conn->insert_id;
+    }
+
+    // Actualizar etapa a VISITA_SEPARADO y temperatura a PURPURA
+    $sql_lead = "UPDATE crm_leads 
+                 SET etapa = 'VISITA_SEPARADO', 
+                     temperatura = 'PURPURA', 
+                     modelo_interes_texto = COALESCE(NULLIF(?, ''), modelo_interes_texto),
+                     fecha_actualizacion = CURRENT_TIMESTAMP 
+                 WHERE id = ?";
+    if ($is_pdo) {
+        $stmt_l = $conn->prepare($sql_lead);
+        $stmt_l->execute([$modelo_laptop, $lead_id]);
+    } else {
+        $stmt_l = $conn->prepare($sql_lead);
+        $stmt_l->bind_param("si", $modelo_laptop, $lead_id);
+        $stmt_l->execute();
+    }
+
+    json_resp([
+        'success' => true, 
+        'message' => 'Cita agendada correctamente', 
+        'agendamiento_id' => $ag_id,
+        'temperatura' => 'PURPURA'
+    ]);
+}
+
+// ----------------------------------------------------------
+// 6. RECORDATORIOS DE HOY (CITAS PRÓXIMAS + LEADS FRÍOS)
+// ----------------------------------------------------------
+if ($action === 'recordatorios_hoy') {
+    $hoy = date('Y-m-d');
+    
+    // 1. Citas pendientes para hoy o próximas
+    $sql_citas = "SELECT a.*, l.nombre AS cliente_nombre, l.telefono, l.sede_preferida, l.presupuesto_aprox 
+                  FROM crm_agendamientos a
+                  JOIN crm_leads l ON a.lead_id = l.id
+                  WHERE a.estado = 'PENDIENTE' AND DATE(a.fecha_hora) = ?
+                  ORDER BY a.fecha_hora ASC";
+    
+    $citas = [];
+    if ($is_pdo) {
+        $stmt = $conn->prepare($sql_citas);
+        $stmt->execute([$hoy]);
+        $citas = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    } else {
+        $stmt = $conn->prepare($sql_citas);
+        $stmt->bind_param("s", $hoy);
+        $stmt->execute();
+        $res = $stmt->get_result();
+        while ($row = $res->fetch_assoc()) $citas[] = $row;
+    }
+
+    // 2. Clientes fríos que requieren llamada de reactivación
+    $sql_frios = "SELECT id, nombre, telefono, modelo_interes_texto, presupuesto_aprox, ultimo_mensaje_hora 
+                  FROM crm_leads 
+                  WHERE etapa NOT IN ('GANADO', 'PERDIDO') 
+                    AND (temperatura = 'ROJO' OR ultimo_mensaje_hora <= DATE_SUB(NOW(), INTERVAL 24 HOUR))
+                  ORDER BY ultimo_mensaje_hora ASC LIMIT 10";
+    
+    $frios = [];
+    if ($is_pdo) {
+        $frios = $conn->query($sql_frios)->fetchAll(PDO::FETCH_ASSOC);
+    } else {
+        $res = $conn->query($sql_frios);
+        while ($row = $res->fetch_assoc()) $frios[] = $row;
+    }
+
+    json_resp([
+        'success' => true,
+        'total_pendientes' => count($citas) + count($frios),
+        'citas_hoy' => $citas,
+        'clientes_frios' => $frios
+    ]);
+}
+
+// ----------------------------------------------------------
+// 7. COMPLETAR O CANCELAR AGENDAMIENTO
+// ----------------------------------------------------------
+if ($action === 'completar_agendamiento' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    $input = json_decode(file_get_contents('php://input'), true) ?? $_POST;
+    $ag_id = (int)($input['id'] ?? 0);
+    $nuevo_estado = $input['estado'] ?? 'COMPLETADO'; // COMPLETADO, NO_ASISTIO, CANCELADO
+    $cerrar_venta = !empty($input['venta_cerrada']);
+
+    $sql = "UPDATE crm_agendamientos SET estado = ? WHERE id = ?";
+    if ($is_pdo) {
+        $stmt = $conn->prepare($sql);
+        $stmt->execute([$nuevo_estado, $ag_id]);
+    } else {
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("si", $nuevo_estado, $ag_id);
+        $stmt->execute();
+    }
+
+    if ($cerrar_venta) {
+        $sql_lead = "UPDATE crm_leads SET etapa = 'GANADO', temperatura = 'VERDE', fecha_actualizacion = CURRENT_TIMESTAMP 
+                     WHERE id = (SELECT lead_id FROM crm_agendamientos WHERE id = ?)";
+        if ($is_pdo) {
+            $stmt_l = $conn->prepare($sql_lead);
+            $stmt_l->execute([$ag_id]);
+        } else {
+            $stmt_l = $conn->prepare($sql_lead);
+            $stmt_l->bind_param("i", $ag_id);
+            $stmt_l->execute();
+        }
+    }
+
+    json_resp(['success' => true, 'message' => 'Agendamiento actualizado']);
 }
 
 json_resp(['success' => false, 'error' => 'Acción no reconocida'], 400);

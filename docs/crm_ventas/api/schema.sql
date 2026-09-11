@@ -36,7 +36,7 @@ CREATE TABLE IF NOT EXISTS `crm_leads` (
   `telefono` VARCHAR(30) NOT NULL, -- Número WhatsApp (ej: 51987654321)
   `nombre` VARCHAR(120) NOT NULL,
   `etapa` ENUM('NUEVO', 'ASESORIA', 'COTIZADO', 'VISITA_SEPARADO', 'GANADO', 'PERDIDO') DEFAULT 'NUEVO',
-  `temperatura` ENUM('VERDE', 'AMBAR', 'ROJO') DEFAULT 'VERDE',
+  `temperatura` ENUM('VERDE', 'AMBAR', 'ROJO', 'PURPURA') DEFAULT 'VERDE',
   `vendedor_id` INT DEFAULT NULL,
   `modelo_interes_id` INT DEFAULT NULL,
   `modelo_interes_texto` VARCHAR(150) DEFAULT NULL,
@@ -54,6 +54,21 @@ CREATE TABLE IF NOT EXISTS `crm_leads` (
   INDEX `idx_etapa` (`etapa`),
   INDEX `idx_temperatura` (`temperatura`),
   INDEX `idx_vendedor` (`vendedor_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS `crm_agendamientos` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `lead_id` INT NOT NULL,
+  `vendedor_id` INT DEFAULT 1,
+  `tipo` ENUM('VISITA_YANAHUARA', 'VISITA_CAYMA', 'LLAMADA_CIERRE', 'SEGUIMIENTO_FRIO') NOT NULL,
+  `fecha_hora` DATETIME NOT NULL,
+  `modelo_laptop` VARCHAR(150) DEFAULT NULL,
+  `estado` ENUM('PENDIENTE', 'COMPLETADO', 'CANCELADO', 'NO_ASISTIO') DEFAULT 'PENDIENTE',
+  `notas` TEXT DEFAULT NULL,
+  `fecha_creacion` DATETIME DEFAULT CURRENT_TIMESTAMP,
+  INDEX `idx_fecha_hora` (`fecha_hora`),
+  INDEX `idx_estado` (`estado`),
+  FOREIGN KEY (`lead_id`) REFERENCES `crm_leads`(`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS `crm_seguimientos` (

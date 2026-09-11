@@ -95,6 +95,17 @@ try {
                 descripcion_comercial TEXT,
                 activo INTEGER DEFAULT 1
             );
+            CREATE TABLE IF NOT EXISTS crm_agendamientos (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                lead_id INTEGER NOT NULL,
+                vendedor_id INTEGER DEFAULT 1,
+                tipo TEXT NOT NULL,
+                fecha_hora DATETIME NOT NULL,
+                modelo_laptop TEXT,
+                estado TEXT DEFAULT 'PENDIENTE',
+                notas TEXT,
+                fecha_creacion DATETIME DEFAULT CURRENT_TIMESTAMP
+            );
         ");
         $conn = $pdo; // Usar PDO SQLite
     } catch (Exception $sqle) {
