@@ -381,12 +381,39 @@ async function cargarPromociones() {
     }
 }
 
+let quoteSearchQuery = '';
+let quoteCategoryFilter = 'TODAS';
+
+function filtrarPromosCotizador(query) {
+    quoteSearchQuery = (query || '').toLowerCase().trim();
+    renderizarListaPromos();
+}
+
+function filtrarPromosCategoria(cat) {
+    quoteCategoryFilter = cat || 'TODAS';
+    renderizarListaPromos();
+}
+
 function renderizarListaPromos() {
     const container = document.getElementById('promo-list-container');
     if (!container) return;
     container.innerHTML = '';
 
-    promosData.forEach(p => {
+    const filtradas = promosData.filter(p => {
+        if (quoteCategoryFilter !== 'TODAS' && p.categoria !== quoteCategoryFilter) return false;
+        if (quoteSearchQuery) {
+            const texto = `${p.marca} ${p.modelo} ${p.procesador} ${p.ram} ${p.precio_promo}`.toLowerCase();
+            if (!texto.includes(quoteSearchQuery)) return false;
+        }
+        return true;
+    });
+
+    if (filtradas.length === 0) {
+        container.innerHTML = `<div style="text-align: center; padding: 25px; color: var(--text-muted); font-size: 0.85rem;">No se encontraron promociones con ese criterio de búsqueda.</div>`;
+        return;
+    }
+
+    filtradas.forEach(p => {
         const stockReal = p.stock_real !== undefined ? parseInt(p.stock_real, 10) : Math.max(0, (parseInt(p.stock_disponible, 10) || 0) - (parseInt(p.unidades_reservadas, 10) || 0));
         const reservadas = parseInt(p.unidades_reservadas, 10) || 0;
         const sinStock = stockReal <= 0;

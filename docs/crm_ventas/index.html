@@ -246,9 +246,16 @@
                 <button class="modal-close" onclick="cerrarModal('modal-cotizador')">&times;</button>
             </div>
             <div class="modal-body">
-                <p style="font-size: 0.85rem; color: var(--text-secondary);">
-                    Selecciona una laptop del catálogo de promociones oficiales de Petulap. Al presionar <strong>"Enviar"</strong>, se abrirá el chat de WhatsApp con la ficha técnica y precio seductor listo para cerrar:
-                </p>
+                <div style="display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap;">
+                    <input type="text" id="quote-search-input" oninput="filtrarPromosCotizador(this.value)" placeholder="🔍 Buscar modelo (T14, Dell, i7, Carbon, S/ ...)..." style="flex: 1; min-width: 220px; padding: 8px 12px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 6px; color: var(--text-primary); font-size: 0.85rem;">
+                    <select id="quote-cat-select" onchange="filtrarPromosCategoria(this.value)" style="padding: 8px 12px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 6px; color: var(--text-primary); font-size: 0.85rem; cursor: pointer;">
+                        <option value="TODAS">📁 Todas las promociones (${promosData.length})</option>
+                        <option value="LAPTOP_MEDIA">💻 Laptops Core i5</option>
+                        <option value="LAPTOP_EJECUTIVA">💼 Laptops Core i7 / MacBook</option>
+                        <option value="WORKSTATION">🚀 Workstations & PC</option>
+                        <option value="ACCESORIO">🔌 Accesorios & Proyectores</option>
+                    </select>
+                </div>
                 <div class="promo-grid" id="promo-list-container">
                     <!-- Cargado dinámicamente por crm.js -->
                 </div>
