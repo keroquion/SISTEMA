@@ -1,0 +1,25 @@
+{
+  "manifest_version": 3,
+  "name": "Petulap Sales CRM - WhatsApp Assistant",
+  "version": "1.0.0",
+  "description": "Inspector pasivo del DOM para sincronizar estados de prospectos en Petulap CRM sin riesgo de baneo.",
+  "permissions": [
+    "storage"
+  ],
+  "host_permissions": [
+    "*://web.whatsapp.com/*",
+    "http://*/*",
+    "https://*/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["*://web.whatsapp.com/*"],
+      "js": ["content.js"],
+      "css": ["panel.css"],
+      "run_at": "document_idle"
+    }
+  ],
+  "icons": {
+    "48": "icon.png"
+  }
+}

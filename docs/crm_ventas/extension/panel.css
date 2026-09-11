@@ -1,0 +1,133 @@
+/* ==========================================================
+   PETULAP CRM - ESTILOS DEL PANEL FLOTANTE EN WHATSAPP WEB
+   Inyección limpia y no invasiva con diseño ejecutivo
+   ========================================================== */
+
+#petulap-crm-sidebar {
+  position: fixed;
+  top: 70px;
+  right: 18px;
+  width: 290px;
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.45);
+  color: #f8fafc;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  z-index: 999999;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+#petulap-crm-sidebar.minimized {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  cursor: pointer;
+  background: #3b82f6;
+  border: none;
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.5);
+}
+
+#petulap-crm-sidebar.minimized .petulap-content {
+  display: none !important;
+}
+
+#petulap-crm-sidebar.minimized .petulap-min-icon {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  color: #fff;
+  font-size: 22px;
+  font-weight: bold;
+}
+
+.petulap-header {
+  background: #0f172a;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #334155;
+}
+
+.petulap-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: #38bdf8;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.petulap-close-btn {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  font-size: 16px;
+}
+.petulap-close-btn:hover {
+  color: #fff;
+}
+
+.petulap-body {
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-size: 12px;
+}
+
+.petulap-lead-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.petulap-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 700;
+  width: fit-content;
+}
+
+.petulap-badge-verde { background: rgba(16, 185, 129, 0.2); color: #10b981; border: 1px solid #10b981; }
+.petulap-badge-ambar { background: rgba(245, 158, 11, 0.2); color: #f59e0b; border: 1px solid #f59e0b; }
+.petulap-badge-rojo  { background: rgba(239, 68, 68, 0.2);  color: #ef4444; border: 1px solid #ef4444; }
+
+.petulap-btn-action {
+  background: #3b82f6;
+  color: #fff;
+  border: none;
+  padding: 7px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  text-decoration: none;
+  transition: background 0.2s;
+}
+.petulap-btn-action:hover {
+  background: #2563eb;
+}
+
+.petulap-btn-secondary {
+  background: #334155;
+  color: #e2e8f0;
+}
+.petulap-btn-secondary:hover {
+  background: #475569;
+}

@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Petulap Sales CRM — WhatsApp & Pipeline de Laptops</title>
+    
+    <!-- Tipografía Inter y Phosphor Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <!-- Estilos Oficiales del CRM -->
+    <link rel="stylesheet" href="css/crm.css">
+</head>
+<body>
+
+    <!-- 1. HEADER PRINCIPAL -->
+    <header class="crm-header">
+        <div class="header-brand">
+            <i class="ph-bold ph-laptop" style="font-size: 1.6rem; color: var(--primary);"></i>
+            <div class="brand-title">
+                Petulap <span>Sales CRM</span>
+                <span class="badge-tag">WhatsApp Pro</span>
+            </div>
+        </div>
+
+        <div class="header-actions">
+            <button class="btn btn-ghost" id="theme-toggle-btn" onclick="toggleTheme()">
+                <i class="ph ph-sun"></i> Modo Claro
+            </button>
+            <button class="btn btn-primary" onclick="abrirModal('modal-nuevo-lead')">
+                <i class="ph-bold ph-user-plus"></i> + Nuevo Lead
+            </button>
+        </div>
+    </header>
+
+    <!-- 2. BARRA DE MÉTRICAS KPI -->
+    <section class="kpi-bar">
+        <div class="kpi-card">
+            <div class="kpi-title">
+                <span>Total Leads</span>
+                <i class="ph-bold ph-users"></i>
+            </div>
+            <div class="kpi-value" id="kpi-total">0</div>
+            <div class="kpi-sub">Prospectos registrados</div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-title">
+                <span>En Cotización</span>
+                <i class="ph-bold ph-file-text" style="color: var(--primary);"></i>
+            </div>
+            <div class="kpi-value" id="kpi-cotizados">0</div>
+            <div class="kpi-sub">Propuestas enviadas</div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-title">
+                <span>Ventas Ganadas</span>
+                <i class="ph-bold ph-check-circle" style="color: var(--success);"></i>
+            </div>
+            <div class="kpi-value" id="kpi-ganados" style="color: var(--success);">0</div>
+            <div class="kpi-sub">Laptops entregadas</div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-title">
+                <span>Clientes Fríos</span>
+                <i class="ph-bold ph-snowflake" style="color: var(--danger);"></i>
+            </div>
+            <div class="kpi-value" id="kpi-rojos" style="color: var(--danger);">0</div>
+            <div class="kpi-sub">>24h sin respuesta (SLA Rojo)</div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-title">
+                <span>Monto Proyectado</span>
+                <i class="ph-bold ph-money" style="color: var(--warning);"></i>
+            </div>
+            <div class="kpi-value" id="kpi-monto">S/ 0</div>
+            <div class="kpi-sub">En negociación y cotizados</div>
+        </div>
+    </section>
+
+    <!-- 3. BARRA DE BÚSQUEDA Y FILTROS -->
+    <section class="filter-bar">
+        <div class="search-box">
+            <i class="ph-bold ph-magnifying-glass search-icon"></i>
+            <input type="text" id="search-input" placeholder="Buscar por cliente, WhatsApp o modelo (ThinkPad, Dell...)...">
+        </div>
+
+        <div class="chips-container">
+            <span class="chip active" data-filter="TODOS">Todos los Leads</span>
+            <span class="chip" data-filter="ROJO">🔥 Clientes Fríos / Rojos</span>
+            <span class="chip" data-filter="SEPARADOS">🏢 Visitas y Separados</span>
+        </div>
+    </section>
+
+    <!-- 4. TABLERO KANBAN DE 6 COLUMNAS -->
+    <main class="kanban-board">
+        <!-- Columna 1 -->
+        <div class="kanban-col">
+            <div class="col-header">
+                <span class="col-title"><i class="ph-bold ph-tray"></i> 1. Nuevos Leads</span>
+                <span class="col-count" id="count-NUEVO">0</span>
+            </div>
+            <div class="col-cards" id="cards-NUEVO"></div>
+        </div>
+
+        <!-- Columna 2 -->
+        <div class="kanban-col">
+            <div class="col-header">
+                <span class="col-title"><i class="ph-bold ph-chat-circle-dots"></i> 2. En Asesoría</span>
+                <span class="col-count" id="count-ASESORIA">0</span>
+            </div>
+            <div class="col-cards" id="cards-ASESORIA"></div>
+        </div>
+
+        <!-- Columna 3 -->
+        <div class="kanban-col">
+            <div class="col-header">
+                <span class="col-title"><i class="ph-bold ph-file-text"></i> 3. Cotizados</span>
+                <span class="col-count" id="count-COTIZADO">0</span>
+            </div>
+            <div class="col-cards" id="cards-COTIZADO"></div>
+        </div>
+
+        <!-- Columna 4 -->
+        <div class="kanban-col">
+            <div class="col-header">
+                <span class="col-title"><i class="ph-bold ph-storefront"></i> 4. Visita / Separado</span>
+                <span class="col-count" id="count-VISITA_SEPARADO">0</span>
+            </div>
+            <div class="col-cards" id="cards-VISITA_SEPARADO"></div>
+        </div>
+
+        <!-- Columna 5 -->
+        <div class="kanban-col">
+            <div class="col-header">
+                <span class="col-title"><i class="ph-bold ph-trophy" style="color: var(--success);"></i> 5. Ganados 🎉</span>
+                <span class="col-count" id="count-GANADO">0</span>
+            </div>
+            <div class="col-cards" id="cards-GANADO"></div>
+        </div>
+
+        <!-- Columna 6 -->
+        <div class="kanban-col">
+            <div class="col-header">
+                <span class="col-title"><i class="ph-bold ph-x-circle" style="color: var(--danger);"></i> 6. Perdidos</span>
+                <span class="col-count" id="count-PERDIDO">0</span>
+            </div>
+            <div class="col-cards" id="cards-PERDIDO"></div>
+        </div>
+    </main>
+
+    <!-- 5. MODAL: NUEVO LEAD -->
+    <div class="modal-overlay" id="modal-nuevo-lead" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">Registrar Nuevo Prospecto</div>
+                <button class="modal-close" onclick="cerrarModal('modal-nuevo-lead')">&times;</button>
+            </div>
+            <form id="form-nuevo-lead" class="modal-body">
+                <div class="form-group">
+                    <label>Nombre Completo del Cliente *</label>
+                    <input type="text" name="nombre" required placeholder="Ej: Carlos Mendoza">
+                </div>
+                <div class="form-group">
+                    <label>Número WhatsApp *</label>
+                    <input type="tel" name="telefono" required placeholder="Ej: 987654321">
+                </div>
+                <div class="form-group">
+                    <label>Modelo o Tipo de Laptop que Busca</label>
+                    <input type="text" name="modelo" placeholder="Ej: ThinkPad T14 o i5 para ingeniería">
+                </div>
+                <div class="form-group">
+                    <label>Presupuesto Aproximado (Soles)</label>
+                    <input type="number" name="presupuesto" placeholder="Ej: 1300">
+                </div>
+                <div class="form-group">
+                    <label>Sede Preferida en Arequipa</label>
+                    <select name="sede">
+                        <option value="YANAHUARA">Yanahuara (Av. Ejército 314)</option>
+                        <option value="CAYMA">Cayma (León XIII Mza A-4)</option>
+                        <option value="ENVIO_PROVINCIA">Envío a Provincia (Cusco, Puno, etc.)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Origen del Lead</label>
+                    <select name="origen">
+                        <option value="WHATSAPP">WhatsApp Directo</option>
+                        <option value="FACEBOOK_ADS">Campaña Facebook / Instagram</option>
+                        <option value="TIKTOK">TikTok</option>
+                        <option value="TIENDA_YANAHUARA">Presencial Yanahuara</option>
+                        <option value="TIENDA_CAYMA">Presencial Cayma</option>
+                        <option value="RECOMENDACION">Recomendación</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Notas Iniciales</label>
+                    <textarea name="notas" rows="2" placeholder="Detalles de lo que necesita el cliente..."></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary" style="justify-content: center; padding: 12px;">
+                    <i class="ph-bold ph-check"></i> Guardar Prospecto en Kanban
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 6. MODAL: COTIZADOR EXPRESS DE WHATSAPP -->
+    <div class="modal-overlay" id="modal-cotizador" style="display: none;">
+        <div class="modal-content" style="max-width: 720px;">
+            <div class="modal-header">
+                <div>
+                    <div class="modal-title">Cotizador Express de WhatsApp</div>
+                    <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 2px;">
+                        Cliente: <strong id="modal-quote-cliente" style="color: var(--text-primary);">...</strong> | <span id="modal-quote-tel">...</span>
+                    </div>
+                </div>
+                <button class="modal-close" onclick="cerrarModal('modal-cotizador')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p style="font-size: 0.85rem; color: var(--text-secondary);">
+                    Selecciona una laptop del catálogo de promociones oficiales de Petulap. Al presionar <strong>"Enviar"</strong>, se abrirá el chat de WhatsApp con la ficha técnica y precio seductor listo para cerrar:
+                </p>
+                <div class="promo-grid" id="promo-list-container">
+                    <!-- Cargado dinámicamente por crm.js -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script de lógica -->
+    <script src="js/crm.js"></script>
+</body>
+</html>
