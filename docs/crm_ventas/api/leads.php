@@ -581,4 +581,177 @@ if ($action === 'registrar_llamada' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     json_resp(['success' => true, 'resultado' => $resultado]);
 }
 
+// ----------------------------------------------------------
+// 14. TIMELINE DE ACTIVIDAD / HISTORIAL DEL LEAD
+// ----------------------------------------------------------
+if ($action === 'historial') {
+    $lead_id = (int)($_GET['lead_id'] ?? 0);
+    if ($lead_id <= 0) json_resp(['success' => false, 'error' => 'Lead ID requerido'], 400);
+
+    $lead_sql = "SELECT l.*, v.nombre as vendedor_nombre 
+                 FROM crm_leads l 
+                 LEFT JOIN crm_vendedores v ON l.vendedor_id = v.id 
+                 WHERE l.id = ?";
+    $lead = null;
+    if ($is_pdo) {
+        $stmt = $conn->prepare($lead_sql);
+        $stmt->execute([$lead_id]);
+        $lead = $stmt->fetch(PDO::FETCH_ASSOC);
+    } else {
+        $stmt = $conn->prepare($lead_sql);
+        $stmt->bind_param('i', $lead_id);
+        $stmt->execute();
+        $lead = $stmt->get_result()->fetch_assoc();
+    }
+    if (!$lead) json_resp(['success' => false, 'error' => 'Lead no encontrado'], 404);
+
+    // Seguimientos y notas
+    $historial = [];
+    $sql_seg = "SELECT s.*, v.nombre as vendedor_nombre 
+                FROM crm_seguimientos s 
+                LEFT JOIN crm_vendedores v ON s.vendedor_id = v.id 
+                WHERE s.lead_id = ? 
+                ORDER BY s.fecha DESC";
+    if ($is_pdo) {
+        $stmt = $conn->prepare($sql_seg);
+        $stmt->execute([$lead_id]);
+        $historial = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    } else {
+        $stmt = $conn->prepare($sql_seg);
+        $stmt->bind_param('i', $lead_id);
+        $stmt->execute();
+        $res = $stmt->get_result();
+        while ($r = $res->fetch_assoc()) $historial[] = $r;
+    }
+
+    // Llamadas telefónicas
+    $llamadas = [];
+    $sql_ll = "SELECT ll.*, v.nombre as vendedor_nombre 
+               FROM crm_llamadas_registro ll 
+               LEFT JOIN crm_vendedores v ON ll.vendedor_id = v.id 
+               WHERE ll.lead_id = ? 
+               ORDER BY ll.fecha_registro DESC";
+    if ($is_pdo) {
+        $stmt = $conn->prepare($sql_ll);
+        $stmt->execute([$lead_id]);
+        $llamadas = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    } else {
+        $stmt = $conn->prepare($sql_ll);
+        $stmt->bind_param('i', $lead_id);
+        $stmt->execute();
+        $res = $stmt->get_result();
+        while ($r = $res->fetch_assoc()) $llamadas[] = $r;
+    }
+
+    json_resp([
+        'success' => true,
+        'lead' => $lead,
+        'historial' => $historial,
+        'llamadas' => $llamadas
+    ]);
+}
+
+// ----------------------------------------------------------
+// 15. AGREGAR NOTA PRIVADA DE SEGUIMIENTO
+// ----------------------------------------------------------
+if ($action === 'agregar_nota' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    $input = json_decode(file_get_contents('php://input'), true) ?? $_POST;
+    $lead_id = (int)($input['lead_id'] ?? 0);
+    $vendedor_id = (int)($input['vendedor_id'] ?? 1);
+    $nota = trim($input['nota'] ?? '');
+
+    if ($lead_id <= 0 || empty($nota)) {
+        json_resp(['success' => false, 'error' => 'Lead ID y contenido de la nota requeridos'], 400);
+    }
+
+    $sql = "INSERT INTO crm_seguimientos (lead_id, vendedor_id, tipo_accion, detalle, fecha) VALUES (?, ?, 'NOTA', ?, NOW())";
+    if ($is_pdo) {
+        $stmt = $conn->prepare($sql);
+        $stmt->execute([$lead_id, $vendedor_id, $nota]);
+    } else {
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param('iis', $lead_id, $vendedor_id, $nota);
+        $stmt->execute();
+    }
+
+    @$conn->query("UPDATE crm_leads SET ultimo_contacto_vendedor = NOW(), fecha_actualizacion = NOW() WHERE id = $lead_id");
+
+    json_resp(['success' => true, 'mensaje' => 'Nota agregada con éxito']);
+}
+
+// ----------------------------------------------------------
+// 16. DESCARTAR LEAD CON MOTIVO DE PÉRDIDA
+// ----------------------------------------------------------
+if ($action === 'marcar_perdido' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    $input = json_decode(file_get_contents('php://input'), true) ?? $_POST;
+    $lead_id = (int)($input['lead_id'] ?? 0);
+    $motivo = trim($input['motivo'] ?? 'Descartado por asesor');
+
+    if ($lead_id <= 0) json_resp(['success' => false, 'error' => 'Lead ID requerido'], 400);
+
+    $sql = "UPDATE crm_leads 
+            SET etapa = 'PERDIDO', motivo_perdida = ?, temperatura = 'ROJO', fecha_actualizacion = NOW() 
+            WHERE id = ?";
+    if ($is_pdo) {
+        $stmt = $conn->prepare($sql);
+        $stmt->execute([$motivo, $lead_id]);
+    } else {
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param('si', $motivo, $lead_id);
+        $stmt->execute();
+    }
+
+    $det = "❌ Venta marcada como PERDIDA. Motivo: $motivo";
+    @$conn->query("INSERT INTO crm_seguimientos (lead_id, tipo_accion, detalle) VALUES ($lead_id, 'CAMBIO_ETAPA', '$det')");
+
+    json_resp(['success' => true, 'motivo' => $motivo]);
+}
+
+// ----------------------------------------------------------
+// 17. EXPORTAR BASE DE DATOS DE CLIENTES A CSV / EXCEL
+// ----------------------------------------------------------
+if ($action === 'exportar_csv') {
+    $sql = "SELECT l.id, l.nombre, l.telefono, l.etapa, l.temperatura, l.sede_preferida, 
+                   l.modelo_interes_texto, l.presupuesto_aprox, l.origen_lead, l.motivo_perdida, 
+                   v.nombre as vendedor_nombre, l.fecha_creacion 
+            FROM crm_leads l 
+            LEFT JOIN crm_vendedores v ON l.vendedor_id = v.id 
+            ORDER BY l.id DESC";
+    $rows = [];
+    if ($is_pdo) {
+        $rows = $conn->query($sql)->fetchAll(PDO::FETCH_ASSOC);
+    } else {
+        $res = $conn->query($sql);
+        while ($r = $res->fetch_assoc()) $rows[] = $r;
+    }
+
+    header('Content-Type: text/csv; charset=utf-8');
+    header('Content-Disposition: attachment; filename="petulap_leads_' . date('Y-m-d') . '.csv"');
+
+    // UTF-8 BOM para soporte de tildes y caracteres especiales en Excel
+    echo "\xEF\xBB\xBF";
+
+    $output = fopen('php://output', 'w');
+    fputcsv($output, ['ID', 'Cliente', 'Telefono WhatsApp', 'Etapa', 'Temperatura', 'Sede Preferida', 'Modelo Interes', 'Presupuesto Aprox (S/)', 'Origen Lead', 'Motivo Perdida', 'Asesor Asignado', 'Fecha Registro']);
+
+    foreach ($rows as $r) {
+        fputcsv($output, [
+            $r['id'],
+            $r['nombre'],
+            $r['telefono'],
+            $r['etapa'],
+            $r['temperatura'],
+            $r['sede_preferida'],
+            $r['modelo_interes_texto'],
+            $r['presupuesto_aprox'],
+            $r['origen_lead'],
+            $r['motivo_perdida'] ?? '',
+            $r['vendedor_nombre'] ?? 'Sin asignar',
+            $r['fecha_creacion']
+        ]);
+    }
+    fclose($output);
+    exit;
+}
+
 json_resp(['success' => false, 'error' => 'Acción no reconocida'], 400);

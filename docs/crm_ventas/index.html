@@ -47,6 +47,9 @@
                 <i class="ph-bold ph-bell"></i> Recordatorios
                 <span class="bell-badge" id="badge-notif-count" style="display: none;">0</span>
             </button>
+            <button class="btn btn-ghost" onclick="exportarLeadsCSV()" title="Descargar Base de Clientes en Excel / CSV">
+                <i class="ph-bold ph-download-simple" style="color: var(--success);"></i> Exportar
+            </button>
             <button class="btn btn-ghost" id="theme-toggle-btn" onclick="toggleTheme()">
                 <i class="ph ph-sun"></i> Modo Claro
             </button>
@@ -403,6 +406,81 @@
             </div>
             <div class="modal-body" id="disparos-modal-container">
                 <!-- Renderizado dinámicamente por crm.js -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 13. MODAL: TIMELINE Y BITÁCORA DEL CLIENTE -->
+    <div class="modal-overlay" id="modal-historial-lead" style="display: none;">
+        <div class="modal-content" style="max-width: 680px;">
+            <div class="modal-header">
+                <div>
+                    <div class="modal-title" style="display: flex; align-items: center; gap: 8px;">
+                        <i class="ph-bold ph-clock-counter-clockwise" style="color: var(--primary);"></i>
+                        <span>Bitácora de Seguimiento</span>
+                    </div>
+                    <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 2px;">
+                        Cliente: <strong id="historial-cliente-nombre" style="color: #fff;">...</strong> | <span id="historial-cliente-tel">...</span>
+                    </div>
+                </div>
+                <button class="modal-close" onclick="cerrarModal('modal-historial-lead')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <!-- Formulario para agregar nueva nota -->
+                <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; margin-bottom: 16px;">
+                    <label style="font-size: 0.8rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px; display: block;">
+                        📝 Agregar Nota Privada de Seguimiento:
+                    </label>
+                    <div style="display: flex; gap: 8px;">
+                        <input type="text" id="nueva-nota-input" placeholder="Ej: Cliente vendrá el sábado con su hermano; prefiere ThinkPad..." style="flex: 1; padding: 8px 12px; background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 6px; color: #fff; font-size: 0.85rem;">
+                        <button class="btn btn-primary" onclick="guardarNotaHistorial()" style="padding: 8px 14px; font-size: 0.8rem;">
+                            Guardar
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Contenedor del Timeline -->
+                <div id="historial-timeline-container" style="max-height: 380px; overflow-y: auto; padding-right: 4px;">
+                    <!-- Renderizado dinámicamente por crm.js -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 14. MODAL: DESCARTAR CLIENTE / MOTIVO DE PÉRDIDA -->
+    <div class="modal-overlay" id="modal-motivo-perdida" style="display: none;">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <i class="ph-bold ph-x-circle" style="font-size: 1.4rem; color: var(--danger);"></i>
+                    <div class="modal-title">Motivo de Descarte / Venta Perdida</div>
+                </div>
+                <button class="modal-close" onclick="cerrarModal('modal-motivo-perdida')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 14px;">
+                    Cliente: <strong id="perdida-cliente-nombre" style="color: #fff;">...</strong><br>
+                    Ayúdanos a registrar la causa para mejorar las promociones e inventario de laptops:
+                </p>
+                <input type="hidden" id="perdida-lead-id">
+
+                <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px;">
+                    <button class="btn btn-ghost" onclick="confirmarPerdida('💸 Fuera de presupuesto / Muy caro')" style="justify-content: flex-start; padding: 10px 14px;">
+                        💸 Fuera de presupuesto / Precio muy alto
+                    </button>
+                    <button class="btn btn-ghost" onclick="confirmarPerdida('🏬 Compró en otra tienda / Galería')" style="justify-content: flex-start; padding: 10px 14px;">
+                        🏬 Compró en otra tienda de Av. Ejército
+                    </button>
+                    <button class="btn btn-ghost" onclick="confirmarPerdida('❌ No teníamos el modelo o procesador')" style="justify-content: flex-start; padding: 10px 14px;">
+                        ❌ No teníamos el modelo o procesador que buscaba
+                    </button>
+                    <button class="btn btn-ghost" onclick="confirmarPerdida('👻 Dejó de responder / En visto')" style="justify-content: flex-start; padding: 10px 14px;">
+                        👻 Dejó de responder / Dejado en visto
+                    </button>
+                    <button class="btn btn-ghost" onclick="confirmarPerdida('🤷‍♂️ Solo preguntaba por curiosidad')" style="justify-content: flex-start; padding: 10px 14px;">
+                        🤷‍♂️ Solo preguntaba por curiosidad / No comprará
+                    </button>
+                </div>
             </div>
         </div>
     </div>

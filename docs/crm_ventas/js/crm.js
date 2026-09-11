@@ -12,6 +12,8 @@ let activeVendedorId = localStorage.getItem('petulap-crm-vendedor') || '0';
 let focoHoyActivo = false;
 let activeLeadForDisparos = null;
 let activeLeadForLlamada = null;
+let activeLeadForHistorial = null;
+let activeLeadForPerdida = null;
 
 // Inicialización
 document.addEventListener('DOMContentLoaded', () => {
@@ -324,11 +326,17 @@ function crearTarjetaLead(lead) {
                 <button class="btn-card-move" style="color: #c084fc; border-color: #a855f7;" onclick="abrirModalAgendar(${lead.id})" title="Agendar Cita en Tienda / Llamada">
                     <i class="ph-bold ph-calendar"></i>
                 </button>
+                <button class="btn-card-move" style="color: #38bdf8; border-color: #0284c7;" onclick="abrirModalHistorial(${lead.id})" title="Bitácora y Notas del Cliente">
+                    <i class="ph-bold ph-clock-counter-clockwise"></i>
+                </button>
                 <a href="${waUrl}" target="_blank" class="btn-card-wa" title="Abrir Chat WhatsApp">
                     <i class="ph-bold ph-whatsapp-logo"></i>
                 </a>
                 <button class="btn-card-move" onclick="avanzarEtapa(${lead.id}, '${lead.etapa}')" title="Avanzar etapa">
                     <i class="ph-bold ph-arrow-right"></i>
+                </button>
+                <button class="btn-card-move" style="color: var(--danger); border-color: rgba(239, 68, 68, 0.4);" onclick="abrirModalPerdida(${lead.id})" title="Descartar / Marcar Venta Perdida">
+                    <i class="ph-bold ph-x"></i>
                 </button>
             </div>
         </div>
@@ -1187,5 +1195,261 @@ function copiarTextoPortapapeles(texto) {
         document.execCommand('copy');
         document.body.removeChild(t);
         alert('📋 Texto copiado al portapapeles.');
+    }
+}
+
+// ----------------------------------------------------------
+// 15. EXPORTAR BASE DE DATOS EN CSV / EXCEL
+// ----------------------------------------------------------
+function exportarLeadsCSV() {
+    window.location.href = `${API_BASE}/leads.php?action=exportar_csv`;
+}
+
+// ----------------------------------------------------------
+// 16. BITÁCORA Y TIMELINE DEL CLIENTE
+// ----------------------------------------------------------
+async function abrirModalHistorial(leadId) {
+    const lead = leadsData.find(l => l.id == leadId);
+    activeLeadForHistorial = lead || { id: leadId, nombre: `Lead #${leadId}`, telefono: '' };
+
+    const nombreEl = document.getElementById('historial-cliente-nombre');
+    const telEl = document.getElementById('historial-cliente-tel');
+    const inputEl = document.getElementById('nueva-nota-input');
+    const container = document.getElementById('historial-timeline-container');
+
+    if (nombreEl) nombreEl.textContent = activeLeadForHistorial.nombre || `Lead #${leadId}`;
+    if (telEl) telEl.textContent = activeLeadForHistorial.telefono || '';
+    if (inputEl) inputEl.value = '';
+
+    if (container) {
+        container.innerHTML = `
+            <div style="text-align: center; padding: 24px; color: var(--text-muted);">
+                <i class="ph ph-spinner ph-spin" style="font-size: 1.5rem; display: block; margin-bottom: 8px;"></i>
+                Cargando bitácora del cliente...
+            </div>
+        `;
+    }
+
+    abrirModal('modal-historial-lead');
+
+    // Permitir guardar con tecla Enter en el input de nota
+    if (inputEl && !inputEl.dataset.enterBound) {
+        inputEl.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') guardarNotaHistorial();
+        });
+        inputEl.dataset.enterBound = 'true';
+    }
+
+    try {
+        const res = await fetch(`${API_BASE}/leads.php?action=historial&lead_id=${leadId}`);
+        const data = await res.json();
+
+        if (!data.success) {
+            if (container) container.innerHTML = `<div style="color: var(--danger); padding: 12px;">Error al cargar bitácora: ${data.error || 'Desconocido'}</div>`;
+            return;
+        }
+
+        const timeline = [];
+
+        // Seguimientos (Notas, Cambios de etapa, etc.)
+        if (Array.isArray(data.historial)) {
+            data.historial.forEach(h => {
+                timeline.push({
+                    tipo: 'SEGUIMIENTO',
+                    fecha: h.fecha,
+                    accion: h.tipo_accion,
+                    detalle: h.detalle,
+                    vendedor: h.vendedor_nombre || 'Asesor'
+                });
+            });
+        }
+
+        // Registro de llamadas telefónicas
+        if (Array.isArray(data.llamadas)) {
+            data.llamadas.forEach(ll => {
+                timeline.push({
+                    tipo: 'LLAMADA',
+                    fecha: ll.fecha_registro,
+                    resultado: ll.resultado,
+                    duracion: ll.duracion_segundos,
+                    notas: ll.notas,
+                    vendedor: ll.vendedor_nombre || 'Asesor'
+                });
+            });
+        }
+
+        // Ordenar cronológicamente descendente (lo más reciente arriba)
+        timeline.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+
+        if (!container) return;
+
+        if (timeline.length === 0) {
+            container.innerHTML = `
+                <div style="text-align: center; padding: 30px 16px; color: var(--text-secondary);">
+                    <i class="ph-bold ph-notepad" style="font-size: 2.2rem; color: var(--text-muted); margin-bottom: 8px; display: block;"></i>
+                    <strong>Sin notas ni registros previos</strong>
+                    <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;">
+                        Escribe la primera nota privada arriba para documentar la preferencia o conversación con este cliente.
+                    </div>
+                </div>
+            `;
+            return;
+        }
+
+        container.innerHTML = `
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+                ${timeline.map(item => {
+                    const fechaObj = new Date(item.fecha);
+                    const fechaStr = isNaN(fechaObj.getTime()) ? item.fecha : fechaObj.toLocaleString('es-PE', { dateStyle: 'short', timeStyle: 'short' });
+
+                    if (item.tipo === 'LLAMADA') {
+                        const esExitosa = item.resultado === 'CONTESTO_INTERESADO';
+                        const badgeColor = esExitosa ? 'var(--success)' : '#f87171';
+                        const badgeBg = esExitosa ? 'var(--success-bg)' : 'rgba(239, 68, 68, 0.15)';
+                        const resLabel = item.resultado ? item.resultado.replace(/_/g, ' ') : 'LLAMADA';
+
+                        return `
+                            <div style="background: var(--bg-card); border-left: 3px solid ${badgeColor}; border-radius: 6px; padding: 10px 12px; font-size: 0.84rem;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                                    <div style="display: flex; align-items: center; gap: 6px;">
+                                        <i class="ph-bold ph-phone-call" style="color: ${badgeColor}; font-size: 1rem;"></i>
+                                        <span style="font-size: 0.72rem; font-weight: 800; background: ${badgeBg}; color: ${badgeColor}; padding: 2px 6px; border-radius: 4px;">
+                                            ${resLabel}
+                                        </span>
+                                        <span style="font-size: 0.75rem; color: var(--text-muted);">⏱️ ${item.duracion || 0}s</span>
+                                    </div>
+                                    <span style="font-size: 0.72rem; color: var(--text-muted);">${fechaStr}</span>
+                                </div>
+                                ${item.notas ? `<div style="color: var(--text-primary); margin-top: 4px;">"${escapar(item.notas)}"</div>` : ''}
+                                <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 4px;">Registrado por: <em>${escapar(item.vendedor)}</em></div>
+                            </div>
+                        `;
+                    } else {
+                        // SEGUIMIENTO
+                        let badgeColor = 'var(--primary)';
+                        let badgeBg = 'var(--primary-glow)';
+                        let icon = 'ph-note-pencil';
+                        let accionLabel = 'NOTA';
+
+                        if (item.accion === 'CAMBIO_ETAPA') {
+                            badgeColor = '#f59e0b';
+                            badgeBg = 'rgba(245, 158, 11, 0.15)';
+                            icon = 'ph-arrows-left-right';
+                            accionLabel = 'ETAPA';
+                        } else if (item.accion === 'MENSAJE_WA') {
+                            badgeColor = 'var(--wa-green)';
+                            badgeBg = 'rgba(37, 211, 102, 0.15)';
+                            icon = 'ph-whatsapp-logo';
+                            accionLabel = 'WHATSAPP';
+                        }
+
+                        return `
+                            <div style="background: var(--bg-card); border-left: 3px solid ${badgeColor}; border-radius: 6px; padding: 10px 12px; font-size: 0.84rem;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                                    <div style="display: flex; align-items: center; gap: 6px;">
+                                        <i class="ph-bold ${icon}" style="color: ${badgeColor}; font-size: 1rem;"></i>
+                                        <span style="font-size: 0.72rem; font-weight: 800; background: ${badgeBg}; color: ${badgeColor}; padding: 2px 6px; border-radius: 4px;">
+                                            ${accionLabel}
+                                        </span>
+                                    </div>
+                                    <span style="font-size: 0.72rem; color: var(--text-muted);">${fechaStr}</span>
+                                </div>
+                                <div style="color: var(--text-primary); margin-top: 4px; white-space: pre-wrap;">${escapar(item.detalle)}</div>
+                                <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 4px;">Por: <em>${escapar(item.vendedor)}</em></div>
+                            </div>
+                        `;
+                    }
+                }).join('')}
+            </div>
+        `;
+
+    } catch (err) {
+        console.error('Error cargando historial:', err);
+        if (container) container.innerHTML = `<div style="color: var(--danger); padding: 12px;">Error al conectar con la bitácora</div>`;
+    }
+}
+
+async function guardarNotaHistorial() {
+    if (!activeLeadForHistorial || !activeLeadForHistorial.id) return;
+    const input = document.getElementById('nueva-nota-input');
+    if (!input) return;
+
+    const nota = input.value.trim();
+    if (!nota) {
+        alert('Por favor escribe una nota antes de guardar.');
+        input.focus();
+        return;
+    }
+
+    try {
+        const res = await fetch(`${API_BASE}/leads.php?action=agregar_nota`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                lead_id: activeLeadForHistorial.id,
+                vendedor_id: parseInt(activeVendedorId) || 1,
+                nota: nota
+            })
+        });
+        const json = await res.json();
+        if (json.success) {
+            input.value = '';
+            abrirModalHistorial(activeLeadForHistorial.id);
+            cargarLeads(false);
+        } else {
+            alert(json.error || 'Error al guardar la nota');
+        }
+    } catch (err) {
+        console.error('Error guardando nota:', err);
+        alert('Error al conectar con el servidor.');
+    }
+}
+
+// ----------------------------------------------------------
+// 17. MOTIVOS DE PÉRDIDA Y DESCARTE DE LEADS
+// ----------------------------------------------------------
+function abrirModalPerdida(leadId) {
+    const lead = leadsData.find(l => l.id == leadId);
+    if (!lead) return;
+    activeLeadForPerdida = lead;
+
+    const idInput = document.getElementById('perdida-lead-id');
+    const nomEl = document.getElementById('perdida-cliente-nombre');
+
+    if (idInput) idInput.value = leadId;
+    if (nomEl) nomEl.textContent = `${lead.nombre} (${lead.telefono})`;
+
+    abrirModal('modal-motivo-perdida');
+}
+
+async function confirmarPerdida(motivo) {
+    const idInput = document.getElementById('perdida-lead-id');
+    const leadId = idInput ? idInput.value : null;
+    if (!leadId) return;
+
+    if (!confirm(`¿Confirmas marcar este prospecto como PERDIDO?\n\nMotivo: ${motivo}`)) {
+        return;
+    }
+
+    try {
+        const res = await fetch(`${API_BASE}/leads.php?action=marcar_perdido`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                lead_id: parseInt(leadId),
+                motivo: motivo
+            })
+        });
+        const json = await res.json();
+        if (json.success) {
+            cerrarModal('modal-motivo-perdida');
+            cargarLeads(false);
+            cargarStats();
+        } else {
+            alert(json.error || 'Error al descartar prospecto');
+        }
+    } catch (err) {
+        console.error('Error descartando prospecto:', err);
+        alert('Error de conexión al marcar como perdido.');
     }
 }
