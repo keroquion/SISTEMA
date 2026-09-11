@@ -105,50 +105,80 @@ PROMPT;
             ]
         ];
 
-        $ch = curl_init();
-        curl_setopt_array($ch, [
-            CURLOPT_URL => $endpoint,
-            CURLOPT_POST => true,
-            CURLOPT_POSTFIELDS => json_encode($requestBody),
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_HTTPHEADER => [
-                'Content-Type: application/json'
-            ],
-            CURLOPT_TIMEOUT => 25,
-            CURLOPT_SSL_VERIFYPEER => true
-        ]);
+        // Modelos con fallback automático en caso de saturación temporal (HTTP 503/429)
+        $modelsToTry = array_unique([DEFAULT_GEMINI_MODEL, 'gemini-2.5-flash', 'gemini-2.5-flash-lite', 'gemini-2.0-flash', 'gemini-1.5-flash']);
+        $lastErrMsg = '';
+        $lastResJson = null;
 
-        $response = curl_exec($ch);
-        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        $curlErr = curl_error($ch);
-        curl_close($ch);
+        foreach ($modelsToTry as $model) {
+            $endpoint = "https://generativelanguage.googleapis.com/v1beta/models/" . urlencode($model) . ":generateContent?key=" . urlencode($key);
 
-        if ($response === false) {
-            return ['success' => false, 'message' => 'Error al conectar con Google Gemini API: ' . $curlErr];
-        }
+            $ch = curl_init();
+            curl_setopt_array($ch, [
+                CURLOPT_URL => $endpoint,
+                CURLOPT_POST => true,
+                CURLOPT_POSTFIELDS => json_encode($requestBody),
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_HTTPHEADER => [
+                    'Content-Type: application/json'
+                ],
+                CURLOPT_TIMEOUT => 20,
+                CURLOPT_SSL_VERIFYPEER => true
+            ]);
 
-        $resJson = json_decode($response, true);
-        if ($httpCode !== 200) {
-            $errMsg = $resJson['error']['message'] ?? 'Error desconocido de Gemini API (HTTP ' . $httpCode . ')';
-            return ['success' => false, 'message' => $errMsg, 'raw' => $resJson];
-        }
+            $response = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            $curlErr = curl_error($ch);
+            curl_close($ch);
 
-        $rawText = $resJson['candidates'][0]['content']['parts'][0]['text'] ?? '';
-        $rawText = trim(str_replace(['```json', '```'], '', $rawText));
-        $parsedData = json_decode($rawText, true);
+            if ($response === false) {
+                $lastErrMsg = 'Error de conexión con Gemini API (' . $model . '): ' . $curlErr;
+                continue;
+            }
 
-        if (!$parsedData) {
-            return [
-                'success' => false,
-                'message' => 'La IA no devolvió un formato JSON estructurado válido.',
-                'raw_text' => $rawText
-            ];
+            $resJson = json_decode($response, true);
+            if ($httpCode === 200) {
+                $rawText = $resJson['candidates'][0]['content']['parts'][0]['text'] ?? '';
+                $rawText = trim(str_replace(['```json', '```'], '', $rawText));
+                $parsedData = json_decode($rawText, true);
+
+                if (!$parsedData) {
+                    return [
+                        'success' => false,
+                        'message' => 'La IA no devolvió un formato JSON estructurado válido.',
+                        'raw_text' => $rawText
+                    ];
+                }
+
+                return [
+                    'success' => true,
+                    'modelo_usado' => $model,
+                    'data' => [
+                        'courier' => $parsedData['courier'] ?? 'DESCONOCIDO',
+                        'codigo_seguimiento' => !empty($parsedData['codigo_seguimiento']) ? strtoupper(trim($parsedData['codigo_seguimiento'])) : null,
+                        'codigo_seguridad' => !empty($parsedData['codigo_seguridad']) ? strtoupper(trim($parsedData['codigo_seguridad'])) : null,
+                        'numero_guia' => $parsedData['numero_guia'] ?? null,
+                        'origen' => $parsedData['origen'] ?? null,
+                        'destino' => $parsedData['destino'] ?? null,
+                        'remitente' => $parsedData['remitente'] ?? null,
+                        'destinatario' => $parsedData['destinatario'] ?? null,
+                        'monto' => floatval($parsedData['monto'] ?? 0.0),
+                        'confianza' => $parsedData['confianza'] ?? 'ALTA',
+                        'notas' => $parsedData['notas'] ?? ''
+                    ],
+                    'raw_ai_response' => $parsedData
+                ];
+            }
+
+            // Registrar error de demanda o cuota e intentar con el siguiente modelo de respaldo
+            $lastErrMsg = $resJson['error']['message'] ?? ('HTTP ' . $httpCode);
+            $lastResJson = $resJson;
         }
 
         return [
-            'success' => true,
-            'data' => $parsedData,
-            'gemini_model' => 'gemini-2.0-flash'
+            'success' => false,
+            'message' => 'Servidores de IA temporalmente ocupados: ' . $lastErrMsg,
+            'raw' => $lastResJson
         ];
     }
 
