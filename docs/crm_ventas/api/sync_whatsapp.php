@@ -30,7 +30,7 @@ if (strlen($telefono) === 9) {
 }
 
 // Buscar si el lead ya existe por teléfono
-$sql = "SELECT id, nombre, etapa, temperatura, modelo_interes_texto, presupuesto_aprox, ultimo_mensaje_hora, ultimo_mensaje_emisor 
+$sql = "SELECT id, nombre, etapa, temperatura, prioridad_compra, modelo_interes_texto, presupuesto_aprox, ultimo_mensaje_hora, ultimo_mensaje_emisor 
         FROM crm_leads 
         WHERE telefono = ? OR telefono LIKE ? LIMIT 1";
 
@@ -50,21 +50,27 @@ if ($is_pdo) {
 }
 
 if ($lead) {
+    // Si la extensión detecta intención de compra o se envía explícito
+    $prioridad_nueva = $input['prioridad_compra'] ?? ($lead['prioridad_compra'] ?? 'NORMAL');
+
     // Actualizar el lead con los datos frescos del DOM de WhatsApp Web
     $update_sql = "UPDATE crm_leads 
                    SET ultimo_mensaje_emisor = ?, 
                        ultimo_mensaje_texto = ?, 
                        ultimo_mensaje_hora = ?, 
+                       prioridad_compra = ?,
+                       ultimo_contacto_vendedor = (CASE WHEN ? = 'PETULAP' THEN NOW() ELSE ultimo_contacto_vendedor END),
                        fecha_actualizacion = CURRENT_TIMESTAMP 
                    WHERE id = ?";
     if ($is_pdo) {
         $u_stmt = $conn->prepare($update_sql);
-        $u_stmt->execute([$emisor, $texto_snippet, $timestamp, $lead['id']]);
+        $u_stmt->execute([$emisor, $texto_snippet, $timestamp, $prioridad_nueva, $emisor, $lead['id']]);
     } else {
         $u_stmt = $conn->prepare($update_sql);
-        $u_stmt->bind_param("sssi", $emisor, $texto_snippet, $timestamp, $lead['id']);
+        $u_stmt->bind_param("sssssi", $emisor, $texto_snippet, $timestamp, $prioridad_nueva, $emisor, $lead['id']);
         $u_stmt->execute();
     }
+    $lead['prioridad_compra'] = $prioridad_nueva;
 
     // Calcular temperatura en caliente
     $lead['ultimo_mensaje_emisor'] = $emisor;

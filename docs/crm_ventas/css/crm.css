@@ -440,6 +440,30 @@ body {
   100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
 }
 
+.temp-inminente {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.25), rgba(245, 158, 11, 0.25));
+  color: #fb923c;
+  border: 1px solid #f97316;
+  font-weight: 800;
+}
+
+.pulse-inminente {
+  background: #f97316;
+  box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.8);
+  animation: pulse-fire 1s infinite;
+}
+
+@keyframes pulse-fire {
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.8); }
+  70% { transform: scale(1.15); box-shadow: 0 0 0 8px rgba(249, 115, 22, 0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(249, 115, 22, 0); }
+}
+
+.kanban-card.inminente {
+  border-left: 4px solid #f97316;
+  background: linear-gradient(180deg, rgba(249, 115, 22, 0.05) 0%, var(--bg-surface) 100%);
+}
+
 @keyframes pulse-purple {
   0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(168, 85, 247, 0.7); }
   70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(168, 85, 247, 0); }

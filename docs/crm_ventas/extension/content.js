@@ -100,23 +100,33 @@ async function analizarChatActivo() {
         }
     }
 
+    // Detección inteligente de intención de compra en laptops de segundo uso
+    const keywordsCompra = ['voy a ir', 'a que hora abren', 'a qué hora abren', 'donde estan', 'dónde quedan', 'cuenta bcp', 'bcp', 'separame', 'sepárame', 'lo compro', 'la compro', 'precio final', 'cuanto ultimo', 'cuánto último', 'paso hoy', 'paso en la tarde', 'paso mañana'];
+    const textoMin = ultimoTexto.toLowerCase();
+    const detectoCompraInminente = keywordsCompra.some(k => textoMin.includes(k)) && ultimoEmisor === 'CLIENTE';
+
     // Si no ha cambiado el teléfono ni el estado, evitar llamadas repetitivas
-    const firmaActual = `${telefono}_${ultimoEmisor}_${ultimoTexto.substring(0, 20)}`;
+    const firmaActual = `${telefono}_${ultimoEmisor}_${ultimoTexto.substring(0, 20)}_${detectoCompraInminente}`;
     if (firmaActual === ultimoTelefonoAnalizado) return;
     ultimoTelefonoAnalizado = firmaActual;
 
     // 3. Notificar al backend del CRM de forma silenciosa
     try {
+        const payload = {
+            telefono: telefono,
+            nombre: nombre,
+            ultimo_mensaje_emisor: ultimoEmisor,
+            ultimo_mensaje_texto: ultimoTexto,
+            ultimo_mensaje_hora: new Date().toISOString()
+        };
+        if (detectoCompraInminente) {
+            payload.prioridad_compra = 'INMINENTE';
+        }
+
         const res = await fetch(`${CRM_API_URL}/sync_whatsapp.php`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                telefono: telefono,
-                nombre: nombre,
-                ultimo_mensaje_emisor: ultimoEmisor,
-                ultimo_mensaje_texto: ultimoTexto,
-                ultimo_mensaje_hora: new Date().toISOString()
-            })
+            body: JSON.stringify(payload)
         });
 
         const json = await res.json();
@@ -134,6 +144,7 @@ function actualizarWidget(data, nombre, telefono, ultimoEmisor) {
 
     if (data.status === 'actualizado' && data.lead) {
         const l = data.lead;
+        const esInminente = l.prioridad_compra === 'INMINENTE';
         const tempClass = `petulap-badge-${(l.temperatura || 'VERDE').toLowerCase()}`;
         const tempLabel = l.temperatura === 'PURPURA' ? '🟣 Cita Agendada'
                         : l.temperatura === 'VERDE' ? '🟢 Al día' 
@@ -144,6 +155,12 @@ function actualizarWidget(data, nombre, telefono, ultimoEmisor) {
             <div class="petulap-lead-name">${escapar(l.nombre || nombre)}</div>
             <div style="color: #94a3b8; font-size: 11px;">Etapa: <strong>${l.etapa}</strong></div>
             
+            ${esInminente ? `
+                <div style="background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(245, 158, 11, 0.2)); border: 1px solid #f97316; border-radius: 6px; padding: 3px 6px; font-size: 10px; font-weight: 800; color: #fb923c; margin: 4px 0; text-align: center;">
+                    🔥 COMPRA INMINENTE
+                </div>
+            ` : ''}
+
             <div class="petulap-status-badge ${tempClass}">
                 ${tempLabel}
             </div>
@@ -157,6 +174,9 @@ function actualizarWidget(data, nombre, telefono, ultimoEmisor) {
             <div style="display: flex; flex-direction: column; gap: 6px; margin-top: 6px;">
                 <button class="petulap-btn-action" style="background: #a855f7;" onclick="mostrarFormAgendamiento(${l.id}, '${escapar(l.nombre || nombre)}', '${escapar(l.modelo_interes_texto || '')}')">
                     📅 Agendar Cita en Tienda
+                </button>
+                <button class="petulap-btn-action" style="background: #f59e0b;" onclick="marcarInminenteDesdeWidget(${l.id})">
+                    ${esInminente ? '✅ Prioridad Inminente Activa' : '🔥 Marcar Compra Inminente'}
                 </button>
                 <button class="petulap-btn-action" onclick="window.open('${CRM_API_URL}/../index.html', '_blank')">
                     📋 Ver en Tablero Kanban
@@ -292,6 +312,23 @@ Tendremos la laptop lista y configurada para que la pruebes con total tranquilid
         }
     } catch (err) {
         alert('Error conectando al CRM: ' + err.message);
+    }
+};
+
+window.marcarInminenteDesdeWidget = async function(leadId) {
+    try {
+        const res = await fetch(`${CRM_API_URL}/leads.php?action=marcar_compra_inminente`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: leadId, prioridad: 'INMINENTE' })
+        });
+        const json = await res.json();
+        if (json.success) {
+            alert('🔥 Lead marcado como COMPRA INMINENTE. Se activó el semáforo prioritario en el CRM.');
+            ultimoTelefonoAnalizado = '';
+        }
+    } catch (e) {
+        alert('Error conectando al CRM: ' + e.message);
     }
 };
 

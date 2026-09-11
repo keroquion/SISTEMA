@@ -8,21 +8,28 @@ let leadsData = [];
 let promosData = [];
 let activeFilter = 'TODOS';
 let activeLeadForQuote = null;
+let activeVendedorId = localStorage.getItem('petulap-crm-vendedor') || '0';
+let focoHoyActivo = false;
+let activeLeadForDisparos = null;
+let activeLeadForLlamada = null;
 
 // Inicialización
 document.addEventListener('DOMContentLoaded', () => {
     initTheme();
+    initAdvisorSelector();
     cargarLeads();
     cargarStats();
     cargarPromociones();
     cargarRecordatoriosHoy();
+    cargarBolsaRescate();
     initEventos();
 
-    // Auto-refrescar cada 60 segundos para mantener el semáforo al día
+    // Auto-refrescar cada 60 segundos para mantener el semáforo y la bolsa al día
     setInterval(() => {
         cargarLeads(false);
         cargarStats();
         cargarRecordatoriosHoy();
+        cargarBolsaRescate();
     }, 60000);
 });
 
@@ -112,7 +119,8 @@ function reproducirAlarmaAudio(tipo = 'cita') {
 // ----------------------------------------------------------
 async function cargarLeads(mostrarLoading = true) {
     try {
-        const res = await fetch(`${API_BASE}/leads.php?action=list`);
+        const url = `${API_BASE}/leads.php?action=list&vendedor_id=${activeVendedorId}&foco_hoy=${focoHoyActivo ? '1' : '0'}`;
+        const res = await fetch(url);
         const json = await res.json();
         if (json.success) {
             leadsData = json.data;
@@ -219,6 +227,7 @@ function renderizarKanban() {
         // Filtro por temperatura / frío si aplica
         if (activeFilter === 'ROJO' && lead.temperatura !== 'ROJO') return;
         if (activeFilter === 'SEPARADOS' && lead.etapa !== 'VISITA_SEPARADO') return;
+        if (activeFilter === 'INMINENTE' && lead.prioridad_compra !== 'INMINENTE') return;
 
         const etapa = columnas[lead.etapa] ? lead.etapa : 'NUEVO';
         conteos[etapa]++;
@@ -239,7 +248,8 @@ function renderizarKanban() {
 // ----------------------------------------------------------
 function crearTarjetaLead(lead) {
     const div = document.createElement('div');
-    div.className = 'lead-card';
+    const esInminente = lead.prioridad_compra === 'INMINENTE';
+    div.className = `lead-card ${esInminente ? 'inminente' : ''}`;
     div.draggable = true;
     div.dataset.id = lead.id;
 
@@ -268,10 +278,17 @@ function crearTarjetaLead(lead) {
     div.innerHTML = `
         <div class="card-top">
             <span class="lead-name">${escapar(lead.nombre)}</span>
-            <span class="temp-badge ${tempClass}">
-                <span class="pulse-dot ${pulseClass}"></span>
-                ${tempLabel}
-            </span>
+            <div style="display: flex; gap: 4px; align-items: center;">
+                ${esInminente ? `
+                    <span class="temp-badge temp-inminente" title="Alerta: Cliente en fase decisiva de compra">
+                        <span class="pulse-dot pulse-inminente"></span> 🔥 INMINENTE
+                    </span>
+                ` : ''}
+                <span class="temp-badge ${tempClass}">
+                    <span class="pulse-dot ${pulseClass}"></span>
+                    ${tempLabel}
+                </span>
+            </div>
         </div>
 
         <div class="lead-model">
@@ -292,6 +309,15 @@ function crearTarjetaLead(lead) {
         <div class="card-footer">
             <span class="lead-time"><i class="ph ph-clock"></i> ${tiempoTexto}</span>
             <div class="card-actions">
+                <button class="btn-card-move" style="color: #fb923c; border-color: ${esInminente ? '#f97316' : 'var(--border-color)'};" onclick="togglePrioridadInminente(${lead.id}, '${lead.prioridad_compra || 'NORMAL'}')" title="${esInminente ? 'Quitar Compra Inminente' : 'Marcar como Compra Inminente / VIP'}">
+                    <i class="ph-bold ph-fire"></i>
+                </button>
+                <button class="btn-card-move" style="color: #60a5fa; border-color: #3b82f6;" onclick="abrirModalDisparos(${lead.id})" title="Cadencia de 4 Disparos WhatsApp para Laptops Usadas">
+                    <i class="ph-bold ph-chat-circle-dots"></i>
+                </button>
+                <button class="btn-card-move" style="color: var(--success); border-color: var(--success);" onclick="abrirModalLlamada(${lead.id})" title="Registrar Llamada Telefónica">
+                    <i class="ph-bold ph-phone-call"></i>
+                </button>
                 <button class="btn-card-move" onclick="abrirCotizador(${lead.id})" title="Enviar Ficha y Cotización">
                     <i class="ph ph-file-text"></i>
                 </button>
@@ -299,7 +325,7 @@ function crearTarjetaLead(lead) {
                     <i class="ph-bold ph-calendar"></i>
                 </button>
                 <a href="${waUrl}" target="_blank" class="btn-card-wa" title="Abrir Chat WhatsApp">
-                    <i class="ph-bold ph-whatsapp-logo"></i> Chat
+                    <i class="ph-bold ph-whatsapp-logo"></i>
                 </a>
                 <button class="btn-card-move" onclick="avanzarEtapa(${lead.id}, '${lead.etapa}')" title="Avanzar etapa">
                     <i class="ph-bold ph-arrow-right"></i>
@@ -842,4 +868,297 @@ function cerrarModal(id) {
 function escapar(str) {
     if (!str) return '';
     return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+// ----------------------------------------------------------
+// 11. GESTIÓN DE ASESOR ACTIVO Y FILTRO MI FOCO DE HOY
+// ----------------------------------------------------------
+function initAdvisorSelector() {
+    const sel = document.getElementById('selector-asesor-activo');
+    if (sel) {
+        sel.value = activeVendedorId;
+    }
+}
+
+function cambiarAsesorActivo(id) {
+    activeVendedorId = id;
+    localStorage.setItem('petulap-crm-vendedor', id);
+    cargarLeads(true);
+    cargarStats();
+    cargarRecordatoriosHoy();
+    cargarBolsaRescate();
+}
+
+function toggleFocoHoy() {
+    focoHoyActivo = !focoHoyActivo;
+    const btn = document.getElementById('chip-foco-hoy');
+    if (btn) {
+        if (focoHoyActivo) {
+            btn.style.background = '#f59e0b';
+            btn.style.color = '#000';
+            btn.innerHTML = '<i class="ph-bold ph-target"></i> 🎯 Mi Foco ACTIVO';
+        } else {
+            btn.style.background = 'rgba(245, 158, 11, 0.1)';
+            btn.style.color = '#fbbf24';
+            btn.innerHTML = '<i class="ph-bold ph-target"></i> 🎯 Mi Foco de Hoy';
+        }
+    }
+    cargarLeads(true);
+}
+
+// ----------------------------------------------------------
+// 12. COMPRA INMINENTE & BOLSA DE RESCATE
+// ----------------------------------------------------------
+async function togglePrioridadInminente(leadId, prioridadActual) {
+    const nueva = prioridadActual === 'INMINENTE' ? 'NORMAL' : 'INMINENTE';
+    try {
+        const res = await fetch(`${API_BASE}/leads.php?action=marcar_compra_inminente`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: leadId, prioridad: nueva })
+        });
+        const json = await res.json();
+        if (json.success) {
+            if (nueva === 'INMINENTE') {
+                reproducirAlarmaAudio('cita');
+            }
+            cargarLeads(false);
+            cargarStats();
+        }
+    } catch (err) {
+        console.error('Error toggling prioridad inminente:', err);
+    }
+}
+
+async function cargarBolsaRescate() {
+    try {
+        const res = await fetch(`${API_BASE}/leads.php?action=bolsa_rescate`);
+        const json = await res.json();
+        if (!json.success) return;
+
+        const total = json.total || 0;
+        const badge = document.getElementById('badge-rescate-count');
+        if (badge) {
+            badge.textContent = total;
+            badge.style.display = total > 0 ? 'inline-block' : 'none';
+        }
+    } catch (err) {
+        console.error('Error cargando bolsa de rescate:', err);
+    }
+}
+
+async function abrirModalBolsaRescate() {
+    const container = document.getElementById('lista-bolsa-rescate-container');
+    if (!container) return;
+    abrirModal('modal-bolsa-rescate');
+
+    container.innerHTML = `
+        <div style="text-align: center; padding: 25px; color: var(--text-muted);">
+            <i class="ph-bold ph-spinner ph-spin" style="font-size: 1.8rem; color: #ef4444;"></i>
+            <p style="margin-top: 8px;">Buscando prospectos abandonados...</p>
+        </div>
+    `;
+
+    try {
+        const res = await fetch(`${API_BASE}/leads.php?action=bolsa_rescate`);
+        const json = await res.json();
+        if (!json.success || !json.data || json.data.length === 0) {
+            container.innerHTML = `
+                <div style="text-align: center; padding: 30px; color: var(--text-muted);">
+                    <i class="ph-bold ph-shield-check" style="font-size: 2.2rem; color: var(--success); display: block; margin-bottom: 8px;"></i>
+                    ¡Excelente! No hay ningún lead caliente abandonado. Todo el equipo está al día.
+                </div>
+            `;
+            return;
+        }
+
+        container.innerHTML = `
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+                ${json.data.map(lead => `
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 14px; background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 8px;">
+                        <div>
+                            <div style="font-weight: 800; font-size: 0.95rem; color: #fff;">
+                                ${escapar(lead.nombre)}
+                                <span style="font-size: 0.72rem; background: #ef4444; color: #fff; padding: 2px 6px; border-radius: 4px; margin-left: 6px;">
+                                    ${escapar(lead.motivo_rescate || '>4h sin respuesta')}
+                                </span>
+                            </div>
+                            <div style="font-size: 0.78rem; color: var(--text-secondary); margin-top: 2px;">
+                                💻 ${escapar(lead.modelo_interes_texto || 'Laptop')} • S/ ${lead.presupuesto_aprox || 0} • Asesor anterior: ${escapar(lead.vendedor_nombre || 'Sin asignar')}
+                            </div>
+                        </div>
+                        <button class="btn btn-primary" style="background: #ef4444; padding: 6px 12px; font-size: 0.8rem;" onclick="ejecutarRescateLead(${lead.id})">
+                            <i class="ph-bold ph-lightning"></i> Rescatar Lead
+                        </button>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+    } catch (err) {
+        console.error('Error cargando modal bolsa rescate:', err);
+        container.innerHTML = `<p style="color: var(--danger); text-align: center;">Error al cargar prospectos rescatables.</p>`;
+    }
+}
+
+async function ejecutarRescateLead(leadId) {
+    try {
+        const nuevoVendedor = activeVendedorId > 0 ? activeVendedorId : 2;
+        const res = await fetch(`${API_BASE}/leads.php?action=rescatar_lead`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ lead_id: leadId, nuevo_vendedor_id: nuevoVendedor })
+        });
+        const json = await res.json();
+        if (json.success) {
+            reproducirAlarmaAudio('cita');
+            cerrarModal('modal-bolsa-rescate');
+            cargarLeads(false);
+            cargarStats();
+            cargarBolsaRescate();
+            alert('🚀 ¡Lead rescatado con éxito! Ahora está asignado a ti en estado de Compra Inminente.');
+        } else {
+            alert(json.error || 'No se pudo rescatar');
+        }
+    } catch (err) {
+        console.error('Error rescatando lead:', err);
+    }
+}
+
+// ----------------------------------------------------------
+// 13. REGISTRO RÁPIDO DE LLAMADAS TELEFÓNICAS
+// ----------------------------------------------------------
+function abrirModalLlamada(leadId) {
+    const lead = leadsData.find(l => l.id == leadId);
+    if (!lead) return;
+    activeLeadForLlamada = lead;
+
+    document.getElementById('llamada-lead-id').value = lead.id;
+    document.getElementById('llamada-cliente-nombre').textContent = `${lead.nombre} (${lead.telefono})`;
+    document.getElementById('llamada-notas').value = '';
+
+    abrirModal('modal-registro-llamada');
+}
+
+async function guardarLlamadaResultado(resultado) {
+    if (!activeLeadForLlamada) return;
+    const leadId = activeLeadForLlamada.id;
+    const notas = document.getElementById('llamada-notas').value.trim();
+
+    try {
+        const res = await fetch(`${API_BASE}/leads.php?action=registrar_llamada`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                lead_id: leadId,
+                vendedor_id: activeVendedorId > 0 ? activeVendedorId : 1,
+                resultado: resultado,
+                notas: notas
+            })
+        });
+        const json = await res.json();
+        if (json.success) {
+            cerrarModal('modal-registro-llamada');
+            cargarLeads(false);
+            cargarStats();
+            if (resultado === 'VIENE_TIENDA') {
+                reproducirAlarmaAudio('cita');
+                alert('🎉 ¡Cliente confirmó visita a tienda! Se avanzó a Visita/Separado con temperatura PÚRPURA.');
+            } else if (resultado === 'VOLVER_A_LLAMAR') {
+                alert('⏰ Llamada registrada: Volver a llamar en 2 horas.');
+            } else if (resultado === 'NO_CONTESTO') {
+                const tel = activeLeadForLlamada.telefono.replace(/\D/g, '');
+                const nombre = activeLeadForLlamada.nombre.split(' ')[0];
+                const msg = `Hola ${nombre} 👋, te intenté llamar de Petulap por la laptop que consultaste. Avísame cuando estés disponible para coordinar o si prefieres que te responda por aquí 🙌`;
+                window.open(`https://wa.me/${tel}?text=${encodeURIComponent(msg)}`, '_blank');
+            }
+        }
+    } catch (err) {
+        console.error('Error guardando llamada:', err);
+    }
+}
+
+// ----------------------------------------------------------
+// 14. CADENCIA DE 4 DISPAROS PARA LAPTOPS USADAS
+// ----------------------------------------------------------
+function abrirModalDisparos(leadId) {
+    const lead = leadsData.find(l => l.id == leadId);
+    if (!lead) return;
+    activeLeadForDisparos = lead;
+
+    const nombre = lead.nombre ? lead.nombre.split(' ')[0] : 'amigo';
+    const laptop = lead.modelo_interes_texto || 'la laptop que vimos';
+    const tel = lead.telefono.replace(/\D/g, '');
+
+    const disparos = [
+        {
+            num: 1,
+            titulo: "📹 Disparo 1: Confianza en Video (Estética y Batería)",
+            momento: "A las 2 horas de la cotización",
+            texto: `¡Hola, ${nombre}! 👋 Te grabé un video rápido de 15 segundos mostrando el estado estético impecable grado A de *${laptop}* y la salud de batería probada al 100%. ¿Deseas que te lo mande por aquí para que la veas antes de que se venda? 💻✨`
+        },
+        {
+            num: 2,
+            titulo: "⚡ Disparo 2: Escasez Real (Pregunta en Tienda)",
+            momento: "A las 6 horas o al día siguiente",
+            texto: `Hola, ${nombre}! Un cliente acaba de venir a consultar por *${laptop}*. Como tú me hablaste primero por WhatsApp, quería consultarte: ¿te la aparto hasta las 6:00 PM o la dejamos en vitrina para venta libre? Me avisas para no quedarte mal 🙌`
+        },
+        {
+            num: 3,
+            titulo: "🎁 Disparo 3: Gancho de Cierre con Regalo (Anti-Frío)",
+            momento: "A las 24 horas (Lead dejado en visto)",
+            texto: `¡${nombre}! Conversé con el encargado: Si pasas hoy a probar *${laptop}* a nuestra sede (Yanahuara o Cayma), te incluiré totalmente de cortesía un *Mouse inalámbrico nuevo + Funda acolchada* de regalo 🎁. ¿A qué hora te quedaría bien pasar?`
+        },
+        {
+            num: 4,
+            titulo: "🚪 Disparo 4: Ruptura Elegante / Despedida (FOMO)",
+            momento: "A las 48 horas sin respuesta",
+            texto: `Hola ${nombre}, una consulta rápida: ¿pudiste conseguir laptop o sigues buscando? Te pregunto para saber si libero la reserva de tu cotización en nuestro sistema o te sigo guardando la opción. ¡Un saludo de Petulap! 🙌`
+        }
+    ];
+
+    const container = document.getElementById('disparos-modal-container');
+    if (!container) return;
+
+    container.innerHTML = `
+        <div style="margin-bottom: 12px; font-size: 0.88rem; color: var(--text-secondary);">
+            Prospecto: <strong style="color: #fff;">${escapar(lead.nombre)}</strong> | Laptop: <strong style="color: var(--primary);">${escapar(laptop)}</strong>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+            ${disparos.map(d => `
+                <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                        <strong style="font-size: 0.88rem; color: #60a5fa;">${d.titulo}</strong>
+                        <span style="font-size: 0.72rem; color: var(--text-muted);">${d.momento}</span>
+                    </div>
+                    <div style="font-size: 0.82rem; background: rgba(0,0,0,0.2); padding: 8px; border-radius: 6px; color: var(--text-primary); margin-bottom: 8px; white-space: pre-wrap; font-family: inherit;">${d.texto}</div>
+                    <div style="display: flex; gap: 8px; justify-content: flex-end;">
+                        <button class="btn btn-ghost" style="padding: 4px 10px; font-size: 0.75rem;" onclick="copiarTextoPortapapeles(${JSON.stringify(d.texto).replace(/"/g, '&quot;')})">
+                            <i class="ph ph-copy"></i> Copiar
+                        </button>
+                        <a href="https://wa.me/${tel}?text=${encodeURIComponent(d.texto)}" target="_blank" class="btn btn-wa" style="padding: 4px 12px; font-size: 0.75rem;">
+                            <i class="ph-bold ph-whatsapp-logo"></i> Enviar a WhatsApp
+                        </a>
+                    </div>
+                </div>
+            `).join('')}
+        </div>
+    `;
+
+    abrirModal('modal-disparos-whatsapp');
+}
+
+function copiarTextoPortapapeles(texto) {
+    if (navigator.clipboard) {
+        navigator.clipboard.writeText(texto).then(() => {
+            alert('📋 Texto copiado al portapapeles.');
+        });
+    } else {
+        const t = document.createElement('textarea');
+        t.value = texto;
+        document.body.appendChild(t);
+        t.select();
+        document.execCommand('copy');
+        document.body.removeChild(t);
+        alert('📋 Texto copiado al portapapeles.');
+    }
 }

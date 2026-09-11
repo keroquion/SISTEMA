@@ -27,6 +27,19 @@
         </div>
 
         <div class="header-actions">
+            <div style="display: flex; align-items: center; gap: 6px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 4px 10px;">
+                <i class="ph-bold ph-user" style="color: var(--primary);"></i>
+                <select id="selector-asesor-activo" onchange="cambiarAsesorActivo(this.value)" style="background: transparent; border: none; color: var(--text-primary); font-size: 0.85rem; font-weight: 700; outline: none; cursor: pointer;">
+                    <option value="0">👑 Modo Supervisor (Todas las Sedes)</option>
+                    <option value="1">👤 Asesor General</option>
+                    <option value="2">👤 Kevin Quicaño (Yanahuara)</option>
+                    <option value="3">👤 Ventas Cayma</option>
+                </select>
+            </div>
+            <button class="btn btn-ghost" id="btn-bolsa-rescate" onclick="abrirModalBolsaRescate()" title="Bolsa de Rescate de Leads Abandonados" style="border-color: rgba(239, 68, 68, 0.4); color: #f87171;">
+                <i class="ph-bold ph-lightning" style="color: #ef4444;"></i> Bolsa Rescate
+                <span class="bell-badge" id="badge-rescate-count" style="display: none; background: #ef4444;">0</span>
+            </button>
             <button class="btn btn-ghost" onclick="abrirModalRanking()" title="Ver Ranking de Ventas y Sedes">
                 <i class="ph-bold ph-trophy" style="color: #f59e0b;"></i> Ranking
             </button>
@@ -99,8 +112,12 @@
         </div>
 
         <div class="chips-container">
+            <button class="chip" id="chip-foco-hoy" onclick="toggleFocoHoy()" style="border: 1px solid rgba(245, 158, 11, 0.5); background: rgba(245, 158, 11, 0.1); color: #fbbf24; font-weight: 800; cursor: pointer;">
+                <i class="ph-bold ph-target"></i> 🎯 Mi Foco de Hoy
+            </button>
             <span class="chip active" data-filter="TODOS">Todos los Leads</span>
-            <span class="chip" data-filter="ROJO">🔥 Clientes Fríos / Rojos</span>
+            <span class="chip" data-filter="INMINENTE" style="color: #f87171; font-weight: 700;">🔥 Compra Inminente</span>
+            <span class="chip" data-filter="ROJO">🔴 Clientes Fríos / Rojos</span>
             <span class="chip" data-filter="SEPARADOS">🏢 Visitas y Separados</span>
         </div>
     </section>
@@ -305,6 +322,79 @@
                 <button class="modal-close" onclick="cerrarModal('modal-ranking-ventas')">&times;</button>
             </div>
             <div class="modal-body" id="ranking-modal-body">
+                <!-- Renderizado dinámicamente por crm.js -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 10. MODAL: BOLSA DE RESCATE DE VENTAS (ANTI-DESIDIA) -->
+    <div class="modal-overlay" id="modal-bolsa-rescate" style="display: none;">
+        <div class="modal-content" style="max-width: 680px;">
+            <div class="modal-header">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <i class="ph-bold ph-lightning" style="font-size: 1.4rem; color: #ef4444;"></i>
+                    <div class="modal-title">Bolsa de Rescate de Ventas (Anti-Abandono)</div>
+                </div>
+                <button class="modal-close" onclick="cerrarModal('modal-bolsa-rescate')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 14px;">
+                    Clientes calientes o cotizados con más de 2h a 4h sin respuesta de su asesor. Cualquier vendedor puede <strong>rescatar el lead</strong> y ganar la comisión.
+                </p>
+                <div id="lista-bolsa-rescate-container">
+                    <!-- Renderizado dinámicamente por crm.js -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 11. MODAL: REGISTRO RÁPIDO DE LLAMADA TELEFÓNICA -->
+    <div class="modal-overlay" id="modal-registro-llamada" style="display: none;">
+        <div class="modal-content" style="max-width: 480px;">
+            <div class="modal-header">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <i class="ph-bold ph-phone-call" style="font-size: 1.4rem; color: var(--success);"></i>
+                    <div class="modal-title">Registrar Resultado de Llamada</div>
+                </div>
+                <button class="modal-close" onclick="cerrarModal('modal-registro-llamada')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p style="font-size: 0.88rem; margin-bottom: 12px; color: var(--text-secondary);">
+                    Cliente: <strong id="llamada-cliente-nombre" style="color: #fff;"></strong>
+                </p>
+                <input type="hidden" id="llamada-lead-id">
+                
+                <div style="display: grid; grid-template-columns: 1fr; gap: 10px; margin-bottom: 14px;">
+                    <button type="button" class="btn btn-primary" onclick="guardarLlamadaResultado('VIENE_TIENDA')" style="background: var(--success); justify-content: center; padding: 12px;">
+                        <i class="ph-bold ph-check-circle"></i> ✅ Contestó y viene a tienda hoy
+                    </button>
+                    <button type="button" class="btn btn-primary" onclick="guardarLlamadaResultado('VOLVER_A_LLAMAR')" style="background: #f59e0b; justify-content: center; padding: 12px;">
+                        <i class="ph-bold ph-clock-countdown"></i> ⏰ Volver a llamar en 2 horas
+                    </button>
+                    <button type="button" class="btn btn-ghost" onclick="guardarLlamadaResultado('NO_CONTESTO')" style="justify-content: center; padding: 12px; border-color: var(--danger); color: #f87171;">
+                        <i class="ph-bold ph-phone-x"></i> ❌ No contestó (Enviar WhatsApp de aviso)
+                    </button>
+                </div>
+
+                <div class="form-group">
+                    <label>Notas rápidas de la llamada:</label>
+                    <textarea id="llamada-notas" rows="2" placeholder="Ej: Pide rebaja a S/ 1,150 o pasará con su hijo a las 5pm..."></textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 12. MODAL: CADENCIA DE 4 DISPAROS PARA LAPTOPS USADAS -->
+    <div class="modal-overlay" id="modal-disparos-whatsapp" style="display: none;">
+        <div class="modal-content" style="max-width: 660px;">
+            <div class="modal-header">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <i class="ph-bold ph-chat-circle-dots" style="font-size: 1.4rem; color: #3b82f6;"></i>
+                    <div class="modal-title">Disparos de Cierre para Laptops Usadas</div>
+                </div>
+                <button class="modal-close" onclick="cerrarModal('modal-disparos-whatsapp')">&times;</button>
+            </div>
+            <div class="modal-body" id="disparos-modal-container">
                 <!-- Renderizado dinámicamente por crm.js -->
             </div>
         </div>

@@ -44,6 +44,10 @@ CREATE TABLE IF NOT EXISTS `crm_leads` (
   `presupuesto_aprox` DECIMAL(10,2) DEFAULT NULL,
   `origen_lead` ENUM('WHATSAPP', 'FACEBOOK_ADS', 'TIKTOK', 'TIENDA_YANAHUARA', 'TIENDA_CAYMA', 'RECOMENDACION') DEFAULT 'WHATSAPP',
   `sede_preferida` ENUM('YANAHUARA', 'CAYMA', 'ENVIO_PROVINCIA') DEFAULT 'YANAHUARA',
+  `prioridad_compra` ENUM('NORMAL', 'ALTA', 'INMINENTE') DEFAULT 'NORMAL',
+  `en_bolsa_rescate` TINYINT(1) DEFAULT 0,
+  `ultimo_contacto_vendedor` DATETIME DEFAULT CURRENT_TIMESTAMP,
+  `proxima_llamada_hora` DATETIME DEFAULT NULL,
   `ultimo_mensaje_texto` TEXT DEFAULT NULL,
   `ultimo_mensaje_hora` DATETIME DEFAULT CURRENT_TIMESTAMP,
   `ultimo_mensaje_emisor` ENUM('CLIENTE', 'PETULAP') DEFAULT 'CLIENTE',
@@ -54,7 +58,19 @@ CREATE TABLE IF NOT EXISTS `crm_leads` (
   INDEX `idx_telefono` (`telefono`),
   INDEX `idx_etapa` (`etapa`),
   INDEX `idx_temperatura` (`temperatura`),
-  INDEX `idx_vendedor` (`vendedor_id`)
+  INDEX `idx_vendedor` (`vendedor_id`),
+  INDEX `idx_prioridad` (`prioridad_compra`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS `crm_llamadas_registro` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `lead_id` INT NOT NULL,
+  `vendedor_id` INT DEFAULT 1,
+  `resultado` VARCHAR(50) NOT NULL, -- VIENE_TIENDA, VOLVER_A_LLAMAR, NO_CONTESTO
+  `notas` TEXT DEFAULT NULL,
+  `fecha_registro` DATETIME DEFAULT CURRENT_TIMESTAMP,
+  INDEX `idx_llamada_lead` (`lead_id`),
+  FOREIGN KEY (`lead_id`) REFERENCES `crm_leads`(`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS `crm_agendamientos` (

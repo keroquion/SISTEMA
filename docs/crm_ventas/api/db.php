@@ -46,6 +46,22 @@ try {
             $conn->multi_query($sql);
             while ($conn->more_results() && $conn->next_result()) {;}
         }
+    } else {
+        // Auto-migración v1.3.0 de columnas nuevas
+        @$conn->query("ALTER TABLE crm_leads ADD COLUMN prioridad_compra VARCHAR(20) DEFAULT 'NORMAL'");
+        @$conn->query("ALTER TABLE crm_leads ADD COLUMN en_bolsa_rescate TINYINT(1) DEFAULT 0");
+        @$conn->query("ALTER TABLE crm_leads ADD COLUMN ultimo_contacto_vendedor DATETIME DEFAULT CURRENT_TIMESTAMP");
+        @$conn->query("ALTER TABLE crm_leads ADD COLUMN proxima_llamada_hora DATETIME DEFAULT NULL");
+        @$conn->query("ALTER TABLE crm_promociones ADD COLUMN unidades_reservadas INT DEFAULT 0");
+        @$conn->query("CREATE TABLE IF NOT EXISTS crm_llamadas_registro (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            lead_id INT NOT NULL,
+            vendedor_id INT DEFAULT 1,
+            resultado VARCHAR(50) NOT NULL,
+            notas TEXT DEFAULT NULL,
+            fecha_registro DATETIME DEFAULT CURRENT_TIMESTAMP,
+            INDEX idx_llamada_lead (lead_id)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
     }
 } catch (Exception $e) {
     // Si falla MySQL local, usar SQLite local en storage/ para que funcione sin configuración

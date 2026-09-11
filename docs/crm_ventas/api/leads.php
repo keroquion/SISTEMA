@@ -16,6 +16,7 @@ if ($action === 'list') {
     $filtro_etapa = $_GET['etapa'] ?? '';
     $filtro_vendedor = $_GET['vendedor_id'] ?? '';
     $filtro_search = $_GET['search'] ?? '';
+    $foco_hoy = isset($_GET['foco_hoy']) && $_GET['foco_hoy'] == '1';
 
     $query = "SELECT * FROM crm_leads WHERE 1=1";
     $params = [];
@@ -24,8 +25,8 @@ if ($action === 'list') {
         $query .= " AND etapa = ?";
         $params[] = $filtro_etapa;
     }
-    if (!empty($filtro_vendedor)) {
-        $query .= " AND vendedor_id = ?";
+    if (!empty($filtro_vendedor) && $filtro_vendedor != '0') {
+        $query .= " AND (vendedor_id = ? OR vendedor_id IS NULL)";
         $params[] = (int)$filtro_vendedor;
     }
     if (!empty($filtro_search)) {
@@ -35,7 +36,10 @@ if ($action === 'list') {
         $params[] = $search_term;
         $params[] = $search_term;
     }
-    $query .= " ORDER BY fecha_actualizacion DESC";
+    if ($foco_hoy) {
+        $query .= " AND etapa NOT IN ('GANADO', 'PERDIDO')";
+    }
+    $query .= " ORDER BY (prioridad_compra = 'INMINENTE') DESC, fecha_actualizacion DESC";
 
     $leads = [];
     if ($is_pdo) {
@@ -55,21 +59,21 @@ if ($action === 'list') {
         }
     }
 
-    // Calcular en caliente la temperatura según las horas transcurridas
+    // Calcular en caliente la temperatura y foco prioritario
     $now = new DateTime();
+    $filtered_leads = [];
     foreach ($leads as &$lead) {
         $ultimo_dt = new DateTime($lead['ultimo_mensaje_hora'] ?? $lead['fecha_creacion']);
         $diff = $now->diff($ultimo_dt);
         $horas = ($diff->days * 24) + $diff->h;
         $lead['horas_sin_contacto'] = $horas;
 
+        // Horas desde el último contacto del vendedor
+        $ultimo_vendedor_dt = new DateTime($lead['ultimo_contacto_vendedor'] ?? $lead['fecha_creacion']);
+        $diff_vendedor = $now->diff($ultimo_vendedor_dt);
+        $lead['horas_sin_atencion_vendedor'] = ($diff_vendedor->days * 24) + $diff_vendedor->h;
+
         // Regla inteligente anti-olvido:
-        // Si tiene cita agendada o está en VISITA_SEPARADO -> PURPURA
-        // Si el cliente fue el último en escribir -> VERDE urgente (atenderlo ya!)
-        // Si Petulap fue el último en escribir:
-        //   < 6h -> VERDE
-        //   6h a 24h -> AMBAR (esperando respuesta)
-        //   > 24h -> ROJO (cliente frío, dejado en visto)
         if ($lead['etapa'] === 'VISITA_SEPARADO' || ($lead['temperatura'] ?? '') === 'PURPURA') {
             $lead['temperatura'] = 'PURPURA';
         } elseif ($lead['etapa'] === 'GANADO') {
@@ -87,7 +91,21 @@ if ($action === 'list') {
                 $lead['temperatura'] = 'ROJO';
             }
         }
+
+        // Si es filtro "Mi Foco de Hoy", priorizar solo leads calientes o urgentes
+        if ($foco_hoy) {
+            $es_inminente = ($lead['prioridad_compra'] ?? '') === 'INMINENTE';
+            $es_cita = $lead['temperatura'] === 'PURPURA';
+            $es_frio = $lead['temperatura'] === 'ROJO';
+            $espera_respuesta = ($lead['ultimo_mensaje_emisor'] ?? '') === 'CLIENTE';
+            if ($es_inminente || $es_cita || $es_frio || $espera_respuesta) {
+                $filtered_leads[] = $lead;
+            }
+        } else {
+            $filtered_leads[] = $lead;
+        }
     }
+    $leads = $filtered_leads;
 
     json_resp(['success' => true, 'total' => count($leads), 'data' => $leads]);
 }
@@ -414,6 +432,153 @@ if ($action === 'ranking_asesores') {
         'sedes' => $sedes,
         'ranking' => $ranking
     ]);
+}
+
+// ----------------------------------------------------------
+// 9. LISTAR ASESORES COMERCIALES DISPONIBLES
+// ----------------------------------------------------------
+if ($action === 'vendedores') {
+    $vendedores = [
+        ['id' => 1, 'nombre' => 'Asesor General', 'sede' => 'TODAS', 'rol' => 'SUPERVISOR'],
+        ['id' => 2, 'nombre' => 'Kevin Quicaño (Yanahuara)', 'sede' => 'YANAHUARA', 'rol' => 'ASESOR'],
+        ['id' => 3, 'nombre' => 'Asesor Cayma', 'sede' => 'CAYMA', 'rol' => 'ASESOR']
+    ];
+    json_resp(['success' => true, 'data' => $vendedores]);
+}
+
+// ----------------------------------------------------------
+// 10. MARCAR PRIORIDAD COMPRA INMINENTE (ANTI-SEPULTAMIENTO)
+// ----------------------------------------------------------
+if ($action === 'marcar_compra_inminente' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    $input = json_decode(file_get_contents('php://input'), true) ?? $_POST;
+    $id = (int)($input['id'] ?? 0);
+    $prioridad = ($input['prioridad'] ?? 'INMINENTE') === 'INMINENTE' ? 'INMINENTE' : 'NORMAL';
+
+    if ($id <= 0) json_resp(['success' => false, 'error' => 'ID inválido'], 400);
+
+    $sql = "UPDATE crm_leads SET prioridad_compra = ?, fecha_actualizacion = NOW() WHERE id = ?";
+    if ($is_pdo) {
+        $stmt = $conn->prepare($sql);
+        $stmt->execute([$prioridad, $id]);
+    } else {
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param('si', $prioridad, $id);
+        $stmt->execute();
+    }
+
+    $nota = $prioridad === 'INMINENTE' 
+        ? "🔥 Marcado como COMPRA INMINENTE / Prioridad Máxima" 
+        : "Prioridad regresada a NORMAL";
+    @$conn->query("INSERT INTO crm_seguimientos (lead_id, tipo_accion, detalle) VALUES ($id, 'AUTO_SLA', '$nota')");
+
+    json_resp(['success' => true, 'prioridad' => $prioridad]);
+}
+
+// ----------------------------------------------------------
+// 11. BOLSA DE RESCATE (LEADS ABANDONADOS POR DESIDIA)
+// ----------------------------------------------------------
+if ($action === 'bolsa_rescate') {
+    $sql = "SELECT l.*, v.nombre as vendedor_nombre 
+            FROM crm_leads l 
+            LEFT JOIN crm_vendedores v ON l.vendedor_id = v.id 
+            WHERE l.etapa NOT IN ('GANADO', 'PERDIDO')";
+    $all = [];
+    if ($is_pdo) {
+        $all = $conn->query($sql)->fetchAll(PDO::FETCH_ASSOC);
+    } else {
+        $res = $conn->query($sql);
+        while ($r = $res->fetch_assoc()) $all[] = $r;
+    }
+
+    $now = new DateTime();
+    $rescatables = [];
+    foreach ($all as $item) {
+        $dt = new DateTime($item['ultimo_mensaje_hora'] ?? $item['fecha_creacion']);
+        $diff = $now->diff($dt);
+        $horas = ($diff->days * 24) + $diff->h;
+        $item['horas_sin_contacto'] = $horas;
+
+        $es_inminente = ($item['prioridad_compra'] ?? '') === 'INMINENTE' && $horas >= 2;
+        $es_abandonado = in_array($item['etapa'], ['ASESORIA', 'COTIZADO', 'NUEVO']) && $horas >= 4;
+
+        if ($es_inminente || $es_abandonado) {
+            $item['motivo_rescate'] = $es_inminente 
+                ? '🔥 Compra Inminente sin atención >2 horas' 
+                : '⏳ Cotización abandonada >4 horas sin seguimiento';
+            $rescatables[] = $item;
+        }
+    }
+
+    json_resp([
+        'success' => true,
+        'total' => count($rescatables),
+        'data' => $rescatables
+    ]);
+}
+
+// ----------------------------------------------------------
+// 12. RESCATAR LEAD DE LA BOLSA Y ASIGNAR A NUEVO ASESOR
+// ----------------------------------------------------------
+if ($action === 'rescatar_lead' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    $input = json_decode(file_get_contents('php://input'), true) ?? $_POST;
+    $lead_id = (int)($input['lead_id'] ?? 0);
+    $nuevo_vendedor_id = (int)($input['nuevo_vendedor_id'] ?? 1);
+
+    if ($lead_id <= 0) json_resp(['success' => false, 'error' => 'Lead ID requerido'], 400);
+
+    $sql = "UPDATE crm_leads 
+            SET vendedor_id = ?, en_bolsa_rescate = 0, prioridad_compra = 'INMINENTE', 
+                ultimo_contacto_vendedor = NOW(), fecha_actualizacion = NOW() 
+            WHERE id = ?";
+    if ($is_pdo) {
+        $stmt = $conn->prepare($sql);
+        $stmt->execute([$nuevo_vendedor_id, $lead_id]);
+    } else {
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param('ii', $nuevo_vendedor_id, $lead_id);
+        $stmt->execute();
+    }
+
+    $det = "🚀 Lead rescatado de la Bolsa de Desidia y reasignado al Asesor #$nuevo_vendedor_id";
+    @$conn->query("INSERT INTO crm_seguimientos (lead_id, vendedor_id, tipo_accion, detalle) VALUES ($lead_id, $nuevo_vendedor_id, 'CAMBIO_ETAPA', '$det')");
+
+    json_resp(['success' => true, 'mensaje' => '¡Lead rescatado exitosamente! Ahora está bajo tu gestión.']);
+}
+
+// ----------------------------------------------------------
+// 13. REGISTRAR RESULTADO DE LLAMADA TELEFÓNICA RÁPIDA
+// ----------------------------------------------------------
+if ($action === 'registrar_llamada' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    $input = json_decode(file_get_contents('php://input'), true) ?? $_POST;
+    $lead_id = (int)($input['lead_id'] ?? 0);
+    $vendedor_id = (int)($input['vendedor_id'] ?? 1);
+    $resultado = $input['resultado'] ?? 'VIENE_TIENDA';
+    $notas = trim($input['notas'] ?? '');
+
+    if ($lead_id <= 0) json_resp(['success' => false, 'error' => 'Lead ID requerido'], 400);
+
+    $sql = "INSERT INTO crm_llamadas_registro (lead_id, vendedor_id, resultado, notas, fecha_registro) VALUES (?, ?, ?, ?, NOW())";
+    if ($is_pdo) {
+        $stmt = $conn->prepare($sql);
+        $stmt->execute([$lead_id, $vendedor_id, $resultado, $notas]);
+    } else {
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param('iiss', $lead_id, $vendedor_id, $resultado, $notas);
+        $stmt->execute();
+    }
+
+    // Actualizar último contacto del vendedor
+    @$conn->query("UPDATE crm_leads SET ultimo_contacto_vendedor = NOW(), fecha_actualizacion = NOW() WHERE id = $lead_id");
+
+    // Si viene a tienda, avanzar a VISITA_SEPARADO
+    if ($resultado === 'VIENE_TIENDA') {
+        @$conn->query("UPDATE crm_leads SET etapa = 'VISITA_SEPARADO', temperatura = 'PURPURA' WHERE id = $lead_id");
+    }
+
+    $det = "📞 Llamada telefónica realizada. Resultado: $resultado. Notas: $notas";
+    @$conn->query("INSERT INTO crm_seguimientos (lead_id, vendedor_id, tipo_accion, detalle) VALUES ($lead_id, $vendedor_id, 'LLAMADA', '$det')");
+
+    json_resp(['success' => true, 'resultado' => $resultado]);
 }
 
 json_resp(['success' => false, 'error' => 'Acción no reconocida'], 400);
