@@ -27,6 +27,9 @@
         </div>
 
         <div class="header-actions">
+            <button class="btn btn-ghost" onclick="abrirModalRanking()" title="Ver Ranking de Ventas y Sedes">
+                <i class="ph-bold ph-trophy" style="color: #f59e0b;"></i> Ranking
+            </button>
             <button class="btn bell-btn" id="btn-recordatorios" onclick="toggleDrawerRecordatorios()" title="Ver Citas y Recordatorios de Hoy">
                 <i class="ph-bold ph-bell"></i> Recordatorios
                 <span class="bell-badge" id="badge-notif-count" style="display: none;">0</span>
@@ -288,6 +291,22 @@
                     <i class="ph-bold ph-calendar-check"></i> Agendar Cita y Pasar a Púrpura
                 </button>
             </form>
+        </div>
+    </div>
+
+    <!-- 9. MODAL: RANKING COMERCIAL Y COMPARATIVA DE SEDES -->
+    <div class="modal-overlay" id="modal-ranking-ventas" style="display: none;">
+        <div class="modal-content" style="max-width: 680px;">
+            <div class="modal-header">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <i class="ph-bold ph-trophy" style="font-size: 1.4rem; color: #f59e0b;"></i>
+                    <div class="modal-title">Rendimiento Comercial & Sedes Arequipa</div>
+                </div>
+                <button class="modal-close" onclick="cerrarModal('modal-ranking-ventas')">&times;</button>
+            </div>
+            <div class="modal-body" id="ranking-modal-body">
+                <!-- Renderizado dinámicamente por crm.js -->
+            </div>
         </div>
     </div>
 

@@ -341,4 +341,79 @@ if ($action === 'completar_agendamiento' && $_SERVER['REQUEST_METHOD'] === 'POST
     json_resp(['success' => true, 'message' => 'Agendamiento actualizado']);
 }
 
+// ----------------------------------------------------------
+// 8. RANKING COMERCIAL Y COMPARATIVA DE SEDES
+// ----------------------------------------------------------
+if ($action === 'ranking_asesores') {
+    $sql = "SELECT id, nombre, etapa, temperatura, sede_preferida, presupuesto_aprox, vendedor_id FROM crm_leads";
+    $rows = [];
+    if ($is_pdo) {
+        $rows = $conn->query($sql)->fetchAll(PDO::FETCH_ASSOC);
+    } else {
+        $res = $conn->query($sql);
+        while ($r = $res->fetch_assoc()) $rows[] = $r;
+    }
+
+    $sedes = [
+        'YANAHUARA' => ['nombre' => 'Sede Yanahuara (Av. Ejército 314)', 'leads' => 0, 'ganados' => 0, 'facturado' => 0.0, 'citas' => 0],
+        'CAYMA' => ['nombre' => 'Sede Cayma (León XIII Mza A-4)', 'leads' => 0, 'ganados' => 0, 'facturado' => 0.0, 'citas' => 0],
+        'ENVIO_PROVINCIA' => ['nombre' => 'Envíos a Provincia', 'leads' => 0, 'ganados' => 0, 'facturado' => 0.0, 'citas' => 0]
+    ];
+
+    $vendedores = [
+        1 => ['id' => 1, 'nombre' => 'Asesor General', 'leads' => 0, 'ganados' => 0, 'facturado' => 0.0, 'citas' => 0, 'frios' => 0],
+        2 => ['id' => 2, 'nombre' => 'Ventas Yanahuara', 'leads' => 0, 'ganados' => 0, 'facturado' => 0.0, 'citas' => 0, 'frios' => 0],
+        3 => ['id' => 3, 'nombre' => 'Ventas Cayma', 'leads' => 0, 'ganados' => 0, 'facturado' => 0.0, 'citas' => 0, 'frios' => 0]
+    ];
+
+    foreach ($rows as $r) {
+        $sede = $r['sede_preferida'] ?? 'YANAHUARA';
+        if (!isset($sedes[$sede])) $sede = 'YANAHUARA';
+        
+        $v_id = (int)($r['vendedor_id'] ?? 1);
+        if (!isset($vendedores[$v_id])) $v_id = 1;
+
+        $monto = (float)($r['presupuesto_aprox'] ?? 0);
+        $et = $r['etapa'] ?? 'NUEVO';
+        $temp = $r['temperatura'] ?? 'VERDE';
+
+        // Sedes
+        $sedes[$sede]['leads']++;
+        if ($et === 'GANADO') {
+            $sedes[$sede]['ganados']++;
+            $sedes[$sede]['facturado'] += $monto;
+        }
+        if ($temp === 'PURPURA' || $et === 'VISITA_SEPARADO') {
+            $sedes[$sede]['citas']++;
+        }
+
+        // Vendedores
+        $vendedores[$v_id]['leads']++;
+        if ($et === 'GANADO') {
+            $vendedores[$v_id]['ganados']++;
+            $vendedores[$v_id]['facturado'] += $monto;
+        }
+        if ($temp === 'PURPURA' || $et === 'VISITA_SEPARADO') {
+            $vendedores[$v_id]['citas']++;
+        }
+        if ($temp === 'ROJO') {
+            $vendedores[$v_id]['frios']++;
+        }
+    }
+
+    // Calcular tasa de conversión
+    $ranking = array_values($vendedores);
+    foreach ($ranking as &$v) {
+        $v['conversion_pct'] = $v['leads'] > 0 ? round(($v['ganados'] / $v['leads']) * 100, 1) : 0;
+    }
+    // Ordenar por facturación descendente
+    usort($ranking, fn($a, $b) => $b['facturado'] <=> $a['facturado']);
+
+    json_resp([
+        'success' => true,
+        'sedes' => $sedes,
+        'ranking' => $ranking
+    ]);
+}
+
 json_resp(['success' => false, 'error' => 'Acción no reconocida'], 400);

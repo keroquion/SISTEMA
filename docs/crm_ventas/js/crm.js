@@ -53,6 +53,61 @@ function actualizarIconoTema(theme) {
 }
 
 // ----------------------------------------------------------
+// 1.1 SINTETIZADOR DE AUDIO WEBAUDIO (Cero dependencias externas)
+// ----------------------------------------------------------
+function reproducirAlarmaAudio(tipo = 'cita') {
+    try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return;
+        const ctx = new AudioCtx();
+        if (ctx.state === 'suspended') {
+            ctx.resume();
+        }
+        
+        if (tipo === 'ganado') {
+            // Fanfarria triunfal de 4 notas ascendentes (C5, E5, G5, C6)
+            const notas = [523.25, 659.25, 783.99, 1046.50];
+            notas.forEach((freq, i) => {
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(freq, ctx.currentTime + (i * 0.12));
+                gain.gain.setValueAtTime(0.25, ctx.currentTime + (i * 0.12));
+                gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + (i * 0.12) + 0.35);
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start(ctx.currentTime + (i * 0.12));
+                osc.stop(ctx.currentTime + (i * 0.12) + 0.36);
+            });
+        } else {
+            // Chime armónico de doble campana para citas y alertas urgentes
+            const osc1 = ctx.createOscillator();
+            const osc2 = ctx.createOscillator();
+            const gainNode = ctx.createGain();
+
+            osc1.type = 'sine';
+            osc1.frequency.setValueAtTime(880, ctx.currentTime); // A5
+            osc2.type = 'triangle';
+            osc2.frequency.setValueAtTime(1760, ctx.currentTime); // A6
+
+            gainNode.gain.setValueAtTime(0.25, ctx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.8);
+
+            osc1.connect(gainNode);
+            osc2.connect(gainNode);
+            gainNode.connect(ctx.destination);
+
+            osc1.start();
+            osc2.start();
+            osc1.stop(ctx.currentTime + 0.8);
+            osc2.stop(ctx.currentTime + 0.8);
+        }
+    } catch (e) {
+        console.warn('AudioContext no disponible o bloqueado:', e);
+    }
+}
+
+// ----------------------------------------------------------
 // 2. CARGAR Y RENDERIZAR LEADS EN EL KANBAN
 // ----------------------------------------------------------
 async function cargarLeads(mostrarLoading = true) {
@@ -273,6 +328,9 @@ async function avanzarEtapa(leadId, etapaActual) {
         });
         const json = await res.json();
         if (json.success) {
+            if (siguienteEtapa === 'GANADO') {
+                reproducirAlarmaAudio('ganado');
+            }
             cargarLeads(false);
             cargarStats();
         }
@@ -303,15 +361,29 @@ function renderizarListaPromos() {
     container.innerHTML = '';
 
     promosData.forEach(p => {
+        const stockReal = p.stock_real !== undefined ? parseInt(p.stock_real, 10) : Math.max(0, (parseInt(p.stock_disponible, 10) || 0) - (parseInt(p.unidades_reservadas, 10) || 0));
+        const reservadas = parseInt(p.unidades_reservadas, 10) || 0;
+        const sinStock = stockReal <= 0;
+
         const item = document.createElement('div');
         item.className = 'promo-item';
         item.innerHTML = `
             <div>
-                <strong>${p.marca} ${p.modelo}</strong>
+                <strong>${escapar(p.marca)} ${escapar(p.modelo)}</strong>
                 <div style="font-size: 0.78rem; color: var(--text-secondary);">
-                    ${p.procesador} | ${p.ram} | ${p.almacenamiento} | ${p.pantalla}
+                    ${escapar(p.procesador)} | ${escapar(p.ram)} | ${escapar(p.almacenamiento)} | ${escapar(p.pantalla)}
                 </div>
-                ${p.nota_stock ? `<span style="font-size: 0.7rem; color: var(--warning); font-weight: 700;">⚠️ ${p.nota_stock}</span>` : ''}
+                <div style="display: flex; gap: 6px; align-items: center; margin-top: 3px; flex-wrap: wrap;">
+                    <span style="font-size: 0.72rem; color: ${sinStock ? 'var(--danger)' : 'var(--success)'}; font-weight: 700;">
+                        ${sinStock ? '⛔ Sin stock libre' : `📦 ${stockReal} disponible${stockReal > 1 ? 's' : ''}`}
+                    </span>
+                    ${reservadas > 0 ? `
+                        <span style="font-size: 0.68rem; background: rgba(168, 85, 247, 0.2); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.4); padding: 1px 6px; border-radius: 4px;" title="Bloqueo temporal de stock por cita agendada">
+                            🔒 ${reservadas} reservada${reservadas > 1 ? 's' : ''} (24h)
+                        </span>
+                    ` : ''}
+                    ${p.nota_stock ? `<span style="font-size: 0.7rem; color: var(--warning); font-weight: 700;">⚠️ ${escapar(p.nota_stock)}</span>` : ''}
+                </div>
             </div>
             <div style="text-align: right;">
                 <div style="font-size: 1rem; font-weight: 800; color: var(--primary);">S/ ${p.precio_promo}</div>
@@ -590,10 +662,12 @@ async function guardarAgendamientoLead(e) {
         const json = await res.json();
         if (json.success) {
             cerrarModal('modal-agendar-lead');
+            reproducirAlarmaAudio('cita');
             cargarLeads(false);
             cargarStats();
             cargarRecordatoriosHoy();
-            alert('🎉 ¡Cita agendada con éxito! El lead avanzó a Visita/Separado con temperatura PÚRPURA.');
+            cargarPromociones();
+            alert('🎉 ¡Cita agendada con éxito! El lead avanzó a Visita/Separado con temperatura PÚRPURA y el equipo quedó reservado por 24h.');
         } else {
             alert(json.error || 'Error al agendar');
         }
@@ -615,12 +689,143 @@ async function completarCita(agId, cerrarVenta) {
         });
         const json = await res.json();
         if (json.success) {
+            if (cerrarVenta) {
+                reproducirAlarmaAudio('ganado');
+            }
             cargarLeads(false);
             cargarStats();
             cargarRecordatoriosHoy();
+            cargarPromociones();
         }
     } catch (err) {
         console.error('Error completando cita:', err);
+    }
+}
+
+// ----------------------------------------------------------
+// 10. MODAL RANKING COMERCIAL Y COMPARATIVA DE SEDES
+// ----------------------------------------------------------
+async function abrirModalRanking() {
+    const container = document.getElementById('ranking-modal-body');
+    if (!container) return;
+    abrirModal('modal-ranking-ventas');
+    container.innerHTML = `
+        <div style="text-align: center; padding: 30px; color: var(--text-muted);">
+            <i class="ph-bold ph-spinner ph-spin" style="font-size: 2rem; color: var(--primary);"></i>
+            <p style="margin-top: 8px;">Cargando métricas comerciales de sedes...</p>
+        </div>
+    `;
+
+    try {
+        const res = await fetch(`${API_BASE}/leads.php?action=ranking_asesores`);
+        const json = await res.json();
+        if (!json.success) {
+            container.innerHTML = `<p style="color: var(--danger); text-align: center;">Error al cargar ranking comercial.</p>`;
+            return;
+        }
+
+        const sedes = json.sedes || {};
+        const ranking = json.ranking || [];
+
+        const yana = sedes.YANAHUARA || { nombre: 'Yanahuara', leads: 0, ganados: 0, facturado: 0, citas: 0 };
+        const cayma = sedes.CAYMA || { nombre: 'Cayma', leads: 0, ganados: 0, facturado: 0, citas: 0 };
+        const envios = sedes.ENVIO_PROVINCIA || { nombre: 'Envíos', leads: 0, ganados: 0, facturado: 0, citas: 0 };
+
+        const totalFacturado = (yana.facturado || 0) + (cayma.facturado || 0) + (envios.facturado || 0);
+        const yanaPct = totalFacturado > 0 ? Math.round((yana.facturado / totalFacturado) * 100) : 50;
+        const caymaPct = totalFacturado > 0 ? Math.round((cayma.facturado / totalFacturado) * 100) : 50;
+
+        const medallas = ['🥇', '🥈', '🥉'];
+
+        container.innerHTML = `
+            <!-- Comparativa Sedes Yanahuara vs Cayma -->
+            <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 18px; margin-bottom: 20px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <div style="font-weight: 800; font-size: 0.95rem; color: var(--text-primary); display: flex; align-items: center; gap: 6px;">
+                        <i class="ph-bold ph-buildings" style="color: var(--primary);"></i> Batalla de Sedes Arequipa
+                    </div>
+                    <div style="font-size: 0.8rem; color: var(--text-muted);">Facturación Total: <strong>S/ ${totalFacturado.toFixed(2)}</strong></div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+                    <!-- Yanahuara -->
+                    <div style="background: rgba(37, 99, 235, 0.08); border: 1px solid rgba(37, 99, 235, 0.3); border-radius: 8px; padding: 12px;">
+                        <div style="font-weight: 800; color: #60a5fa; font-size: 0.85rem;">📍 SEDE YANAHUARA</div>
+                        <div style="font-size: 1.2rem; font-weight: 900; color: #fff; margin: 4px 0;">S/ ${Number(yana.facturado).toFixed(2)}</div>
+                        <div style="display: flex; gap: 8px; font-size: 0.75rem; color: var(--text-secondary);">
+                            <span>👥 ${yana.leads} leads</span>
+                            <span>🎉 ${yana.ganados} ventas</span>
+                            <span>📅 ${yana.citas} citas</span>
+                        </div>
+                    </div>
+
+                    <!-- Cayma -->
+                    <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 8px; padding: 12px;">
+                        <div style="font-weight: 800; color: #34d399; font-size: 0.85rem;">📍 SEDE CAYMA</div>
+                        <div style="font-size: 1.2rem; font-weight: 900; color: #fff; margin: 4px 0;">S/ ${Number(cayma.facturado).toFixed(2)}</div>
+                        <div style="display: flex; gap: 8px; font-size: 0.75rem; color: var(--text-secondary);">
+                            <span>👥 ${cayma.leads} leads</span>
+                            <span>🎉 ${cayma.ganados} ventas</span>
+                            <span>📅 ${cayma.citas} citas</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Barra comparativa porcentual -->
+                <div style="margin-top: 14px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 0.72rem; color: var(--text-secondary); margin-bottom: 4px;">
+                        <span>Yanahuara (${yanaPct}%)</span>
+                        <span>Cayma (${caymaPct}%)</span>
+                    </div>
+                    <div style="display: flex; height: 8px; border-radius: 4px; overflow: hidden; background: #334155;">
+                        <div style="width: ${yanaPct}%; background: #3b82f6; transition: width 0.4s ease;"></div>
+                        <div style="width: ${caymaPct}%; background: #10b981; transition: width 0.4s ease;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Leaderboard de Asesores de Venta -->
+            <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 18px;">
+                <div style="font-weight: 800; font-size: 0.95rem; color: var(--text-primary); margin-bottom: 12px; display: flex; align-items: center; gap: 6px;">
+                    <i class="ph-bold ph-medal" style="color: #f59e0b;"></i> Podio de Asesores Comerciales
+                </div>
+
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                    ${ranking.map((asesor, index) => {
+                        const medalla = medallas[index] || `#${index + 1}`;
+                        const isTop = index === 0;
+                        return `
+                            <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; border-radius: 8px; background: ${isTop ? 'rgba(245, 158, 11, 0.1)' : 'rgba(255, 255, 255, 0.02)'}; border: 1px solid ${isTop ? 'rgba(245, 158, 11, 0.3)' : 'var(--border-color)'};">
+                                <div style="display: flex; align-items: center; gap: 12px;">
+                                    <span style="font-size: 1.3rem;">${medalla}</span>
+                                    <div>
+                                        <div style="font-weight: 800; font-size: 0.9rem; color: ${isTop ? '#fbbf24' : 'var(--text-primary)'};">
+                                            ${escapar(asesor.nombre)}
+                                        </div>
+                                        <div style="font-size: 0.72rem; color: var(--text-secondary); display: flex; gap: 8px;">
+                                            <span>📥 ${asesor.leads} atendidos</span>
+                                            <span>📅 ${asesor.citas} citas</span>
+                                            <span style="color: ${asesor.frios > 0 ? 'var(--danger)' : 'var(--text-muted)'};">🔴 ${asesor.frios} fríos</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div style="text-align: right;">
+                                    <div style="font-size: 0.95rem; font-weight: 800; color: var(--success);">
+                                        S/ ${Number(asesor.facturado).toFixed(2)}
+                                    </div>
+                                    <div style="font-size: 0.72rem; color: var(--primary); font-weight: 700;">
+                                        Conv: ${asesor.conversion_pct}% (${asesor.ganados} ganados)
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            </div>
+        `;
+    } catch (err) {
+        console.error('Error cargando modal ranking:', err);
+        container.innerHTML = `<p style="color: var(--danger); text-align: center;">Ocurrió un error al cargar el ranking.</p>`;
     }
 }
 

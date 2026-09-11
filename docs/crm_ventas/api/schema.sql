@@ -25,6 +25,7 @@ CREATE TABLE IF NOT EXISTS `crm_promociones` (
   `precio_regular` DECIMAL(10,2) DEFAULT NULL,
   `precio_promo` DECIMAL(10,2) NOT NULL,
   `stock_disponible` INT DEFAULT 1,
+  `unidades_reservadas` INT DEFAULT 0,
   `nota_stock` VARCHAR(100) DEFAULT NULL, -- Ej: 'Solo 2 unidades', '1 stock'
   `descripcion_comercial` TEXT DEFAULT NULL,
   `activo` TINYINT(1) DEFAULT 1,

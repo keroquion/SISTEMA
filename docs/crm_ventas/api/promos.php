@@ -293,6 +293,10 @@ $promos_seed = [
 ];
 
 if ($action === 'list') {
+    foreach ($promos_seed as &$p) {
+        $p['unidades_reservadas'] = $p['unidades_reservadas'] ?? 0;
+        $p['stock_real'] = max(0, $p['stock_disponible'] - $p['unidades_reservadas']);
+    }
     json_resp(['success' => true, 'total' => count($promos_seed), 'data' => $promos_seed]);
 }
 
