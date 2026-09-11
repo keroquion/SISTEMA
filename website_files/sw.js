@@ -1,6 +1,6 @@
-// Service Worker - Petulap PWA v29 (Mensajería humanizada WhatsApp, tracking 1-clic con DNI y mapas Arequipa v1.5.8)
+// Service Worker - Petulap PWA v32 (Trazabilidad en vivo de repuestos con escaneo móvil IA v1.6.1)
  
-var CACHE_NAME = 'petulap-v29';
+var CACHE_NAME = 'petulap-v32';
 var ASSETS = [
     './',
     'index.html',

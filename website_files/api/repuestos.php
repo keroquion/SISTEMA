@@ -13,6 +13,7 @@ session_write_close();
 
 header('Content-Type: application/json; charset=utf-8');
 require_once "config.php";
+require_once "courier_ia.php";
 $db = getDB();
 $action = $_GET["action"] ?? "list";
 
@@ -122,12 +123,17 @@ $ensureTablePedidosRepuestos = function() use ($db) {
             proveedor_nombre VARCHAR(100) NULL,
             courier VARCHAR(100) NULL,
             tracking_number VARCHAR(100) NULL,
+            codigo_seguridad VARCHAR(20) NULL,
             fecha_compra DATE NULL,
             fecha_estimada_llegada DATE NULL,
             costo_compra DECIMAL(10,2) DEFAULT 0.00,
             precio_cliente DECIMAL(10,2) DEFAULT 0.00,
             es_garantia TINYINT(1) DEFAULT 0,
             estado_envio ENUM('SOLICITADO', 'EN_TRANSITO', 'RECIBIDO_EN_TALLER', 'INSTALADO') DEFAULT 'SOLICITADO',
+            ultimo_estado_courier VARCHAR(150) NULL,
+            agencia_destino VARCHAR(150) NULL,
+            voucher_foto_url VARCHAR(255) NULL,
+            ultimo_rastreo_json MEDIUMTEXT NULL,
             notas_envio TEXT NULL,
             fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             fecha_actualizacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -139,6 +145,18 @@ $ensureTablePedidosRepuestos = function() use ($db) {
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
     ";
     $db->query($sql);
+
+    // Auto-migración no destructiva de columnas si la tabla ya existía
+    $colRes = $db->query("SHOW COLUMNS FROM pedidos_repuestos");
+    if ($colRes) {
+        $existingCols = [];
+        while ($r = $colRes->fetch_assoc()) $existingCols[] = $r['Field'];
+        if (!in_array('codigo_seguridad', $existingCols)) { @$db->query("ALTER TABLE pedidos_repuestos ADD COLUMN codigo_seguridad VARCHAR(20) NULL AFTER tracking_number"); }
+        if (!in_array('ultimo_estado_courier', $existingCols)) { @$db->query("ALTER TABLE pedidos_repuestos ADD COLUMN ultimo_estado_courier VARCHAR(150) NULL AFTER estado_envio"); }
+        if (!in_array('agencia_destino', $existingCols)) { @$db->query("ALTER TABLE pedidos_repuestos ADD COLUMN agencia_destino VARCHAR(150) NULL AFTER ultimo_estado_courier"); }
+        if (!in_array('voucher_foto_url', $existingCols)) { @$db->query("ALTER TABLE pedidos_repuestos ADD COLUMN voucher_foto_url VARCHAR(255) NULL AFTER agencia_destino"); }
+        if (!in_array('ultimo_rastreo_json', $existingCols)) { @$db->query("ALTER TABLE pedidos_repuestos ADD COLUMN ultimo_rastreo_json MEDIUMTEXT NULL AFTER voucher_foto_url"); }
+    }
 };
 
 switch ($action) {
@@ -304,6 +322,180 @@ switch ($action) {
             echo json_encode(["ok" => false, "msg" => "Error al actualizar: " . $db->error]);
         }
         $stmt->close();
+        break;
+
+    // -------------------------------------------------------------
+    // ESCANEAR VOUCHER CON IA Y RASTREO AUTOMÁTICO (v1.6.1)
+    // -------------------------------------------------------------
+    case "escanear_voucher_pedido":
+        $ensureTablePedidosRepuestos();
+        
+        $id = 0;
+        $base64 = '';
+        $mimeType = 'image/jpeg';
+
+        if (!empty($_FILES['imagen']['tmp_name'])) {
+            $id = (int)($_POST['id'] ?? $_POST['pedido_id'] ?? 0);
+            $fileTmp = $_FILES['imagen']['tmp_name'];
+            $mimeType = mime_content_type($fileTmp) ?: 'image/jpeg';
+            $base64 = base64_encode(file_get_contents($fileTmp));
+        } else {
+            $data = json_decode(file_get_contents("php://input"), true) ?? $_POST;
+            $id = (int)($data['id'] ?? $data['pedido_id'] ?? 0);
+            $rawB64 = $data['imagen_base64'] ?? '';
+            if (preg_match('/^data:(image\/[a-zA-Z]+);base64,(.+)$/', $rawB64, $matches)) {
+                $mimeType = $matches[1];
+                $base64 = $matches[2];
+            } else {
+                $base64 = $rawB64;
+            }
+        }
+
+        if ($id <= 0) {
+            echo json_encode(["ok" => false, "msg" => "ID de pedido inválido"]);
+            break;
+        }
+
+        if (empty($base64)) {
+            echo json_encode(["ok" => false, "msg" => "Fotografía del voucher requerida"]);
+            break;
+        }
+
+        // 1. Análisis de imagen con IA Gemini Vision
+        $iaResult = CourierIAService::analizarVoucherConIA($base64, $mimeType);
+        if (!$iaResult['success']) {
+            echo json_encode(["ok" => false, "msg" => "Error de análisis IA: " . ($iaResult['message'] ?? 'No se pudo procesar la foto')]);
+            break;
+        }
+
+        $ia = $iaResult['data'];
+        $courier = $ia['courier'] ?? 'DESCONOCIDO';
+        $codigo = $ia['codigo_seguimiento'] ?? '';
+        $claveSeg = $ia['codigo_seguridad'] ?? null;
+        $monto = floatval($ia['monto'] ?? 0);
+
+        if (empty($codigo) || $courier === 'DESCONOCIDO') {
+            echo json_encode([
+                "ok" => false, 
+                "msg" => "La IA no pudo detectar un código de seguimiento válido ni la empresa de transporte en este comprobante.",
+                "ia_data" => $ia
+            ]);
+            break;
+        }
+
+        // 2. Rastreo en vivo inmediato con el Courier oficial
+        $trackResult = ($courier === 'CRUZ_DEL_SUR')
+            ? CourierIAService::trackCruzDelSur($codigo)
+            : CourierIAService::trackShalom($codigo, $claveSeg ?? '');
+
+        // 3. Estimación de llegada y estado
+        $ultimoEstado = $trackResult['mensaje_estado'] ?? $trackResult['estado_actual'] ?? 'EN TRÁNSITO';
+        $agenciaDest = $trackResult['agencia_destino'] ?? $trackResult['destino'] ?? $ia['destino'] ?? '';
+        $fLlegadaEst = null;
+        $fCompra = date('Y-m-d');
+
+        if (stripos($ultimoEstado, 'entregad') !== false || stripos($ultimoEstado, 'agencia destino') !== false) {
+            $fLlegadaEst = date('Y-m-d');
+        } else {
+            $fLlegadaEst = date('Y-m-d', strtotime('+2 weekdays'));
+        }
+
+        $trackJson = json_encode($trackResult, JSON_UNESCAPED_UNICODE);
+
+        // 4. Actualizar registro en pedidos_repuestos
+        $stmtUpd = $db->prepare("
+            UPDATE pedidos_repuestos SET
+                courier = ?,
+                tracking_number = ?,
+                codigo_seguridad = ?,
+                fecha_compra = COALESCE(fecha_compra, ?),
+                fecha_estimada_llegada = COALESCE(?, fecha_estimada_llegada),
+                estado_envio = 'EN_TRANSITO',
+                ultimo_estado_courier = ?,
+                agencia_destino = ?,
+                ultimo_rastreo_json = ?
+            WHERE id = ?
+        ");
+        $stmtUpd->bind_param("ssssssssi", $courier, $codigo, $claveSeg, $fCompra, $fLlegadaEst, $ultimoEstado, $agenciaDest, $trackJson, $id);
+        $stmtUpd->execute();
+        $stmtUpd->close();
+
+        // 5. Sincronizar soporte_tecnico si tiene ticket_id
+        $stmtTk = $db->prepare("SELECT ticket_id, numero_referencia FROM pedidos_repuestos WHERE id = ?");
+        $stmtTk->bind_param("i", $id);
+        $stmtTk->execute();
+        $resTk = $stmtTk->get_result()->fetch_assoc();
+        $stmtTk->close();
+
+        if (!empty($resTk['ticket_id'])) {
+            $tkId = (int)$resTk['ticket_id'];
+            $stmtSt = $db->prepare("UPDATE soporte_tecnico SET repuesto_fecha_llegada_aprox = ? WHERE id = ?");
+            $stmtSt->bind_param("si", $fLlegadaEst, $tkId);
+            $stmtSt->execute();
+            $stmtSt->close();
+        }
+
+        echo json_encode([
+            "ok" => true,
+            "msg" => "Voucher procesado exitosamente por IA y tracking registrado",
+            "courier" => $courier,
+            "tracking_number" => $codigo,
+            "ia_data" => $ia,
+            "tracking" => $trackResult
+        ]);
+        break;
+
+    // -------------------------------------------------------------
+    // ACTUALIZAR RASTREO EN VIVO 1-CLIC (v1.6.1)
+    // -------------------------------------------------------------
+    case "actualizar_tracking_en_vivo":
+        $ensureTablePedidosRepuestos();
+        $id = (int)($_GET['id'] ?? $_POST['id'] ?? 0);
+        if ($id <= 0) {
+            echo json_encode(["ok" => false, "msg" => "ID de pedido inválido"]);
+            break;
+        }
+
+        $stmtSel = $db->prepare("SELECT courier, tracking_number, codigo_seguridad FROM pedidos_repuestos WHERE id = ?");
+        $stmtSel->bind_param("i", $id);
+        $stmtSel->execute();
+        $ped = $stmtSel->get_result()->fetch_assoc();
+        $stmtSel->close();
+
+        if (!$ped || empty($ped['tracking_number'])) {
+            echo json_encode(["ok" => false, "msg" => "El pedido no tiene código de tracking registrado"]);
+            break;
+        }
+
+        $cType = $ped['courier'];
+        $cCode = $ped['tracking_number'];
+        $cSec = $ped['codigo_seguridad'] ?? '';
+
+        $trackResult = ($cType === 'CRUZ_DEL_SUR')
+            ? CourierIAService::trackCruzDelSur($cCode)
+            : CourierIAService::trackShalom($cCode, $cSec);
+
+        if ($trackResult['success']) {
+            $ultimoEstado = $trackResult['mensaje_estado'] ?? $trackResult['estado_actual'] ?? 'EN TRÁNSITO';
+            $agenciaDest = $trackResult['agencia_destino'] ?? $trackResult['destino'] ?? '';
+            $trackJson = json_encode($trackResult, JSON_UNESCAPED_UNICODE);
+
+            $stmtUpd = $db->prepare("
+                UPDATE pedidos_repuestos SET
+                    ultimo_estado_courier = ?,
+                    agencia_destino = ?,
+                    ultimo_rastreo_json = ?
+                WHERE id = ?
+            ");
+            $stmtUpd->bind_param("sssi", $ultimoEstado, $agenciaDest, $trackJson, $id);
+            $stmtUpd->execute();
+            $stmtUpd->close();
+        }
+
+        echo json_encode([
+            "ok" => true,
+            "tracking" => $trackResult
+        ]);
         break;
 
     case "marcar_recibido":

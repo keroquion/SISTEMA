@@ -28,6 +28,22 @@ Para garantizar trazabilidad absoluta, auditoría técnica rigurosa y claridad e
 - **`[Security]`**: Implementación de un pipeline de Integración y Despliegue Continuo (CI/CD) automatizado desde GitHub hacia el hosting de producción (cPanel/Apache) para reemplazar el traspaso manual por FTP y mitigar el riesgo de desincronización o error humano en despliegues.
 - **`[Changed]`**: Coordinación en el panel de control del servidor (cPanel) para renombrar la base de datos de `petumjvq_pruebas` a un identificador formal de producción (ej. `petumjvq_sistema`), actualizando la variable de entorno en el servidor de forma segura.
 
+## [1.6.1] — 2026-09-10
+
+### Added
+- `pedidos_repuestos.html`: Cabecera ejecutiva de estado de envío en tiempo real sobre cada tarjeta de pedido (`.card-courier-banner`), mostrando insignia oficial del courier (Cruz del Sur Cargo en Azul / Shalom Express en Naranja), punto de control en carretera, localidad/agencia de destino y fecha estimada de llegada sin alterar ningún campo preexistente.
+- `pedidos_repuestos.html`: Botón táctil móvil para escaneo directo de tickets físicos con la cámara trasera del smartphone (`capture="environment"`), escáner láser animado (`#modal-escaneando-ia`) y modal interactivo de ruta cronológica (`#modal-ruta-courier`) con detalle de manifiestos y entregas.
+- `api/repuestos.php`: Acción `escanear_voucher_pedido` que analiza la foto con Google Gemini 2.5 Flash Vision, extrae los códigos de guía/orden, consulta los servidores del transportista en vivo y actualiza automáticamente `pedidos_repuestos` y la fecha de llegada aproximada en `soporte_tecnico`.
+- `api/repuestos.php`: Acción `actualizar_tracking_en_vivo` para reconsultar y sincronizar en 1 clic el estado oficial del courier sin recargar la página.
+
+### Changed
+- `sw.js`: Incremento de caché a `petulap-v32` para actualización inmediata de los clientes PWA y personal de taller.
+
+### Security
+- `api/secrets.php`: Aislamiento estricto de la API Key de Google Gemini en el backend, blindado en `.gitignore` y protegido contra fugas al cliente front-end.
+
+> **El Por Qué:** En la operativa diaria del taller de Petulap, cuando un proveedor o técnico despacha un repuesto en Lima u otra provincia, se genera un comprobante o ticket físico (Cruz del Sur o Shalom). Anteriormente, era necesario ingresar manualmente el número de guía, adivinar la fecha de entrega y hacer seguimiento por separado. Con esta funcionalidad, el técnico simplemente apunta la cámara de su celular al voucher; la IA multimodal extrae la empresa y el código, consulta el estado real en carretera y lo refleja al instante sobre la tarjeta de la orden.
+
 ## [1.6.0] — 2026-09-10
 
 ### Added
