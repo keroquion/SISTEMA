@@ -3,7 +3,7 @@
 // 100% SEGURO: Solo lectura de pantalla, cero riesgo de baneo
 // ==========================================================
 
-const CRM_API_URL = 'http://localhost/docs/crm_ventas/api'; // Ajustable según servidor
+const CRM_API_URL = 'https://petulap.store/crm_ventas/api'; // Producción oficial
 let ultimoTelefonoAnalizado = '';
 let widgetElement = null;
 

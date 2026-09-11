@@ -14,14 +14,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit;
 }
 
-// Intentar leer credenciales de la app principal si existen
+// Credenciales de producción Petulap
 $host = 'localhost';
-$db_user = 'root';
-$db_pass = '';
+$db_user = 'petumjvq_petumjvq';
+$db_pass = 'gu39hMsxVWDMhYP';
 $db_name = 'petumjvq_pruebas';
 
-// Si existe config.php de la app principal, usarlo
-$main_config = __DIR__ . '/../../website_files/api/db_config.php';
+// Si existe config.php de la app principal, usar sus constantes
+$main_config = __DIR__ . '/../../website_files/api/config.php';
 if (file_exists($main_config)) {
     @include_once $main_config;
     if (defined('DB_HOST')) $host = DB_HOST;
