@@ -374,12 +374,13 @@ PROMPT;
 }
 
 // ============================================================================
-// ENRUTADOR
+// ENRUTADOR (Solo se ejecuta si es invocado directamente como API)
 // ============================================================================
-$action = $_GET['action'] ?? $_POST['action'] ?? 'rastrear';
-$apiKeyCustom = $_SERVER['HTTP_X_GEMINI_KEY'] ?? $_POST['gemini_api_key'] ?? $_GET['gemini_api_key'] ?? '';
+if (basename(__FILE__) === basename($_SERVER['SCRIPT_FILENAME'] ?? '')) {
+    $action = $_GET['action'] ?? $_POST['action'] ?? 'rastrear';
+    $apiKeyCustom = $_SERVER['HTTP_X_GEMINI_KEY'] ?? $_POST['gemini_api_key'] ?? $_GET['gemini_api_key'] ?? '';
 
-switch ($action) {
+    switch ($action) {
 
     // -------------------------------------------------------------
     // ACCIÓN 1: analizar_voucher (IA Gemini Vision)
@@ -524,4 +525,6 @@ switch ($action) {
     default:
         echo json_encode(['ok' => false, 'msg' => 'Acción no válida.']);
         break;
+    }
 }
+

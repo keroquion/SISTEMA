@@ -159,6 +159,8 @@ Controla el stock de piezas de recambio (pantallas, teclados, cargadores, bater�
 | `tracking_pedidos` | **GET** | Auto-sincroniza y lista las compras de repuestos en tránsito, couriers y fechas estimadas de llegada. |
 | `guardar_tracking` | **POST** | Actualiza proveedor, courier, número de tracking, costo y estado de envío de un pedido de repuesto. |
 | `marcar_recibido` | **POST** | Cambia el estado de la pieza a "RECIBIDO_EN_TALLER", actualiza el ticket de soporte a "EN_REPARACION" y notifica al técnico. |
+| `escanear_voucher_pedido` | **POST** | Procesa la fotografía de un voucher físico con IA Gemini 2.5 Flash, extrae datos de la encomienda, consulta el rastreo oficial en vivo y actualiza la orden y la fecha estimada de llegada en `soporte_tecnico`. |
+| `actualizar_tracking_en_vivo` | **POST** | Reconsulta en vivo la API de Cruz del Sur Cargo o Shalom Express y refresca el estado en carretera, destino y eventos de transporte de una orden de repuesto. |
 
 ---
 
@@ -257,6 +259,16 @@ Permite conectar de forma automatizada e instantánea con las empresas de transp
 
 ---
 
+### 1.19. Extracción Multimodal de Vouchers con Inteligencia Artificial: `api/courier_ia.php`
+Servicio de visión artificial basado en Google Gemini 2.5 Flash con arquitectura resiliente de fallback escalonado (`gemini-2.5-flash` → `gemini-2.5-flash-lite` → `gemini-2.0-flash`).
+
+| Acción (`action`) | Método | ¿Qué hace en una frase simple? |
+| :--- | :---: | :--- |
+| `escanear_voucher` | **POST** | Recibe una imagen en Base64 o archivo multipart, identifica la empresa transportista (Cruz del Sur Cargo o Shalom Express), y extrae número de guía, serie, orden y código de seguridad en formato JSON limpio. |
+| `analizar_y_rastrear` | **POST** | Escanea el voucher físico con IA y encadena de inmediato la consulta a los servidores del transportista, entregando la encomienda parseada junto con su estado oficial en vivo. |
+
+---
+
 ## 2. Matriz de Seguridad y Control de Acceso
 
 No todas las ventanillas están abiertas para todo el mundo. El sistema aplica tres niveles de candado:
@@ -287,6 +299,7 @@ No todas las ventanillas están abiertas para todo el mundo. El sistema aplica t
 | `manage_accounts.php` | ✅ Sí | **Solo Administrador** (`admin_only`) | Bloqueo HTTP `403 Forbidden` (Acceso denegado). |
 | `courier_tracking.php?action=asociar/desvincular` | ✅ Sí | Sesión de Técnico, Recepción o Admin | Bloqueo HTTP `401 Unauthorized` si no inició sesión. |
 | `courier_tracking.php?action=ver/consultar` | ⚠️ Opcional | Libre / Sesión activa | Consulta el estado del transporte y devuelve timeline. |
+| `courier_ia.php` | ✅ Sí | Sesión activa en el sistema | Bloqueo HTTP `401 Unauthorized` si no inició sesión. |
 
 ---
 

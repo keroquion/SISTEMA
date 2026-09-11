@@ -347,6 +347,279 @@
                 font-size: 0.62rem;
             }
         }
+
+        /* ========================================================= */
+        /* BANNER DEL ESTADO DEL ENVÍO EN VIVO (ARRIBA DE LA TARJETA) */
+        /* ========================================================= */
+        .card-courier-banner {
+            border-radius: var(--radius-md, 12px);
+            padding: 12px 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .card-courier-banner.banner-cds {
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.08), rgba(29, 78, 216, 0.03));
+            border: 1.5px solid rgba(37, 99, 235, 0.25);
+        }
+
+        .card-courier-banner.banner-shalom {
+            background: linear-gradient(135deg, rgba(234, 88, 12, 0.08), rgba(194, 65, 12, 0.03));
+            border: 1.5px solid rgba(234, 88, 12, 0.25);
+        }
+
+        .card-courier-banner.banner-generic {
+            background: var(--bg-surface-hover);
+            border: 1.5px solid var(--border-default);
+        }
+
+        .courier-banner-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .courier-brand-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.84rem;
+            font-weight: 800;
+            letter-spacing: 0.3px;
+        }
+        .banner-cds .courier-brand-tag { color: #2563EB; }
+        .banner-shalom .courier-brand-tag { color: #EA580C; }
+
+        .courier-pulse-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            background: var(--bg-surface);
+            padding: 2px 8px;
+            border-radius: 12px;
+            border: 1px solid var(--border-default);
+            color: var(--text-primary);
+        }
+
+        .courier-live-msg {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1.35;
+            display: flex;
+            align-items: flex-start;
+            gap: 7px;
+        }
+
+        .courier-detail-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .courier-pill {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-default);
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 0.74rem;
+            color: var(--text-secondary);
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .courier-pill code {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .pill-sec-key {
+            background: rgba(234, 88, 12, 0.12);
+            color: #EA580C;
+            padding: 1px 4px;
+            border-radius: 4px;
+            font-weight: 700;
+            margin-left: 2px;
+        }
+
+        .courier-quick-actions {
+            display: flex;
+            gap: 6px;
+            margin-top: 2px;
+            flex-wrap: wrap;
+        }
+
+        .btn-courier-action {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-default);
+            color: var(--text-primary);
+            padding: 5px 10px;
+            border-radius: 6px;
+            font-size: 0.74rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.15s ease;
+        }
+
+        .btn-courier-action:hover {
+            background: var(--bg-surface-hover);
+            border-color: var(--color-brand);
+            color: var(--color-brand);
+        }
+
+        .btn-action-timeline {
+            background: rgba(37, 99, 235, 0.08);
+            color: #2563EB;
+            border-color: rgba(37, 99, 235, 0.25);
+        }
+
+        /* ========================================================= */
+        /* BANNER CTA DE CAPTURA MÓVIL (CUANDO NO HAY GUÍA AÚN)     */
+        /* ========================================================= */
+        .card-voucher-cta {
+            background: linear-gradient(135deg, rgba(124, 58, 237, 0.06), rgba(37, 99, 235, 0.04));
+            border: 1.5px dashed rgba(124, 58, 237, 0.3);
+            border-radius: var(--radius-md, 12px);
+            padding: 12px 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .cta-text-wrap {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .cta-camera-badge {
+            width: 36px;
+            height: 36px;
+            border-radius: 9px;
+            background: linear-gradient(135deg, #7C3AED, #2563EB);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .cta-title {
+            font-weight: 700;
+            font-size: 0.86rem;
+            color: var(--text-primary);
+        }
+
+        .cta-subtitle {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .btn-tomar-foto-voucher {
+            background: linear-gradient(135deg, #2563EB, #7C3AED);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 14px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25);
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .btn-tomar-foto-voucher:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
+        }
+
+        /* Láser de Escaneo */
+        @keyframes laser-scan {
+            0% { top: 0%; opacity: 0.8; }
+            50% { top: 96%; opacity: 1; }
+            100% { top: 0%; opacity: 0.8; }
+        }
+
+        .scanner-laser-bar {
+            position: absolute;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #3B82F6, #8B5CF6, transparent);
+            box-shadow: 0 0 14px rgba(139, 92, 246, 0.8);
+            animation: laser-scan 2s ease-in-out infinite;
+            z-index: 10;
+        }
+
+        /* Timeline Step en Modal */
+        .timeline-step-row {
+            display: flex;
+            gap: 12px;
+            position: relative;
+            padding-bottom: 18px;
+        }
+        .timeline-step-row:last-child {
+            padding-bottom: 0;
+        }
+        .timeline-step-row::before {
+            content: '';
+            position: absolute;
+            left: 6px;
+            top: 14px;
+            bottom: 0;
+            width: 2px;
+            background: var(--border-default);
+        }
+        .timeline-step-row:last-child::before {
+            display: none;
+        }
+        .timeline-step-bullet {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: var(--color-brand);
+            margin-top: 2px;
+            flex-shrink: 0;
+            z-index: 2;
+            border: 2px solid var(--bg-surface);
+            box-shadow: 0 0 0 2px var(--color-brand);
+        }
+
+        @media (max-width: 600px) {
+            .card-voucher-cta {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .btn-tomar-foto-voucher {
+                justify-content: center;
+                padding: 10px;
+                font-size: 0.85rem;
+            }
+            .courier-quick-actions {
+                flex-direction: column;
+            }
+            .btn-courier-action {
+                justify-content: center;
+                padding: 7px;
+            }
+        }
     </style>
 </head>
 <body class="dashboard-body">
@@ -949,6 +1222,69 @@
         </div>
     </div>
 
+    <!-- Input Global para Cámara Móvil de Vouchers -->
+    <input type="file" id="global-camera-voucher-input" accept="image/*" capture="environment" style="display:none;" onchange="procesarSubidaVoucher(this)">
+
+    <!-- MODAL DE ESCANEO LÁSER CON IA (FEEDBACK VISUAL INMEDIATO) -->
+    <div id="modal-escaneando-ia" style="display:none; position:fixed; inset:0; background:rgba(15,23,42,0.75); backdrop-filter:blur(6px); z-index:9999; align-items:center; justify-content:center; padding:16px;">
+        <div style="background:var(--bg-surface); border:1px solid var(--border-default); border-radius:20px; max-width:440px; width:100%; padding:28px 24px; box-shadow:0 24px 48px rgba(0,0,0,0.35); text-align:center; position:relative; overflow:hidden;">
+            <div class="scanner-laser-bar" id="scan-laser-bar"></div>
+            
+            <div style="width:64px; height:64px; border-radius:18px; background:linear-gradient(135deg, #2563EB, #7C3AED); color:white; display:inline-flex; align-items:center; justify-content:center; font-size:2rem; margin-bottom:14px; box-shadow:0 6px 18px rgba(37,99,235,0.35);">
+                <i class="ph-fill ph-sparkle" id="scan-icon-state"></i>
+            </div>
+
+            <h3 style="font-size:1.15rem; font-weight:800; margin:0 0 6px 0; color:var(--text-primary);" id="scan-title">
+                Analizando Comprobante con IA
+            </h3>
+            <p style="font-size:0.84rem; color:var(--text-secondary); margin:0 0 16px 0; line-height:1.45;" id="scan-subtitle">
+                Extrayendo número de guía, empresa de transporte y consultando rastreo en tiempo real...
+            </p>
+
+            <div id="scan-preview-box" style="display:none; margin:0 auto 16px auto; max-height:160px; max-width:240px; border-radius:12px; overflow:hidden; border:1px solid var(--border-default); position:relative; box-shadow:0 4px 12px rgba(0,0,0,0.1);">
+                <img id="scan-preview-img" src="" style="width:100%; height:auto; display:block;">
+            </div>
+
+            <div style="display:flex; align-items:center; justify-content:center; gap:8px; font-size:0.86rem; font-weight:700; color:var(--color-brand);" id="scan-feedback">
+                <i class="ph-bold ph-spinner" style="animation: spin 1s linear infinite;"></i> Procesando con Gemini 2.5 Flash...
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE VISUALIZACIÓN DE RUTA Y EVENTOS CRONOLÓGICOS -->
+    <div id="modal-ruta-courier" style="display:none; position:fixed; inset:0; background:rgba(15,23,42,0.65); backdrop-filter:blur(5px); z-index:9998; align-items:center; justify-content:center; padding:16px;">
+        <div style="background:var(--bg-surface); border:1px solid var(--border-default); border-radius:var(--radius-lg); max-width:560px; width:100%; max-height:85vh; display:flex; flex-direction:column; box-shadow:0 20px 50px rgba(0,0,0,0.25); overflow:hidden;">
+            <!-- Cabecera Modal -->
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:16px 20px; border-bottom:1px solid var(--border-default); background:var(--bg-surface);">
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <div id="modal-ruta-courier-icon" style="width:36px; height:36px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:1.3rem;">
+                        <i class="ph-fill ph-truck"></i>
+                    </div>
+                    <div>
+                        <h3 style="margin:0; font-size:1.05rem; font-weight:800; color:var(--text-primary);" id="modal-ruta-titulo">Ruta de la Encomienda</h3>
+                        <div style="font-size:0.78rem; color:var(--text-secondary);" id="modal-ruta-subtitulo">Detalle oficial del transportista</div>
+                    </div>
+                </div>
+                <button onclick="cerrarModalRuta()" style="background:none; border:none; font-size:1.3rem; color:var(--text-secondary); cursor:pointer;">
+                    <i class="ph ph-x"></i>
+                </button>
+            </div>
+
+            <!-- Contenido Scrollable -->
+            <div style="padding:18px 20px; overflow-y:auto; flex:1;" id="modal-ruta-contenido">
+                <!-- Se inyecta dinámicamente -->
+            </div>
+
+            <!-- Pie Modal -->
+            <div style="padding:12px 20px; border-top:1px solid var(--border-default); display:flex; justify-content:space-between; align-items:center; background:var(--bg-surface-hover);">
+                <button class="btn btn-secondary" onclick="cerrarModalRuta()">Cerrar</button>
+                <button class="btn btn-primary" id="btn-ruta-refrescar" onclick="refrescarTrackingDesdeModal()">
+                    <i class="ph-bold ph-arrows-clockwise"></i> Actualizar en Vivo
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Scripts de Lógica y Control -->
     <script src="js/check_auth.js"></script>
     <script src="js/dashboard.js?v=4"></script>
@@ -1142,8 +1478,109 @@
                     `;
                 }
 
+                // =========================================================
+                // BLOQUE DEL ESTADO DEL ENVÍO (ARRIBA DE LA TARJETA)
+                // =========================================================
+                let courierLiveHeader = '';
+                if (p.tracking_number) {
+                    const isCDS = (p.courier === 'CRUZ_DEL_SUR' || (p.tracking_number && p.tracking_number.length === 10 && !/^\d+$/.test(p.tracking_number)));
+                    const isShalom = (p.courier === 'SHALOM' || (/^\d{8}$/.test(p.tracking_number)));
+                    const courierBrandName = isCDS ? 'Cruz del Sur Cargo' : (isShalom ? 'Shalom Express' : (p.courier || 'Transporte Courier'));
+                    const courierIcon = isCDS ? 'ph-bus' : 'ph-package';
+                    const bannerClass = isCDS ? 'banner-cds' : (isShalom ? 'banner-shalom' : 'banner-generic');
+
+                    let cantEventos = 0;
+                    if (p.ultimo_rastreo_json) {
+                        try {
+                            const parsedTrack = typeof p.ultimo_rastreo_json === 'string' ? JSON.parse(p.ultimo_rastreo_json) : p.ultimo_rastreo_json;
+                            if (parsedTrack && parsedTrack.eventos_cronologicos) {
+                                cantEventos = parsedTrack.eventos_cronologicos.length;
+                            }
+                        } catch(e) {}
+                    }
+
+                    const estadoMsg = p.ultimo_estado_courier || 'Mercadería en camino hacia el taller';
+                    let pulseClass = 'pulse-blue';
+                    let statusBadgeText = 'En Tránsito';
+                    const msgLower = estadoMsg.toLowerCase();
+                    if (msgLower.includes('entregad')) {
+                        pulseClass = 'pulse-green';
+                        statusBadgeText = 'Entregado';
+                    } else if (msgLower.includes('agencia') || msgLower.includes('destino') || msgLower.includes('recojo')) {
+                        pulseClass = 'pulse-amber';
+                        statusBadgeText = 'En Agencia';
+                    }
+
+                    courierLiveHeader = `
+                        <div class="card-courier-banner ${bannerClass}">
+                            <div class="courier-banner-head">
+                                <div class="courier-brand-tag">
+                                    <i class="ph-fill ${courierIcon}"></i>
+                                    <span>${courierBrandName}</span>
+                                </div>
+                                <div class="courier-pulse-tag">
+                                    <span class="pulse-dot ${pulseClass}"></span>
+                                    <span>${statusBadgeText}</span>
+                                </div>
+                            </div>
+
+                            <div class="courier-live-msg">
+                                <i class="ph-bold ph-navigation-arrow"></i>
+                                <span>${estadoMsg}</span>
+                            </div>
+
+                            <div class="courier-detail-pills">
+                                <div class="courier-pill">
+                                    <i class="ph-bold ph-barcode"></i>
+                                    <code>${p.tracking_number}</code>
+                                    ${p.codigo_seguridad ? `<span class="pill-sec-key">Clave: ${p.codigo_seguridad}</span>` : ''}
+                                </div>
+                                <div class="courier-pill">
+                                    <i class="ph-bold ph-calendar-check"></i>
+                                    <span>${p.fecha_estimada_llegada ? 'Llegada: <strong>' + p.fecha_estimada_llegada + '</strong>' : 'En camino'}</span>
+                                </div>
+                                ${p.agencia_destino ? `
+                                <div class="courier-pill">
+                                    <i class="ph-bold ph-map-pin"></i>
+                                    <span>${p.agencia_destino}</span>
+                                </div>` : ''}
+                            </div>
+
+                            <div class="courier-quick-actions">
+                                <button type="button" class="btn-courier-action" onclick="refrescarTrackingLive(${p.id}, this)" title="Refrescar en vivo con el courier">
+                                    <i class="ph-bold ph-arrows-clockwise"></i> Refrescar en Vivo
+                                </button>
+                                <button type="button" class="btn-courier-action btn-action-timeline" onclick='abrirModalRuta(${JSON.stringify(p).replace(/'/g, "&apos;")})' title="Ver ruta e hitos">
+                                    <i class="ph-bold ph-clock-counter-clockwise"></i> Ver Ruta (${cantEventos > 0 ? cantEventos + ' hitos' : 'Historial'})
+                                </button>
+                                <button type="button" class="btn-courier-action" onclick="iniciarEscaneoTicket(${p.id})" title="Re-escanear foto">
+                                    <i class="ph-bold ph-camera"></i> Re-escanear
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    courierLiveHeader = `
+                        <div class="card-voucher-cta">
+                            <div class="cta-text-wrap">
+                                <div class="cta-camera-badge"><i class="ph-bold ph-camera"></i></div>
+                                <div>
+                                    <div class="cta-title">Ticket de Encomienda Pendiente</div>
+                                    <div class="cta-subtitle">Toma foto al ticket con tu celular para rastreo automático con IA</div>
+                                </div>
+                            </div>
+                            <button type="button" class="btn-tomar-foto-voucher" onclick="iniciarEscaneoTicket(${p.id})">
+                                <i class="ph-bold ph-camera"></i> Tomar foto al ticket
+                            </button>
+                        </div>
+                    `;
+                }
+
                 html += `
                     <div class="tracking-rep-card">
+                        <!-- Estado del Envío Arriba de la Tarjeta (Registrado o Pendiente) -->
+                        ${courierLiveHeader}
+
                         <!-- Cabecera de la Tarjeta -->
                         <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">
                             <div>
@@ -1212,7 +1649,10 @@
                         ${p.notas_envio ? `<div style="font-size:0.78rem; color:var(--text-muted); font-style:italic;"><i class="ph ph-note"></i> ${p.notas_envio}</div>` : ''}
 
                         <!-- Botones de Acción -->
-                        <div style="display:flex; justify-content:flex-end; gap:8px; border-top:1px solid var(--border-default); padding-top:10px; margin-top:4px;">
+                        <div style="display:flex; justify-content:flex-end; gap:8px; border-top:1px solid var(--border-default); padding-top:10px; margin-top:4px; flex-wrap:wrap;">
+                            <button class="btn btn-secondary" style="font-size:0.8rem; padding:6px 12px; background:linear-gradient(135deg, rgba(37,99,235,0.08), rgba(124,58,237,0.08)); border-color:rgba(124,58,237,0.3); color:#6D28D9;" onclick="iniciarEscaneoTicket(${p.id})">
+                                <i class="ph-bold ph-camera"></i> ${p.tracking_number ? 'Re-escanear' : 'Escanear con IA'}
+                            </button>
                             <button class="btn btn-secondary" style="font-size:0.8rem; padding:6px 12px;" onclick='abrirModalTracking(${JSON.stringify(p).replace(/'/g, "&apos;")})'>
                                 <i class="ph-bold ph-pencil-simple"></i> Editar Tracking
                             </button>
@@ -1344,6 +1784,244 @@
             }).catch(() => {
                 alert('Código: ' + texto);
             });
+        }
+
+        let gPedidoEnEscaneo = null;
+        let gPedidoModalRutaActual = null;
+
+        // Iniciar escaneo móvil disparando la cámara directamente (capture="environment")
+        function iniciarEscaneoTicket(pedidoId) {
+            gPedidoEnEscaneo = pedidoId;
+            const inputCam = document.getElementById('global-camera-voucher-input');
+            if (inputCam) {
+                inputCam.value = '';
+                inputCam.click();
+            }
+        }
+
+        // Procesar foto capturada por la cámara o galería
+        async function procesarSubidaVoucher(input) {
+            if (!input.files || !input.files[0] || !gPedidoEnEscaneo) return;
+            const file = input.files[0];
+            const pedidoId = gPedidoEnEscaneo;
+
+            const modalScan = document.getElementById('modal-escaneando-ia');
+            const previewBox = document.getElementById('scan-preview-box');
+            const previewImg = document.getElementById('scan-preview-img');
+            const feedback = document.getElementById('scan-feedback');
+            const scanTitle = document.getElementById('scan-title');
+            const scanSubtitle = document.getElementById('scan-subtitle');
+            const scanIcon = document.getElementById('scan-icon-state');
+
+            scanIcon.className = 'ph-fill ph-sparkle';
+            scanIcon.style.color = '#ffffff';
+            scanTitle.textContent = 'Analizando Comprobante con IA';
+            scanSubtitle.textContent = 'Extrayendo número de guía, empresa de transporte y consultando rastreo en tiempo real...';
+            feedback.innerHTML = '<i class="ph-bold ph-spinner" style="animation: spin 1s linear infinite;"></i> Procesando con Gemini 2.5 Flash...';
+            feedback.style.color = 'var(--color-brand)';
+            modalScan.style.display = 'flex';
+
+            // Previsualización inmediata de la foto
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                const fullB64 = e.target.result;
+                previewImg.src = fullB64;
+                previewBox.style.display = 'block';
+
+                try {
+                    const res = await fetch(`${API_REPUESTOS}?action=escanear_voucher_pedido`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            id: pedidoId,
+                            imagen_base64: fullB64
+                        })
+                    }).then(r => r.json());
+
+                    if (res.ok) {
+                        scanIcon.className = 'ph-bold ph-check-circle';
+                        scanIcon.style.color = '#10B981';
+                        scanTitle.textContent = '¡Voucher Vinculado con Éxito!';
+                        scanSubtitle.textContent = `${res.courier === 'CRUZ_DEL_SUR' ? 'Cruz del Sur Cargo' : 'Shalom Express'} • Guía: ${res.tracking_number}`;
+                        feedback.innerHTML = '<i class="ph-bold ph-check"></i> Rastreando en vivo';
+                        feedback.style.color = '#10B981';
+
+                        setTimeout(() => {
+                            modalScan.style.display = 'none';
+                            previewBox.style.display = 'none';
+                            cargarTracking();
+                        }, 1200);
+                    } else {
+                        scanIcon.className = 'ph-bold ph-warning-circle';
+                        scanTitle.textContent = 'Aviso de Lectura';
+                        scanSubtitle.textContent = res.msg || 'No se pudo detectar el código de seguimiento en la foto.';
+                        feedback.innerHTML = `
+                            <button class="btn btn-secondary" style="font-size:0.8rem; padding:6px 14px; margin-top:8px;" onclick="document.getElementById('modal-escaneando-ia').style.display='none'">
+                                Cerrar
+                            </button>
+                        `;
+                    }
+                } catch(err) {
+                    scanIcon.className = 'ph-bold ph-x-circle';
+                    scanTitle.textContent = 'Error de Red';
+                    scanSubtitle.textContent = 'Ocurrió un problema al enviar la fotografía al servidor.';
+                    feedback.innerHTML = `
+                        <button class="btn btn-secondary" style="font-size:0.8rem; padding:6px 14px; margin-top:8px;" onclick="document.getElementById('modal-escaneando-ia').style.display='none'">
+                            Cerrar
+                        </button>
+                    `;
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Refrescar rastreo en vivo de una tarjeta
+        async function refrescarTrackingLive(pedidoId, btn) {
+            const originalHtml = btn ? btn.innerHTML : '';
+            if (btn) {
+                btn.innerHTML = '<i class="ph-bold ph-spinner" style="animation: spin 1s linear infinite;"></i> Refrescando...';
+                btn.disabled = true;
+            }
+
+            try {
+                const res = await fetch(`${API_REPUESTOS}?action=actualizar_tracking_en_vivo&id=${pedidoId}`).then(r => r.json());
+                if (res.ok) {
+                    cargarTracking();
+                } else {
+                    alert('Aviso: ' + (res.msg || 'No se pudo actualizar el rastreo'));
+                }
+            } catch(e) {
+                alert('Error al conectar con los servidores del transportista.');
+            } finally {
+                if (btn) {
+                    btn.innerHTML = originalHtml;
+                    btn.disabled = false;
+                }
+            }
+        }
+
+        // Abrir modal de ruta y eventos cronológicos
+        function abrirModalRuta(p) {
+            gPedidoModalRutaActual = p;
+            const modal = document.getElementById('modal-ruta-courier');
+            const titulo = document.getElementById('modal-ruta-titulo');
+            const subtitulo = document.getElementById('modal-ruta-subtitulo');
+            const contenido = document.getElementById('modal-ruta-contenido');
+            const iconWrap = document.getElementById('modal-ruta-courier-icon');
+
+            const isCDS = (p.courier === 'CRUZ_DEL_SUR' || (p.tracking_number && p.tracking_number.length === 10 && !/^\d+$/.test(p.tracking_number)));
+            const courierName = isCDS ? 'Cruz del Sur Cargo' : 'Shalom Express';
+
+            titulo.textContent = `${p.numero_referencia} — ${courierName}`;
+            subtitulo.textContent = `Guía / Orden: ${p.tracking_number} ${p.codigo_seguridad ? '• Clave: ' + p.codigo_seguridad : ''}`;
+
+            iconWrap.style.background = isCDS ? 'rgba(37,99,235,0.12)' : 'rgba(234,88,12,0.12)';
+            iconWrap.style.color = isCDS ? '#2563EB' : '#EA580C';
+            iconWrap.innerHTML = `<i class="ph-fill ${isCDS ? 'ph-bus' : 'ph-package'}"></i>`;
+
+            let eventos = [];
+            let origenTxt = p.origen || '-';
+            let destinoTxt = p.agencia_destino || p.destino || '-';
+            let destinatarioTxt = p.destinatario || p.cliente_nombre || '-';
+            let estadoMsg = p.ultimo_estado_courier || 'En camino';
+
+            if (p.ultimo_rastreo_json) {
+                try {
+                    const parsed = typeof p.ultimo_rastreo_json === 'string' ? JSON.parse(p.ultimo_rastreo_json) : p.ultimo_rastreo_json;
+                    if (parsed) {
+                        eventos = parsed.eventos_cronologicos || [];
+                        if (parsed.origen) origenTxt = parsed.origen;
+                        if (parsed.destino || parsed.agencia_destino) destinoTxt = parsed.agencia_destino || parsed.destino;
+                        if (parsed.destinatario) destinatarioTxt = parsed.destinatario;
+                        if (parsed.mensaje_estado) estadoMsg = parsed.mensaje_estado;
+                    }
+                } catch(e) {}
+            }
+
+            let timelineHtml = '';
+            if (eventos.length > 0) {
+                eventos.forEach((ev, idx) => {
+                    const isLast = (idx === eventos.length - 1);
+                    const bulletColor = isLast ? (isCDS ? '#2563EB' : '#EA580C') : 'var(--color-brand)';
+                    timelineHtml += `
+                        <div class="timeline-step-row">
+                            <div class="timeline-step-bullet" style="background:${bulletColor}; box-shadow:0 0 0 2px ${bulletColor};"></div>
+                            <div style="flex:1;">
+                                <div style="display:flex; justify-content:space-between; align-items:center; gap:6px; flex-wrap:wrap;">
+                                    <strong style="font-size:0.86rem; color:var(--text-primary);">${ev.evento || 'Punto de Control'}</strong>
+                                    <span style="font-size:0.75rem; color:var(--text-secondary); font-family:'JetBrains Mono', monospace;">${ev.fecha_hora || ev.fecha || ''}</span>
+                                </div>
+                                ${ev.agencia || ev.localidad ? `<div style="font-size:0.78rem; color:var(--text-secondary); margin-top:2px;"><i class="ph ph-map-pin"></i> ${ev.agencia || ''} ${ev.localidad ? '— ' + ev.localidad : ''}</div>` : ''}
+                                ${ev.detalle ? `<div style="font-size:0.8rem; color:var(--text-primary); margin-top:4px; background:var(--bg-surface-hover); padding:5px 8px; border-radius:6px;">${ev.detalle}</div>` : ''}
+                            </div>
+                        </div>
+                    `;
+                });
+            } else {
+                timelineHtml = `
+                    <div style="text-align:center; padding:24px 10px; color:var(--text-secondary); font-size:0.85rem;">
+                        <i class="ph-bold ph-path" style="font-size:2rem; opacity:0.3; display:block; margin-bottom:6px;"></i>
+                        No hay puntos intermedios registrados aún o el transportista está procesando el manifiesto inicial.
+                    </div>
+                `;
+            }
+
+            contenido.innerHTML = `
+                <!-- Tarjeta Resumen de Ruta -->
+                <div style="background:var(--bg-surface-hover); border:1px solid var(--border-default); border-radius:12px; padding:14px; margin-bottom:18px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; font-size:0.82rem;">
+                        <span style="color:var(--text-secondary);">Ruta Oficial:</span>
+                        <strong style="color:var(--text-primary);">${origenTxt} → ${destinoTxt}</strong>
+                    </div>
+                    <div style="font-size:0.86rem; font-weight:700; color:var(--text-primary); margin-bottom:4px;">
+                        <i class="ph-bold ph-truck" style="color:var(--color-brand);"></i> ${estadoMsg}
+                    </div>
+                    <div style="font-size:0.76rem; color:var(--text-secondary);">
+                        Destinatario: <strong>${destinatarioTxt}</strong>
+                    </div>
+                </div>
+
+                <h4 style="margin:0 0 14px 0; font-size:0.9rem; font-weight:700; color:var(--text-primary); text-transform:uppercase; letter-spacing:0.5px;">
+                    <i class="ph-bold ph-list-numbers"></i> Hitos y Puntos de Control en Carretera:
+                </h4>
+
+                <div style="padding-left:4px;">
+                    ${timelineHtml}
+                </div>
+            `;
+
+            modal.style.display = 'flex';
+        }
+
+        async function refrescarTrackingDesdeModal() {
+            if (!gPedidoModalRutaActual) return;
+            const btn = document.getElementById('btn-ruta-refrescar');
+            const orig = btn.innerHTML;
+            btn.innerHTML = '<i class="ph-bold ph-spinner" style="animation: spin 1s linear infinite;"></i> Refrescando...';
+            btn.disabled = true;
+
+            try {
+                const res = await fetch(`${API_REPUESTOS}?action=actualizar_tracking_en_vivo&id=${gPedidoModalRutaActual.id}`).then(r => r.json());
+                if (res.ok && res.tracking) {
+                    gPedidoModalRutaActual.ultimo_estado_courier = res.tracking.mensaje_estado || res.tracking.estado_actual;
+                    gPedidoModalRutaActual.agencia_destino = res.tracking.agencia_destino || res.tracking.destino;
+                    gPedidoModalRutaActual.ultimo_rastreo_json = res.tracking;
+                    abrirModalRuta(gPedidoModalRutaActual);
+                    cargarTracking();
+                } else {
+                    alert('No se recibieron nuevos eventos del courier.');
+                }
+            } catch(e) {
+                alert('Error al refrescar.');
+            } finally {
+                btn.innerHTML = orig;
+                btn.disabled = false;
+            }
+        }
+
+        function cerrarModalRuta() {
+            document.getElementById('modal-ruta-courier').style.display = 'none';
+            gPedidoModalRutaActual = null;
         }
 
         window.onload = () => {
