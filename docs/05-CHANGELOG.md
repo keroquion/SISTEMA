@@ -28,6 +28,24 @@ Para garantizar trazabilidad absoluta, auditoría técnica rigurosa y claridad e
 - **`[Security]`**: Implementación de un pipeline de Integración y Despliegue Continuo (CI/CD) automatizado desde GitHub hacia el hosting de producción (cPanel/Apache) para reemplazar el traspaso manual por FTP y mitigar el riesgo de desincronización o error humano en despliegues.
 - **`[Changed]`**: Coordinación en el panel de control del servidor (cPanel) para renombrar la base de datos de `petumjvq_pruebas` a un identificador formal de producción (ej. `petumjvq_sistema`), actualizando la variable de entorno en el servidor de forma segura.
 
+## [1.6.3] — 2026-09-10
+
+### Added
+- `api/repuestos.php`: Esquema ampliado de persistencia auto-migrado con columnas `costo_envio`, `banco_proveedor`, `cuenta_proveedor`, `nro_operacion_pago`, `fecha_pago_proveedor`, `pago_proveedor_estado`, `comprobante_pago_url` y `ultima_alerta_sla`.
+- `api/repuestos.php`: Endpoint `registrar_pago_proveedor` para asentar transferencias bancarias de Gerencia a proveedores (BCP, Interbank, BBVA, Yape, etc.), número de operación y almacenamiento seguro de comprobante en `uploads/vouchers_proveedores/`.
+- `api/repuestos.php`: Endpoint `marcar_compra_local` para registrar en 1 clic compras locales en Arequipa (CompuPlaza/Centro) sin flete courier (`costo_envio = 0.00`).
+- `api/repuestos.php`: Endpoint `marcar_instalado` que avanza el pedido a `INSTALADO`, actualiza automáticamente el ticket en `soporte_tecnico` a `REPARADO` (Listo para entrega), notifica a recepción y registra auditoría en `historial_cambios`.
+- `api/repuestos.php`: Endpoint `finalizar_entrega` que liquida la orden, deduce el flete courier (`Margen = Cobro Cliente - Costo Pieza - Flete`), transiciona el ticket técnico a `ENTREGADO`, activa la garantía técnica y archiva el pedido.
+- `pedidos_repuestos.html`: Mini-stepper interactivo ampliado a 5 etapas ejecutivas (`1. Pedido`, `2. Courier`, `3. En Taller`, `4. Instalado`, `5. Entregado`).
+- `pedidos_repuestos.html`: Tarjeta de balance financiero con desglose cuádruple (`Costo Pieza`, `Flete Courier`, `Cobro Cliente`, `Margen Neto`), badge de estado de pago de gerencia y botones contextuales de avance rápido por etapa.
+- `pedidos_repuestos.html`: Modal de registro de pago de gerencia (`#modal-pago-proveedor`) y modal de entrega al cliente con balance de margen neto (`#modal-entrega-cliente`).
+
+### Changed
+- `api/repuestos.php`: Extracción y asignación automática del flete (`costo_envio`) al escanear guías de Cruz del Sur Cargo o Shalom Express con Gemini 2.5 Flash Vision.
+- `sw.js`: Incremento de versión de caché a `petulap-v34` para invalidación y recarga inmediata de los nuevos flujos en PWA móviles.
+
+> **El Por Qué:** El taller requería un flujo ágil, sin la sobrecarga ni fricción de un ERP complejo, que conectara fluidamente cada fase del repuesto: el pago de Gerencia al proveedor, la deducción automática del flete de la encomienda al capturar el ticket, la confirmación de llegada física al taller, la colocación por el técnico y la entrega final al cliente con balance neto transparente. Con esta arquitectura de 5 etapas, el equipo administrativo y técnico opera en 1 clic manteniendo sincronizados en tiempo real los pedidos, las órdenes de soporte técnico y el margen comercial de Petulap.
+
 ## [1.6.2] — 2026-09-10
 
 ### Fixed

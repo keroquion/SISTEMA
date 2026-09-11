@@ -152,10 +152,18 @@ $ensureTablePedidosRepuestos = function() use ($db) {
         $existingCols = [];
         while ($r = $colRes->fetch_assoc()) $existingCols[] = $r['Field'];
         if (!in_array('codigo_seguridad', $existingCols)) { @$db->query("ALTER TABLE pedidos_repuestos ADD COLUMN codigo_seguridad VARCHAR(20) NULL AFTER tracking_number"); }
+        if (!in_array('costo_envio', $existingCols)) { @$db->query("ALTER TABLE pedidos_repuestos ADD COLUMN costo_envio DECIMAL(10,2) DEFAULT 0.00 AFTER costo_compra"); }
+        if (!in_array('banco_proveedor', $existingCols)) { @$db->query("ALTER TABLE pedidos_repuestos ADD COLUMN banco_proveedor VARCHAR(50) NULL AFTER proveedor_nombre"); }
+        if (!in_array('cuenta_proveedor', $existingCols)) { @$db->query("ALTER TABLE pedidos_repuestos ADD COLUMN cuenta_proveedor VARCHAR(100) NULL AFTER banco_proveedor"); }
+        if (!in_array('nro_operacion_pago', $existingCols)) { @$db->query("ALTER TABLE pedidos_repuestos ADD COLUMN nro_operacion_pago VARCHAR(100) NULL AFTER cuenta_proveedor"); }
+        if (!in_array('fecha_pago_proveedor', $existingCols)) { @$db->query("ALTER TABLE pedidos_repuestos ADD COLUMN fecha_pago_proveedor DATETIME NULL AFTER nro_operacion_pago"); }
+        if (!in_array('pago_proveedor_estado', $existingCols)) { @$db->query("ALTER TABLE pedidos_repuestos ADD COLUMN pago_proveedor_estado ENUM('PENDIENTE', 'PAGADO') DEFAULT 'PENDIENTE' AFTER fecha_pago_proveedor"); }
+        if (!in_array('comprobante_pago_url', $existingCols)) { @$db->query("ALTER TABLE pedidos_repuestos ADD COLUMN comprobante_pago_url VARCHAR(255) NULL AFTER pago_proveedor_estado"); }
         if (!in_array('ultimo_estado_courier', $existingCols)) { @$db->query("ALTER TABLE pedidos_repuestos ADD COLUMN ultimo_estado_courier VARCHAR(150) NULL AFTER estado_envio"); }
         if (!in_array('agencia_destino', $existingCols)) { @$db->query("ALTER TABLE pedidos_repuestos ADD COLUMN agencia_destino VARCHAR(150) NULL AFTER ultimo_estado_courier"); }
         if (!in_array('voucher_foto_url', $existingCols)) { @$db->query("ALTER TABLE pedidos_repuestos ADD COLUMN voucher_foto_url VARCHAR(255) NULL AFTER agencia_destino"); }
         if (!in_array('ultimo_rastreo_json', $existingCols)) { @$db->query("ALTER TABLE pedidos_repuestos ADD COLUMN ultimo_rastreo_json MEDIUMTEXT NULL AFTER voucher_foto_url"); }
+        if (!in_array('ultima_alerta_sla', $existingCols)) { @$db->query("ALTER TABLE pedidos_repuestos ADD COLUMN ultima_alerta_sla DATETIME DEFAULT NULL"); }
     }
 };
 
@@ -274,6 +282,7 @@ switch ($action) {
         $fCompra = !empty($data["fecha_compra"]) ? $data["fecha_compra"] : null;
         $fLlegada = !empty($data["fecha_estimada_llegada"]) ? $data["fecha_estimada_llegada"] : null;
         $costo = (float)($data["costo_compra"] ?? 0);
+        $costoEnvio = isset($data["costo_envio"]) ? (float)$data["costo_envio"] : 0.00;
         $precio = (float)($data["precio_cliente"] ?? 0);
         $esGar = (!empty($data["es_garantia"])) ? 1 : 0;
         $estadoEnvio = trim($data["estado_envio"] ?? "SOLICITADO");
@@ -287,13 +296,14 @@ switch ($action) {
                 fecha_compra = ?,
                 fecha_estimada_llegada = ?,
                 costo_compra = ?,
+                costo_envio = ?,
                 precio_cliente = ?,
                 es_garantia = ?,
                 estado_envio = ?,
                 notas_envio = ?
             WHERE id = ?
         ");
-        $stmt->bind_param("sssssddissi", $prov, $courier, $tracking, $fCompra, $fLlegada, $costo, $precio, $esGar, $estadoEnvio, $notas, $id);
+        $stmt->bind_param("sssssdddissi", $prov, $courier, $tracking, $fCompra, $fLlegada, $costo, $costoEnvio, $precio, $esGar, $estadoEnvio, $notas, $id);
         
         if ($stmt->execute()) {
             // Sincronizar ticket de soporte si aplica
@@ -402,7 +412,9 @@ switch ($action) {
 
         $trackJson = json_encode($trackResult, JSON_UNESCAPED_UNICODE);
 
-        // 4. Actualizar registro en pedidos_repuestos
+        $fleteFila = floatval($trackResult['importe'] ?? $monto ?? 0);
+
+        // 4. Actualizar registro en pedidos_repuestos con flete courier descontable
         $stmtUpd = $db->prepare("
             UPDATE pedidos_repuestos SET
                 courier = ?,
@@ -410,13 +422,14 @@ switch ($action) {
                 codigo_seguridad = ?,
                 fecha_compra = COALESCE(fecha_compra, ?),
                 fecha_estimada_llegada = COALESCE(?, fecha_estimada_llegada),
+                costo_envio = CASE WHEN ? > 0 THEN ? ELSE costo_envio END,
                 estado_envio = 'EN_TRANSITO',
                 ultimo_estado_courier = ?,
                 agencia_destino = ?,
                 ultimo_rastreo_json = ?
             WHERE id = ?
         ");
-        $stmtUpd->bind_param("ssssssssi", $courier, $codigo, $claveSeg, $fCompra, $fLlegadaEst, $ultimoEstado, $agenciaDest, $trackJson, $id);
+        $stmtUpd->bind_param("sssssddsssi", $courier, $codigo, $claveSeg, $fCompra, $fLlegadaEst, $fleteFila, $fleteFila, $ultimoEstado, $agenciaDest, $trackJson, $id);
         $stmtUpd->execute();
         $stmtUpd->close();
 
@@ -572,6 +585,249 @@ switch ($action) {
             echo json_encode(["ok" => false, "msg" => "Error al marcar recepción: " . $db->error]);
         }
         $stmt->close();
+        break;
+
+    // -------------------------------------------------------------
+    // REGISTRAR PAGO A PROVEEDOR (GERENCIA / TESORERÍA - v1.6.3)
+    // -------------------------------------------------------------
+    case "registrar_pago_proveedor":
+        $ensureTablePedidosRepuestos();
+        $data = json_decode(file_get_contents("php://input"), true) ?? $_POST;
+        $id = (int)($data["id"] ?? 0);
+        if ($id <= 0) {
+            echo json_encode(["ok" => false, "msg" => "ID de pedido inválido"]);
+            break;
+        }
+
+        $prov = trim($data["proveedor_nombre"] ?? "");
+        $costo = floatval($data["costo_compra"] ?? 0);
+        $banco = trim($data["banco_proveedor"] ?? "");
+        $cuenta = trim($data["cuenta_proveedor"] ?? "");
+        $op = trim($data["nro_operacion_pago"] ?? "");
+        $voucherB64 = $data["comprobante_b64"] ?? "";
+
+        $comprobanteUrl = null;
+        if (!empty($voucherB64) && strpos($voucherB64, 'data:image') !== false) {
+            $dir = __DIR__ . "/../uploads/vouchers_proveedores/";
+            if (!is_dir($dir)) @mkdir($dir, 0755, true);
+            $imgParts = explode(";base64,", $voucherB64);
+            if (count($imgParts) === 2) {
+                $imgData = base64_decode($imgParts[1]);
+                $fileName = "pago_prov_{$id}_" . time() . ".jpg";
+                if (@file_put_contents($dir . $fileName, $imgData)) {
+                    $comprobanteUrl = "uploads/vouchers_proveedores/" . $fileName;
+                }
+            }
+        }
+
+        $stmt = $db->prepare("
+            UPDATE pedidos_repuestos SET
+                proveedor_nombre = CASE WHEN ? != '' THEN ? ELSE proveedor_nombre END,
+                costo_compra = CASE WHEN ? > 0 THEN ? ELSE costo_compra END,
+                banco_proveedor = ?,
+                cuenta_proveedor = ?,
+                nro_operacion_pago = ?,
+                fecha_pago_proveedor = NOW(),
+                pago_proveedor_estado = 'PAGADO',
+                comprobante_pago_url = COALESCE(?, comprobante_pago_url)
+            WHERE id = ?
+        ");
+        $stmt->bind_param("ssddsssssi", $prov, $prov, $costo, $costo, $banco, $cuenta, $op, $comprobanteUrl, $id);
+
+        if ($stmt->execute()) {
+            // Historial de auditoría
+            $stmtHist = $db->prepare("
+                INSERT INTO historial_cambios 
+                (tabla_origen, registro_id, numero_referencia, campo_cambiado, valor_anterior, valor_nuevo, usuario_nombre)
+                VALUES ('pedidos_repuestos', ?, (SELECT numero_referencia FROM pedidos_repuestos WHERE id = ?), 'pago_proveedor', 'PENDIENTE', 'PAGADO', ?)
+            ");
+            if ($stmtHist) {
+                $stmtHist->bind_param("iis", $id, $id, $userName);
+                $stmtHist->execute();
+                $stmtHist->close();
+            }
+
+            echo json_encode([
+                "ok" => true,
+                "msg" => "Pago a proveedor registrado exitosamente",
+                "comprobante_url" => $comprobanteUrl
+            ]);
+        } else {
+            echo json_encode(["ok" => false, "msg" => "Error al registrar pago: " . $db->error]);
+        }
+        $stmt->close();
+        break;
+
+    // -------------------------------------------------------------
+    // MARCAR COMPRA LOCAL EN AREQUIPA (v1.6.3)
+    // -------------------------------------------------------------
+    case "marcar_compra_local":
+        $ensureTablePedidosRepuestos();
+        $data = json_decode(file_get_contents("php://input"), true) ?? $_POST;
+        $id = (int)($data["id"] ?? 0);
+        if ($id <= 0) {
+            echo json_encode(["ok" => false, "msg" => "ID de pedido inválido"]);
+            break;
+        }
+
+        $prov = trim($data["proveedor_nombre"] ?? "Compuplaza Arequipa / Local");
+        $costo = isset($data["costo_compra"]) ? floatval($data["costo_compra"]) : 0;
+        $curDate = date('Y-m-d');
+        $msgEstado = "Compra local en Arequipa - Entrega estimada hoy";
+
+        $stmt = $db->prepare("
+            UPDATE pedidos_repuestos SET
+                proveedor_nombre = CASE WHEN ? != '' THEN ? ELSE proveedor_nombre END,
+                costo_compra = CASE WHEN ? > 0 THEN ? ELSE costo_compra END,
+                courier = 'COMPRA_LOCAL',
+                tracking_number = 'LOCAL-AQP',
+                costo_envio = 0.00,
+                fecha_compra = COALESCE(fecha_compra, ?),
+                fecha_estimada_llegada = ?,
+                estado_envio = 'EN_TRANSITO',
+                ultimo_estado_courier = ?
+            WHERE id = ?
+        ");
+        $stmt->bind_param("ssddsssi", $prov, $prov, $costo, $costo, $curDate, $curDate, $msgEstado, $id);
+
+        if ($stmt->execute()) {
+            echo json_encode(["ok" => true, "msg" => "Compra local en Arequipa registrada exitosamente"]);
+        } else {
+            echo json_encode(["ok" => false, "msg" => "Error: " . $db->error]);
+        }
+        $stmt->close();
+        break;
+
+    // -------------------------------------------------------------
+    // MARCAR INSTALADO Y PROBADO (TÉCNICO / 1-CLIC - v1.6.3)
+    // -------------------------------------------------------------
+    case "marcar_instalado":
+        $ensureTablePedidosRepuestos();
+        $data = json_decode(file_get_contents("php://input"), true) ?? $_POST;
+        $id = (int)($data["id"] ?? 0);
+        if ($id <= 0) {
+            echo json_encode(["ok" => false, "msg" => "ID de pedido inválido"]);
+            break;
+        }
+
+        $stmt = $db->prepare("UPDATE pedidos_repuestos SET estado_envio = 'INSTALADO' WHERE id = ?");
+        $stmt->bind_param("i", $id);
+
+        if ($stmt->execute()) {
+            // Sincronizar ticket de soporte técnico
+            $stmtInfo = $db->prepare("SELECT ticket_id, numero_referencia, repuesto_nombre FROM pedidos_repuestos WHERE id = ?");
+            $stmtInfo->bind_param("i", $id);
+            $stmtInfo->execute();
+            $info = $stmtInfo->get_result()->fetch_assoc();
+            $stmtInfo->close();
+
+            if (!empty($info['ticket_id'])) {
+                $tkId = (int)$info['ticket_id'];
+                $stmtUpdSt = $db->prepare("UPDATE soporte_tecnico SET estado = 'REPARADO', fecha_reparado = NOW() WHERE id = ?");
+                $stmtUpdSt->bind_param("i", $tkId);
+                $stmtUpdSt->execute();
+                $stmtUpdSt->close();
+
+                // Historial de cambios
+                $numRef = $info['numero_referencia'] ?? "Ticket #$tkId";
+                $stmtHist = $db->prepare("
+                    INSERT INTO historial_cambios 
+                    (tabla_origen, registro_id, numero_referencia, campo_cambiado, valor_anterior, valor_nuevo, usuario_nombre)
+                    VALUES ('soporte_tecnico', ?, ?, 'estado', 'EN_REPARACION', 'REPARADO', ?)
+                ");
+                if ($stmtHist) {
+                    $stmtHist->bind_param("iss", $tkId, $numRef, $userName);
+                    $stmtHist->execute();
+                    $stmtHist->close();
+                }
+
+                // Notificación a administradores y recepción para coordinar entrega
+                $stmtNotif = $db->prepare("
+                    INSERT INTO notificaciones (usuario_id, titulo, mensaje, link)
+                    SELECT id, ?, ?, 'soporte.html' FROM personas WHERE tipo IN ('admin', 'recepcion') AND estado = 'ACTIVO'
+                ");
+                if ($stmtNotif) {
+                    $titN = "Equipo Listo: " . $numRef;
+                    $msgN = "El repuesto {$info['repuesto_nombre']} fue instalado y probado. El equipo pasó a REPARADO y está listo para entrega.";
+                    $stmtNotif->bind_param("ss", $titN, $msgN);
+                    $stmtNotif->execute();
+                    $stmtNotif->close();
+                }
+            }
+
+            echo json_encode(["ok" => true, "msg" => "Repuesto instalado y probado. Laptop en estado REPARADO."]);
+        } else {
+            echo json_encode(["ok" => false, "msg" => "Error: " . $db->error]);
+        }
+        $stmt->close();
+        break;
+
+    // -------------------------------------------------------------
+    // FINALIZAR ENTREGA AL CLIENTE CON BALANCE NETO (v1.6.3)
+    // -------------------------------------------------------------
+    case "finalizar_entrega":
+        $ensureTablePedidosRepuestos();
+        $data = json_decode(file_get_contents("php://input"), true) ?? $_POST;
+        $id = (int)($data["id"] ?? 0);
+        if ($id <= 0) {
+            echo json_encode(["ok" => false, "msg" => "ID de pedido inválido"]);
+            break;
+        }
+
+        $stmtInfo = $db->prepare("SELECT * FROM pedidos_repuestos WHERE id = ?");
+        $stmtInfo->bind_param("i", $id);
+        $stmtInfo->execute();
+        $p = $stmtInfo->get_result()->fetch_assoc();
+        $stmtInfo->close();
+
+        if (!$p) {
+            echo json_encode(["ok" => false, "msg" => "Pedido no encontrado"]);
+            break;
+        }
+
+        $pCli = floatval($p['precio_cliente'] ?? 0);
+        $cCmp = floatval($p['costo_compra'] ?? 0);
+        $cEnv = floatval($p['costo_envio'] ?? 0);
+        $gananciaNeta = $pCli - $cCmp - $cEnv;
+        $tkId = (int)($p['ticket_id'] ?? 0);
+        $numRef = $p['numero_referencia'] ?? "Orden #$id";
+
+        // Marcar soporte técnico como ENTREGADO
+        if ($tkId > 0) {
+            $stmtSt = $db->prepare("UPDATE soporte_tecnico SET estado = 'ENTREGADO', fecha_entrega = NOW() WHERE id = ?");
+            $stmtSt->bind_param("i", $tkId);
+            $stmtSt->execute();
+            $stmtSt->close();
+
+            $stmtHist = $db->prepare("
+                INSERT INTO historial_cambios 
+                (tabla_origen, registro_id, numero_referencia, campo_cambiado, valor_anterior, valor_nuevo, usuario_nombre)
+                VALUES ('soporte_tecnico', ?, ?, 'estado', 'REPARADO', 'ENTREGADO', ?)
+            ");
+            if ($stmtHist) {
+                $stmtHist->bind_param("iss", $tkId, $numRef, $userName);
+                $stmtHist->execute();
+                $stmtHist->close();
+            }
+        }
+
+        // Anotar balance final en notas_envio de pedidos_repuestos y marcar estado ENTREGADO
+        $notaCierre = " [ENTREGADO - Margen Neto: S/ " . number_format($gananciaNeta, 2) . "]";
+        $stmtUpdPed = $db->prepare("UPDATE pedidos_repuestos SET estado_envio = 'ENTREGADO', notas_envio = CONCAT(COALESCE(notas_envio, ''), ?) WHERE id = ?");
+        $stmtUpdPed->bind_param("si", $notaCierre, $id);
+        $stmtUpdPed->execute();
+        $stmtUpdPed->close();
+
+        echo json_encode([
+            "ok" => true,
+            "msg" => "Equipo entregado al cliente exitosamente",
+            "balance" => [
+                "precio_cliente" => $pCli,
+                "costo_compra" => $cCmp,
+                "costo_envio" => $cEnv,
+                "ganancia_neta" => $gananciaNeta
+            ]
+        ]);
         break;
 
     // -------------------------------------------------------------

@@ -1,6 +1,6 @@
-// Service Worker - Petulap PWA v33 (Campanita unificada con Chrome Push y Motor SLA Repuestos v1.6.2)
+// Service Worker - Petulap PWA v34 (Flujo ágil de 5 etapas, pagos gerencia y balance neto v1.6.3)
  
-var CACHE_NAME = 'petulap-v33';
+var CACHE_NAME = 'petulap-v34';
 var ASSETS = [
     './',
     'index.html',

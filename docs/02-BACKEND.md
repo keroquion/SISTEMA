@@ -159,8 +159,12 @@ Controla el stock de piezas de recambio (pantallas, teclados, cargadores, bater�
 | `tracking_pedidos` | **GET** | Auto-sincroniza y lista las compras de repuestos en tránsito, couriers y fechas estimadas de llegada. |
 | `guardar_tracking` | **POST** | Actualiza proveedor, courier, número de tracking, costo y estado de envío de un pedido de repuesto. |
 | `marcar_recibido` | **POST** | Cambia el estado de la pieza a "RECIBIDO_EN_TALLER", actualiza el ticket de soporte a "EN_REPARACION" y notifica al técnico. |
-| `escanear_voucher_pedido` | **POST** | Procesa la fotografía de un voucher físico con IA Gemini 2.5 Flash, extrae datos de la encomienda, consulta el rastreo oficial en vivo y actualiza la orden y la fecha estimada de llegada en `soporte_tecnico`. |
+| `escanear_voucher_pedido` | **POST** | Procesa la fotografía de un voucher físico con IA Gemini 2.5 Flash, extrae datos de la encomienda y flete (`costo_envio`), consulta el rastreo oficial en vivo y actualiza la orden y la fecha estimada de llegada en `soporte_tecnico`. |
 | `actualizar_tracking_en_vivo` | **POST** | Reconsulta en vivo la API de Cruz del Sur Cargo o Shalom Express y refresca el estado en carretera, destino y eventos de transporte de una orden de repuesto. |
+| `registrar_pago_proveedor` | **POST** | Registra el pago por transferencia de Gerencia al proveedor (banco, CCI/cuenta, número de operación y voucher digital) y actualiza el balance financiero. |
+| `marcar_compra_local` | **POST** | Registra en 1 clic compras locales en Arequipa sin flete courier (`costo_envio = 0.00`), pasando la orden a tránsito inmediato. |
+| `marcar_instalado` | **POST** | Marca el repuesto como instalado y probado por el técnico, actualiza `soporte_tecnico` a `REPARADO` (Listo para entrega) y notifica a recepción. |
+| `finalizar_entrega` | **POST** | Registra la entrega final al cliente, calcula el balance neto de rentabilidad deduciendo el flete (`Cobro - Costo - Flete = Margen`), transiciona a `ENTREGADO` y activa la garantía técnica. |
 
 ---
 

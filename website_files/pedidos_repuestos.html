@@ -1182,16 +1182,22 @@
                 </div>
             </div>
 
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px; margin-bottom:14px;">
+            <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:12px; margin-bottom:14px;">
                 <div>
                     <label class="form-label" style="font-size:0.82rem; font-weight:600; color:var(--text-secondary); display:block; margin-bottom:5px;">
-                        Costo Compra (S/)
+                        Costo Pieza (S/)
                     </label>
                     <input type="number" step="0.01" id="m-costo" class="form-control" placeholder="0.00" style="width:100%; background:var(--bg-surface); color:var(--text-primary);">
                 </div>
                 <div>
                     <label class="form-label" style="font-size:0.82rem; font-weight:600; color:var(--text-secondary); display:block; margin-bottom:5px;">
-                        Precio Cobrado Cliente (S/)
+                        Flete Courier (S/)
+                    </label>
+                    <input type="number" step="0.01" id="m-flete" class="form-control" placeholder="0.00" style="width:100%; background:var(--bg-surface); color:var(--text-primary);">
+                </div>
+                <div>
+                    <label class="form-label" style="font-size:0.82rem; font-weight:600; color:var(--text-secondary); display:block; margin-bottom:5px;">
+                        Precio Cobrado (S/)
                     </label>
                     <input type="number" step="0.01" id="m-precio" class="form-control" placeholder="0.00" style="width:100%; background:var(--bg-surface); color:var(--text-primary);">
                 </div>
@@ -1290,6 +1296,150 @@
                 <button class="btn btn-secondary" onclick="cerrarModalRuta()">Cerrar</button>
                 <button class="btn btn-primary" id="btn-ruta-refrescar" onclick="refrescarTrackingDesdeModal()">
                     <i class="ph-bold ph-arrows-clockwise"></i> Actualizar en Vivo
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE PAGO BANCARIO A PROVEEDOR (GERENCIA) -->
+    <div id="modal-pago-proveedor" style="display:none; position:fixed; inset:0; background:rgba(15,23,42,0.65); backdrop-filter:blur(5px); z-index:9998; align-items:center; justify-content:center; padding:16px;">
+        <div style="background:var(--bg-surface); border:1px solid var(--border-default); border-radius:var(--radius-lg); max-width:500px; width:100%; box-shadow:0 20px 50px rgba(0,0,0,0.25); overflow:hidden;">
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:16px 20px; border-bottom:1px solid var(--border-default); background:var(--bg-surface-hover);">
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <div style="width:36px; height:36px; border-radius:10px; background:rgba(37,99,235,0.12); color:var(--color-brand); display:flex; align-items:center; justify-content:center; font-size:1.2rem;">
+                        <i class="ph-bold ph-credit-card"></i>
+                    </div>
+                    <div>
+                        <h3 style="margin:0; font-size:1.05rem; font-weight:800; color:var(--text-primary);">Pago a Proveedor (Gerencia)</h3>
+                        <div style="font-size:0.78rem; color:var(--text-secondary);" id="pago-lbl-sub">Registro de transferencia bancaria</div>
+                    </div>
+                </div>
+                <button onclick="cerrarModalPagoProveedor()" style="background:none; border:none; font-size:1.3rem; color:var(--text-secondary); cursor:pointer;">
+                    <i class="ph ph-x"></i>
+                </button>
+            </div>
+
+            <div style="padding:20px; display:flex; flex-direction:column; gap:14px;">
+                <input type="hidden" id="pago-pedido-id">
+                
+                <div style="background:var(--bg-surface-hover); padding:10px 14px; border-radius:8px; border:1px solid var(--border-default);">
+                    <div style="font-size:0.75rem; text-transform:uppercase; font-weight:700; color:var(--text-muted);">Orden / Repuesto</div>
+                    <div style="font-weight:700; color:var(--color-brand);" id="pago-lbl-ref">ST-XXXX</div>
+                    <div style="font-size:0.85rem; color:var(--text-primary);" id="pago-lbl-pieza">Pantalla 15.6 LED Slim</div>
+                </div>
+
+                <div class="form-row" style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+                    <div>
+                        <label style="font-size:0.8rem; font-weight:600; color:var(--text-secondary); display:block; margin-bottom:4px;">Proveedor / Tienda</label>
+                        <input type="text" id="pago-proveedor-nombre" class="form-control" placeholder="Ej. Mayorista Wilson / Lima" style="width:100%; background:var(--bg-surface); color:var(--text-primary);">
+                    </div>
+                    <div>
+                        <label style="font-size:0.8rem; font-weight:600; color:var(--text-secondary); display:block; margin-bottom:4px;">Monto Pagado (S/ Costo)</label>
+                        <input type="number" step="0.50" id="pago-costo-compra" class="form-control" placeholder="0.00" style="width:100%; background:var(--bg-surface); font-weight:700; color:var(--color-danger);">
+                    </div>
+                </div>
+
+                <div class="form-row" style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+                    <div>
+                        <label style="font-size:0.8rem; font-weight:600; color:var(--text-secondary); display:block; margin-bottom:4px;">Banco / Método</label>
+                        <select id="pago-banco" class="form-control" style="width:100%; background:var(--bg-surface); color:var(--text-primary);">
+                            <option value="BCP">BCP (Banco de Crédito)</option>
+                            <option value="Interbank">Interbank</option>
+                            <option value="BBVA">BBVA Continental</option>
+                            <option value="Scotiabank">Scotiabank</option>
+                            <option value="Banco de la Nación">Banco de la Nación</option>
+                            <option value="Yape">Yape</option>
+                            <option value="Plin">Plin</option>
+                            <option value="Efectivo / Caja">Efectivo / Caja Taller</option>
+                            <option value="Otro">Otro</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="font-size:0.8rem; font-weight:600; color:var(--text-secondary); display:block; margin-bottom:4px;">Cuenta / CCI Proveedor</label>
+                        <input type="text" id="pago-cuenta" class="form-control" placeholder="Nro de cta o celular Yape" style="width:100%; background:var(--bg-surface); color:var(--text-primary);">
+                    </div>
+                </div>
+
+                <div>
+                    <label style="font-size:0.8rem; font-weight:600; color:var(--text-secondary); display:block; margin-bottom:4px;">N° de Operación Bancaria</label>
+                    <input type="text" id="pago-operacion" class="form-control" placeholder="Ej. Op. 4918239 o ref. de transferencia" style="width:100%; background:var(--bg-surface); color:var(--text-primary);">
+                </div>
+
+                <div>
+                    <label style="font-size:0.8rem; font-weight:600; color:var(--text-secondary); display:block; margin-bottom:4px;">Voucher / Foto de Transferencia (Opcional)</label>
+                    <input type="file" id="pago-voucher-file" accept="image/*" class="form-control" style="width:100%; background:var(--bg-surface); color:var(--text-primary);" onchange="previewVoucherPago(this)">
+                    <div id="pago-voucher-preview" style="display:none; margin-top:8px; text-align:center;">
+                        <img id="pago-voucher-img" src="" style="max-height:120px; border-radius:6px; border:1px solid var(--border-default);">
+                    </div>
+                </div>
+            </div>
+
+            <div style="padding:14px 20px; border-top:1px solid var(--border-default); display:flex; justify-content:flex-end; gap:10px; background:var(--bg-surface-hover);">
+                <button class="btn btn-secondary" onclick="cerrarModalPagoProveedor()">Cancelar</button>
+                <button class="btn btn-primary" id="btn-guardar-pago-prov" onclick="guardarPagoProveedor()">
+                    <i class="ph-bold ph-check"></i> Confirmar Pago
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE ENTREGA AL CLIENTE Y CIERRE FINANCIERO -->
+    <div id="modal-entrega-cliente" style="display:none; position:fixed; inset:0; background:rgba(15,23,42,0.65); backdrop-filter:blur(5px); z-index:9998; align-items:center; justify-content:center; padding:16px;">
+        <div style="background:var(--bg-surface); border:1px solid var(--border-default); border-radius:var(--radius-lg); max-width:480px; width:100%; box-shadow:0 20px 50px rgba(0,0,0,0.25); overflow:hidden;">
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:16px 20px; border-bottom:1px solid var(--border-default); background:var(--bg-surface-hover);">
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <div style="width:36px; height:36px; border-radius:10px; background:rgba(16,185,129,0.12); color:#10b981; display:flex; align-items:center; justify-content:center; font-size:1.2rem;">
+                        <i class="ph-bold ph-handshake"></i>
+                    </div>
+                    <div>
+                        <h3 style="margin:0; font-size:1.05rem; font-weight:800; color:var(--text-primary);">Entrega Final del Equipo</h3>
+                        <div style="font-size:0.78rem; color:var(--text-secondary);">Cierre de orden técnica y balance neto</div>
+                    </div>
+                </div>
+                <button onclick="cerrarModalEntregaCliente()" style="background:none; border:none; font-size:1.3rem; color:var(--text-secondary); cursor:pointer;">
+                    <i class="ph ph-x"></i>
+                </button>
+            </div>
+
+            <div style="padding:20px; display:flex; flex-direction:column; gap:14px;">
+                <input type="hidden" id="entrega-pedido-id">
+                
+                <div style="background:var(--bg-surface-hover); padding:12px 14px; border-radius:8px; border:1px solid var(--border-default);">
+                    <div style="font-size:0.75rem; text-transform:uppercase; font-weight:700; color:var(--text-muted);">Equipo / Cliente</div>
+                    <div style="font-weight:700; font-size:1rem; color:var(--color-brand);" id="entrega-lbl-ref">ST-XXXX</div>
+                    <div style="font-size:0.85rem; color:var(--text-primary); margin-top:2px;" id="entrega-lbl-cliente">Cliente: Juan Pérez</div>
+                </div>
+
+                <div style="background:var(--bg-surface); padding:14px; border-radius:8px; border:1px solid var(--border-default);">
+                    <div style="font-size:0.78rem; font-weight:700; text-transform:uppercase; color:var(--text-muted); margin-bottom:8px;">Balance de Rentabilidad</div>
+                    
+                    <div style="display:flex; justify-content:space-between; font-size:0.88rem; margin-bottom:4px;">
+                        <span>Precio Cobrado al Cliente:</span>
+                        <strong style="color:var(--color-brand);" id="entrega-val-cliente">S/ 0.00</strong>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; font-size:0.88rem; margin-bottom:4px;">
+                        <span>(-) Costo Repuesto (Proveedor):</span>
+                        <strong style="color:var(--color-danger);" id="entrega-val-costo">- S/ 0.00</strong>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; font-size:0.88rem; margin-bottom:8px;">
+                        <span>(-) Flete Courier (Envío):</span>
+                        <strong style="color:#d97706;" id="entrega-val-flete">- S/ 0.00</strong>
+                    </div>
+                    <div style="border-top:1px dashed var(--border-default); padding-top:8px; display:flex; justify-content:space-between; font-size:1rem; align-items:center;">
+                        <span style="font-weight:700;">Ganancia Neta del Taller:</span>
+                        <strong style="color:#10b981; font-size:1.2rem;" id="entrega-val-ganancia">S/ 0.00</strong>
+                    </div>
+                </div>
+
+                <div style="font-size:0.8rem; color:var(--text-secondary); background:rgba(16,185,129,0.06); padding:10px 12px; border-radius:6px; border-left:3px solid #10b981;">
+                    <i class="ph ph-shield-check" style="color:#10b981;"></i> Al confirmar la entrega, la orden pasará a <strong>ENTREGADO</strong> y se activará la garantía técnica oficial en el sistema.
+                </div>
+            </div>
+
+            <div style="padding:14px 20px; border-top:1px solid var(--border-default); display:flex; justify-content:flex-end; gap:10px; background:var(--bg-surface-hover);">
+                <button class="btn btn-secondary" onclick="cerrarModalEntregaCliente()">Cancelar</button>
+                <button class="btn btn-primary" id="btn-confirmar-entrega" style="background:#10b981; border-color:#059669;" onclick="confirmarEntregaCliente()">
+                    <i class="ph-bold ph-check-circle"></i> Confirmar Entrega y Cobro
                 </button>
             </div>
         </div>
@@ -1434,19 +1584,21 @@
                 // Insignia de SLA
                 let slaBadge = `<span class="badge-sla sla-${p.sla_color || 'slate'}">${p.sla_label || 'Sin fecha'}</span>`;
 
-                // Cálculo de fase del Stepper (1: Solicitado, 2: En Tránsito, 3: Recibido en Taller, 4: Instalado)
+                // Cálculo de fase del Stepper de 5 Etapas (1: Pedido, 2: Courier, 3: En Taller, 4: Instalado, 5: Entregado)
                 let faseNum = 1;
                 const est = p.estado_envio || 'SOLICITADO';
                 if (est === 'EN_TRANSITO') faseNum = 2;
                 else if (est === 'RECIBIDO_EN_TALLER') faseNum = 3;
                 else if (est === 'INSTALADO') faseNum = 4;
+                else if (est === 'ENTREGADO') faseNum = 5;
 
-                const fillPercent = ((faseNum - 1) / 3) * 100;
+                const fillPercent = ((faseNum - 1) / 4) * 100;
 
                 const step1Class = (faseNum > 1) ? 'completed' : ((faseNum === 1) ? 'current' : '');
                 const step2Class = (faseNum > 2) ? 'completed' : ((faseNum === 2) ? 'current' : '');
                 const step3Class = (faseNum > 3) ? 'completed' : ((faseNum === 3) ? 'current' : '');
-                const step4Class = (faseNum === 4) ? 'completed current' : '';
+                const step4Class = (faseNum > 4) ? 'completed' : ((faseNum === 4) ? 'current' : '');
+                const step5Class = (faseNum === 5) ? 'completed current' : '';
 
                 // Courier y Tracking
                 let trackingHtml = '<span style="color:var(--text-muted);">Sin guía aún</span>';
@@ -1459,32 +1611,115 @@
                     `;
                 }
 
-                // Bloque Financiero
+                // Bloque Financiero y Estado de Pago de Gerencia al Proveedor
                 let finHtml = '';
+                const costoPieza = parseFloat(p.costo_compra || 0);
+                const costoFlete = parseFloat(p.costo_envio || 0);
+                const precioCli = parseFloat(p.precio_cliente || 0);
+                const gananciaNeta = (precioCli - costoPieza - costoFlete);
+
+                // Badge Pago Proveedor
+                let pagoProvBadge = '';
+                if (p.pago_proveedor_estado === 'PAGADO') {
+                    pagoProvBadge = `<span style="background:rgba(16,185,129,0.12); color:#059669; font-weight:700; padding:3px 8px; border-radius:12px; font-size:0.75rem; display:inline-flex; align-items:center; gap:4px;"><i class="ph-bold ph-check-circle"></i> Pagado: ${p.banco_proveedor || 'Banco'}</span>`;
+                } else {
+                    pagoProvBadge = `<span style="background:rgba(239,68,68,0.12); color:#dc2626; font-weight:700; padding:3px 8px; border-radius:12px; font-size:0.75rem; display:inline-flex; align-items:center; gap:4px;"><i class="ph-bold ph-clock"></i> Pago Pendiente Gerencia</span>`;
+                }
+
                 if (p.es_garantia == 1 || p.origen_tipo === 'GARANTIA') {
+                    const totalGarantia = costoPieza + costoFlete;
                     finHtml = `
-                        <div style="background:rgba(245,158,11,0.1); border:1px dashed rgba(245,158,11,0.4); border-radius:6px; padding:6px 10px; font-size:0.8rem; color:#d97706; display:flex; justify-content:space-between; align-items:center;">
-                            <span>Costo Taller: <strong>S/ ${parseFloat(p.costo_compra || 0).toFixed(2)}</strong></span>
-                            <span style="font-weight:700;">🛡️ Cubierto por Garantía</span>
+                        <div style="background:rgba(245,158,11,0.08); border:1px dashed rgba(245,158,11,0.4); border-radius:8px; padding:8px 12px; font-size:0.8rem;">
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                                <span style="color:#d97706; font-weight:700;">🛡️ Cubierto por Garantía Petulap</span>
+                                ${pagoProvBadge}
+                            </div>
+                            <div style="display:flex; justify-content:space-between; font-size:0.78rem; color:var(--text-secondary);">
+                                <span>Pieza: <strong>S/ ${costoPieza.toFixed(2)}</strong></span>
+                                <span>Flete: <strong>S/ ${costoFlete.toFixed(2)}</strong></span>
+                                <span>Costo Total: <strong style="color:var(--color-danger);">S/ ${totalGarantia.toFixed(2)}</strong></span>
+                            </div>
                         </div>
                     `;
                 } else {
-                    const ganancia = (parseFloat(p.precio_cliente || 0) - parseFloat(p.costo_compra || 0));
+                    const colorMargen = gananciaNeta >= 0 ? '#10b981' : '#ef4444';
                     finHtml = `
-                        <div style="display:flex; justify-content:space-between; font-size:0.82rem; background:var(--bg-surface-hover); padding:7px 10px; border-radius:6px; border:1px solid var(--border-default);">
-                            <div>Costo: <strong>S/ ${parseFloat(p.costo_compra || 0).toFixed(2)}</strong></div>
-                            <div>Precio Cliente: <strong style="color:var(--color-brand);">S/ ${parseFloat(p.precio_cliente || 0).toFixed(2)}</strong></div>
+                        <div style="background:var(--bg-surface-hover); border:1px solid var(--border-default); border-radius:8px; padding:8px 12px; font-size:0.8rem;">
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                                <span style="color:var(--text-secondary); font-size:0.75rem; font-weight:700; text-transform:uppercase;">Balance Financiero</span>
+                                ${pagoProvBadge}
+                            </div>
+                            <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:6px; font-size:0.78rem; text-align:center;">
+                                <div style="background:var(--bg-surface); padding:4px 6px; border-radius:4px; border:1px solid var(--border-default);">
+                                    <div style="color:var(--text-muted); font-size:0.7rem;">Costo Pieza</div>
+                                    <strong style="color:var(--text-primary);">S/ ${costoPieza.toFixed(2)}</strong>
+                                </div>
+                                <div style="background:var(--bg-surface); padding:4px 6px; border-radius:4px; border:1px solid var(--border-default);">
+                                    <div style="color:var(--text-muted); font-size:0.7rem;">Flete Courier</div>
+                                    <strong style="color:#d97706;">S/ ${costoFlete.toFixed(2)}</strong>
+                                </div>
+                                <div style="background:var(--bg-surface); padding:4px 6px; border-radius:4px; border:1px solid var(--border-default);">
+                                    <div style="color:var(--text-muted); font-size:0.7rem;">Cobro Cliente</div>
+                                    <strong style="color:var(--color-brand);">S/ ${precioCli.toFixed(2)}</strong>
+                                </div>
+                                <div style="background:var(--bg-surface); padding:4px 6px; border-radius:4px; border:1px solid var(--border-default);">
+                                    <div style="color:var(--text-muted); font-size:0.7rem;">Margen Neto</div>
+                                    <strong style="color:${colorMargen}; font-size:0.85rem;">S/ ${gananciaNeta.toFixed(2)}</strong>
+                                </div>
+                            </div>
                         </div>
                     `;
                 }
 
-                // Botón Marcar Recibido (visible si aún no está en taller)
-                let btnRecibirHtml = '';
-                if (faseNum < 3) {
-                    btnRecibirHtml = `
-                        <button class="btn btn-secondary" style="font-size:0.8rem; padding:6px 12px; background:rgba(16,185,129,0.12); color:#059669; border-color:rgba(16,185,129,0.3);" onclick="marcarRecibido(${p.id}, '${p.numero_referencia}')">
-                            <i class="ph-bold ph-check-circle"></i> Recibido
+                // Acciones Dinámicas de 5 Etapas
+                let btnPagoProv = '';
+                if (p.pago_proveedor_estado !== 'PAGADO') {
+                    btnPagoProv = `
+                        <button class="btn btn-secondary" style="font-size:0.8rem; padding:6px 11px; background:rgba(37,99,235,0.08); color:#2563eb; border-color:rgba(37,99,235,0.25);" onclick='abrirModalPagoProveedor(${JSON.stringify(p).replace(/'/g, "&apos;")})' title="Registrar transferencia a proveedor">
+                            <i class="ph-bold ph-credit-card"></i> Pagar Proveedor
                         </button>
+                    `;
+                } else {
+                    btnPagoProv = `
+                        <button class="btn btn-secondary" style="font-size:0.8rem; padding:6px 11px; color:#059669; border-color:rgba(16,185,129,0.25);" onclick='abrirModalPagoProveedor(${JSON.stringify(p).replace(/'/g, "&apos;")})' title="Ver comprobante de pago al proveedor">
+                            <i class="ph-bold ph-check"></i> Pagado (${p.banco_proveedor || 'Banco'})
+                        </button>
+                    `;
+                }
+
+                let btnCompraLocal = '';
+                if (!p.tracking_number && (p.estado_envio === 'SOLICITADO' || !p.estado_envio)) {
+                    btnCompraLocal = `
+                        <button class="btn btn-secondary" style="font-size:0.8rem; padding:6px 11px; background:rgba(245,158,11,0.08); color:#d97706; border-color:rgba(245,158,11,0.25);" onclick="marcarCompraLocal(${p.id}, '${p.numero_referencia}')" title="Comprado en CompuPlaza o tienda local Arequipa (Flete S/ 0)">
+                            <i class="ph-bold ph-lightning"></i> Compra Local
+                        </button>
+                    `;
+                }
+
+                let btnSiguienteEtapa = '';
+                if (faseNum < 3) {
+                    btnSiguienteEtapa = `
+                        <button class="btn btn-secondary" style="font-size:0.8rem; padding:6px 12px; background:rgba(16,185,129,0.12); color:#059669; border-color:rgba(16,185,129,0.3); font-weight:700;" onclick="marcarRecibido(${p.id}, '${p.numero_referencia}')" title="Marcar llegada física del repuesto al taller">
+                            <i class="ph-bold ph-package"></i> ¡Llegó al Taller!
+                        </button>
+                    `;
+                } else if (faseNum === 3) {
+                    btnSiguienteEtapa = `
+                        <button class="btn btn-secondary" style="font-size:0.8rem; padding:6px 12px; background:rgba(124,58,237,0.12); color:#7c3aed; border-color:rgba(124,58,237,0.3); font-weight:700;" onclick="marcarInstalado(${p.id}, '${p.numero_referencia}')" title="Marcar repuesto colocado y probado por el técnico">
+                            <i class="ph-bold ph-wrench"></i> Repuesto Instalado
+                        </button>
+                    `;
+                } else if (faseNum === 4) {
+                    btnSiguienteEtapa = `
+                        <button class="btn btn-primary" style="font-size:0.8rem; padding:6px 14px; background:#10b981; border-color:#059669; font-weight:700;" onclick='abrirModalEntregaCliente(${JSON.stringify(p).replace(/'/g, "&apos;")})' title="Entregar equipo, ver balance de margen y cerrar orden">
+                            <i class="ph-bold ph-handshake"></i> Entregar y Cobrar
+                        </button>
+                    `;
+                } else if (faseNum === 5) {
+                    btnSiguienteEtapa = `
+                        <span style="font-size:0.8rem; color:#10b981; font-weight:700; display:inline-flex; align-items:center; gap:4px; padding:5px 10px; background:rgba(16,185,129,0.1); border-radius:6px; border:1px solid rgba(16,185,129,0.25);">
+                            <i class="ph-bold ph-seal-check"></i> Entregado al Cliente
+                        </span>
                     `;
                 }
 
@@ -1607,18 +1842,18 @@
                             </div>
                         </div>
 
-                        <!-- Mini-Stepper de 4 Fases -->
+                        <!-- Mini-Stepper de 5 Fases -->
                         <div class="stepper-container">
                             <div class="stepper-progress-bar">
                                 <div class="stepper-progress-fill" style="width: ${fillPercent}%;"></div>
                             </div>
                             <div class="step-item ${step1Class}">
                                 <div class="step-node"><i class="ph-bold ph-receipt"></i></div>
-                                <span class="step-label">1. Solicitado</span>
+                                <span class="step-label">1. Pedido</span>
                             </div>
                             <div class="step-item ${step2Class}">
                                 <div class="step-node"><i class="ph-bold ph-truck"></i></div>
-                                <span class="step-label">2. Tránsito</span>
+                                <span class="step-label">2. Courier</span>
                             </div>
                             <div class="step-item ${step3Class}">
                                 <div class="step-node"><i class="ph-bold ph-package"></i></div>
@@ -1627,6 +1862,10 @@
                             <div class="step-item ${step4Class}">
                                 <div class="step-node"><i class="ph-bold ph-wrench"></i></div>
                                 <span class="step-label">4. Instalado</span>
+                            </div>
+                            <div class="step-item ${step5Class}">
+                                <div class="step-node"><i class="ph-bold ph-handshake"></i></div>
+                                <span class="step-label">5. Entregado</span>
                             </div>
                         </div>
 
@@ -1658,15 +1897,17 @@
 
                         ${p.notas_envio ? `<div style="font-size:0.78rem; color:var(--text-muted); font-style:italic;"><i class="ph ph-note"></i> ${p.notas_envio}</div>` : ''}
 
-                        <!-- Botones de Acción -->
+                        <!-- Botones de Acción de 5 Etapas -->
                         <div style="display:flex; justify-content:flex-end; gap:8px; border-top:1px solid var(--border-default); padding-top:10px; margin-top:4px; flex-wrap:wrap;">
-                            <button class="btn btn-secondary" style="font-size:0.8rem; padding:6px 12px; background:linear-gradient(135deg, rgba(37,99,235,0.08), rgba(124,58,237,0.08)); border-color:rgba(124,58,237,0.3); color:#6D28D9;" onclick="iniciarEscaneoTicket(${p.id})">
-                                <i class="ph-bold ph-camera"></i> ${p.tracking_number ? 'Re-escanear' : 'Escanear con IA'}
+                            ${btnPagoProv}
+                            ${btnCompraLocal}
+                            <button class="btn btn-secondary" style="font-size:0.8rem; padding:6px 11px; background:linear-gradient(135deg, rgba(37,99,235,0.08), rgba(124,58,237,0.08)); border-color:rgba(124,58,237,0.3); color:#6D28D9;" onclick="iniciarEscaneoTicket(${p.id})" title="Escanear ticket de encomienda">
+                                <i class="ph-bold ph-camera"></i> ${p.tracking_number ? 'Re-escanear' : 'Escanear Ticket'}
                             </button>
-                            <button class="btn btn-secondary" style="font-size:0.8rem; padding:6px 12px;" onclick='abrirModalTracking(${JSON.stringify(p).replace(/'/g, "&apos;")})'>
-                                <i class="ph-bold ph-pencil-simple"></i> Editar Tracking
+                            <button class="btn btn-secondary" style="font-size:0.8rem; padding:6px 11px;" onclick='abrirModalTracking(${JSON.stringify(p).replace(/'/g, "&apos;")})' title="Editar datos completos de tracking y flete">
+                                <i class="ph-bold ph-pencil-simple"></i> Editar
                             </button>
-                            ${btnRecibirHtml}
+                            ${btnSiguienteEtapa}
                         </div>
                     </div>
                 `;
@@ -1702,6 +1943,7 @@
             document.getElementById('m-fecha-compra').value = p.fecha_compra || '';
             document.getElementById('m-fecha-llegada').value = p.fecha_estimada_llegada || '';
             document.getElementById('m-costo').value = p.costo_compra ? parseFloat(p.costo_compra) : '';
+            document.getElementById('m-flete').value = p.costo_envio ? parseFloat(p.costo_envio) : '';
             document.getElementById('m-precio').value = p.precio_cliente ? parseFloat(p.precio_cliente) : '';
             
             const esGar = (p.es_garantia == 1 || p.origen_tipo === 'GARANTIA');
@@ -1749,6 +1991,7 @@
                 fecha_compra: document.getElementById('m-fecha-compra').value || null,
                 fecha_estimada_llegada: document.getElementById('m-fecha-llegada').value || null,
                 costo_compra: parseFloat(document.getElementById('m-costo').value) || 0.00,
+                costo_envio: parseFloat(document.getElementById('m-flete').value) || 0.00,
                 precio_cliente: parseFloat(document.getElementById('m-precio').value) || 0.00,
                 es_garantia: document.getElementById('m-garantia').checked ? 1 : 0,
                 estado_envio: document.getElementById('m-estado-envio').value,
@@ -1776,7 +2019,7 @@
             }
         }
 
-        // Marcar recibido directamente con un clic
+        // Marcar recibido en taller directamente con un clic (Etapa 3)
         async function marcarRecibido(id, ref) {
             if (!confirm(`¿Confirmas que el repuesto para la orden ${ref} ha llegado físicamente al taller?`)) {
                 return;
@@ -1796,6 +2039,205 @@
                 }
             } catch (e) {
                 alert('Error de conexión al marcar recepción.');
+            }
+        }
+
+        // Marcar compra local en Arequipa (sin flete courier)
+        async function marcarCompraLocal(id, ref) {
+            if (!confirm(`¿Confirmar que el repuesto para ${ref} se compró en tienda local en Arequipa (sin flete courier)?`)) {
+                return;
+            }
+
+            try {
+                const res = await fetch(`${API_REPUESTOS}?action=marcar_compra_local`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id: id })
+                }).then(r => r.json());
+
+                if (res.ok) {
+                    cargarTracking();
+                } else {
+                    alert('Error: ' + (res.msg || 'No se pudo registrar compra local'));
+                }
+            } catch (e) {
+                alert('Error de conexión con el servidor.');
+            }
+        }
+
+        // Marcar repuesto como Instalado y Probado por el técnico (Etapa 4)
+        async function marcarInstalado(id, ref) {
+            if (!confirm(`¿Confirmar que el repuesto para ${ref} ya fue INSTALADO y PROBADO? La orden pasará a REPARADO (Listo para entrega al cliente).`)) {
+                return;
+            }
+
+            try {
+                const res = await fetch(`${API_REPUESTOS}?action=marcar_instalado`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id: id })
+                }).then(r => r.json());
+
+                if (res.ok) {
+                    cargarTracking();
+                } else {
+                    alert('Error: ' + (res.msg || 'No se pudo marcar instalación'));
+                }
+            } catch (e) {
+                alert('Error de conexión con el servidor.');
+            }
+        }
+
+        // =========================================================
+        // CONTROL DE PAGO A PROVEEDOR (GERENCIA - ETAPA 1)
+        // =========================================================
+        let gPedidoPagoActual = null;
+        let gVoucherPagoB64 = '';
+
+        function abrirModalPagoProveedor(p) {
+            gPedidoPagoActual = p;
+            gVoucherPagoB64 = '';
+            document.getElementById('pago-pedido-id').value = p.id;
+            document.getElementById('pago-lbl-ref').textContent = p.numero_referencia;
+            document.getElementById('pago-lbl-pieza').textContent = `${p.repuesto_nombre} ${p.repuesto_pn ? '(PN: ' + p.repuesto_pn + ')' : ''}`;
+            document.getElementById('pago-proveedor-nombre').value = p.proveedor_nombre || '';
+            document.getElementById('pago-costo-compra').value = p.costo_compra ? parseFloat(p.costo_compra) : '';
+            document.getElementById('pago-banco').value = p.banco_proveedor || 'BCP';
+            document.getElementById('pago-cuenta').value = p.cuenta_proveedor || '';
+            document.getElementById('pago-operacion').value = p.nro_operacion_pago || '';
+
+            const fileInp = document.getElementById('pago-voucher-file');
+            if (fileInp) fileInp.value = '';
+            const previewWrap = document.getElementById('pago-voucher-preview');
+            const previewImg = document.getElementById('pago-voucher-img');
+            if (p.comprobante_pago_url) {
+                previewImg.src = p.comprobante_pago_url;
+                previewWrap.style.display = 'block';
+            } else {
+                previewImg.src = '';
+                previewWrap.style.display = 'none';
+            }
+
+            document.getElementById('modal-pago-proveedor').style.display = 'flex';
+        }
+
+        function cerrarModalPagoProveedor() {
+            document.getElementById('modal-pago-proveedor').style.display = 'none';
+            gPedidoPagoActual = null;
+            gVoucherPagoB64 = '';
+        }
+
+        function previewVoucherPago(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    gVoucherPagoB64 = e.target.result;
+                    document.getElementById('pago-voucher-img').src = gVoucherPagoB64;
+                    document.getElementById('pago-voucher-preview').style.display = 'block';
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        async function guardarPagoProveedor() {
+            const id = document.getElementById('pago-pedido-id').value;
+            if (!id) return;
+
+            const btn = document.getElementById('btn-guardar-pago-prov');
+            const orig = btn.innerHTML;
+            btn.innerHTML = '<i class="ph ph-spinner ph-spin"></i> Guardando...';
+            btn.disabled = true;
+
+            const payload = {
+                id: parseInt(id),
+                proveedor_nombre: document.getElementById('pago-proveedor-nombre').value.trim(),
+                costo_compra: parseFloat(document.getElementById('pago-costo-compra').value) || 0.00,
+                banco_proveedor: document.getElementById('pago-banco').value,
+                cuenta_proveedor: document.getElementById('pago-cuenta').value.trim(),
+                nro_operacion_pago: document.getElementById('pago-operacion').value.trim(),
+                comprobante_b64: gVoucherPagoB64 || null
+            };
+
+            try {
+                const res = await fetch(`${API_REPUESTOS}?action=registrar_pago_proveedor`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                }).then(r => r.json());
+
+                if (res.ok) {
+                    cerrarModalPagoProveedor();
+                    cargarTracking();
+                } else {
+                    alert('Error: ' + (res.msg || 'No se pudo guardar el pago'));
+                }
+            } catch (e) {
+                alert('Error de conexión al registrar pago de gerencia.');
+            } finally {
+                btn.innerHTML = orig;
+                btn.disabled = false;
+            }
+        }
+
+        // =========================================================
+        // ENTREGA FINAL AL CLIENTE Y BALANCE FINANCIERO (ETAPA 5)
+        // =========================================================
+        let gPedidoEntregaActual = null;
+
+        function abrirModalEntregaCliente(p) {
+            gPedidoEntregaActual = p;
+            document.getElementById('entrega-pedido-id').value = p.id;
+            document.getElementById('entrega-lbl-ref').textContent = `${p.numero_referencia} — ${p.repuesto_nombre}`;
+            document.getElementById('entrega-lbl-cliente').textContent = `Cliente: ${p.cliente_nombre || 'Cliente General'} ${p.cliente_telefono ? '(' + p.cliente_telefono + ')' : ''}`;
+
+            const costoPieza = parseFloat(p.costo_compra || 0);
+            const costoFlete = parseFloat(p.costo_envio || 0);
+            const precioCli = parseFloat(p.precio_cliente || 0);
+            const gananciaNeta = precioCli - costoPieza - costoFlete;
+
+            document.getElementById('entrega-val-cliente').textContent = `S/ ${precioCli.toFixed(2)}`;
+            document.getElementById('entrega-val-costo').textContent = `- S/ ${costoPieza.toFixed(2)}`;
+            document.getElementById('entrega-val-flete').textContent = `- S/ ${costoFlete.toFixed(2)}`;
+            
+            const elGanancia = document.getElementById('entrega-val-ganancia');
+            elGanancia.textContent = `S/ ${gananciaNeta.toFixed(2)}`;
+            elGanancia.style.color = (gananciaNeta >= 0) ? '#10b981' : '#ef4444';
+
+            document.getElementById('modal-entrega-cliente').style.display = 'flex';
+        }
+
+        function cerrarModalEntregaCliente() {
+            document.getElementById('modal-entrega-cliente').style.display = 'none';
+            gPedidoEntregaActual = null;
+        }
+
+        async function confirmarEntregaCliente() {
+            const id = document.getElementById('entrega-pedido-id').value;
+            if (!id) return;
+
+            const btn = document.getElementById('btn-confirmar-entrega');
+            const orig = btn.innerHTML;
+            btn.innerHTML = '<i class="ph ph-spinner ph-spin"></i> Finalizando...';
+            btn.disabled = true;
+
+            try {
+                const res = await fetch(`${API_REPUESTOS}?action=finalizar_entrega`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id: parseInt(id) })
+                }).then(r => r.json());
+
+                if (res.ok) {
+                    cerrarModalEntregaCliente();
+                    cargarTracking();
+                } else {
+                    alert('Error: ' + (res.msg || 'No se pudo finalizar la entrega'));
+                }
+            } catch (e) {
+                alert('Error de conexión al finalizar la entrega.');
+            } finally {
+                btn.innerHTML = orig;
+                btn.disabled = false;
             }
         }
 
