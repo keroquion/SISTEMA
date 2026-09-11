@@ -1,6 +1,6 @@
-// Service Worker - Petulap PWA v32 (Trazabilidad en vivo de repuestos con escaneo móvil IA v1.6.1)
+// Service Worker - Petulap PWA v33 (Campanita unificada con Chrome Push y Motor SLA Repuestos v1.6.2)
  
-var CACHE_NAME = 'petulap-v32';
+var CACHE_NAME = 'petulap-v33';
 var ASSETS = [
     './',
     'index.html',

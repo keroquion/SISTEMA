@@ -293,54 +293,89 @@ window.guardarTareaGlobal = function() {
 };
 
 
-// ====== NOTIFICATION BELL LOGIC ======
+// ====== NOTIFICATION BELL LOGIC (v1.6.2) ======
 document.addEventListener('DOMContentLoaded', function() {
-    const bellBtn = document.querySelector('.notification-btn');
-    if (!bellBtn) return;
+    const bellBtns = document.querySelectorAll('.notification-btn');
+    if (!bellBtns || bellBtns.length === 0) return;
     
-    // Inject dropdown container
-    const notifHtml = '<div id="notif-dropdown" class="card" style="display:none; position:absolute; right:20px; top:60px; width:320px; max-height:400px; overflow-y:auto; z-index:9999; padding:0; box-shadow:0 10px 25px rgba(0,0,0,0.2);">'
-      + '<div style="padding:15px; border-bottom:1px solid var(--border-default); display:flex; justify-content:space-between; align-items:center;">'
-      + '<h3 style="margin:0; font-size:16px;">Notificaciones</h3>'
-      + '<button onclick="marcarTodasLeidas()" style="background:none; border:none; color:var(--color-brand); cursor:pointer; font-size:12px; font-weight:bold;">Marcar leídas</button>'
-      + '</div>'
-      + '<div id="notif-list" style="padding:10px;">Cargando...</div>'
-      + '</div>';
-    document.body.insertAdjacentHTML('beforeend', notifHtml);
+    // Inject dropdown container if not present
+    if (!document.getElementById('notif-dropdown')) {
+        const notifHtml = `
+            <div id="notif-dropdown" class="card" style="display:none; position:fixed; right:16px; top:62px; width:360px; max-width:calc(100vw - 32px); max-height:480px; overflow-y:auto; z-index:10000; padding:0; box-shadow:0 14px 36px rgba(0,0,0,0.3); border:1px solid var(--border-default); border-radius:12px; background:var(--bg-surface);">
+                <div style="padding:12px 15px; border-bottom:1px solid var(--border-default); display:flex; justify-content:space-between; align-items:center; background:var(--bg-surface-hover);">
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <i class="ph-bold ph-bell" style="color:var(--color-brand); font-size:1.1rem;"></i>
+                        <h3 style="margin:0; font-size:15px; font-weight:700; color:var(--text-primary);">Notificaciones</h3>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <button onclick="marcarTodasLeidas()" style="background:none; border:none; color:var(--color-brand); cursor:pointer; font-size:12px; font-weight:600; padding:4px 8px; border-radius:4px;" title="Marcar todas como leídas">Marcar leídas</button>
+                        <button onclick="cerrarDropdownNotif()" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:16px; padding:2px 6px; line-height:1;" aria-label="Cerrar">&times;</button>
+                    </div>
+                </div>
+                <div id="notif-push-banner" style="display:none; padding:8px 14px; background:rgba(37,99,235,0.08); border-bottom:1px solid rgba(37,99,235,0.15); font-size:11.5px; color:var(--text-secondary); display:flex; justify-content:space-between; align-items:center;">
+                    <span style="display:flex; align-items:center; gap:6px;">
+                        <i class="ph ph-broadcast" style="color:var(--color-brand)"></i> Alertas nativas en Chrome
+                    </span>
+                    <button onclick="activarPushManual(event)" class="btn btn-primary" style="padding:2px 8px; font-size:11px; border-radius:4px; font-weight:600;">Activar</button>
+                </div>
+                <div id="notif-list" style="padding:8px; max-height:380px; overflow-y:auto;">
+                    <div style="padding:20px; text-align:center; color:var(--text-muted);">
+                        <i class="ph ph-spinner ph-spin" style="font-size:1.4rem;"></i>
+                        <p style="margin-top:6px; font-size:12px;">Cargando notificaciones...</p>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.insertAdjacentHTML('beforeend', notifHtml);
+    }
     
-    // Inject badge (hide by default)
-    const badgeHtml = '<span id="notif-badge" style="display:none; position:absolute; top:-2px; right:-2px; background:var(--color-danger); color:white; border-radius:50%; font-size:10px; width:16px; height:16px; align-items:center; justify-content:center; font-weight:bold;">0</span>';
-    bellBtn.style.position = 'relative';
-    bellBtn.insertAdjacentHTML('beforeend', badgeHtml);
-    
-    const dropdown = document.getElementById('notif-dropdown');
-    
-    bellBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        if(dropdown.style.display === 'none') {
-            dropdown.style.display = 'block';
-            cargarNotificaciones();
-        } else {
-            dropdown.style.display = 'none';
+    // Inject badges on all notification bell buttons (desktop + mobile)
+    bellBtns.forEach((btn, idx) => {
+        btn.style.position = 'relative';
+        if (!btn.querySelector('.notif-badge-item')) {
+            const badgeHtml = `<span class="notif-badge-item" ${idx === 0 ? 'id="notif-badge"' : ''} style="display:none; position:absolute; top:-3px; right:-3px; background:var(--color-danger); color:white; border-radius:50%; font-size:10px; min-width:16px; height:16px; padding:0 3px; align-items:center; justify-content:center; font-weight:bold; box-shadow:0 0 0 2px var(--bg-surface); pointer-events:none;">0</span>`;
+            btn.insertAdjacentHTML('beforeend', badgeHtml);
         }
+
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const dropdown = document.getElementById('notif-dropdown');
+            if (!dropdown) return;
+            
+            if (dropdown.style.display === 'none' || !dropdown.style.display) {
+                dropdown.style.display = 'block';
+                cargarNotificaciones();
+                verificarEstadoPushBanner();
+            } else {
+                dropdown.style.display = 'none';
+            }
+        });
     });
-    
+
     // Clic fuera del dropdown lo cierra
     document.addEventListener('click', (e) => {
-        if (dropdown.style.display === 'block' && !dropdown.contains(e.target) && !bellBtn.contains(e.target)) {
+        const dropdown = document.getElementById('notif-dropdown');
+        if (!dropdown || dropdown.style.display !== 'block') return;
+        
+        let clickedOnBell = false;
+        bellBtns.forEach(btn => {
+            if (btn.contains(e.target)) clickedOnBell = true;
+        });
+
+        if (!dropdown.contains(e.target) && !clickedOnBell) {
             dropdown.style.display = 'none';
         }
     });
-    
-    // Auto load on start
+
+    // Cargar notificaciones al inicio
     cargarNotificaciones();
 
-    // Smart Polling de Alta Escalabilidad (Page Visibility API + Jitter anti-estampida)
+    // Smart Polling de Alta Escalabilidad (Page Visibility API + Jitter)
     let lastNotifCheck = Date.now();
-    const BASE_POLL_INTERVAL = 5 * 60 * 1000; // 5 minutos
+    const BASE_POLL_INTERVAL = 4 * 60 * 1000; // 4 minutos
 
     function planificarSiguienteSondeo() {
-        const jitter = (Math.random() - 0.5) * 30 * 1000; // ±15 segundos de dispersión
+        const jitter = (Math.random() - 0.5) * 30 * 1000;
         const delay = Math.max(60000, BASE_POLL_INTERVAL + jitter);
         setTimeout(() => {
             if (document.visibilityState === 'visible') {
@@ -352,7 +387,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     planificarSiguienteSondeo();
 
-    // Actualizar inmediatamente al reactivar la pestaña si venció el intervalo
     document.addEventListener('visibilitychange', () => {
         if (document.visibilityState === 'visible' && (Date.now() - lastNotifCheck) >= BASE_POLL_INTERVAL) {
             cargarNotificaciones();
@@ -361,43 +395,138 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
+window.cerrarDropdownNotif = function() {
+    const dropdown = document.getElementById('notif-dropdown');
+    if (dropdown) dropdown.style.display = 'none';
+};
+
+window.verificarEstadoPushBanner = function() {
+    const banner = document.getElementById('notif-push-banner');
+    if (!banner) return;
+    if (typeof petulap_checkPushStatus === 'function') {
+        const st = petulap_checkPushStatus();
+        banner.style.display = (st === 'granted') ? 'none' : 'flex';
+    } else {
+        banner.style.display = 'none';
+    }
+};
+
+window.activarPushManual = async function(e) {
+    if (e) e.stopPropagation();
+    if (typeof petulap_subscribePush === 'function') {
+        const ok = await petulap_subscribePush();
+        if (ok) {
+            alert('¡Notificaciones de Chrome activadas con éxito!');
+            verificarEstadoPushBanner();
+        } else {
+            alert('No se pudo activar las notificaciones. Por favor revisa los permisos de tu navegador.');
+        }
+    }
+};
+
 window.cargarNotificaciones = async function() {
     try {
-        const res = await fetch('api/notificaciones.php?action=list').then(r=>r.json());
-        if(res.ok) {
+        const res = await fetch('api/notificaciones.php?action=list').then(r => r.json());
+        if (res.ok) {
             let unread = 0;
             let html = '';
-            res.data.forEach(n => {
-                if(n.leido == 0) unread++;
-                const bg = n.leido == 0 ? 'var(--bg-surface-hover)' : 'transparent';
-                const fw = n.leido == 0 ? 'bold' : 'normal';
-                html += `<div style="padding:12px; border-bottom:1px solid var(--border-default); background:${bg}; cursor:pointer; border-radius:8px; margin-bottom:5px; transition: background 0.2s;" onclick="clickNotif(${n.id}, '${n.link}')" onmouseover="this.style.background='var(--bg-surface-hover)'" onmouseout="this.style.background='${bg}'">
-                    <div style="font-weight:${fw}; font-size:14px; margin-bottom:5px; color:var(--text-primary);"><i class="ph ph-bell-ringing" style="margin-right:5px; color:var(--color-brand)"></i>${n.titulo}</div>
-                    <div style="font-size:13px; color:var(--text-secondary); line-height: 1.3;">${n.mensaje}</div>
-                    <div style="font-size:11px; color:var(--text-muted); margin-top:6px; text-align:right;">${n.fecha}</div>
-                </div>`;
-            });
-            if(res.data.length === 0) html = '<div style="padding:20px; text-align:center; color:var(--text-secondary);">No hay notificaciones nuevas</div>';
-            document.getElementById('notif-list').innerHTML = html;
-            
-            const badge = document.getElementById('notif-badge');
-            if(unread > 0) {
-                badge.style.display = 'flex';
-                badge.innerText = unread > 9 ? '9+' : unread;
+            const listContainer = document.getElementById('notif-list');
+            if (!listContainer) return;
+
+            if (!res.data || res.data.length === 0) {
+                html = `
+                    <div style="padding:30px 15px; text-align:center; color:var(--text-muted);">
+                        <i class="ph ph-bell-simple-slash" style="font-size:2rem; opacity:0.6;"></i>
+                        <p style="margin-top:8px; font-size:13px; font-weight:500;">No tienes notificaciones pendientes</p>
+                    </div>
+                `;
             } else {
-                badge.style.display = 'none';
+                res.data.forEach(n => {
+                    const isUnread = (parseInt(n.leido) === 0);
+                    if (isUnread) unread++;
+
+                    const bg = isUnread ? 'var(--bg-surface-hover)' : 'transparent';
+                    const fw = isUnread ? '700' : '500';
+                    const borderLeft = isUnread ? '3px solid var(--color-brand)' : '3px solid transparent';
+                    
+                    // Elegir ícono y color contextual según título / contenido
+                    let iconHtml = '<i class="ph ph-bell-ringing" style="color:var(--color-brand)"></i>';
+                    const tit = (n.titulo || '').toLowerCase();
+                    const msg = (n.mensaje || '').toLowerCase();
+                    
+                    if (tit.includes('repuesto') || msg.includes('repuesto') || tit.includes('compra')) {
+                        if (tit.includes('crítica') || tit.includes('urgente') || msg.includes('urgente')) {
+                            iconHtml = '<i class="ph-bold ph-warning-circle" style="color:var(--color-danger); font-size:1.1rem;"></i>';
+                        } else {
+                            iconHtml = '<i class="ph-bold ph-package" style="color:#f59e0b; font-size:1.1rem;"></i>';
+                        }
+                    } else if (tit.includes('courier') || tit.includes('envío') || tit.includes('tracking') || tit.includes('encomienda')) {
+                        iconHtml = '<i class="ph-bold ph-truck" style="color:#0284c7; font-size:1.1rem;"></i>';
+                    } else if (tit.includes('garantía')) {
+                        iconHtml = '<i class="ph-bold ph-shield-check" style="color:#8b5cf6; font-size:1.1rem;"></i>';
+                    } else if (tit.includes('ticket') || tit.includes('orden') || tit.includes('tarea')) {
+                        iconHtml = '<i class="ph-bold ph-wrench" style="color:#10b981; font-size:1.1rem;"></i>';
+                    }
+
+                    const safeLink = n.link ? n.link.replace(/"/g, '&quot;') : '';
+
+                    html += `
+                        <div style="padding:10px 12px; border-bottom:1px solid var(--border-default); background:${bg}; border-left:${borderLeft}; cursor:pointer; border-radius:8px; margin-bottom:5px; transition:all 0.15s ease;"
+                             onclick="clickNotif(${n.id}, '${safeLink}')"
+                             onmouseover="this.style.background='var(--bg-surface-hover)'"
+                             onmouseout="this.style.background='${bg}'">
+                            <div style="display:flex; align-items:center; gap:6px; font-weight:${fw}; font-size:13.5px; margin-bottom:4px; color:var(--text-primary);">
+                                ${iconHtml}
+                                <span>${n.titulo}</span>
+                            </div>
+                            <div style="font-size:12.5px; color:var(--text-secondary); line-height:1.35; padding-left:22px;">
+                                ${n.mensaje}
+                            </div>
+                            <div style="font-size:10.5px; color:var(--text-muted); margin-top:5px; text-align:right;">
+                                ${n.fecha || ''}
+                            </div>
+                        </div>
+                    `;
+                });
             }
+
+            listContainer.innerHTML = html;
+
+            // Actualizar todos los badges (.notif-badge-item)
+            const badges = document.querySelectorAll('.notif-badge-item');
+            badges.forEach(badge => {
+                if (unread > 0) {
+                    badge.style.display = 'flex';
+                    badge.textContent = unread > 9 ? '9+' : unread;
+                } else {
+                    badge.style.display = 'none';
+                }
+            });
         }
-    } catch(e) {}
+    } catch (e) {
+        console.warn('Error cargando notificaciones:', e);
+    }
 };
 
 window.clickNotif = async function(id, link) {
-    await fetch('api/notificaciones.php?action=marcar_leida', {method:'POST', body:JSON.stringify({id: id})});
-    if(link && link !== 'null') window.location.href = link;
-    else cargarNotificaciones();
+    try {
+        await fetch('api/notificaciones.php?action=marcar_leida', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({id: id})
+        });
+    } catch(e) {}
+
+    if (link && link !== 'null' && link !== '') {
+        window.location.href = link;
+    } else {
+        cargarNotificaciones();
+    }
 };
 
 window.marcarTodasLeidas = async function() {
-    await fetch('api/notificaciones.php?action=marcar_todas_leidas');
-    cargarNotificaciones();
+    try {
+        await fetch('api/notificaciones.php?action=marcar_todas_leidas');
+        cargarNotificaciones();
+    } catch(e) {}
 };

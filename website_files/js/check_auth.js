@@ -12,23 +12,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     const pushScript = document.createElement('script');
     pushScript.src = 'js/push.js';
     pushScript.onload = () => {
-        // Wire up notification bell if present
-        const bellBtns = document.querySelectorAll('.notification-btn');
-        bellBtns.forEach(bellBtn => {
-            bellBtn.onclick = async () => {
-                const status = petulap_checkPushStatus();
-                if (status === 'granted') {
-                    await petulap_testPush();
-                    alert('Notificaciones activas. Se envio un mensaje de prueba.');
-                } else {
-                    const ok = await petulap_subscribePush();
-                    if (ok) alert('Notificaciones activadas con exito.');
-                    else alert('No se pudo activar las notificaciones. Verifica los permisos de tu navegador.');
-                }
-            };
-        });
-        // Ensure re-subscription if token changed behind the scenes
-        if (petulap_checkPushStatus() === 'granted') {
+        // Suscripción silenciosa de Web Push en segundo plano si el permiso ya fue concedido
+        if (typeof petulap_checkPushStatus === 'function' && petulap_checkPushStatus() === 'granted') {
             petulap_subscribePush().catch(e => console.log('Silent push update failed', e));
         }
     };

@@ -223,14 +223,14 @@ Hace sonar y vibrar los teléfonos y computadoras del personal cuando entra una 
 
 ---
 
-### 1.16. Notificaciones Internas en Pantalla: `api/notificaciones.php`
-Controla la campanita de alertas visuales en la esquina superior de la pantalla.
+### 1.16. Notificaciones Internas y Motor de SLA: `api/notificaciones.php`
+Controla el centro de notificaciones de la campanita en pantalla, coordina alertas en tiempo real y ejecuta el motor de SLA para compras críticas de repuestos y vencimiento de garantías.
 
 | Acción (`action`) | Método | ¿Qué hace en una frase simple? |
 | :--- | :---: | :--- |
-| `list` | **GET** | Muestra las últimas 50 alertas dirigidas al usuario que tiene la sesión abierta. |
-| `marcar_leida` | **POST** | Apaga el punto rojo de una alerta individual cuando el usuario hace clic sobre ella. |
-| `marcar_todas_leidas`| **POST** | Marca como leídas todas las alertas acumuladas en la campanita. |
+| `list` | **GET** | Ejecuta en segundo plano la evaluación de SLA (24h preventivo / 48h recurrente horaria en repuestos sin comprar y garantías demoradas) y entrega las últimas 50 alertas dirigidas al usuario. |
+| `marcar_leida` | **POST** | Marca una notificación individual como leída (apagando su borde activo) al hacer clic sobre ella antes de redirigir al módulo destino. |
+| `marcar_todas_leidas`| **POST** | Marca como leídas todas las alertas acumuladas del usuario y resetea el contador del badge a cero. |
 
 ---
 

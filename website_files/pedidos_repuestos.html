@@ -602,6 +602,16 @@
             box-shadow: 0 0 0 2px var(--color-brand);
         }
 
+        @keyframes glowPulse {
+            0% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.7); }
+            70% { box-shadow: 0 0 0 14px rgba(37, 99, 235, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0); }
+        }
+        .card-highlight-glow {
+            border: 2px solid var(--color-brand) !important;
+            animation: glowPulse 1.4s ease-in-out infinite;
+        }
+
         @media (max-width: 600px) {
             .card-voucher-cta {
                 flex-direction: column;
@@ -1577,7 +1587,7 @@
                 }
 
                 html += `
-                    <div class="tracking-rep-card">
+                    <div class="tracking-rep-card" id="card-pedido-${p.id}">
                         <!-- Estado del Envío Arriba de la Tarjeta (Registrado o Pendiente) -->
                         ${courierLiveHeader}
 
@@ -1663,6 +1673,20 @@
             });
 
             container.innerHTML = html;
+
+            // Auto-enfocar y resaltar tarjeta si viene ?pedido_id= en la URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const targetId = urlParams.get('pedido_id');
+            if (targetId) {
+                setTimeout(() => {
+                    const cardEl = document.getElementById(`card-pedido-${targetId}`);
+                    if (cardEl) {
+                        cardEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        cardEl.classList.add('card-highlight-glow');
+                        setTimeout(() => { cardEl.classList.remove('card-highlight-glow'); }, 6000);
+                    }
+                }, 300);
+            }
         }
 
         // Abrir modal con datos cargados

@@ -28,6 +28,25 @@ Para garantizar trazabilidad absoluta, auditoría técnica rigurosa y claridad e
 - **`[Security]`**: Implementación de un pipeline de Integración y Despliegue Continuo (CI/CD) automatizado desde GitHub hacia el hosting de producción (cPanel/Apache) para reemplazar el traspaso manual por FTP y mitigar el riesgo de desincronización o error humano en despliegues.
 - **`[Changed]`**: Coordinación en el panel de control del servidor (cPanel) para renombrar la base de datos de `petumjvq_pruebas` a un identificador formal de producción (ej. `petumjvq_sistema`), actualizando la variable de entorno en el servidor de forma segura.
 
+## [1.6.2] — 2026-09-10
+
+### Fixed
+- `js/check_auth.js`: Eliminación de la sobreescritura destructiva de `bellBtn.onclick` que secuestraba el clic del botón de notificaciones lanzando diálogos de prueba `alert('Notificaciones activas...')` e impedía la apertura del panel desplegable.
+- `js/dashboard.js`: Refactorización de `.notification-btn` con `querySelectorAll()` para vincular simultáneamente la campana del encabezado de escritorio y de la barra superior móvil (`#mobile-topbar`), e inyección del badge `.notif-badge-item` con conteo reactivo en todas las vistas.
+
+### Added
+- `api/notificaciones.php`: Motor de SLA automatizado para compras de repuestos en taller:
+  - **Plazo > 24 horas:** Recordatorio preventivo diario para registrar precio, modelo y proveedor de la pieza.
+  - **Plazo >= 48 horas:** Alerta Crítica recurrente **cada 60 minutos** notificando al personal de compras y administración.
+  - Sincronización bidireccional inmediata con Chrome Web Push (`sendPushToAdmins()`) disparando la notificación nativa al escritorio y smartphone.
+- `js/dashboard.js`: Centro de notificaciones interactivo con clasificación visual por íconos semánticos (repuestos en rojo/ámbar, couriers en azul, tickets técnicos en verde, garantías en morado), banner no intrusivo para activar alertas de Chrome y cierre optimizado para pantallas táctiles.
+- `pedidos_repuestos.html`: Detección de parámetro de navegación profunda `?pedido_id=...` con auto-desplazamiento suave (`scrollIntoView`) y animación de pulso luminoso (`.card-highlight-glow`) sobre la tarjeta objetivo para gestión inmediata de compra y captura de ticket.
+
+### Changed
+- `sw.js`: Incremento de versión de caché a `petulap-v33` para refresco instantáneo de la lógica de notificaciones en clientes PWA.
+
+> **El Por Qué:** La campana de notificaciones presentaba un bloqueo técnico en el cliente que impedía a los usuarios consultar alertas internas, mientras que los pedidos de repuestos podían quedar desatendidos durante días sin un recordatorio activo. Con esta solución, la campanita unifica todas las alertas de Chrome y del sistema en un menú accesible en cualquier dispositivo, y el motor de SLA genera una cadencia horaria estricta cuando un repuesto supera las 48 horas sin gestión, garantizando que el taller mantenga sus compras al día y reduzca el tiempo de inactividad de los equipos de los clientes.
+
 ## [1.6.1] — 2026-09-10
 
 ### Added
