@@ -8,7 +8,12 @@ node_modules/
 # Credenciales y configuracion de base de datos sensible
 website_files/api/config.php
 api/config.php
+website_files/api/secrets.php
+api/secrets.php
+*secrets.php
+.env
 
 *.rar
 *.zip
 TAREAS/
+

@@ -28,6 +28,43 @@ Para garantizar trazabilidad absoluta, auditoría técnica rigurosa y claridad e
 - **`[Security]`**: Implementación de un pipeline de Integración y Despliegue Continuo (CI/CD) automatizado desde GitHub hacia el hosting de producción (cPanel/Apache) para reemplazar el traspaso manual por FTP y mitigar el riesgo de desincronización o error humano en despliegues.
 - **`[Changed]`**: Coordinación en el panel de control del servidor (cPanel) para renombrar la base de datos de `petumjvq_pruebas` a un identificador formal de producción (ej. `petumjvq_sistema`), actualizando la variable de entorno en el servidor de forma segura.
 
+## [1.6.0] — 2026-09-10
+
+### Added
+- `api/courier_tracking.php`: Endpoint integral de backend para la automatización de rastreo de encomiendas con los dos principales couriers interprovinciales de Perú:
+  - **Cruz del Sur Cargo:** Conexión REST v4 con autenticación Basic Auth nativa para consulta instantánea por código alfanumérico de 10 caracteres (ej. `7D2092CC54`).
+  - **Shalom Express:** Arquitectura de microservicios con generación dinámica de Bearer Tokens HMAC-SHA256 y descifrado criptográfico AES-256-CBC vía OpenSSL nativo, accediendo al flujo operativo de dos pasos (`/reclamo/orden/buscar` + `/rastrea/estados`) sin requerir Google reCAPTCHA.
+  - Soporte de acciones seguras: `asociar` (vinculación con validación en vivo contra la agencia), `consultar` (refresco en tiempo real y actualización en BD), `ver` (lectura con timeline cronológico) y `desvincular`.
+- `private_scripts/migracion_couriers_tracking.sql`: Script DDL para la creación de la tabla `guias_envio` con soporte para tickets de soporte técnico, códigos de seguridad, identificador interno OSE, montos, pesos y serialización de eventos en JSON.
+- `soporte.html`: Panel interactivo de gestión de encomiendas incorporado en el modal de detalle de orden (`abrirDetalle`). Permite a técnicos y recepcionistas vincular guías en tiempo real con validación inmediata, visualizar el badge de estado semántico, ruta interprovincial, timeline de transferencias y acciones 1-clic para forzar refresco o desvincular.
+- `consulta.html`: Tarjeta ejecutiva de seguimiento de transporte `#box-courier-tracking` en el portal público de clientes. Se despliega automáticamente si el equipo cuenta con una encomienda asociada, presentando el courier oficial (Cruz del Sur Cargo / Shalom Express), número de guía con botón interactivo de copiado, estado en camino o listo para recojo, agencia de destino y cronología de traslados.
+- `docs/02-BACKEND.md`: Documentación técnica del endpoint `api/courier_tracking.php`, matriz de control de acceso y esquema de la tabla `guias_envio` (tabla #18).
+
+### Changed
+- `api/consulta.php`: Incorporación de `LEFT JOIN guias_envio` con autocreación resiliente `CREATE TABLE IF NOT EXISTS` para exponer de forma segura y unificada los datos de encomienda al titular del ticket tras validar su DNI.
+- `sw.js`: Incremento de versión de caché a `petulap-v31` garantizando invalidación y refresco inmediato de los activos PWA en clientes y personal de taller.
+
+### Security
+- `api/courier_tracking.php`: Protección estricta con `check_api_access()` en todas las acciones de escritura y mutación (`asociar`, `desvincular`), sanitización de tipos de courier y sentencias preparadas nativas de MySQLi (`prepare()` + `bind_param()`) en todas las consultas y escrituras.
+
+> **El Por Qué:** Un porcentaje significativo de los clientes de Petulap en Arequipa y provincias del sur (Cusco, Puno, Moquegua, Tacna, Lima) envían y reciben laptops y repuestos a través de Cruz del Sur Cargo y Shalom Express. Anteriormente, la verificación del despacho dependía de consultas manuales en las páginas externas de cada transportista, perdiendo trazabilidad dentro del expediente técnico del ticket. Con este módulo automatizado, el sistema valida y monitorea la encomienda directamente desde el backend de Petulap, otorgando transparencia total al cliente en su portal de consulta y agilizando la gestión logística del taller.
+
+## [1.5.9] — 2026-09-10
+
+### Added
+- `consulta.html`: Tarjeta ejecutiva de repuestos con renderizado condicional de 3 escenarios inteligentes: Escenario A (Cotización en curso con importadores de EE.UU./Lima si no tiene precio asignado), Escenario B (Aprobación y pago de repuesto requerido con desglose en soles, pasarela informativa de cuentas oficiales Petulap S.A.C. en BCP, Interbank y Yape/Plin con botón interactivo "Copiar" y botón CTA de WhatsApp para envío de comprobante 1-clic) y Escenario C (Repuesto 100% cubierto por Garantía Oficial Petulap a costo S/ 0.00).
+
+### Changed
+- `consulta.html`: Priorización del Código Interno Petulap (`equipo_codigo`, ej. `P124314`) con badge visual destacado de código de barras por encima del número de serie en la tarjeta de EQUIPO, manteniendo fallback ordenado al S/N tradicional o descripción general.
+- `consulta.html`: Stepper de seguimiento técnico adaptativo — cuando el ticket se encuentra en estado `ESPERANDO_REPUESTO`, el paso 3 actualiza dinámicamente su rótulo a "3. Esperando Repuesto", su ícono a `ph-package` y activa la clase `.warning-step` con animación de pulso ámbar; en cualquier otro estado, se restaura a "3. Reparación" con `ph-wrench`.
+- `api/consulta.php`: Ampliación del SELECT para exponer `equipo_codigo`, `equipo_serie`, `repuesto_nombre`, `repuesto_precio` y `en_garantia` mediante un `LEFT JOIN` a la tabla `pedidos_repuestos` ordenado por el pedido más reciente.
+- `sw.js`: Incremento de la versión de caché del Service Worker a `petulap-v30` para forzar la invalidación inmediata de assets en clientes móviles y de escritorio.
+
+### Security
+- `api/consulta.php`: Mantenimiento estricto del aislamiento de datos cliente-ticket mediante sentencias preparadas nativas de MySQLi (`prepare()` + `bind_param("ss", $ticket, $dni)`), garantizando protección total contra inyección SQL y acceso no autorizado a información de terceros.
+
+> **El Por Qué:** Los clientes cuyos equipos ingresaban al estado `ESPERANDO_REPUESTO` carecían de visibilidad sobre la pieza solicitada, el estado de cotización con importadores y los canales formales para abonar el adelanto, lo que generaba saturación de consultas manuales al taller. Adicionalmente, la tarjeta de equipo priorizaba el S/N de fábrica que suele ser largo y poco reconocible para el cliente, en lugar del código de barras interno con prefijo 'P' asignado en el taller. Esta actualización resuelve la trazabilidad comercial y agiliza la aprobación y abono de repuestos.
+
 ## [1.5.8] — 2026-09-10
 
 ### Changed

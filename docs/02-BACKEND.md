@@ -244,6 +244,19 @@ Calcula métricas de productividad, estado en vivo y auditoría histórica de ti
 
 ---
 
+### 1.18. Rastreo de Couriers y Encomiendas: `api/courier_tracking.php`
+Permite conectar de forma automatizada e instantánea con las empresas de transporte interprovincial Cruz del Sur Cargo y Shalom Express.
+
+| Acción (`action`) | Método | ¿Qué hace en una frase simple? |
+| :--- | :---: | :--- |
+| `asociar` | **POST** | Valida una guía en vivo contra la API del courier y la vincula de forma segura a una orden de trabajo. |
+| `consultar` | **GET / POST** | Consulta el estado en tiempo real contra el servidor del courier y refresca la base de datos local. |
+| `ver` | **GET** | Devuelve los datos de la guía vinculada a un ticket, su estado actual y su línea de tiempo de eventos. |
+| `desvincular` | **POST** | Remueve la asociación de transporte de un ticket en caso de equivocación de número. |
+| `test_en_vivo` | **GET** | Ejecuta una verificación diagnóstica directa con Cruz del Sur o Shalom (solo administración). |
+
+---
+
 ## 2. Matriz de Seguridad y Control de Acceso
 
 No todas las ventanillas están abiertas para todo el mundo. El sistema aplica tres niveles de candado:
@@ -272,12 +285,14 @@ No todas las ventanillas están abiertas para todo el mundo. El sistema aplica t
 | `notificaciones.php` | ✅ Sí | Sesión activa en el sistema | Bloqueo HTTP `401 Unauthorized` si no inició sesión. |
 | `cleanup_dupes.php` | ✅ Sí | **Solo Administrador** (`admin_only`) | Bloqueo HTTP `403 Forbidden` (Acceso denegado). |
 | `manage_accounts.php` | ✅ Sí | **Solo Administrador** (`admin_only`) | Bloqueo HTTP `403 Forbidden` (Acceso denegado). |
+| `courier_tracking.php?action=asociar/desvincular` | ✅ Sí | Sesión de Técnico, Recepción o Admin | Bloqueo HTTP `401 Unauthorized` si no inició sesión. |
+| `courier_tracking.php?action=ver/consultar` | ⚠️ Opcional | Libre / Sesión activa | Consulta el estado del transporte y devuelve timeline. |
 
 ---
 
 ## 3. Esquema Completo de la Base de Datos
 
-La base de datos MySQL se llama `petumjvq_sst` y funciona como un archivero con **17 cajones principales (tablas)**.  
+La base de datos MySQL se llama `petumjvq_sst` y funciona como un archivero con **18 cajones principales (tablas)**.  
 Una **clave foránea** (o relación) es simplemente un número que apunta a otra tabla para evitar repetir información (por ejemplo, en vez de escribir todo el nombre del cliente en cada ticket, solo se anota su `cliente_id`).
 
 A continuación se lista cada cajón y su función:
@@ -354,6 +369,10 @@ A continuación se lista cada cajón y su función:
 - **Relaciones:**  
   - `sesion_id` apunta a `sesiones_inventario.id`.  
   - `equipo_id` apunta a `equipos.id`.
+
+### 18. `guias_envio` (Rastreo de Encomiendas de Couriers)
+- **Columnas clave:** `id`, `ticket_id` (orden de soporte asociada), `numero_referencia` (`ST-...`), `courier` (`CRUZ_DEL_SUR`, `SHALOM`), `numero_guia_orden`, `codigo_seguridad`, `ose_id`, `estado_courier` (`REGISTRADO`, `EN_TRANSITO`, `LISTO_PARA_RECOJO`, `ENTREGADO`), `ultimo_mensaje`, `origen`, `destino`, `agencia_destino`, `remitente`, `destinatario`, `fecha_emision`, `fecha_entrega_courier`, `importe`, `peso_kg`, `raw_data_json`.
+- **Relaciones:** `ticket_id` apunta a `soporte_tecnico.id`.
 
 ---
 

@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <title>Módulo de Rastreo con IA — Petulap SST</title>
+    
+    <!-- Favicon Oficial -->
+    <link rel="icon" type="image/png" href="img/favicon-petulap.png">
+    
+    <!-- Anti-flicker de tema -->
+    <script>
+      (function(){
+        if(localStorage.getItem('petulap-theme') === 'dark') {
+          document.documentElement.setAttribute('data-theme', 'dark');
+        }
+      })();
+    </script>
+    
+    <!-- Fuentes e Íconos -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <!-- Jerarquía Estricta de CSS -->
+    <link rel="stylesheet" href="css/tokens.css?v=1">
+    <link rel="stylesheet" href="css/styles.css?v=3">
+    <link rel="stylesheet" href="css/dashboard.css?v=3">
+    
+    <style>
+      body {
+        background-color: var(--bg-page, #F3F6F9);
+        color: var(--text-primary, #1E293B);
+        font-family: 'Inter', system-ui, sans-serif;
+        min-height: 100vh;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+      }
+      
+      .sandbox-header {
+        background: var(--bg-surface-glass, rgba(255, 255, 255, 0.95));
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid var(--border-default, rgba(15, 23, 42, 0.08));
+        padding: 16px 24px;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .sandbox-title-wrap {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .sandbox-logo {
+        height: 34px;
+      }
+
+      [data-theme="dark"] .sandbox-logo {
+        filter: brightness(0) invert(1);
+      }
+
+      .sandbox-badge {
+        background: linear-gradient(135deg, #2563EB, #7C3AED);
+        color: white;
+        font-size: 0.75rem;
+        font-weight: 700;
+        padding: 4px 10px;
+        border-radius: 9999px;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+      }
+
+      .sandbox-container {
+        max-width: 1080px;
+        margin: 28px auto;
+        padding: 0 20px;
+        width: 100%;
+        box-sizing: border-box;
+      }
+
+      .grid-layout {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 24px;
+      }
+
+      @media (max-width: 900px) {
+        .grid-layout { grid-template-columns: 1fr; }
+      }
+
+      .sandbox-card {
+        background: var(--bg-surface, #FFFFFF);
+        border: 1px solid var(--border-default, #E2E8F0);
+        border-radius: 16px;
+        padding: 24px;
+        box-shadow: var(--shadow-sm, 0 1px 3px rgba(0,0,0,0.05));
+      }
+
+      [data-theme="dark"] .sandbox-card {
+        background: var(--bg-surface, #1E293B);
+        border-color: rgba(255, 255, 255, 0.08);
+      }
+
+      .card-header-title {
+        font-size: 1.15rem;
+        font-weight: 800;
+        margin: 0 0 6px 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--text-primary, #1E293B);
+      }
+
+      .card-header-subtitle {
+        font-size: 0.85rem;
+        color: var(--text-secondary, #64748B);
+        margin: 0 0 18px 0;
+      }
+
+      /* Dropzone de Imagen */
+      .dropzone {
+        border: 2px dashed var(--color-brand, #3B82F6);
+        background: var(--bg-brand-subtle, #EFF6FF);
+        border-radius: 14px;
+        padding: 28px 20px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        position: relative;
+        overflow: hidden;
+      }
+
+      [data-theme="dark"] .dropzone {
+        background: rgba(37, 99, 235, 0.08);
+      }
+
+      .dropzone:hover, .dropzone.dragover {
+        background: rgba(37, 99, 235, 0.15);
+        border-color: #1D4ED8;
+      }
+
+      .dropzone-icon {
+        font-size: 2.5rem;
+        color: var(--color-brand, #2563EB);
+        margin-bottom: 8px;
+      }
+
+      .preview-box {
+        margin-top: 14px;
+        border-radius: 12px;
+        max-height: 220px;
+        overflow: hidden;
+        border: 1px solid var(--border-default, #E2E8F0);
+        position: relative;
+        display: none;
+      }
+
+      .preview-box img {
+        width: 100%;
+        height: auto;
+        display: block;
+        object-fit: contain;
+      }
+
+      /* Animación de Escaneo Láser */
+      .scanner-laser {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 3px;
+        background: linear-gradient(90deg, transparent, #3B82F6, #60A5FA, transparent);
+        box-shadow: 0 0 12px #3B82F6;
+        animation: scanAnim 1.8s infinite alternate ease-in-out;
+        display: none;
+      }
+
+      @keyframes scanAnim {
+        0% { top: 0%; }
+        100% { top: 98%; }
+      }
+
+      /* Config API Key */
+      .key-input-wrap {
+        background: var(--bg-page, #F8FAFC);
+        border: 1px solid var(--border-default, #E2E8F0);
+        border-radius: 10px;
+        padding: 12px 14px;
+        margin-bottom: 18px;
+      }
+
+      .key-label {
+        font-size: 0.78rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: var(--text-secondary, #64748B);
+        margin-bottom: 6px;
+        display: flex;
+        justify-content: space-between;
+      }
+
+      .key-input {
+        width: 100%;
+        box-sizing: border-box;
+        border: 1px solid var(--border-default, #CBD5E1);
+        border-radius: 8px;
+        padding: 8px 12px;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.85rem;
+        background: var(--bg-surface, #FFFFFF);
+        color: var(--text-primary, #1E293B);
+      }
+
+      /* Botones */
+      .btn-ia {
+        background: linear-gradient(135deg, #2563EB, #7C3AED);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        padding: 13px 20px;
+        font-weight: 700;
+        font-size: 0.95rem;
+        width: 100%;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
+        transition: all 0.2s ease;
+      }
+
+      .btn-ia:hover:not(:disabled) {
+        transform: translateY(-1px);
+        box-shadow: 0 6px 18px rgba(37, 99, 235, 0.4);
+      }
+
+      .btn-ia:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+
+      .preset-buttons {
+        display: flex;
+        gap: 8px;
+        margin-top: 14px;
+      }
+
+      .btn-preset {
+        flex: 1;
+        background: var(--bg-page, #F8FAFC);
+        border: 1px solid var(--border-default, #CBD5E1);
+        border-radius: 8px;
+        padding: 8px 10px;
+        font-size: 0.78rem;
+        font-weight: 600;
+        cursor: pointer;
+        color: var(--text-primary, #1E293B);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+      }
+
+      .btn-preset:hover {
+        background: var(--bg-surface-hover, #F1F5F9);
+        border-color: var(--color-brand, #2563EB);
+      }
+
+      /* Tarjeta de Resultados */
+      .result-banner {
+        border-radius: 12px;
+        padding: 16px;
+        margin-bottom: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .banner-cds {
+        background: linear-gradient(135deg, rgba(37, 99, 235, 0.12), rgba(29, 78, 216, 0.08));
+        border: 1.5px solid #2563EB;
+      }
+
+      .banner-shalom {
+        background: linear-gradient(135deg, rgba(234, 88, 12, 0.12), rgba(194, 65, 12, 0.08));
+        border: 1.5px solid #EA580C;
+      }
+
+      .timeline-step {
+        display: flex;
+        gap: 12px;
+        position: relative;
+        padding-bottom: 14px;
+      }
+
+      .timeline-step:last-child {
+        padding-bottom: 0;
+      }
+
+      .timeline-step::before {
+        content: '';
+        position: absolute;
+        left: 5px;
+        top: 18px;
+        bottom: 0;
+        width: 2px;
+        background: var(--border-default, #E2E8F0);
+      }
+
+      .timeline-step:last-child::before {
+        display: none;
+      }
+
+      .timeline-bullet {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: var(--color-brand, #2563EB);
+        margin-top: 4px;
+        flex-shrink: 0;
+      }
+
+      .raw-viewer {
+        background: #0F172A;
+        color: #38BDF8;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.78rem;
+        padding: 12px;
+        border-radius: 10px;
+        max-height: 200px;
+        overflow: auto;
+        white-space: pre-wrap;
+      }
+    </style>
+</head>
+<body>
+
+    <!-- Header Aislado -->
+    <header class="sandbox-header">
+        <div class="sandbox-title-wrap">
+            <img src="img/logo-petulap.png" alt="Petulap SST" class="sandbox-logo">
+            <span class="sandbox-badge">Módulo Aislado v1.6.0</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <a href="soporte.html" style="font-size: 0.85rem; text-decoration: none; color: var(--text-secondary); font-weight: 600;">
+                <i class="ph ph-arrow-left"></i> Volver a Soporte
+            </a>
+            <button class="portal-theme-btn" onclick="toggleTheme()" style="background:none; border:none; font-size:20px; cursor:pointer; color:var(--text-secondary);">
+                <i class="ph ph-moon"></i>
+            </button>
+        </div>
+    </header>
+
+    <div class="sandbox-container">
+        
+        <!-- Banner Explicativo -->
+        <div style="background: var(--bg-surface); border: 1px solid var(--border-default); border-radius: 12px; padding: 14px 18px; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <i class="ph-fill ph-sparkle" style="font-size: 1.8rem; color: #7C3AED;"></i>
+                <div>
+                    <strong style="font-size: 0.95rem;">Sandbox de Prueba de Rastreo Automatizado con IA</strong>
+                    <div style="font-size: 0.82rem; color: var(--text-secondary);">
+                        Este módulo funciona de manera 100% independiente. Sube una foto o prueba los vouchers preconfigurados sin alterar pantallas ni tablas de producción.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid-layout">
+            
+            <!-- COLUMNA 1: SUBIR Y ANALIZAR CON GEMINI -->
+            <div class="sandbox-card">
+                <h2 class="card-header-title">
+                    <i class="ph-bold ph-camera" style="color: #7C3AED;"></i> 1. Escanear Voucher con IA
+                </h2>
+                <p class="card-header-subtitle">
+                    Sube la fotografía de un voucher de Cruz del Sur Cargo o Shalom Express.
+                </p>
+
+                <!-- Configuración de API Key -->
+                <div class="key-input-wrap">
+                    <div class="key-label">
+                        <span>Google Gemini API Key</span>
+                        <span id="key-status-badge" style="color: #10B981; font-weight: 700; font-size: 0.75rem; display: none;">
+                            <i class="ph-bold ph-shield-check"></i> Configurada en Servidor
+                        </span>
+                        <a id="key-help-link" href="https://aistudio.google.com/app/apikey" target="_blank" style="color: var(--color-brand); text-decoration: none; font-size: 0.75rem;">Obtener Gratis ↗</a>
+                    </div>
+                    <input type="password" id="gemini-key" class="key-input" placeholder="Opcional: usar clave del servidor o ingresar personalizada..." onchange="guardarKey(this.value)">
+                    <div id="key-server-note" style="font-size: 0.75rem; color: #10B981; margin-top: 4px; display: none;">
+                        ✓ El servidor tiene configurada la clave en <code>secrets.php</code> con el modelo <b>Gemini 2.5 Flash</b>.
+                    </div>
+                </div>
+
+                <!-- Dropzone / Input de Archivo -->
+                <div class="dropzone" id="dropzone" onclick="document.getElementById('file-input').click()">
+                    <i class="ph-bold ph-cloud-arrow-up dropzone-icon"></i>
+                    <div style="font-weight: 700; font-size: 0.95rem; margin-bottom: 4px;">Toca para tomar foto o seleccionar voucher</div>
+                    <div style="font-size: 0.8rem; color: var(--text-secondary);">Soporta JPG, PNG o captura directa de cámara</div>
+                    <input type="file" id="file-input" accept="image/*" capture="environment" style="display: none;" onchange="manejarArchivo(this.files[0])">
+                </div>
+
+                <!-- Preview de Imagen con Escáner -->
+                <div class="preview-box" id="preview-box">
+                    <img id="preview-img" src="" alt="Voucher Preview">
+                    <div class="scanner-laser" id="scanner-laser"></div>
+                </div>
+
+                <!-- Botón de Análisis -->
+                <button type="button" class="btn-ia" id="btn-analizar" style="margin-top: 16px;" onclick="analizarConGemini()" disabled>
+                    <i class="ph-bold ph-sparkle"></i> Analizar Voucher con Gemini 2.5 Flash
+                </button>
+
+                <!-- Accesos Rápidos de Prueba -->
+                <div style="margin-top: 18px; border-top: 1px dashed var(--border-default); padding-top: 14px;">
+                    <div style="font-size: 0.78rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 8px;">
+                        O prueba directamente con datos reales validados:
+                    </div>
+                    <div class="preset-buttons">
+                        <button type="button" class="btn-preset" onclick="cargarPreset('CDS', '7D2092CC54')">
+                            <i class="ph-bold ph-bus" style="color: #2563EB;"></i> Cruz del Sur (7D2092CC54)
+                        </button>
+                        <button type="button" class="btn-preset" onclick="cargarPreset('SHALOM', '94833476')">
+                            <i class="ph-bold ph-package" style="color: #EA580C;"></i> Shalom (94833476)
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Resultado de Extracción IA -->
+                <div id="ia-output" style="margin-top: 16px; display: none;">
+                    <div style="font-size: 0.82rem; font-weight: 700; color: #7C3AED; margin-bottom: 6px; text-transform: uppercase;">
+                        ⚡ Datos Extraídos por Gemini:
+                    </div>
+                    <div id="ia-output-content" style="background: var(--bg-page); border: 1px solid var(--border-default); border-radius: 10px; padding: 12px; font-size: 0.85rem;"></div>
+                </div>
+
+            </div>
+
+
+            <!-- COLUMNA 2: RASTREO OFICIAL EN VIVO -->
+            <div class="sandbox-card">
+                <h2 class="card-header-title">
+                    <i class="ph-bold ph-truck" style="color: #2563EB;"></i> 2. Rastreo Oficial en Vivo
+                </h2>
+                <p class="card-header-subtitle">
+                    Consulta directa a los servidores oficiales sin CAPTCHA.
+                </p>
+
+                <!-- Formulario de Consulta Directa -->
+                <div style="display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap;">
+                    <select id="sel-courier" class="key-input" style="flex: 1; min-width: 140px;">
+                        <option value="CRUZ_DEL_SUR">Cruz del Sur Cargo</option>
+                        <option value="SHALOM">Shalom Express</option>
+                    </select>
+                    <input type="text" id="inp-codigo" class="key-input" style="flex: 2; min-width: 160px;" placeholder="Código de tracking / N° orden">
+                    <button type="button" class="btn-ia" style="width: auto; padding: 0 18px;" onclick="ejecutarRastreo()">
+                        <i class="ph-bold ph-magnifying-glass"></i> Rastrear
+                    </button>
+                </div>
+
+                <!-- Estado del Rastreo -->
+                <div id="tracking-result-box" style="display: none;">
+                    
+                    <div id="courier-banner" class="result-banner"></div>
+
+                    <!-- Datos Generales -->
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px;" id="info-grid"></div>
+
+                    <!-- Timeline Oficial -->
+                    <div style="background: var(--bg-page); border: 1px solid var(--border-default); border-radius: 12px; padding: 16px;">
+                        <div style="font-size: 0.82rem; font-weight: 700; color: var(--color-brand); text-transform: uppercase; margin-bottom: 12px; display: flex; align-items: center; gap: 6px;">
+                            <i class="ph-bold ph-clock-counter-clockwise"></i> Línea de Tiempo de Eventos Oficiales
+                        </div>
+                        <div id="timeline-list"></div>
+                    </div>
+
+                    <!-- Debug JSON -->
+                    <div style="margin-top: 16px;">
+                        <details>
+                            <summary style="font-size: 0.78rem; font-weight: 700; color: var(--text-secondary); cursor: pointer;">Inspeccionar Respuesta JSON Cruda (Desarrollador)</summary>
+                            <div class="raw-viewer" id="raw-json" style="margin-top: 8px;"></div>
+                        </details>
+                    </div>
+
+                </div>
+
+                <div id="tracking-empty" style="text-align: center; padding: 40px 20px; color: var(--text-secondary);">
+                    <i class="ph-bold ph-barcode" style="font-size: 3rem; opacity: 0.3; margin-bottom: 10px; display: block;"></i>
+                    Aquí aparecerá el resultado en vivo de la encomienda una vez analizada la foto o ingresado el código.
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <script>
+    let imagenBase64Actual = '';
+    let imagenMimeActual = 'image/jpeg';
+    let backendKeyConfigured = false;
+    let backendModel = 'Gemini 2.5 Flash';
+
+    // Cargar clave guardada y verificar estado del servidor
+    document.addEventListener('DOMContentLoaded', async () => {
+        const savedKey = localStorage.getItem('gemini_api_key') || '';
+        if (savedKey) {
+            document.getElementById('gemini-key').value = savedKey;
+        }
+
+        try {
+            const res = await fetch('api/courier_ia.php?action=status').then(r => r.json());
+            if (res.ok && res.configured) {
+                backendKeyConfigured = true;
+                backendModel = res.model || 'gemini-2.5-flash';
+                const badge = document.getElementById('key-status-badge');
+                const note = document.getElementById('key-server-note');
+                if (badge) badge.style.display = 'inline-flex';
+                if (note) {
+                    note.style.display = 'block';
+                    note.innerHTML = `✓ Clave protegida en servidor (<code>${res.masked_key}</code>) con modelo <b>${backendModel}</b>.`;
+                }
+                if (!savedKey) {
+                    document.getElementById('gemini-key').placeholder = `Protegida en servidor: ${backendModel} (${res.masked_key})`;
+                }
+            }
+        } catch (e) {
+            console.log('Aviso: modo offline o sin verificar status del backend');
+        }
+    });
+
+    function guardarKey(val) {
+        localStorage.setItem('gemini_api_key', val.trim());
+    }
+
+    function toggleTheme() {
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        if (isDark) {
+            document.documentElement.removeAttribute('data-theme');
+            localStorage.setItem('petulap-theme', 'light');
+        } else {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            localStorage.setItem('petulap-theme', 'dark');
+        }
+    }
+
+    // Manejo de Archivo y Previsualización
+    function manejarArchivo(file) {
+        if (!file) return;
+        imagenMimeActual = file.type || 'image/jpeg';
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const fullB64 = e.target.result;
+            imagenBase64Actual = fullB64.replace(/^data:image\/[a-zA-Z]+;base64,/, '');
+            
+            document.getElementById('preview-img').src = fullB64;
+            document.getElementById('preview-box').style.display = 'block';
+            document.getElementById('btn-analizar').disabled = false;
+        };
+        reader.readAsDataURL(file);
+    }
+
+    // Drag and Drop
+    const dropzone = document.getElementById('dropzone');
+    ['dragenter', 'dragover'].forEach(name => {
+        dropzone.addEventListener(name, (e) => { e.preventDefault(); dropzone.classList.add('dragover'); });
+    });
+    ['dragleave', 'drop'].forEach(name => {
+        dropzone.addEventListener(name, (e) => { e.preventDefault(); dropzone.classList.remove('dragover'); });
+    });
+    dropzone.addEventListener('drop', (e) => {
+        if (e.dataTransfer.files.length) manejarArchivo(e.dataTransfer.files[0]);
+    });
+
+    // 1. Análisis con Gemini
+    async function analizarConGemini() {
+        const apiKey = document.getElementById('gemini-key').value.trim();
+        if (!apiKey && !backendKeyConfigured) {
+            alert('Por favor ingresa tu API Key de Google Gemini en la casilla superior o configúrala en secrets.php.');
+            document.getElementById('gemini-key').focus();
+            return;
+        }
+
+        const btn = document.getElementById('btn-analizar');
+        const laser = document.getElementById('scanner-laser');
+        const iaOut = document.getElementById('ia-output');
+        const iaContent = document.getElementById('ia-output-content');
+
+        btn.disabled = true;
+        btn.innerHTML = `<i class="ph-bold ph-spinner" style="animation: spin 1s linear infinite;"></i> Analizando voucher con ${backendModel}...`;
+        laser.style.display = 'block';
+
+        try {
+            const headers = {
+                'Content-Type': 'application/json'
+            };
+            if (apiKey) {
+                headers['X-Gemini-Key'] = apiKey;
+            }
+
+            const res = await fetch('api/courier_ia.php?action=analizar_voucher', {
+                method: 'POST',
+                headers: headers,
+                body: JSON.stringify({
+                    imagen_base64: imagenBase64Actual
+                })
+            }).then(r => r.json());
+
+            btn.disabled = false;
+            btn.innerHTML = `<i class="ph-bold ph-sparkle"></i> Analizar Voucher con ${backendModel}`;
+            laser.style.display = 'none';
+
+            if (!res.ok) {
+                alert('Error al analizar: ' + (res.msg || 'Desconocido'));
+                return;
+            }
+
+            const d = res.data;
+            iaOut.style.display = 'block';
+            iaContent.innerHTML = `
+                <div><strong>Courier Detectado:</strong> <span style="color:${d.courier === 'CRUZ_DEL_SUR' ? '#2563EB' : '#EA580C'}; font-weight:800;">${d.courier}</span></div>
+                <div><strong>Código Extraído:</strong> <code style="font-size:1rem; font-weight:800;">${d.codigo_seguimiento || 'No detectado'}</code></div>
+                ${d.codigo_seguridad ? `<div><strong>Clave Seguridad:</strong> <code>${d.codigo_seguridad}</code></div>` : ''}
+                <div><strong>Ruta detectada:</strong> ${d.origen || '-'} → ${d.destino || '-'}</div>
+                <div><strong>Destinatario:</strong> ${d.destinatario || '-'}</div>
+                <div style="margin-top:6px; font-size:0.78rem; color:var(--text-secondary);">Confianza: <b>${d.confianza || 'ALTA'}</b> | ${d.notas || ''}</div>
+            `;
+
+            // Autocompletar formulario y ejecutar rastreo en vivo automáticamente
+            if (d.codigo_seguimiento) {
+                document.getElementById('sel-courier').value = d.courier;
+                document.getElementById('inp-codigo').value = d.codigo_seguimiento;
+                ejecutarRastreo();
+            }
+
+        } catch (e) {
+            btn.disabled = false;
+            btn.innerHTML = `<i class="ph-bold ph-sparkle"></i> Analizar Voucher con ${backendModel}`;
+            laser.style.display = 'none';
+            alert('Error de conexión al consultar el endpoint de IA');
+        }
+    }
+
+    // 2. Rastreo Oficial en Vivo
+    async function ejecutarRastreo() {
+        const courier = document.getElementById('sel-courier').value;
+        const codigo = document.getElementById('inp-codigo').value.trim();
+        if (!codigo) { alert('Ingresa el código'); return; }
+
+        const emptyBox = document.getElementById('tracking-empty');
+        const resBox = document.getElementById('tracking-result-box');
+        emptyBox.style.display = 'none';
+        resBox.style.display = 'block';
+
+        const banner = document.getElementById('courier-banner');
+        const grid = document.getElementById('info-grid');
+        const timelineList = document.getElementById('timeline-list');
+        const rawJson = document.getElementById('raw-json');
+
+        banner.className = 'result-banner ' + (courier === 'CRUZ_DEL_SUR' ? 'banner-cds' : 'banner-shalom');
+        banner.innerHTML = `<span style="font-weight:700;"><i class="ph ph-spinner ph-spin"></i> Consultando servidores de ${courier === 'CRUZ_DEL_SUR' ? 'Cruz del Sur Cargo' : 'Shalom Express'}...</span>`;
+
+        try {
+            const res = await fetch(`api/courier_ia.php?action=rastrear&courier=${courier}&codigo=${encodeURIComponent(codigo)}`).then(r => r.json());
+            
+            if (!res.ok || !res.data || !res.data.success) {
+                banner.innerHTML = `<span style="color:var(--text-danger);"><i class="ph-bold ph-x-circle"></i> ${res.msg || 'No se encontró la guía en la agencia.'}</span>`;
+                grid.innerHTML = '';
+                timelineList.innerHTML = '<div style="color:var(--text-secondary); font-size:0.85rem;">Sin eventos registrados.</div>';
+                rawJson.textContent = JSON.stringify(res, null, 2);
+                return;
+            }
+
+            const t = res.data;
+            const isCDS = t.courier === 'CRUZ_DEL_SUR';
+            const courierNombre = isCDS ? 'Cruz del Sur Cargo' : 'Shalom Express';
+            const icon = isCDS ? 'ph-bus' : 'ph-package';
+            const color = isCDS ? '#2563EB' : '#EA580C';
+
+            banner.innerHTML = `
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <i class="ph-fill ${icon}" style="font-size:1.8rem; color:${color};"></i>
+                    <div>
+                        <strong style="font-size:1.1rem; color:var(--text-primary);">${courierNombre}</strong>
+                        <div style="font-size:0.82rem; color:var(--text-secondary);">Guía / Orden: <b>${t.numero_guia || t.tracking_code}</b></div>
+                    </div>
+                </div>
+                <span class="status-pill pill-${t.estado_actual === 'ENTREGADO' ? 'green' : 'blue'}" style="margin:0;">
+                    <i class="ph-fill ph-check-circle"></i> ${t.estado_actual}
+                </span>
+            `;
+
+            grid.innerHTML = `
+                <div style="background:var(--bg-page); border:1px solid var(--border-default); border-radius:8px; padding:10px;">
+                    <div style="font-size:0.74rem; color:var(--text-secondary); text-transform:uppercase;">Ruta</div>
+                    <div style="font-weight:700; font-size:0.9rem;">${t.origen || '-'} → ${t.destino || '-'}</div>
+                </div>
+                <div style="background:var(--bg-page); border:1px solid var(--border-default); border-radius:8px; padding:10px;">
+                    <div style="font-size:0.74rem; color:var(--text-secondary); text-transform:uppercase;">Destinatario</div>
+                    <div style="font-weight:700; font-size:0.9rem;">${t.destinatario || '-'}</div>
+                </div>
+                <div style="background:var(--bg-page); border:1px solid var(--border-default); border-radius:8px; padding:10px; grid-column:span 2;">
+                    <div style="font-size:0.74rem; color:var(--text-secondary); text-transform:uppercase;">Último Mensaje de la Agencia</div>
+                    <div style="font-weight:700; color:var(--color-brand); font-size:0.9rem;">${t.mensaje_estado || t.ultimo_mensaje || '-'}</div>
+                </div>
+            `;
+
+            const evs = t.eventos_cronologicos || [];
+            if (evs.length > 0) {
+                timelineList.innerHTML = evs.map(ev => `
+                    <div class="timeline-step">
+                        <div class="timeline-bullet" style="background:${color};"></div>
+                        <div style="font-size:0.85rem;">
+                            <strong style="font-family:'JetBrains Mono', monospace;">${ev.fecha_hora || ''}</strong> — 
+                            <span>${ev.evento || ev.detalle || ''}</span>
+                            ${ev.agencia ? `<span style="color:var(--text-secondary);"> (${ev.agencia})</span>` : ''}
+                        </div>
+                    </div>
+                `).join('');
+            } else {
+                timelineList.innerHTML = '<div style="color:var(--text-secondary); font-size:0.85rem;">Sin eventos detallados.</div>';
+            }
+
+            rawJson.textContent = JSON.stringify(t, null, 2);
+
+        } catch (e) {
+            banner.innerHTML = `<span style="color:var(--text-danger);">Error de conexión al consultar courier.</span>`;
+        }
+    }
+
+    // Presets rápidos para probar
+    function cargarPreset(courier, codigo) {
+        document.getElementById('sel-courier').value = courier;
+        document.getElementById('inp-codigo').value = codigo;
+        ejecutarRastreo();
+    }
+    </script>
+</body>
+</html>
